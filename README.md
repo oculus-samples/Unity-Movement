@@ -19,7 +19,7 @@ Then, bring this package into the project.
 The sample scenes are located under the **Samples/../Scenes** folders.
 
 ## Samples
-The project contains several sample scenes. More information about the samples can be found [here](https://developer.oculus.com/documentation/unity/move-samples/).
+The project contains several sample scenes. For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-sample-aura/), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-sample-hip-pinning/), and [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-high-fidelity/).
 
 ## Documentation
 The documentation for this package can be found [here](https://developer.oculus.com/documentation/unity/move-overview/).
