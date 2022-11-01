@@ -1,0 +1,34 @@
+name: Build and deploy documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Editor/**
+      - Runtime/**
+      - Samples/**
+      - '*.md'
+      - 'package*'
+      - 'LICENSE*'
+  workflow_dispatch:
+
+jobs:
+  generate-docs:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install DocFX
+        run: choco install -y docfx
+      - name: Use README.md as index.md
+        run: cp README.md .Documentation/index.md
+      - name: Build
+        run: docfx .Documentation/docfx.json
+      - name: Publish
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_site
+          force_orphan: true

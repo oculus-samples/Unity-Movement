@@ -1,0 +1,25 @@
+name: Merge dev into main
+
+on:
+  workflow_dispatch:
+
+jobs:
+  merge-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: Set Git config
+        run: |
+            git config --local user.email "actions@github.com"
+            git config --local user.name "Github Actions"
+      - name: Merge dev to main
+        run: |
+          git pull
+          git merge --no-ff --allow-unrelated-histories -X theirs origin/dev -m "[Automated] Merged dev into main"
+      - name: Push
+        run: |
+          git push
