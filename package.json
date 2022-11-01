@@ -1,0 +1,14 @@
+{
+  "name": "com.meta.movement",
+  "displayName": "Meta Movement",
+  "version": "0.0.1",
+  "unity": "2020.3",
+  "keywords": [
+    "Meta",
+    "Movement"
+  ],
+  "description": "Meta Movement",
+  "dependencies": {
+    "com.unity.textmeshpro": "3.0.6"
+  }
+}

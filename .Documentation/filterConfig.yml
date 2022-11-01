@@ -1,0 +1,28 @@
+apiRules:
+- include:
+    uidRegex: ^Oculus.Movement$
+    type: Namespace
+- include:
+    uidRegex: ^Oculus.Movement.Attributes$
+    type: Namespace
+- include:
+    uidRegex: ^Oculus.Movement.Effects$
+    type: Namespace
+- include:
+    uidRegex: ^Oculus.Movement.Tracking$
+    type: Namespace
+- include:
+    uidRegex: ^Oculus.Movement.Validation$
+    type: Namespace
+- include:
+    uidRegex: ^Oculus.Movement.UI$
+    type: Namespace
+- include:
+    uidRegex: ^Oculus.Movement.Utils$
+    type: Namespace
+- exclude:
+    uidRegex: '^Oculus\.Movement\.[^.]+Tooltips$'
+    type: Class
+- exclude:
+    uidRegex: .*
+    type: Namespace
