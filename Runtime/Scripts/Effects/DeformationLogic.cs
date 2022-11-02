@@ -359,6 +359,11 @@ namespace Oculus.Movement.Effects
 
             if (_shouldUpdate)
             {
+                foreach (var bone in _bones)
+                {
+                    bone.UpdateDirection();
+                }
+
                 if (_spineTranslationCorrectionType != SpineTranslationCorrectionType.None &&
                     (!_correctSpineOnce || (_correctSpineOnce && !_hasRunSpineCorrection)))
                 {
@@ -381,10 +386,6 @@ namespace Oculus.Movement.Effects
         {
             _leftArmPositionInfo.UpperArmPos = _leftArmPositionInfo.UpperArm.position;
             _rightArmPositionInfo.UpperArmPos = _rightArmPositionInfo.UpperArm.position;
-            foreach (var bone in _bones)
-            {
-                bone.UpdateDirection();
-            }
             foreach (var bone in _bones)
             {
                 if (bone.EndBoneTransform == _leftArmPositionInfo.UpperArm)
