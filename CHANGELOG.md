@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v1.0.1...v1.1.0) (2022-11-02)
+
+
+### Features
+
+* **runtime:** Update deformation logic ([c375c4c](https://github.com/oculus-samples/Unity-Movement/commit/c375c4cc4df990df880786bee74ef22e651832d8))
+
 ## [1.0.1](https://github.com/oculus-samples/Unity-Movement/compare/v1.0.0...v1.0.1) (2022-11-01)
 
 
