@@ -98,6 +98,7 @@ Shader "Movement/PBR (Metallic)"
 
         Pass
         {
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
             Name "FORWARD"
             Tags { "LightMode" = "UniversalForward" }
             Stencil
@@ -113,29 +114,44 @@ Shader "Movement/PBR (Metallic)"
             #pragma exclude_renderers gles gles3 glcore
             #pragma target 4.5
 
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature _EMISSION
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
 
-            #pragma shader_feature _EMISSION
             #pragma shader_feature_local _METALLICGLOSSMAP
-            // used in UnityGI_IndirectSpecular
-            #pragma shader_feature_local _GLOSSYREFLECTIONS_OFF
+            #pragma shader_feature_local _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
+
             #pragma shader_feature_local _AREA_LIGHT_SPECULAR
             #pragma shader_feature_local _DIFFUSE_WRAP
             #pragma shader_feature_local _SPECULAR_AFFECT_BY_NDOTL
             #pragma shader_feature_local _RECALCULATE_NORMALS
 
-            #pragma multi_compile_fwdbase
+            // -------------------------------------
+            // Universal Pipeline keywords
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
+
+            // -------------------------------------
+            // Unity defined keywords
+            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
+            #pragma multi_compile _ LIGHTMAP_ON
+
             #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
 
             #pragma vertex VertexForwardBase
             #pragma fragment FragmentForwardBase
 
-#if IS_URP
             #include "MovementForwardBase.hlsl"
-#else
-            #include "MovementForwardBase.cginc"
-#endif
             ENDHLSL
         }
 
@@ -143,6 +159,7 @@ Shader "Movement/PBR (Metallic)"
         //  Shadow rendering pass
         Pass
         {
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
             Stencil
@@ -151,7 +168,9 @@ Shader "Movement/PBR (Metallic)"
                 Comp[_StencilComp]
             }
 
-            ZWrite On ZTest LEqual
+            ZWrite On
+            ZTest LEqual
+            ColorMask 0
 
             HLSLPROGRAM
             #pragma exclude_renderers gles gles3 glcore
@@ -160,22 +179,17 @@ Shader "Movement/PBR (Metallic)"
             #define UNITY_SETUP_BRDF_INPUT MetallicSetup
 
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _METALLICGLOSSMAP
 
-            #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
-#if IS_URP
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
-#else
-            #pragma vertex vertShadowCaster
-            #pragma fragment fragShadowCaster
-
-            #include "UnityStandardShadow.cginc"
-#endif
             ENDHLSL
         }
 
@@ -184,6 +198,7 @@ Shader "Movement/PBR (Metallic)"
         // This pass it not used during regular rendering.
         Pass
         {
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
             Name "META"
             Tags { "LightMode" = "Meta" }
 
@@ -202,19 +217,11 @@ Shader "Movement/PBR (Metallic)"
 
             #pragma shader_feature_local_fragment _SPECGLOSSMAP
 
-#if IS_URP
             #pragma vertex UniversalVertexMeta
             #pragma fragment UniversalFragmentMeta
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"
-#else
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
-
-            #include "UnityStandardMeta.cginc"
-#endif
-
             ENDHLSL
         }
 	}

@@ -30,23 +30,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "MovementCommon.hlsl"
 
-CBUFFER_START(UnityLighting)
-  #ifdef USING_DIRECTIONAL_LIGHT
-  half4 _WorldSpaceLightPos0;
-  #else
-  float4 _WorldSpaceLightPos0;
-  #endif
-CBUFFER_END
-
 struct VertexInputMovement
 {
   float4  vertex  : POSITION;
   half3   normal  : NORMAL;
+  half4   tangent : TANGENT;
   float2  uv0     : TEXCOORD0;
   float2  uv1     : TEXCOORD1;
-#ifdef _TANGENT_TO_WORLD
-  half4   tangent : TANGENT;
-#endif
+
+  // We always want to use tangent to world space.
+  //#ifdef _TANGENT_TO_WORLD
 #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
   float2  uv2     : TEXCOORD2;
 #endif
@@ -59,68 +52,13 @@ struct VertexOutputBaseMovement
   float2  tex                             : TEXCOORD0;
   half3   eyeVec                          : TEXCOORD1;
   float4  tangentToWorldAndPackedData[3]  : TEXCOORD2;
-  // spherical harmonics or lightmap UV
-  half4   ambientOrLightmapUV             : TEXCOORD5;
-  half4   fogFactorAndVertexLight         : TEXCOORD6; // x: fogFactor, yzw: vertex light
-  float4  shadowCoord                     : TEXCOORD7;
-
-  // a more "complete" shader would allow worldposition in fragment space
-  float3  posWorld                        : TEXCOORD8;
-  float3  posWorldShadow                  : TEXCOORD9;
-
+  // Spherical harmonics or lightmap UV.
+  DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 5);
+  half4   fogFactorAndVertexLight         : TEXCOORD6;
+  float3  posWorld                        : TEXCOORD7;
   UNITY_VERTEX_INPUT_INSTANCE_ID
   UNITY_VERTEX_OUTPUT_STEREO
 };
-
-UnityLight MainLight(VertexOutputBaseMovement i, half3 lightDir, half atten)
-{
-  Light light = GetMainLight();
-
-  UnityLight mainLight;
-  mainLight.color = light.color * atten;
-  mainLight.dir = light.direction + lightDir;
-  #ifndef USING_DIRECTIONAL_LIGHT
-    mainLight.dir = normalize((float3)mainLight.dir);
-  #endif
-  return mainLight;
-}
-
-inline UnityGI FragmentGI (FragmentCommonData s, half occlusion, VertexOutputBaseMovement i, half atten, UnityLight mainLight)
-{
-  UnityGI o_gi;
-  ResetUnityGI(o_gi);
-
-  o_gi.light = mainLight;
-  o_gi.light.color *= atten;
-
-  // use vertex light or lightmaps
-#if defined(LIGHTMAP_ON)
-  half4 bakedColorTex = SAMPLE_TEXTURE2D(unity_Lightmap, samplerunity_Lightmap, i.ambientOrLightmapUV.xy);
-  half4 decodeInstructions = half4(LIGHTMAP_HDR_MULTIPLIER, LIGHTMAP_HDR_EXPONENT, 0.0h, 0.0h);
-  half3 bakedColor = DecodeLightmap(bakedColorTex, decodeInstructions);
-  o_gi.indirect.diffuse = bakedColor;
-#else
-  o_gi.indirect.diffuse = i.ambientOrLightmapUV.rgb;
-#endif
-
-  // environment reflections
-#if defined(_REFLMODE_SCENECOLOR) //equivalent to Unity Standard _GLOSSYREFLECTIONS_OFF
-  o_gi.indirect.specular = unity_IndirectSpecColor.rgb;
-#elif defined(_REFLMODE_SCENECUBEMAP) //unity scene skybox or reflection probe
-  Unity_GlossyEnvironmentData envData = UnityGlossyEnvironmentSetup(
-      s.smoothness, s.eyeVec, s.normalWorld, float3(0, 0, 0)
-  );
-  o_gi.indirect.specular = Unity_GlossyEnvironment(
-      unity_SpecCube0, samplerunity_SpecCube0, unity_SpecCube0_HDR, envData
-  );
-  // o_gi.indirect.specular = GlossyEnvironmentReflection(envData.reflUVW, envData.perceptualRoughness, 1);
-  #endif
-  //o_gi.indirect.specular *= _SpecColor.rgb;
-  o_gi.indirect.specular *= occlusion;
-  o_gi.indirect.diffuse *= occlusion;
-
-  return o_gi;
-}
 
 float _VertexDisplShadows;
 
@@ -133,48 +71,41 @@ VertexOutputBaseMovement VertexForwardBase(VertexInputMovement v, uint vid : SV_
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
     VertexPositionInputs vertexInput = GetVertexPositionInputs(v.vertex.xyz);
-    float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
-    #if UNITY_PACK_WORLDPOS_WITH_TANGENT
-        output.tangentToWorldAndPackedData[0].w = posWorld.x;
-        output.tangentToWorldAndPackedData[1].w = posWorld.y;
-        output.tangentToWorldAndPackedData[2].w = posWorld.z;
-    #else
-        output.posWorld = posWorld.xyz;
-    #endif
+    float3 posWorld = mul(unity_ObjectToWorld, v.vertex).xyz;
+#if UNITY_PACK_WORLDPOS_WITH_TANGENT
+    output.tangentToWorldAndPackedData[0].w = posWorld.x;
+    output.tangentToWorldAndPackedData[1].w = posWorld.y;
+    output.tangentToWorldAndPackedData[2].w = posWorld.z;
+#else
+    output.posWorld = posWorld;
+#endif
     output.pos = vertexInput.positionCS;
 
     output.tex = TRANSFORM_TEX(v.uv0, _MainTex);
-    // this vector normalized in fragment shader.
-    output.eyeVec.xyz = posWorld.xyz - _WorldSpaceCameraPos;
+    // This vector is normalized in the fragment shader.
+    output.eyeVec.xyz = posWorld - _WorldSpaceCameraPos;
     float3 normalWorld = TransformObjectToWorldNormal(v.normal);
+
 #ifdef _RECALCULATE_NORMALS
     normalWorld = GetRecalculatedNormal(vid);
 #endif
 
-#ifdef _TANGENT_TO_WORLD
+    // We always want to use tangent to world space, as the shader is designed to be used with a normal map.
+    //#if _TANGENT_TO_WORLD
     float4 tangentWorldSpace = float4(TransformObjectToWorldDir(
         v.tangent.xyz),
         v.tangent.w);
-    float3x3 tangentMatrix = CreateTangentToWorldPerVertex(
+    const float3x3 tangentMatrix = CreateTangentToWorldPerVertex(
         normalWorld, tangentWorldSpace.xyz, tangentWorldSpace.w);
     output.tangentToWorldAndPackedData[0].xyz = tangentMatrix[0];
     output.tangentToWorldAndPackedData[1].xyz = tangentMatrix[1];
     output.tangentToWorldAndPackedData[2].xyz = tangentMatrix[2];
-#else
-    output.tangentToWorldAndPackedData[0].xyz = 0;
-    output.tangentToWorldAndPackedData[1].xyz = 0;
-    output.tangentToWorldAndPackedData[2].xyz = normalWorld;
-#endif
-    OUTPUT_LIGHTMAP_UV(v.uv1, unity_LightmapST, output.ambientOrLightmapUV);
-    OUTPUT_SH(normalWorld, output.ambientOrLightmapUV);
-    output.posWorldShadow = posWorld.xyz - normalWorld * _VertexDisplShadows;
-    output.shadowCoord = GetShadowCoord(vertexInput);
 
-    float3 lightDir = _WorldSpaceLightPos0.xyz -
-        posWorld.xyz * _WorldSpaceLightPos0.w;
-    output.tangentToWorldAndPackedData[0].w = lightDir.x;
-    output.tangentToWorldAndPackedData[1].w = lightDir.y;
-    output.tangentToWorldAndPackedData[2].w = lightDir.z;
+    OUTPUT_LIGHTMAP_UV(v.uv1, unity_LightmapST, output.lightmapUV);
+    OUTPUT_SH(normalWorld, output.vertexSH);
+    half3 vertexLight = VertexLighting(posWorld.xyz, normalWorld);
+    half fogFactor = ComputeFogFactor(vertexInput.positionCS.z);
+    output.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
 
     return output;
 }
@@ -185,9 +116,13 @@ half _EmissionStrength;
 half4 FragmentForwardBase(VertexOutputBaseMovement input) : SV_Target
 {
     float2 inputUV = input.tex;
+#if UNITY_PACK_WORLDPOS_WITH_TANGENT
     half3 inWorldPos = half3(input.tangentToWorldAndPackedData[0].w,
                              input.tangentToWorldAndPackedData[1].w,
                              input.tangentToWorldAndPackedData[2].w);
+#else
+    half3 inWorldPos = input.posWorld;
+#endif
     // fragment set up creates data for metallic or specular flow.
     FragmentCommonData fragData = RunFragmentSetup(
         inputUV,
@@ -198,31 +133,59 @@ half4 FragmentForwardBase(VertexOutputBaseMovement input) : SV_Target
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-    half atten = MainLightRealtimeShadow(input.shadowCoord);
-    UnityLight mainLight = MainLight(input,
-      half3(input.tangentToWorldAndPackedData[0].w,
-        input.tangentToWorldAndPackedData[1].w,
-        input.tangentToWorldAndPackedData[2].w), atten);
+    half3 bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, fragData.normalWorld);
+    const half4 shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
+    const half occlusion = GetAmbientOcclusion(inputUV);
+    const half perceptualRoughness = PerceptualSmoothnessToPerceptualRoughness(fragData.smoothness);
+    const half3 reflectVector = reflect(-fragData.eyeVec, fragData.normalWorld);
+    const half4 shadowCoord = TransformWorldToShadowCoord(inWorldPos) -
+      float4(fragData.normalWorld * _VertexDisplShadows, 1);
 
-    half occlusion = GetAmbientOcclusion(inputUV);
-    UnityGI gi = FragmentGI(fragData, occlusion, input, atten, mainLight);
+    Light mainLight = GetMainLight(shadowCoord, inWorldPos, shadowMask);
+    MixRealtimeAndBakedGI(mainLight, fragData.normalWorld, bakedGI);
+
+    UnityLight mainUnityLight;
+    mainUnityLight.color = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
+    mainUnityLight.dir = mainLight.direction;
+    UnityIndirect indirect;
+    indirect.diffuse = bakedGI * occlusion;
+    indirect.specular = GlossyEnvironmentReflection(reflectVector, perceptualRoughness, occlusion);
+
     half4 color = UnityBRDFModifiedGGX(
         fragData.diffColor, fragData.specColor,
         fragData.oneMinusReflectivity,
         fragData.smoothness, fragData.normalWorld,
-        -fragData.eyeVec, gi.light, gi.indirect);
+        -fragData.eyeVec, mainUnityLight, indirect);
 
-    #ifdef _EMISSION
-        color.rgb += _EmissionStrength *
-            SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, inputUV).rgb * _EmissionColor.rgb;
-    #endif
+    uint pixelLightCount = GetAdditionalLightsCount();
+    for (uint lightIndex = 0u; lightIndex < pixelLightCount; ++lightIndex)
+    {
+      Light light = GetAdditionalLight(lightIndex, inWorldPos, shadowMask);
 
-    #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
-      color.a = fragData.alpha;
-    #else
-      color.a = 1.0f;
-    #endif
+      UnityLight unityLight;
+      unityLight.color = light.color * (light.distanceAttenuation * light.shadowAttenuation);
+      unityLight.dir = light.direction;
+      UnityIndirect unityIndirect;
+      unityIndirect.diffuse = half3(0, 0, 0);
+      unityIndirect.specular = half3(0, 0, 0);
+
+      color += UnityBRDFModifiedGGX(
+        fragData.diffColor, fragData.specColor,
+        fragData.oneMinusReflectivity,
+        fragData.smoothness, fragData.normalWorld,
+        -fragData.eyeVec, unityLight, unityIndirect);
+    }
+
+#ifdef _EMISSION
+    color.rgb += _EmissionStrength *
+        SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, inputUV).rgb * _EmissionColor.rgb;
+#endif
+
+#if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
+    color.a = fragData.alpha;
+#else
+    color.a = 1.0f;
+#endif
     return color;
 }
-
 #endif

@@ -67,7 +67,7 @@ VertexOutputBaseMovement VertexForwardBase(VertexInputMovement v, uint vid : SV_
         output.posWorld = posWorld.xyz;
     #endif
     output.pos = UnityObjectToClipPos(v.vertex);
-    
+
     output.tex = TRANSFORM_TEX(v.uv0, _MainTex);
     // this vector normalized in fragment shader.
     output.eyeVec.xyz = posWorld.xyz - _WorldSpaceCameraPos;
@@ -122,7 +122,6 @@ half4 FragmentForwardBase(VertexOutputBaseMovement input) : SV_Target
     UNITY_LIGHT_ATTENUATION(atten, input, input.posWorldShadow);
 
     half occlusion = GetAmbientOcclusion(inputUV);
-    // TODO: re-write GI code, look at Workrooms FBForwardBase.cginc
     UnityGI gi = FragmentGI(fragData, occlusion, input.ambientOrLightmapUV,
         atten, mainLight);
 
