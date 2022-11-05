@@ -55,7 +55,8 @@ namespace Oculus.Movement
 
         public const string BodySectionsToPosition =
             "A list of body sections to fix the position of by matching against " +
-            "the body tracking rig. The other bones can be fixed via IK.";
+            "the body tracking rig. The other bones can be fixed via IK. Back bones " +
+            "differ among rigs, so be careful about aligning those.";
 
         public const string AnimatorTargetTPose =
             "Animator of target character in T-pose.";

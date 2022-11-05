@@ -24,17 +24,32 @@ namespace Oculus.Movement.Tracking
         /// Adjustments to apply per-joint.
         /// </summary>
         [System.Serializable]
-        public class JointAdjustment
+        public class JointAdjustment : ISerializationCallbackReceiver
         {
-            public JointAdjustment()
+            public void OnBeforeSerialize()
             {
-                Joint = HumanBodyBones.Hips;
-                RotationChange = Quaternion.identity;
-                JointDisplacement = 0.0f;
-                DisableRotationTransform = false;
-                DisablePositionTransform = false;
-                BoneIdOverrideValue = BodyTrackingBoneId.NoOverride;
+                // For some reason, Unity does not load the default values specified for each variable.
+                // So if this the first time that these variables are being serialized, set those
+                // values.
+                if (!_hasBeenSerialized)
+                {
+                    Joint = HumanBodyBones.Hips;
+                    RotationChange = Quaternion.identity;
+                    JointDisplacement = 0.0f;
+                    DisableRotationTransform = false;
+                    DisablePositionTransform = false;
+                    BoneIdOverrideValue = BodyTrackingBoneId.NoOverride;
+                }
+                _hasBeenSerialized = true;
             }
+
+            public void OnAfterDeserialize()
+            {
+                // Nothing to implement
+            }
+
+            [SerializeField, HideInInspector]
+            private bool _hasBeenSerialized = false;
 
             /// <summary>
             /// Joint to adjust.
@@ -59,13 +74,13 @@ namespace Oculus.Movement.Tracking
             /// Allows disable rotational transform on joint.
             /// </summary>
             [Tooltip(DriveThirdPartySkeletonTooltips.JointAdjustmentTooltips.DisableRotationTransform)]
-            public bool DisableRotationTransform;
+            public bool DisableRotationTransform = false;
 
             /// <summary>
             /// Allows disable position transform on joint.
             /// </summary>
             [Tooltip(DriveThirdPartySkeletonTooltips.JointAdjustmentTooltips.DisablePositionTransform)]
-            public bool DisablePositionTransform;
+            public bool DisablePositionTransform = false;
 
             /// <summary>
             /// Allows mapping this human body bone to OVRSkeleton bone different from the
@@ -93,21 +108,23 @@ namespace Oculus.Movement.Tracking
         {
             BodySection.LeftArm, BodySection.RightArm,
             BodySection.LeftHand, BodySection.RightHand,
-            BodySection.Back, BodySection.Neck,
-            BodySection.Hips
+            BodySection.Hips, BodySection.Back,
+            BodySection.Neck, BodySection.Head
         };
 
         /// <summary>
         /// A list of body sections to fix the position of by matching against
-        /// the body tracking rig. The other bones can be fixed via IK.
+        /// the body tracking rig. The other bones can be fixed via IK. Back bones
+        /// differ among rigs, so be careful about aligning those.
         /// </summary>
         [SerializeField]
         [Tooltip(DriveThirdPartySkeletonTooltips.BodySectionsToPosition)]
         protected BodySection[] _bodySectionToPosition =
         {
             BodySection.LeftArm, BodySection.RightArm,
-            BodySection.LeftHand, BodySection.RightArm,
-            BodySection.Hips, BodySection.Head
+            BodySection.LeftHand, BodySection.RightHand,
+            BodySection.Hips, BodySection.Neck,
+            BodySection.Head
         };
 
         /// <summary>
@@ -122,7 +139,7 @@ namespace Oculus.Movement.Tracking
         /// </summary>
         [SerializeField]
         [Tooltip(DriveThirdPartySkeletonTooltips.UpdatePositions)]
-        private bool _updatePositions;
+        private bool _updatePositions = true;
         protected bool UpdatePositions => _updatePositions;
 
         /// <summary>
@@ -210,18 +227,18 @@ namespace Oculus.Movement.Tracking
         protected GameObject _jointRendererTargetPrefab;
 
         /// <summary>
-        /// Axes debug prefab, target.
-        /// </summary>
-        [SerializeField]
-        [Tooltip(DriveThirdPartySkeletonTooltips.AxisRendererTargetPrefab)]
-        protected GameObject _axisRendererTargetPrefab;
-
-        /// <summary>
         /// Axes debug prefab, source.
         /// </summary>
         [SerializeField]
         [Tooltip(DriveThirdPartySkeletonTooltips.AxisRendererSourcePrefab)]
         protected GameObject _axisRendererSourcePrefab;
+
+        /// <summary>
+        /// Axes debug prefab, target.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(DriveThirdPartySkeletonTooltips.AxisRendererTargetPrefab)]
+        protected GameObject _axisRendererTargetPrefab;
 
         /// <summary>
         /// Show or hide debug axes.
@@ -235,7 +252,7 @@ namespace Oculus.Movement.Tracking
         /// </summary>
         [SerializeField]
         [Tooltip(DriveThirdPartySkeletonTooltips.DebugSkeletalViews)]
-        protected bool _showSkeletalDebugViews = true;
+        protected bool _showSkeletalDebugViews = false;
 
         /// <summary>
         /// Renderer of target character.
@@ -296,6 +313,8 @@ namespace Oculus.Movement.Tracking
 
         private Dictionary<HumanBodyBones, InGameDebugRenderObjects> _humanBoneToDebugRenderObjects
             = new Dictionary<HumanBodyBones, InGameDebugRenderObjects>();
+        private Dictionary<OVRSkeleton.BoneId, HumanBodyBones> _customBoneIdToHumanBodyBone =
+            new Dictionary<OVRSkeleton.BoneId, HumanBodyBones>();
 
         private void Awake()
         {
@@ -314,9 +333,37 @@ namespace Oculus.Movement.Tracking
 
         private void Start()
         {
+            CreateCustomBoneIdToHumanBodyBoneMapping();
+
+            _targetSkeletonData = new SkeletonMetadata(_animatorTargetSkeleton);
+            Debug.Log("Target party bones, based on Unity humanoid: ");
+            _targetSkeletonData.PrintJointPairs();
+
+            _targetSkeletonTPoseData = new SkeletonMetadata(_animatorTargetTPose);
+            _targetSkeletonTPoseData.BuildCoordinateAxesForAllBones();
+            _targetSkeletonData.BuildCoordinateAxesForAllBones(
+                _targetSkeletonTPoseData.BodyToBoneData);
+        }
+
+        private void CreateCustomBoneIdToHumanBodyBoneMapping()
+        {
+            CopyBoneIdToHumanBodyBoneMapping();
+            AdjustCustomBoneIdToHumanBodyBoneMapping();
+        }
+
+        private void CopyBoneIdToHumanBodyBoneMapping()
+        {
+            foreach(var keyValuePair in HumanBodyBonesMappings.BoneIdToHumanBodyBone)
+            {
+                _customBoneIdToHumanBodyBone.Add(keyValuePair.Key, keyValuePair.Value);
+            }
+        }
+
+        private void AdjustCustomBoneIdToHumanBodyBoneMapping()
+        {
             // if there is a mapping override that the user provided,
             // enforce it.
-            foreach(var adjustment in _adjustments)
+            foreach (var adjustment in _adjustments)
             {
                 if (adjustment.BoneIdOverrideValue == BodyTrackingBoneId.NoOverride)
                 {
@@ -329,28 +376,19 @@ namespace Oculus.Movement.Tracking
                 }
                 else
                 {
-                    HumanBodyBonesMappings.BoneIdToHumanBodyBone[(OVRSkeleton.BoneId)adjustment.BoneIdOverrideValue]
+                    _customBoneIdToHumanBodyBone[(OVRSkeleton.BoneId)adjustment.BoneIdOverrideValue]
                         = adjustment.Joint;
                 }
             }
-
-            _targetSkeletonData = new SkeletonMetadata(_animatorTargetSkeleton);
-            Debug.Log("Target party bones, based on Unity humanoid: ");
-            _targetSkeletonData.PrintJointPairs();
-
-            _targetSkeletonTPoseData = new SkeletonMetadata(_animatorTargetTPose);
-            _targetSkeletonTPoseData.BuildCoordinateAxesForAllBones();
-            _targetSkeletonData.BuildCoordinateAxesForAllBones(
-                _targetSkeletonTPoseData.BodyToBoneData);
         }
 
         private void RemoveMappingCorrespondingToHumanBodyBone(HumanBodyBones boneId)
         {
             OVRSkeleton.BoneId keyToRemove = OVRSkeleton.BoneId.Max;
 
-            foreach(var key in HumanBodyBonesMappings.BoneIdToHumanBodyBone.Keys)
+            foreach (var key in _customBoneIdToHumanBodyBone.Keys)
             {
-                var bone = HumanBodyBonesMappings.BoneIdToHumanBodyBone[key];
+                var bone = _customBoneIdToHumanBodyBone[key];
                 if (bone == boneId)
                 {
                     keyToRemove = key;
@@ -360,7 +398,7 @@ namespace Oculus.Movement.Tracking
 
             if (keyToRemove != OVRSkeleton.BoneId.Max)
             {
-                HumanBodyBonesMappings.BoneIdToHumanBodyBone.Remove(keyToRemove);
+                _customBoneIdToHumanBodyBone.Remove(keyToRemove);
             }
         }
 
@@ -398,21 +436,21 @@ namespace Oculus.Movement.Tracking
 
             if (_sourceSkeletonData == null)
             {
-                _sourceSkeletonData = new SkeletonMetadata(_ovrSkeleton, false);
+                _sourceSkeletonData = new SkeletonMetadata(_ovrSkeleton, false, _customBoneIdToHumanBodyBone);
             }
             else
             {
-                _sourceSkeletonData.BuildBoneDataSkeleton(_ovrSkeleton, false);
+                _sourceSkeletonData.BuildBoneDataSkeleton(_ovrSkeleton, false, _customBoneIdToHumanBodyBone);
             }
             _sourceSkeletonData.BuildCoordinateAxesForAllBones();
 
             if (_sourceSkeletonTPoseData == null)
             {
-                _sourceSkeletonTPoseData = new SkeletonMetadata(_ovrSkeleton, true);
+                _sourceSkeletonTPoseData = new SkeletonMetadata(_ovrSkeleton, true, _customBoneIdToHumanBodyBone);
             }
             else
             {
-                _sourceSkeletonTPoseData.BuildBoneDataSkeleton(_ovrSkeleton, true);
+                _sourceSkeletonTPoseData.BuildBoneDataSkeleton(_ovrSkeleton, true, _customBoneIdToHumanBodyBone);
             }
             _sourceSkeletonTPoseData.BuildCoordinateAxesForAllBones();
 
@@ -423,12 +461,12 @@ namespace Oculus.Movement.Tracking
             {
                 var currBindPose = binePoses[i];
                 var skelBoneId = currBindPose.Id;
-                if (!BoneIdToHumanBodyBone.ContainsKey(skelBoneId))
+                if (!_customBoneIdToHumanBodyBone.ContainsKey(skelBoneId))
                 {
                     continue;
                 }
 
-                var humanBodyBone = BoneIdToHumanBodyBone[skelBoneId];
+                var humanBodyBone = _customBoneIdToHumanBodyBone[skelBoneId];
                 if (!targetBoneDataMap.ContainsKey(humanBodyBone))
                 {
                     continue;
@@ -439,8 +477,8 @@ namespace Oculus.Movement.Tracking
                 if (IsBodySectionInArray(bodySection, _bodySectionsToAlign) &&
                     _sourceSkeletonTPoseData.BodyToBoneData.ContainsKey(humanBodyBone))
                 {
-                   var sourceTPoseOrientation =
-                        _sourceSkeletonTPoseData.BodyToBoneData[humanBodyBone].JointPairOrientation;
+                    var sourceTPoseOrientation =
+                         _sourceSkeletonTPoseData.BodyToBoneData[humanBodyBone].JointPairOrientation;
                     var targetTPoseOrientation =
                         _targetSkeletonTPoseData.BodyToBoneData[humanBodyBone].JointPairOrientation;
 
@@ -474,7 +512,7 @@ namespace Oculus.Movement.Tracking
                    _targetSkeletonData.BodyToBoneData,
                    _boneGizmosTarget);
             }
-            
+
             if (_sourceSkeletonTPoseData != null)
             {
                 DrawGizmosForBothBoneDatasSource(
@@ -762,7 +800,7 @@ namespace Oculus.Movement.Tracking
             }
 
             var boneDataMap = metadata.BodyToBoneData;
-            foreach(var key in boneDataMap.Keys)
+            foreach (var key in boneDataMap.Keys)
             {
                 var renderObject = _humanBoneToDebugRenderObjects[key];
                 var boneData = boneDataMap[key];
@@ -779,9 +817,9 @@ namespace Oculus.Movement.Tracking
 
         private void UpdateActiveStates()
         {
-            foreach(var value in _humanBoneToDebugRenderObjects.Values)
+            foreach (var value in _humanBoneToDebugRenderObjects.Values)
             {
-                foreach(var lineRend in value.AnnotatedLineRenderers)
+                foreach (var lineRend in value.AnnotatedLineRenderers)
                 {
                     if (lineRend != null &&
                         lineRend.GetActiveMode() != _showSkeletalDebugViews)
@@ -828,12 +866,12 @@ namespace Oculus.Movement.Tracking
             {
                 var currBone = bones[i];
                 var skelBoneId = currBone.Id;
-                if (!BoneIdToHumanBodyBone.ContainsKey(skelBoneId))
+                if (!_customBoneIdToHumanBodyBone.ContainsKey(skelBoneId))
                 {
                     continue;
                 }
 
-                var humanBodyBone = BoneIdToHumanBodyBone[skelBoneId];
+                var humanBodyBone = _customBoneIdToHumanBodyBone[skelBoneId];
                 if (!targetBoneDataMap.ContainsKey(humanBodyBone))
                 {
                     continue;
@@ -907,12 +945,12 @@ namespace Oculus.Movement.Tracking
             {
                 var currBone = bones[i];
                 var skelBoneId = currBone.Id;
-                if (!BoneIdToHumanBodyBone.ContainsKey(skelBoneId))
+                if (!_customBoneIdToHumanBodyBone.ContainsKey(skelBoneId))
                 {
                     continue;
                 }
 
-                var humanBodyBone = BoneIdToHumanBodyBone[skelBoneId];
+                var humanBodyBone = _customBoneIdToHumanBodyBone[skelBoneId];
                 if (!targetBoneDataMap.ContainsKey(humanBodyBone))
                 {
                     continue;

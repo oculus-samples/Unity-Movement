@@ -86,9 +86,11 @@ namespace Oculus.Movement.Tracking
         /// </summary>
         /// <param name="skeleton">Skeleton to build meta data from.</param>
         /// <param name="useBindPose">Whether to use bind pose (T-pose) or not.</param>
-        public SkeletonMetadata(OVRSkeleton skeleton, bool useBindPose)
+        /// <param name="customBoneIdToHumanBodyBone">Custom bone ID to human body bone mapping.</param>
+        public SkeletonMetadata(OVRSkeleton skeleton, bool useBindPose,
+            Dictionary<OVRSkeleton.BoneId, HumanBodyBones> customBoneIdToHumanBodyBone)
         {
-            BuildBoneDataSkeleton(skeleton, useBindPose);
+            BuildBoneDataSkeleton(skeleton, useBindPose, customBoneIdToHumanBodyBone);
         }
 
         /// <summary>
@@ -96,7 +98,9 @@ namespace Oculus.Movement.Tracking
         /// </summary>
         /// <param name="skeleton">The OVRSkeleton.</param>
         /// <param name="useBindPose">If true, use the bind pose.</param>
-        public void BuildBoneDataSkeleton(OVRSkeleton skeleton, bool useBindPose)
+        /// <param name="customBoneIdToHumanBodyBone">Custom bone ID to human body bone mapping.</param>
+        public void BuildBoneDataSkeleton(OVRSkeleton skeleton, bool useBindPose,
+            Dictionary<OVRSkeleton.BoneId, HumanBodyBones> customBoneIdToHumanBodyBone)
         {
             if (_bodyToBoneData.Count != 0)
             {
@@ -110,11 +114,11 @@ namespace Oculus.Movement.Tracking
                 var bone = allBones[i];
                 var boneId = bone.Id;
 
-                if (!HumanBodyBonesMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
+                if (!customBoneIdToHumanBodyBone.ContainsKey(boneId))
                 {
                     continue;
                 }
-                var bodyBone = HumanBodyBonesMappings.BoneIdToHumanBodyBone[boneId];
+                var humanBodyBone = customBoneIdToHumanBodyBone[boneId];
 
                 BoneData boneData = new BoneData();
                 boneData.OriginalJoint = bone.Transform;
@@ -145,7 +149,7 @@ namespace Oculus.Movement.Tracking
                     Debug.LogWarning($"{boneId} has invalid end joint.");
                 }
 
-                _bodyToBoneData.Add(bodyBone, boneData);
+                _bodyToBoneData.Add(humanBodyBone, boneData);
             }
         }
 
