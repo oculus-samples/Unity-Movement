@@ -357,6 +357,9 @@ namespace Oculus.Movement
         public const string HipPinningLeave =
             "If true, hip pinning will be disabled when the character leaves a certain range.";
 
+        public const string HipPinningHeightAdjustment =
+            "If true, hip pinning will adjust the height of the seat to match the tracked position.";
+
         public const string HipPinningLeaveRange =
             "The range from the hip pinning target before hip pinning is disabled.";
 
