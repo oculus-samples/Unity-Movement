@@ -27,6 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Packing.hlsl"
 #include "MovementUnityStandardCore.hlsl"
 
 // A lot of this code has been adapted from UnityStandardCore.cginc etc
@@ -51,6 +52,7 @@ uint _TexUVSet;
 TEXTURE2D(_OcclusionMap);       SAMPLER(sampler_OcclusionMap);
 TEXTURE2D(_MetallicGlossMap);   SAMPLER(sampler_MetallicGlossMap);
 TEXTURE2D(_SpecGlossMap);       SAMPLER(sampler_SpecGlossMap);
+
 TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
 TEXTURE2D(_BumpMap);            SAMPLER(sampler_BumpMap);
 TEXTURE2D(_EmissionMap);        SAMPLER(sampler_EmissionMap);
@@ -59,14 +61,13 @@ half4 ComputeSpecularGloss(float2 uv)
 {
     half4 sg;
 #ifdef _SPECGLOSSMAP
-
     #if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
         sg.rgb = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv).rgb;
         sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a;
     #else
         sg = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv);
     #endif
-    sg.a *= _Glossiness;
+    sg.a *= _GlossMapScale;
 #else
     sg.rgb = _SpecColor.rgb;
     #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
@@ -84,7 +85,7 @@ half2 ComputeMetallicGloss(float2 uv)
 #ifdef _METALLICGLOSSMAP
 #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
     mg.r = SAMPLE_TEXTURE2D(_MetallicGlossMap, sampler_MetallicGlossMap, uv).r;
-    mg.g = SAMPLE_TEXTURE2D(_MainTex, uv).a;
+    mg.g = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a;
 #else
     mg = SAMPLE_TEXTURE2D(_MetallicGlossMap, sampler_MetallicGlossMap, uv).ra;
 #endif
@@ -253,9 +254,8 @@ half GetAmbientOcclusion(float2 uv)
 #ifdef _NORMALMAP
 half3 GetNormalInTangentSpace(float2 texcoords)
 {
-    half3 normalTangent = UnpackScaleNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, texcoords.xy),
-        _BumpScale);
-    return normalTangent;
+    const half4 normalTangent = SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, texcoords.xy);
+    return UnpackNormalScale(normalTangent, _BumpScale);
 }
 #endif
 
@@ -266,16 +266,17 @@ float3 GetPerPixelWorldNormal(float2 iTex, float4 tangentToWorld[3])
     half3 binormal = tangentToWorld[1].xyz;
     half3 normal = tangentToWorld[2].xyz;
 
-#if UNITY_TANGENT_ORTHONORMALIZE
-    normal = normalize(normal);
-
-    // ortho-normalize Tangent
-    tangent = normalize(tangent - normal * dot(tangent, normal));
-
-    // recalculate Binormal
-    half3 newB = cross(normal, tangent);
-    binormal = newB * sign(dot(newB, binormal));
-#endif
+    // Disabled in UnityStandardConfig.cginc, so the define is not included.
+    // #if UNITY_TANGENT_ORTHONORMALIZE
+    //     normal = normalize(normal);
+    //
+    //     // ortho-normalize Tangent
+    //     tangent = normalize(tangent - normal * dot(tangent, normal));
+    //
+    //     // recalculate Binormal
+    //     half3 newB = cross(normal, tangent);
+    //     binormal = newB * sign(dot(newB, binormal));
+    // #endif
 
     half3 normalTangent = GetNormalInTangentSpace(iTex);
     float3 normalWorld = normalize(tangent * normalTangent.x +
@@ -448,7 +449,7 @@ half4 UnityBRDFModifiedGGX(half3 diffColor, half3 specColor, half oneMinusReflec
     half NdotV = saturate(dot(normal, viewDirTowardEye));
     float LdotH = saturate(dot(light.dir, halfDir));
 
-    half perceptualRoughness = 1 - smoothness;
+    half perceptualRoughness = PerceptualSmoothnessToPerceptualRoughness(smoothness);
     half roughness = PerceptualRoughnessToRoughness(perceptualRoughness);
 
     // GGX Distribution multiplied by combined approximation of Visibility and Fresnel

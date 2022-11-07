@@ -25,6 +25,24 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+// Defines copied from UnityStandardConfig.cginc so we can still use the defines in an .hlsl shader.
+//---------------------------------------
+// Energy conservation for Specular workflow is Monochrome. For instance: Red metal will make diffuse Black not Cyan
+#ifndef UNITY_CONSERVE_ENERGY
+#define UNITY_CONSERVE_ENERGY 1
+#endif
+#ifndef UNITY_CONSERVE_ENERGY_MONOCHROME
+#define UNITY_CONSERVE_ENERGY_MONOCHROME 1
+#endif
+
+// Should we pack worldPos along tangent (saving an interpolator)
+// We want to skip this on mobile platforms, because worldpos gets packed into mediump
+#if !defined(SHADER_API_MOBILE)
+    #define UNITY_PACK_WORLDPOS_WITH_TANGENT 1
+#else
+    #define UNITY_PACK_WORLDPOS_WITH_TANGENT 0
+#endif
+
 // Functions and structures copied from UnityStandardCore.cginc so we can still use them in an .hlsl shader.
 // Some functions have been changed with compatible hlsl calls.
 
@@ -38,16 +56,9 @@ struct FragmentCommonData
   float3 eyeVec;
   half alpha;
   float3 posWorld;
-
-#if UNITY_STANDARD_SIMPLE
-  half3 reflUVW;
-#endif
-
-#if UNITY_STANDARD_SIMPLE
-  half3 tangentSpaceNormal;
-#endif
 };
 
+//-------------------------------------------------------------------------------------
 struct UnityLight
 {
   half3 color;
@@ -60,48 +71,11 @@ struct UnityIndirect
   half3 specular;
 };
 
-struct UnityGI
+//-------------------------------------------------------------------------------------
+half3x3 CreateTangentToWorldPerVertex(half3 normal, half3 tangent, half tangentSign)
 {
-  UnityLight light;
-  UnityIndirect indirect;
-};
-
-inline void ResetUnityGI(out UnityGI outGI)
-{
-  outGI.light.color = 0;
-  outGI.light.dir = 0;
-  outGI.indirect.diffuse = 0;
-  outGI.indirect.specular = 0;
-}
-
-half3 UnpackScaleNormal(half4 packednormal, half bumpScale)
-{
-#if defined(UNITY_NO_DXT5nm)
-    half3 normal = packednormal.xyz * 2 - 1;
-#if (SHADER_TARGET >= 30)
-    // SM2.0: instruction count limitation
-    // SM2.0: normal scaler is not supported
-    normal.xy *= bumpScale;
-#endif
-    return normal;
-#elif defined(UNITY_ASTC_NORMALMAP_ENCODING)
-    half3 normal;
-    normal.xy = (packednormal.wy * 2 - 1);
-    normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
-    normal.xy *= bumpScale;
-    return normal;
-#else
-    // This do the trick
-    packednormal.x *= packednormal.w;
-
-    half3 normal;
-    normal.xy = (packednormal.xy * 2 - 1);
-#if (SHADER_TARGET >= 30)
-    // SM2.0: instruction count limitation
-    // SM2.0: normal scaler is not supported
-    normal.xy *= bumpScale;
-#endif
-    normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
-    return normal;
-#endif
+  // For odd-negative scale transforms we need to flip the sign
+  half sign = tangentSign * unity_WorldTransformParams.w;
+  half3 binormal = cross(normal, tangent) * sign;
+  return half3x3(tangent, binormal, normal);
 }

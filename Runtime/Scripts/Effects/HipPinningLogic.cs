@@ -223,6 +223,12 @@ namespace Oculus.Movement.Effects
         protected bool _enableHipPinningLeave = true;
 
         /// <summary>
+        /// If true, hip pinning will adjust the height of the seat to match the tracked position.
+        /// </summary>
+        [SerializeField]
+        protected bool _enableHipPinningHeightAdjustment;
+
+        /// <summary>
         /// If true, hip pinning is currently active.
         /// </summary>
         [SerializeField]
@@ -260,6 +266,7 @@ namespace Oculus.Movement.Effects
 
         private OVRSkeleton.IOVRSkeletonDataProvider _skeletonDataProvider;
         private Vector3 _trackedHipTranslation;
+        private Vector3 _calibratedHipTranslation;
         private bool _shouldFlipRotationLimit;
         private bool _shouldUpdate = true;
 
@@ -307,7 +314,12 @@ namespace Oculus.Movement.Effects
         /// <param name="position">The position of the character's hips.</param>
         public void CalibrateInitialHipHeight(Vector3 position)
         {
-            HipPinTarget.UpdateHeight(position.y - HipPinTarget.HipTargetTransform.position.y);
+            _calibratedHipTranslation = _skeletonDataProvider.GetSkeletonPoseData()
+                .BoneTranslations[(int)OVRSkeleton.BoneId.Body_Hips].FromFlippedZVector3f();
+            if (_enableHipPinningHeightAdjustment)
+            {
+                HipPinTarget.UpdateHeight(position.y - HipPinTarget.HipTargetTransform.position.y);
+            }
         }
 
         /// <summary>
@@ -399,8 +411,7 @@ namespace Oculus.Movement.Effects
         private void CheckIfHipPinningIsValid(OVRSkeleton.SkeletonPoseData data)
         {
             Vector3 trackedHipTranslation = data.BoneTranslations[(int)OVRSkeleton.BoneId.Body_Hips].FromFlippedZVector3f();
-            Vector3 hipPosition = _hipPinningProperties.HipBodyJointProperties.BodyJoint.transform.TransformPoint(trackedHipTranslation);
-            float dist = Vector3.Distance(HipPinTarget.HipTargetTransform.position, hipPosition);
+            float dist = Vector3.Distance(_calibratedHipTranslation, trackedHipTranslation);
             if (dist > _hipPinningLeaveRange)
             {
                 RemoveHipPinningTarget(HipPinTarget);

@@ -354,6 +354,10 @@ namespace Oculus.Movement.Effects
                 new GUIContent("Enable Transformations", HipPinningLogicTooltips.EnableApplyTransformations),
                 GUILayout.Height(20));
             EditorGUILayout.PropertyField(
+                serializedObject.FindProperty("_enableHipPinningHeightAdjustment"),
+                new GUIContent("Enable Hip Pinning Height Adjustment", HipPinningLogicTooltips.HipPinningHeightAdjustment),
+                GUILayout.Height(20));
+            EditorGUILayout.PropertyField(
                 serializedObject.FindProperty("_enableHipPinningLeave"),
                 new GUIContent("Enable Hip Pinning Detection", HipPinningLogicTooltips.HipPinningLeave),
                 GUILayout.Height(20));

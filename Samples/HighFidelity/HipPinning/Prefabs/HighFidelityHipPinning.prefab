@@ -1648,8 +1648,9 @@ MonoBehaviour:
   _enableConstrainedMovement: 0
   _enableApplyTransformations: 1
   _enableHipPinningLeave: 1
+  _enableHipPinningHeightAdjustment: 0
   _hipPinningActive: 0
-  _hipPinningLeaveRange: 0.8
+  _hipPinningLeaveRange: 0.3
   _skeleton: {fileID: 2038134759}
   _dataProvider: {fileID: 2038134762}
   _hipPinningTargets:

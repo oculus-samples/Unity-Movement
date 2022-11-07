@@ -44,12 +44,8 @@ PrefabInstance:
       value: MirroredCharacter
       objectReference: {fileID: 0}
     - target: {fileID: 2038134767, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
-      propertyPath: _moveTowardsArms
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2038134767, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
       propertyPath: _spineTranslationCorrectionType
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2038134768, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
       propertyPath: _twistForwardAxis.x
