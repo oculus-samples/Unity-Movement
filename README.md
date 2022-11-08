@@ -16,7 +16,7 @@ Then, bring this package into the project.
 - In Package Manager, click on the add button below the window title and select **Add package from git URL…**, using this URL: https://github.com/oculus-samples/Unity-Movement.git
 - Alternatively, in package manager, click on the add button below the window title and select **Add package from disk...**, using the package.json located after unzipping one of the releases here: https://github.com/oculus-samples/Unity-Movement/releases
 
-The sample scenes are located under the **Samples/../Scenes** folders.
+The sample scenes are located under the **Samples/../Scenes** folders. The Character (layer index 10), the MirroredCharacter (layer index 11), and the HiddenMesh layers must be present in the project.
 
 ## Samples
 The project contains several sample scenes. For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-sample-aura/), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-sample-hip-pinning/), and [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-high-fidelity/).
