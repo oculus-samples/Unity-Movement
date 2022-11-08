@@ -731,33 +731,6 @@ namespace Oculus.Movement
         }
     }
 
-    public static class LayerAndVulkanValidationTooltips
-    {
-        public const string ExpectedLayers =
-            "Layers expected in scene.";
-    }
-
-    public static class RuntimeUnitValidationTooltips
-    {
-        public const string TestCases =
-            "List of TestCases, which are functions that call a given result bool callback.";
-
-        public static class TestCase
-        {
-            public const string Name =
-                "Metadata describing the test.";
-
-            public const string Test =
-                "Function that accepts a bool callback, giving it the test result.";
-
-            public const string OnTrue =
-                "Unity Editor can insert a response here to a true case from the test.";
-
-            public const string OnFalse =
-                "Unity Editor can insert a response here to a false case from the test.";
-        }
-    }
-
     public static class ScriptEffectToggleTooltips
     {
         public const string ComponentToToggle =
@@ -788,8 +761,10 @@ namespace Oculus.Movement
     {
         public const string OutlineObject =
             "Outline object that indicates toggle state.";
+
         public const string SelectColor =
             "Select color.";
+
         public const string DeselectColor =
             "Deselected color.";
     }
