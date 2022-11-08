@@ -1,4 +1,4 @@
-name: Merge dev into main
+name: Cleanup deleted files from dev in main
 
 on:
   workflow_dispatch:
@@ -19,11 +19,11 @@ jobs:
       - name: Merge dev to main
         run: |
           git pull
-          git merge --no-ff --allow-unrelated-histories -X theirs origin/dev -m "[Automated] Merged dev into main"
+          git merge --allow-unrelated-histories $(git commit-tree -p main -m "[Automated] Cleanup" origin/dev^{tree})
       - name: Use CHANGELOG and package.json from main
         run: |
-          git checkout HEAD~1 CHANGELOG.md
-          git checkout HEAD~1 package.json
+          git checkout HEAD~2 CHANGELOG.md
+          git checkout HEAD~2 package.json
           git commit --amend --no-edit
       - name: Push
         run: |
