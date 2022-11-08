@@ -20,6 +20,11 @@ jobs:
         run: |
           git pull
           git merge --allow-unrelated-histories $(git commit-tree -p main -m "[Automated] Cleanup" origin/dev^{tree})
+      - name: Use CHANGELOG and package.json from main
+        run: |
+          git checkout HEAD~2 CHANGELOG.md
+          git checkout HEAD~2 package.json
+          git commit --amend --no-edit
       - name: Push
         run: |
           git push
