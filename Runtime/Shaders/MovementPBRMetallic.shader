@@ -256,6 +256,7 @@ Shader "Movement/PBR (Metallic)"
 
             #pragma shader_feature _EMISSION
             #pragma shader_feature_local _METALLICGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             // used in UnityGI_IndirectSpecular
             #pragma shader_feature_local _GLOSSYREFLECTIONS_OFF
             #pragma shader_feature_local _AREA_LIGHT_SPECULAR
@@ -292,6 +293,7 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _METALLICGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _SPECULAR_AFFECT_BY_NDOTL
             #pragma shader_feature_local _RECALCULATE_NORMALS
 
@@ -325,6 +327,7 @@ Shader "Movement/PBR (Metallic)"
 
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _METALLICGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
             #pragma multi_compile_shadowcaster
             #pragma multi_compile_instancing
@@ -353,6 +356,7 @@ Shader "Movement/PBR (Metallic)"
 
             #pragma shader_feature _EMISSION
             #pragma shader_feature_local _METALLICGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _DETAIL_MULX2
             #pragma shader_feature EDITOR_VISUALIZATION
 
