@@ -61,20 +61,20 @@ half4 ComputeSpecularGloss(float2 uv)
 {
     half4 sg;
 #ifdef _SPECGLOSSMAP
-    #if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
-        sg.rgb = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv).rgb;
-        sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a;
-    #else
-        sg = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv);
-    #endif
+#if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
+    sg.rgb = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv).rgb;
+    sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a;
+#else
+    sg = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv);
+#endif
     sg.a *= _GlossMapScale;
 #else
     sg.rgb = _SpecColor.rgb;
-    #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-        sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _GlossMapScale;
-    #else
-        sg.a = _Glossiness;
-    #endif
+#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+    sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _GlossMapScale;
+#else
+    sg.a = _Glossiness;
+#endif
 #endif
     return sg;
 }
@@ -93,38 +93,12 @@ half2 ComputeMetallicGloss(float2 uv)
 #else
     mg.r = _Metallic;
 #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-    mg.g = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _Glossiness;
+    mg.g = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _GlossMapScale;
 #else
     mg.g = _Glossiness;
 #endif
 #endif
     return mg;
-}
-
-half4 ComputeSampleMetallicSpecGloss(float2 uv, half albedoAlpha, float glossiness)
-{
-  half4 specGloss;
-#ifdef _METALLICSPECGLOSSMAP
-  specGloss = SAMPLE_METALLICSPECULAR(uv);
-#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-  specGloss.a = albedoAlpha * glossiness;
-#else
-  specGloss.a *= glossiness;
-#endif
-#else // _METALLICSPECGLOSSMAP
-#if _SPECULAR_SETUP
-  specGloss.rgb = _SpecColor.rgb;
-#else
-  specGloss.rgb = _Metallic.rrr;
-#endif
-
-#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-  specGloss.a = albedoAlpha * glossiness;
-#else
-  specGloss.a = glossiness;
-#endif
-#endif
-  return specGloss;
 }
 
 // Like the UnityStandardUtils version, except we assume SHADER_TARGET is >= 30
