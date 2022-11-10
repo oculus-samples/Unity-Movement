@@ -454,9 +454,9 @@ half4 UnityBRDFModifiedGGX(half3 diffColor, half3 specColor, half oneMinusReflec
     surfaceReduction = 1.0 - roughness * perceptualRoughness * surfaceReduction;
 
 #ifdef _SPECULAR_AFFECT_BY_NDOTL
-    half localSpecTerm = specularTerm * specColor * light.color * NdotL;
+    half3 localSpecTerm = specularTerm * specColor * light.color * NdotL;
 #else
-    half localSpecTerm = specularTerm * specColor;
+    half3 localSpecTerm = specularTerm * specColor;
 #endif
 
     half grazingTerm = saturate(smoothness + (1 - oneMinusReflectivity));

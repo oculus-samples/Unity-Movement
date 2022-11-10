@@ -433,7 +433,7 @@ half4 UnityBRDFModifiedGGX(half3 diffColor, half3 specColor, half oneMinusReflec
     float a2 = a * a;
 
     float d = NDotH * NDotH * (a2 - 1.f) + 1.00001f;
-    float specularTerm;
+    float specularTerm = 0.0;
 
     // Incorporate area light contribution for improved specularity.
 #if defined(_AREA_LIGHT_SPECULAR)
@@ -460,9 +460,9 @@ half4 UnityBRDFModifiedGGX(half3 diffColor, half3 specColor, half oneMinusReflec
     surfaceReduction = 1.0 - roughness * perceptualRoughness * surfaceReduction;
 
 #ifdef _SPECULAR_AFFECT_BY_NDOTL
-    half localSpecTerm = specularTerm * specColor.x * light.color.x * NdotL;
+    half3 localSpecTerm = specularTerm * specColor.x * light.color.x * NdotL;
 #else
-    half localSpecTerm = specularTerm * specColor.x;
+    half3 localSpecTerm = specularTerm * specColor.x;
 #endif
 
     half grazingTerm = saturate(smoothness + (1 - oneMinusReflectivity));
