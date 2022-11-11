@@ -114,7 +114,7 @@ namespace Oculus.Movement.Effects
             /// The speed of the arm move towards if enabled.
             /// </summary>
             [SerializeField]
-            [Tooltip(DeformationLogicTooltips.ArmPositionInfo.Weight)]
+            [Tooltip(DeformationLogicTooltips.ArmPositionInfo.MoveSpeed)]
             protected float _moveSpeed = 1.0f;
 
             /// <summary>

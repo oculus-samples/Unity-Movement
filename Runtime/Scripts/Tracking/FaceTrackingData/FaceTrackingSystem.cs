@@ -47,27 +47,59 @@ namespace Oculus.Movement.Tracking
         /// </summary>
         public bool CorrectivesEnabled { get; set; }
 
+        /// <summary>
+        /// Last updated expression weights.
+        /// </summary>
+        public float[] ExpressionWeights { get; private set; }
+
+        /// <summary>
+        /// Allows one to freeze current values obtained from facial expressions component.
+        /// </summary>
+        public bool UpdateFacialExpressions { get; set; }
+
         private void Awake()
         {
             Assert.IsNotNull(_blendShapeMapping);
             Assert.IsNotNull(_ovrFaceExpressions);
             Assert.IsNotNull(_correctiveShapesDriver);
+            ExpressionWeights = new float[(int)OVRFaceExpressions.FaceExpression.Max];
 
             CorrectivesEnabled = true;
         }
 
         private void Update()
         {
+            if (ExpressionWeights == null || ExpressionWeights.Length != (int)OVRFaceExpressions.FaceExpression.Max)
+            {
+                ExpressionWeights = new float[(int)OVRFaceExpressions.FaceExpression.Max];
+            }
+
             if (_ovrFaceExpressions.enabled &&
                 _ovrFaceExpressions.FaceTrackingEnabled &&
                 _ovrFaceExpressions.ValidExpressions)
             {
+                UpdateExpressionWeights();
                 UpdateAllMeshesUsingFaceTracking();
             }
 
             if (CorrectivesEnabled)
             {
                 _correctiveShapesDriver.ApplyCorrectives();
+            }
+        }
+
+        private void UpdateExpressionWeights()
+        {
+            if (UpdateFacialExpressions)
+            {
+                return;
+            }
+            for (var expressionIndex = 0;
+                    expressionIndex < (int)OVRFaceExpressions.FaceExpression.Max;
+                    ++expressionIndex)
+            {
+                var blendshape = (OVRFaceExpressions.FaceExpression)expressionIndex;
+                ExpressionWeights[expressionIndex] = _ovrFaceExpressions[blendshape];
             }
         }
 
@@ -99,16 +131,16 @@ namespace Oculus.Movement.Tracking
                     {
                         continue;
                     }
-                    float currentWeight = _ovrFaceExpressions[blendShapeToFaceExpression];
+                    float currentWeight = ExpressionWeights[(int)blendShapeToFaceExpression];
 
                     // Recover true eyes closed values
                     if (blendShapeToFaceExpression == OVRFaceExpressions.FaceExpression.EyesClosedL)
                     {
-                        currentWeight += _ovrFaceExpressions[OVRFaceExpressions.FaceExpression.EyesLookDownL];
+                        currentWeight += ExpressionWeights[(int)OVRFaceExpressions.FaceExpression.EyesLookDownL];
                     }
                     else if (blendShapeToFaceExpression == OVRFaceExpressions.FaceExpression.EyesClosedR)
                     {
-                        currentWeight += _ovrFaceExpressions[OVRFaceExpressions.FaceExpression.EyesLookDownR];
+                        currentWeight += ExpressionWeights[(int)OVRFaceExpressions.FaceExpression.EyesLookDownR];
                     }
 
                     if (_blendshapeModifier != null)

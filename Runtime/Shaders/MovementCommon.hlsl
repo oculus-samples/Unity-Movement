@@ -61,20 +61,20 @@ half4 ComputeSpecularGloss(float2 uv)
 {
     half4 sg;
 #ifdef _SPECGLOSSMAP
-    #if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
-        sg.rgb = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv).rgb;
-        sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a;
-    #else
-        sg = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv);
-    #endif
+#if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
+    sg.rgb = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv).rgb;
+    sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a;
+#else
+    sg = SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv);
+#endif
     sg.a *= _GlossMapScale;
 #else
     sg.rgb = _SpecColor.rgb;
-    #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-        sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _GlossMapScale;
-    #else
-        sg.a = _Glossiness;
-    #endif
+#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+    sg.a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _GlossMapScale;
+#else
+    sg.a = _Glossiness;
+#endif
 #endif
     return sg;
 }
@@ -93,38 +93,12 @@ half2 ComputeMetallicGloss(float2 uv)
 #else
     mg.r = _Metallic;
 #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-    mg.g = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _Glossiness;
+    mg.g = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).a * _GlossMapScale;
 #else
     mg.g = _Glossiness;
 #endif
 #endif
     return mg;
-}
-
-half4 ComputeSampleMetallicSpecGloss(float2 uv, half albedoAlpha, float glossiness)
-{
-  half4 specGloss;
-#ifdef _METALLICSPECGLOSSMAP
-  specGloss = SAMPLE_METALLICSPECULAR(uv);
-#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-  specGloss.a = albedoAlpha * glossiness;
-#else
-  specGloss.a *= glossiness;
-#endif
-#else // _METALLICSPECGLOSSMAP
-#if _SPECULAR_SETUP
-  specGloss.rgb = _SpecColor.rgb;
-#else
-  specGloss.rgb = _Metallic.rrr;
-#endif
-
-#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-  specGloss.a = albedoAlpha * glossiness;
-#else
-  specGloss.a = glossiness;
-#endif
-#endif
-  return specGloss;
 }
 
 // Like the UnityStandardUtils version, except we assume SHADER_TARGET is >= 30
@@ -459,7 +433,7 @@ half4 UnityBRDFModifiedGGX(half3 diffColor, half3 specColor, half oneMinusReflec
     float a2 = a * a;
 
     float d = NDotH * NDotH * (a2 - 1.f) + 1.00001f;
-    float specularTerm;
+    float specularTerm = 0.0;
 
     // Incorporate area light contribution for improved specularity.
 #if defined(_AREA_LIGHT_SPECULAR)
@@ -486,9 +460,9 @@ half4 UnityBRDFModifiedGGX(half3 diffColor, half3 specColor, half oneMinusReflec
     surfaceReduction = 1.0 - roughness * perceptualRoughness * surfaceReduction;
 
 #ifdef _SPECULAR_AFFECT_BY_NDOTL
-    half localSpecTerm = specularTerm * specColor.x * light.color.x * NdotL;
+    half3 localSpecTerm = specularTerm * specColor * light.color * NdotL;
 #else
-    half localSpecTerm = specularTerm * specColor.x;
+    half3 localSpecTerm = specularTerm * specColor;
 #endif
 
     half grazingTerm = saturate(smoothness + (1 - oneMinusReflectivity));
