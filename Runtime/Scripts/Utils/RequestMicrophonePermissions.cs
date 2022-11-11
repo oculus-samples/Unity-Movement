@@ -11,6 +11,12 @@ namespace Oculus.Movement.Utils
     /// </summary>
     public class RequestMicrophonePermissions : MonoBehaviour
     {
+        /// <summary>
+        /// True when permissions done.
+        /// </summary>
+        public bool PermissionsFlowDone { get; private set; } = false;
+
+
         private IEnumerator Start()
         {
             // Wait until OVRManager starts permission requests.
@@ -24,6 +30,8 @@ namespace Oculus.Movement.Utils
 
             var enabledMicrophone = Microphone.devices.Length >= 1;
             Debug.Log($"Microphone is {(enabledMicrophone ? "enabled." : "disabled.")}");
+
+            PermissionsFlowDone = true;
         }
     }
 }
