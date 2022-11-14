@@ -14,7 +14,13 @@ namespace Oculus.Movement.Effects
         /// <summary>
         /// Returns the current state of if smile is enabled or disabled.
         /// </summary>
-        public bool SmileEnabled { get; set; }
+        [SerializeField]
+        [Tooltip(SmileEffectTooltips.SmileEnabled)]
+        protected bool _smileEnabled = false;
+        /// <summary>
+        /// Returns the current state of if smile is enabled or disabled.
+        /// </summary>
+        public bool SmileEnabled { get => _smileEnabled; set => _smileEnabled = value; }
 
         /// <summary>
         /// Facial expression detector to query events from.
@@ -35,7 +41,7 @@ namespace Oculus.Movement.Effects
         /// </summary>
         [SerializeField]
         [Tooltip(SmileEffectTooltips.Renderer)]
-        protected Renderer _renderer;
+        protected SkinnedMeshRenderer _renderer;
 
         /// <summary>
         /// Glow curve that modulates emission strength on face.
@@ -54,11 +60,8 @@ namespace Oculus.Movement.Effects
             Assert.IsNotNull(_renderer);
             Assert.IsNotNull(_glowCurve);
 
-            SmileEnabled = true;
-
             _materials = _renderer.materials;
             Assert.IsTrue(_materialIndex < _materials.Length);
-
             _emissionStrengthId = Shader.PropertyToID("_EmissionStrength");
             _initialEmissionValue = _materials[_materialIndex].GetFloat(_emissionStrengthId);
 
@@ -83,6 +86,10 @@ namespace Oculus.Movement.Effects
         private void MacroExpressionStateChange(
             MacroFacialExpressionDetector.MacroExpressionStateChangeEventArgs eventArgs)
         {
+            if (!SmileEnabled)
+            {
+                return;
+            }
             if (eventArgs.State == MacroFacialExpressionDetector.MacroExpressionState.Active ||
                 eventArgs.State == MacroFacialExpressionDetector.MacroExpressionState.Maintain)
             {

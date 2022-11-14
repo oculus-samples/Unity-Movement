@@ -573,6 +573,9 @@ namespace Oculus.Movement
 
     public static class SmileEffectTooltips
     {
+        public const string SmileEnabled =
+            "Returns the current state of if smile is enabled or disabled.";
+
         public const string FacialExpressionDetector =
             "Facial expression detector to query events from.";
 
