@@ -111,7 +111,7 @@ Shader "Movement/PBR (Metallic)"
             ZWrite [_ZWrite]
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             // -------------------------------------
@@ -173,7 +173,7 @@ Shader "Movement/PBR (Metallic)"
             ColorMask 0
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             #define UNITY_SETUP_BRDF_INPUT MetallicSetup
@@ -205,7 +205,7 @@ Shader "Movement/PBR (Metallic)"
             Cull Off
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             #pragma shader_feature _EMISSION

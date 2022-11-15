@@ -110,7 +110,7 @@ Shader "Movement/PBR (Specular)"
             ZWrite[_ZWrite]
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             // -------------------------------------
@@ -172,7 +172,7 @@ Shader "Movement/PBR (Specular)"
             ColorMask 0
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             #define UNITY_SETUP_BRDF_INPUT MetallicSetup
@@ -204,7 +204,7 @@ Shader "Movement/PBR (Specular)"
             Cull Off
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             #pragma shader_feature _EMISSION
