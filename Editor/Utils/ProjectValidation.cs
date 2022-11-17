@@ -42,21 +42,9 @@ namespace Oculus.Movement.Utils
             return allLayersArePresent;
         }
 
-        /// <summary>
-        /// If the project is using URP, returns true if vulkan is set.
-        /// </summary>
-        /// <returns>True if vulkan is set and the project requires URP.</returns>
-        public static bool TestVulkan()
-        {
-            bool vulkanFoundOrNotRequired = GraphicsSettings.renderPipelineAsset == null
-                                            || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan
-                                            || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D11;
-            return vulkanFoundOrNotRequired;
-        }
-
         private static bool ShouldShowWindow()
         {
-            return !TestLayers() || !TestVulkan();
+            return !TestLayers();
         }
     }
 
@@ -92,7 +80,6 @@ namespace Oculus.Movement.Utils
         private void OnGUI()
         {
             bool layersValid = ProjectValidation.TestLayers();
-            bool vulkanValid = ProjectValidation.TestVulkan();
             GUIStyle labelStyle = new GUIStyle (EditorStyles.label);
             labelStyle.richText = true;
             labelStyle.wordWrap = true;
@@ -105,18 +92,6 @@ namespace Oculus.Movement.Utils
                     GUILayout.Label("Layers", EditorStyles.boldLabel);
                     GUILayout.Label(
                         "For the sample scenes, the following layers must be present in the project: <b>Character (layer index 10), MirroredCharacter (layer index 11), and HiddenMesh</b>. \n\nImport the Layers preset in <b>Edit -> Project Settings -> Tags and Layers</b> by selecting the tiny settings icon located at the top right corner and choosing the <b>Layers</b> preset located in the <b>Samples/Shared/Presets</b> folder.",
-                        labelStyle);
-                    GUILayout.Space(5);
-                }
-                GUILayout.EndVertical();
-                GUI.enabled = true;
-
-                GUI.enabled = !vulkanValid;
-                GUILayout.BeginVertical(EditorStyles.helpBox);
-                {
-                    GUILayout.Label("Vulkan", EditorStyles.boldLabel);
-                    GUILayout.Label(
-                        "Set the primary graphics API to Vulkan in <b>Edit -> Project Settings -> Player -> Other Settings -> Graphics API</b>.",
                         labelStyle);
                     GUILayout.Space(5);
                 }
