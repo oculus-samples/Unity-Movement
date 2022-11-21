@@ -1175,32 +1175,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a2493713676f604ea00e2cfc3446ce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1142506903 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2063060108205716209, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
+--- !u!1818360608 &1142506904 stripped
+PositionConstraint:
+  m_CorrespondingSourceObject: {fileID: 4970786823407275195, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
   m_PrefabInstance: {fileID: 5041646639421274656}
   m_PrefabAsset: {fileID: 0}
---- !u!1818360608 &1142506904
-PositionConstraint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1142506903}
-  m_Enabled: 1
-  m_Weight: 1
-  m_TranslationAtRest: {x: 0, y: 0, z: 0}
-  m_TranslationOffset: {x: 0, y: 0, z: 0}
-  m_AffectTranslationX: 1
-  m_AffectTranslationY: 1
-  m_AffectTranslationZ: 1
-  m_IsContraintActive: 0
-  m_IsLocked: 1
-  m_Sources:
-  - sourceTransform: {fileID: 2078806467}
-    weight: 1
-  - sourceTransform: {fileID: 2038134770}
-    weight: 0
 --- !u!1001 &1379030071
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2515,6 +2494,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 580004043}
     - target: {fileID: 2844980554562158856, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
+      propertyPath: _skeleton
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2844980554562158856, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
+      propertyPath: _dataProvider
+      value: 
+      objectReference: {fileID: 1523344281}
+    - target: {fileID: 2844980554562158856, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
       propertyPath: _hipPinningTargets.Array.data[0]
       value: 
       objectReference: {fileID: 998163530}
@@ -2630,6 +2617,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4970786823407275195, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
+      propertyPath: m_Sources.Array.data[0].sourceTransform
+      value: 
+      objectReference: {fileID: 2078806467}
     - target: {fileID: 5275667044770607249, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
       propertyPath: m_Name
       value: HighFidelityHipPinningThirdPersonMirrored
@@ -2702,11 +2693,7 @@ PrefabInstance:
       propertyPath: m_BlendShapeWeights.Array.data[317]
       value: 100
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 2844980554562162398, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
-    - {fileID: 2844980554562162399, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
-    - {fileID: 2844980554562162396, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
-    - {fileID: 2844980554562162397, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b11de249d7ff7a14686cb55f71fa0c9e, type: 3}
 --- !u!114 &5041646639421274657 stripped
 MonoBehaviour:

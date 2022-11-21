@@ -678,6 +678,9 @@ namespace Oculus.Movement
         public const string Skeleton =
             "The OVR Skeleton component.";
 
+        public const string MirrorSkeleton =
+            "The Mirror Skeleton component.";
+
         public const string Animator =
             "Animator component. Setting this will cause this script " +
             "to ignore the skeleton field..";

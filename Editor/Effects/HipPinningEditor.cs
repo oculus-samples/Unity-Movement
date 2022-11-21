@@ -23,6 +23,7 @@ namespace Oculus.Movement.Effects
         private readonly string[] _chestBoneNames = { "Chest" };
 
         private SerializedProperty _skeletonProp = null;
+        private SerializedProperty _mirrorSkeletonProp = null;
         private SerializedProperty _dataProviderProp = null;
         private SerializedProperty _hipPinningTargetProp = null;
 
@@ -34,6 +35,7 @@ namespace Oculus.Movement.Effects
         private void OnEnable()
         {
             _skeletonProp = serializedObject.FindProperty("_skeleton");
+            _mirrorSkeletonProp = serializedObject.FindProperty("_mirrorSkeleton");
             _dataProviderProp = serializedObject.FindProperty("_dataProvider");
             _hipPinningTargetProp = serializedObject.FindProperty("_hipPinningTargets");
             _hipPropertiesProp = serializedObject.FindProperty("_hipPinningProperties");
@@ -325,14 +327,20 @@ namespace Oculus.Movement.Effects
                 serializedObject.FindProperty("_hipPinningActive"),
                 new GUIContent("Hip Pinning Active", HipPinningLogicTooltips.HipPinningActive),
                 GUILayout.Height(20));
-            EditorGUILayout.PropertyField(
-                _skeletonProp,
-                new GUIContent("OVR Skeleton", HipPinningLogicTooltips.Skeleton),
+            if (_skeletonProp.objectReferenceValue == null)
+            {
+                EditorGUILayout.PropertyField(
+                _mirrorSkeletonProp,
+                new GUIContent("Mirror Skeleton", HipPinningLogicTooltips.Skeleton),
                 GUILayout.Height(20));
-            EditorGUILayout.PropertyField(
-                _dataProviderProp,
-                new GUIContent("OVR Skeleton Data Provider", HipPinningLogicTooltips.DataProvider),
-                GUILayout.Height(20));
+            }
+            if (_mirrorSkeletonProp.objectReferenceValue == null)
+            {
+                EditorGUILayout.PropertyField(
+                    _skeletonProp,
+                    new GUIContent("OVR Skeleton", HipPinningLogicTooltips.Skeleton),
+                    GUILayout.Height(20));
+            }
             EditorGUILayout.PropertyField(
                 _hipPinningTargetProp,
                 new GUIContent("Hip Pinning Targets", HipPinningLogicTooltips.HipPinningTargets),
