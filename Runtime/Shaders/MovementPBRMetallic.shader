@@ -98,7 +98,7 @@ Shader "Movement/PBR (Metallic)"
 
         Pass
         {
-            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,12.1.8]" }
             Name "FORWARD"
             Tags { "LightMode" = "UniversalForward" }
             Stencil
@@ -157,7 +157,7 @@ Shader "Movement/PBR (Metallic)"
         //  Shadow rendering pass
         Pass
         {
-            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,12.1.8]" }
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
             Stencil
@@ -193,7 +193,7 @@ Shader "Movement/PBR (Metallic)"
         // This pass is not used during regular rendering.
         Pass
         {
-            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,12.1.8]" }
             Name "META"
             Tags { "LightMode" = "Meta" }
 
