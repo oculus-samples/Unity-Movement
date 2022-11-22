@@ -306,6 +306,15 @@ namespace Oculus.Movement.Effects
         public void SetHipPinningActive(bool isActive)
         {
             _hipPinningActive = isActive;
+
+            // Disable all position constraints
+            foreach (var positionConstraint in _hipPinningProperties.PositionConstraints)
+            {
+                if (positionConstraint != null)
+                {
+                    positionConstraint.enabled = false;
+                }
+            }
             if (isActive && _enableApplyTransformations)
             {
                 _hipPinningProperties.SetPositionConstraintsActive(false);
