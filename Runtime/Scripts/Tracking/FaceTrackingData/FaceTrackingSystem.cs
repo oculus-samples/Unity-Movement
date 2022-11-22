@@ -55,7 +55,7 @@ namespace Oculus.Movement.Tracking
         /// <summary>
         /// Allows one to freeze current values obtained from facial expressions component.
         /// </summary>
-        public bool UpdateFacialExpressions { get; set; }
+        public bool FreezeExpressionWeights { get; set; }
 
         private void Awake()
         {
@@ -90,7 +90,7 @@ namespace Oculus.Movement.Tracking
 
         private void UpdateExpressionWeights()
         {
-            if (UpdateFacialExpressions)
+            if (FreezeExpressionWeights)
             {
                 return;
             }
