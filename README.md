@@ -18,6 +18,24 @@ Then, bring this package into the project.
 
 The sample scenes are located under the **Samples/../Scenes** folders. The Character (layer index 10), the MirroredCharacter (layer index 11), and the HiddenMesh layers must be present in the project.
 
+## Rendering Quality
+Navigate to your Project Settings (Edit->Project Settings...) and click on
+the "Quality" section. If your project uses URP,
+then some of these settings might be part the rendering pipeline asset currently
+in use. The pipeline picked will be shown in the Quality menu.
+
+The following settings are recommended:
+1. Four bones for Skin Weights.
+2. 2x Multi Sampling Anti Aliasing.
+3. Full resolution textures.
+4. Shadow settings:
+  1. Hard and soft shadows.
+  2. Very high shadow resolution.
+  3. Stable fit.
+  4. Shadow distance of 3 meters with cascades. This will allow viewing shadows
+nearby without experiencing poor quality.
+5. At least one pixel light.
+
 ## Samples
 The project contains several sample scenes. For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-sample-aura/), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-sample-hip-pinning/), and [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-high-fidelity/).
 
