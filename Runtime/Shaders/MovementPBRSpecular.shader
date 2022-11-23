@@ -211,7 +211,12 @@ Shader "Movement/PBR (Specular)"
             #pragma shader_feature_local_fragment _SPECGLOSSMAP
 
             #pragma vertex UniversalVertexMeta
+#if UNITY_VERSION >= 202120
+            #pragma shader_feature EDITOR_VISUALIZATION
+            #pragma fragment UniversalFragmentMetaLit
+#else
             #pragma fragment UniversalFragmentMeta
+#endif
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"
