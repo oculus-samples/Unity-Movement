@@ -27,7 +27,8 @@ If the new scene or an existing scene doesn’t have a GameObject with the OVRCa
 3. In the Project tab, expand the Assets > Oculus > VR > Prefab folder and drag and drop the OVRCameraRig prefab into the scene. You can also drag and drop it into the Hierarchy tab.
 4. On the Inspector tab, go to OVR Manager > Quest Features.
 5. In the General tab, there are options to enable body, face, and eye tracking support. Select Supported or Required for the type of tracking support you wish to add.
-6. The Character (layer index 10), the MirroredCharacter (layer index 11), and HiddenMesh layers must be present in the project.
+6. Under OVRManager's "Permission Requests On Startup" section, enable Body, Face and Eye Tracking.
+7. The Character (layer index 10), the MirroredCharacter (layer index 11), and HiddenMesh layers must be present in the project.
 
 TextMeshPro is required.
 
@@ -48,6 +49,10 @@ The following settings are recommended:
   4. Shadow distance of 3 meters with cascades. This will allow viewing shadows
 nearby without experiencing poor quality.
 5. At least one pixel light.
+
+## Player Settings
+
+Make sure that the color space is set to Linear.
 
 ## Samples
 The project contains several sample scenes. For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-sample-aura/), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-sample-hip-pinning/), and [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-high-fidelity/).
