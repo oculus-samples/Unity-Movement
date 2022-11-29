@@ -1115,6 +1115,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 342251b4ca1613147a88fcd7e98ac276, type: 3}
+--- !u!4 &6924934869824844794 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -9036842334875203369, guid: 342251b4ca1613147a88fcd7e98ac276, type: 3}
+  m_PrefabInstance: {fileID: 7101297370585725741}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &130019977209536938 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -2071360955842159993, guid: 342251b4ca1613147a88fcd7e98ac276, type: 3}
@@ -1585,11 +1590,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2176018656357934825, guid: 342251b4ca1613147a88fcd7e98ac276, type: 3}
   m_PrefabInstance: {fileID: 7101297370585725741}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &6924934869824844794 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -9036842334875203369, guid: 342251b4ca1613147a88fcd7e98ac276, type: 3}
-  m_PrefabInstance: {fileID: 7101297370585725741}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8659009376639246725 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -7303119564941387096, guid: 342251b4ca1613147a88fcd7e98ac276, type: 3}
@@ -1613,6 +1613,27 @@ MonoBehaviour:
   ApplyRotation: 1
   ReferenceFrame: {fileID: 8727489803623170524}
   TrackingMode: 0
+--- !u!1818360608 &7169922996705638998
+PositionConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4312777740085904412}
+  m_Enabled: 0
+  m_Weight: 1
+  m_TranslationAtRest: {x: 0, y: 0, z: 0}
+  m_TranslationOffset: {x: 0, y: 0, z: 0}
+  m_AffectTranslationX: 1
+  m_AffectTranslationY: 1
+  m_AffectTranslationZ: 1
+  m_IsContraintActive: 0
+  m_IsLocked: 1
+  m_Sources:
+  - sourceTransform: {fileID: 0}
+    weight: 1
+  - sourceTransform: {fileID: 993875434627818080}
+    weight: 0
 --- !u!114 &5768694214254682536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1652,6 +1673,7 @@ MonoBehaviour:
   _hipPinningActive: 0
   _hipPinningLeaveRange: 0.3
   _skeleton: {fileID: 2038134759}
+  _mirrorSkeleton: {fileID: 0}
   _dataProvider: {fileID: 2038134762}
   _hipPinningTargets:
   - {fileID: 0}
@@ -1864,6 +1886,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _skeleton: {fileID: 2038134759}
+  _mirrorSkeleton: {fileID: 0}
   _animator: {fileID: 0}
   _spineTranslationCorrectionType: 1
   _leftArmPositionInfo:

@@ -1187,6 +1187,10 @@ PrefabInstance:
       propertyPath: _ovrFaceExpressions
       value: 
       objectReference: {fileID: 723382822}
+    - target: {fileID: 9019641223856128825, guid: 4a9c3c50bb28bdf418af4bb28501c305, type: 3}
+      propertyPath: _ovrFaceExpressions
+      value: 
+      objectReference: {fileID: 723382822}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4a9c3c50bb28bdf418af4bb28501c305, type: 3}
 --- !u!1001 &8563162955161708253
@@ -1243,6 +1247,10 @@ PrefabInstance:
     - target: {fileID: 4313630502284581082, guid: b7deeec84cfb5464f8178d08a689fcf0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6469653352445425161, guid: b7deeec84cfb5464f8178d08a689fcf0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7deeec84cfb5464f8178d08a689fcf0, type: 3}

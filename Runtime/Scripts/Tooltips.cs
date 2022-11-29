@@ -573,6 +573,9 @@ namespace Oculus.Movement
 
     public static class SmileEffectTooltips
     {
+        public const string SmileEnabled =
+            "Returns the current state of if smile is enabled or disabled.";
+
         public const string FacialExpressionDetector =
             "Facial expression detector to query events from.";
 
@@ -674,6 +677,9 @@ namespace Oculus.Movement
 
         public const string Skeleton =
             "The OVR Skeleton component.";
+
+        public const string MirrorSkeleton =
+            "The Mirror Skeleton component.";
 
         public const string Animator =
             "Animator component. Setting this will cause this script " +

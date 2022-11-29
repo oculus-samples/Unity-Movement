@@ -40,7 +40,7 @@ namespace Oculus.Movement.Effects
             public List<BodyJointProperties> BodyJointProperties;
 
             /// <summary>
-            /// All of the position constraints for hip pinning.
+            /// All of the disabled position constraints for hip pinning.
             /// </summary>
             public List<PositionConstraint> PositionConstraints;
 
@@ -247,10 +247,10 @@ namespace Oculus.Movement.Effects
         protected OVRCustomSkeleton _skeleton;
 
         /// <summary>
-        /// The tracking data provider.
+        /// The Mirror Skeleton component.
         /// </summary>
-        [SerializeField, Interface(typeof(OVRSkeleton.IOVRSkeletonDataProvider))]
-        protected MonoBehaviour _dataProvider;
+        [SerializeField]
+        protected MirrorSkeleton _mirrorSkeleton;
 
         /// <summary>
         /// The list of hip pinning targets in the scene.
@@ -264,7 +264,8 @@ namespace Oculus.Movement.Effects
         [SerializeField]
         protected HipPinningProperties _hipPinningProperties;
 
-        private OVRSkeleton.IOVRSkeletonDataProvider _skeletonDataProvider;
+        private OVRCustomSkeleton _currentSkeleton;
+        private OVRCustomSkeleton _originalSkeleton;
         private Vector3 _trackedHipTranslation;
         private Vector3 _calibratedHipTranslation;
         private bool _shouldFlipRotationLimit;
@@ -272,12 +273,20 @@ namespace Oculus.Movement.Effects
 
         private void Start()
         {
-            Assert.IsNotNull(_skeleton);
-            Assert.IsNotNull(_dataProvider);
+            Assert.IsTrue(_skeleton != null || _mirrorSkeleton != null);
+            if (_mirrorSkeleton != null)
+            {
+                _currentSkeleton = _mirrorSkeleton.MirroredSkeleton;
+                _originalSkeleton = _mirrorSkeleton.OriginalSkeleton;
+            }
+            else
+            {
+                _currentSkeleton = _skeleton;
+                _originalSkeleton = _skeleton;
+            }
             Assert.IsNotNull(_hipPinningProperties.HipBodyJointProperties);
             Assert.IsTrue(_hipPinningTargets.Length > 0);
 
-            _skeletonDataProvider = _dataProvider as OVRSkeleton.IOVRSkeletonDataProvider;
             SetHipPinningActive(_hipPinningActive);
             AssignClosestHipPinningTarget(_hipPinningProperties.HipBodyJointProperties.BodyJoint.transform.position);
         }
@@ -297,6 +306,15 @@ namespace Oculus.Movement.Effects
         public void SetHipPinningActive(bool isActive)
         {
             _hipPinningActive = isActive;
+
+            // Disable all position constraints
+            foreach (var positionConstraint in _hipPinningProperties.PositionConstraints)
+            {
+                if (positionConstraint != null)
+                {
+                    positionConstraint.enabled = false;
+                }
+            }
             if (isActive && _enableApplyTransformations)
             {
                 _hipPinningProperties.SetPositionConstraintsActive(false);
@@ -314,8 +332,7 @@ namespace Oculus.Movement.Effects
         /// <param name="position">The position of the character's hips.</param>
         public void CalibrateInitialHipHeight(Vector3 position)
         {
-            _calibratedHipTranslation = _skeletonDataProvider.GetSkeletonPoseData()
-                .BoneTranslations[(int)OVRSkeleton.BoneId.Body_Hips].FromFlippedZVector3f();
+            _calibratedHipTranslation = _hipPinningProperties.HipBodyJointProperties.BodyJoint.transform.position;
             if (_enableHipPinningHeightAdjustment)
             {
                 HipPinTarget.UpdateHeight(position.y - HipPinTarget.HipTargetTransform.position.y);
@@ -359,6 +376,7 @@ namespace Oculus.Movement.Effects
                     positionConstraint.translationAtRest = Vector3.zero;
                     positionConstraint.translationOffset = Vector3.zero;
                     positionConstraint.locked = true;
+                    positionConstraint.enabled = false;
                     HipPinProperties.PositionConstraints[i] = positionConstraint;
                 }
             }
@@ -374,13 +392,12 @@ namespace Oculus.Movement.Effects
                 return;
             }
 
-            var data = _skeletonDataProvider.GetSkeletonPoseData();
             if (_enableLegRotation)
             {
                 RestrictHipPinTargetRotation();
             }
 
-            if (_skeleton.IsDataValid)
+            if (_originalSkeleton.IsDataValid)
             {
                 _shouldUpdate = true;
             }
@@ -394,23 +411,45 @@ namespace Oculus.Movement.Effects
 
                 if (_hipPinningActive)
                 {
-                    RestrictAllBonesBasedOnHip(data);
+                    RestrictAllBonesBasedOnHip();
                 }
 
-                if (_enableHipPinningLeave && _skeleton.IsDataValid)
+                if (_enableHipPinningLeave && _originalSkeleton.IsDataValid)
                 {
-                    CheckIfHipPinningIsValid(data);
+                    CheckIfHipPinningIsValid();
                 }
-                if (!_skeleton.IsDataValid)
+
+                ApplyConstraints();
+
+                if (!_originalSkeleton.IsDataValid)
                 {
                     _shouldUpdate = false;
                 }
             }
         }
 
-        private void CheckIfHipPinningIsValid(OVRSkeleton.SkeletonPoseData data)
+        private void ApplyConstraints()
         {
-            Vector3 trackedHipTranslation = data.BoneTranslations[(int)OVRSkeleton.BoneId.Body_Hips].FromFlippedZVector3f();
+            var sources = new List<ConstraintSource>();
+            foreach (var positionConstraint in _hipPinningProperties.PositionConstraints)
+            {
+                if (positionConstraint.constraintActive)
+                {
+                    sources.Clear();
+                    positionConstraint.GetSources(sources);
+                    Vector3 constrainedPosition = Vector3.zero;
+                    foreach (var source in sources)
+                    {
+                        constrainedPosition += source.sourceTransform.position * source.weight;
+                    }
+                    positionConstraint.transform.position = constrainedPosition;
+                }
+            }
+        }
+
+        private void CheckIfHipPinningIsValid()
+        {
+            Vector3 trackedHipTranslation = _hipPinningProperties.HipBodyJointProperties.BodyJoint.transform.position;
             float dist = Vector3.Distance(_calibratedHipTranslation, trackedHipTranslation);
             if (dist > _hipPinningLeaveRange)
             {
@@ -525,61 +564,47 @@ namespace Oculus.Movement.Effects
             HipPinTarget.UpdateHipTargetTransform(_hipPinningProperties.HipBodyJointProperties.BodyJoint.transform.position);
         }
 
-        private void RestrictAllBonesBasedOnHip(OVRSkeleton.SkeletonPoseData data)
+        private void RestrictAllBonesBasedOnHip()
         {
-            if (data.IsDataValid)
-            {
-                _trackedHipTranslation = data.BoneTranslations[(int)OVRSkeleton.BoneId.Body_Hips].FromFlippedZVector3f();
-            }
+            _trackedHipTranslation = _hipPinningProperties.HipBodyJointProperties.BodyJoint.transform.localPosition;
             Vector3 hipPinningPosition = transform.InverseTransformPoint(HipPinTarget.HipTargetTransform.position);
             Vector3 toInitialHipPositionDelta = hipPinningPosition - _trackedHipTranslation;
 
             // Apply the offset transformation to all joints
             if (_enableApplyTransformations)
             {
-                ApplyOffsetTransformationBasedOnHip(data, toInitialHipPositionDelta);
+                ApplyOffsetTransformationBasedOnHip(toInitialHipPositionDelta);
             }
             else
             {
-                ApplyDecreasingTransformationBasedOnHip(data, toInitialHipPositionDelta);
+                ApplyDecreasingTransformationBasedOnHip(toInitialHipPositionDelta);
             }
-            _hipPinningProperties.HipBodyJointProperties.BodyJoint.transform.position =
-                HipPinTarget.HipTargetTransform.position;
         }
 
-        private void ApplyOffsetTransformationBasedOnHip(OVRSkeleton.SkeletonPoseData data, Vector3 toInitialHipPositionDelta)
+        private void ApplyOffsetTransformationBasedOnHip(Vector3 toInitialHipPositionDelta)
         {
-            for (int i = (int)OVRSkeleton.BoneId.Body_Hips + 1; i < _skeleton.Bones.Count; i++)
+            for (int i = (int)OVRSkeleton.BoneId.Body_Hips + 1; i < _currentSkeleton.Bones.Count; i++)
             {
-                var bone = _skeleton.Bones[i];
+                var bone = _currentSkeleton.Bones[i];
                 if (bone != null)
                 {
-                    if (data.IsDataValid)
-                    {
-                        bone.Transform.localPosition = data.BoneTranslations[i].FromFlippedZVector3f() + toInitialHipPositionDelta;
-                    }
-                    else
-                    {
-                        bone.Transform.localPosition += toInitialHipPositionDelta;
-                    }
+                    bone.Transform.localPosition += toInitialHipPositionDelta;
                 }
             }
         }
 
-        private void ApplyDecreasingTransformationBasedOnHip(OVRSkeleton.SkeletonPoseData data,
-            Vector3 toInitialHipPositionDelta)
+        private void ApplyDecreasingTransformationBasedOnHip(Vector3 toInitialHipPositionDelta)
         {
             // Apply a decreasing offset from hips to the specified joint
             for (int i = 1; i < _hipPinningProperties.BodyJointProperties.Count; i++)
             {
                 var boneId = OVRSkeleton.BoneId.Body_Hips + i;
-                var bone = _skeleton.Bones[(int)boneId];
+                var bone = _currentSkeleton.Bones[(int)boneId];
                 if (bone.Transform != null)
                 {
                     var bodyJointProperties = _hipPinningProperties.BodyJointProperties[i];
-                    Vector3 boneTranslation = data.BoneTranslations[(int)boneId].FromFlippedZVector3f();
                     Vector3 positionDeltaToApply = toInitialHipPositionDelta * bodyJointProperties.OffsetWeight;
-                    bone.Transform.localPosition = boneTranslation + positionDeltaToApply;
+                    bone.Transform.localPosition += positionDeltaToApply;
 
                     var constraintWeightDistance = Vector3.Distance(bone.Transform.position, HipPinTarget.SpineTargetTransforms[i].position);
                     if (constraintWeightDistance >= bodyJointProperties.PositionDistanceThreshold)

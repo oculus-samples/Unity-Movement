@@ -425,6 +425,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HighFidelityThirdPersonMirrored
       objectReference: {fileID: 0}
+    - target: {fileID: 7012604155270119660, guid: f5fbe4c8a3844794ea70af9a9ba83310, type: 3}
+      propertyPath: _skeleton
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8563559907054880308, guid: f5fbe4c8a3844794ea70af9a9ba83310, type: 3}
       propertyPath: _segmentEndUpAxis.x
       value: 1

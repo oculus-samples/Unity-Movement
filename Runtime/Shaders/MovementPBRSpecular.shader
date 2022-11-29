@@ -97,7 +97,7 @@ Shader "Movement/PBR (Specular)"
 
         Pass
         {
-            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,12.1.8]" }
             Name "FORWARD"
             Tags { "LightMode" = "UniversalForward" }
             Stencil
@@ -110,24 +110,23 @@ Shader "Movement/PBR (Specular)"
             ZWrite[_ZWrite]
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             // -------------------------------------
             // Material Keywords
             #pragma shader_feature _EMISSION
             #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-
-            #pragma shader_feature_local _SPECGLOSSMAP
-            #pragma shader_feature_local _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma shader_feature_local _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
-
-            #pragma shader_feature_local _AREA_LIGHT_SPECULAR
-            #pragma shader_feature_local _DIFFUSE_WRAP
-            #pragma shader_feature_local _SPECULAR_AFFECT_BY_NDOTL
             #pragma shader_feature_local _RECALCULATE_NORMALS
+
+            #pragma shader_feature_local_fragment _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local_fragment _SPECGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local_fragment _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _AREA_LIGHT_SPECULAR
+            #pragma shader_feature_local_fragment _DIFFUSE_WRAP
+            #pragma shader_feature_local_fragment _SPECULAR_AFFECT_BY_NDOTL
 
             // -------------------------------------
             // Universal Pipeline keywords
@@ -144,7 +143,6 @@ Shader "Movement/PBR (Specular)"
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
 
-            #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
 
             #pragma vertex VertexForwardBase
@@ -158,7 +156,7 @@ Shader "Movement/PBR (Specular)"
         //  Shadow rendering pass
         Pass
         {
-            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,12.1.8]" }
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
             Stencil
@@ -172,17 +170,14 @@ Shader "Movement/PBR (Specular)"
             ColorMask 0
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
-
-            #define UNITY_SETUP_BRDF_INPUT MetallicSetup
 
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _SPECGLOSSMAP
 
             #pragma multi_compile_instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -194,30 +189,34 @@ Shader "Movement/PBR (Specular)"
 
 		// ------------------------------------------------------------------
         // Extracts information for lightmapping, GI (emission, albedo, ...)
-        // This pass it not used during regular rendering.
+        // This pass is not used during regular rendering.
         Pass
         {
-            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,10.10.0]" }
+            PackageRequirements { "com.unity.render-pipelines.universal": "[10.8.1,12.1.8]" }
             Name "META"
             Tags { "LightMode" = "Meta" }
 
             Cull Off
 
             HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
+            #pragma exclude_renderers gles glcore
             #pragma target 4.5
 
             #pragma shader_feature _EMISSION
-            #pragma shader_feature_local _SPECULAR_SETUP
-            #pragma shader_feature_local _METALLICSPECGLOSSMAP
-            #pragma shader_feature_local _ALPHATEST_ON
-            #pragma shader_feature_local _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma shader_feature_local _ _DETAIL_MULX2 _DETAIL_SCALED
+            #pragma shader_feature_local_fragment _SPECULAR_SETUP
+            #pragma shader_feature_local_fragment _METALLICSPECGLOSSMAP
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
             #pragma shader_feature_local_fragment _SPECGLOSSMAP
 
             #pragma vertex UniversalVertexMeta
+#if UNITY_VERSION >= 202120
+            #pragma shader_feature EDITOR_VISUALIZATION
+            #pragma fragment UniversalFragmentMetaLit
+#else
             #pragma fragment UniversalFragmentMeta
+#endif
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"

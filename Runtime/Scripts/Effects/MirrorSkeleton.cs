@@ -12,17 +12,28 @@ namespace Oculus.Movement.Effects
     public class MirrorSkeleton : MonoBehaviour
     {
         /// <summary>
-        /// The camera which its viewport will be used to take the screenshot.
+        /// The skeleton which transform values are being mirrored from.
         /// </summary>
         [SerializeField]
         [Tooltip(MirrorSkeletonTooltips.SkeletonToCopy)]
-        private OVRCustomSkeleton _skeletonToCopy;
+        protected OVRCustomSkeleton _skeletonToCopy;
+
         /// <summary>
-        /// The target blendshape mapping.
+        /// The target skeleton which transform values are being mirrored to.
         /// </summary>
         [SerializeField]
         [Tooltip(MirrorSkeletonTooltips.MySkeleton)]
-        private OVRCustomSkeleton _mySkeleton;
+        protected OVRCustomSkeleton _mySkeleton;
+
+        /// <summary>
+        /// Returns the original skeleton that the mirrored skeleton is mirroring.
+        /// </summary>
+        public OVRCustomSkeleton OriginalSkeleton => _skeletonToCopy;
+
+        /// <summary>
+        /// Returns the mirrored skeleton.
+        /// </summary>
+        public OVRCustomSkeleton MirroredSkeleton => _mySkeleton;
 
         private void Awake()
         {

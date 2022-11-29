@@ -1074,9 +1074,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -9030175415902569553, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
   m_PrefabInstance: {fileID: 5368807790722968521}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1544769904406251662 stripped
+--- !u!4 &6828565186807125320 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 6913577617777828679, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
+  m_CorrespondingSourceObject: {fileID: -7763579146615603583, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
   m_PrefabInstance: {fileID: 5368807790722968521}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &4145346235155667402 stripped
@@ -1092,6 +1092,11 @@ Transform:
 --- !u!137 &1762312744520966081 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5977728229198574600, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
+  m_PrefabInstance: {fileID: 5368807790722968521}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &2404434375672670693 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1450279550107696596, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
   m_PrefabInstance: {fileID: 5368807790722968521}
   m_PrefabAsset: {fileID: 0}
 --- !u!137 &7066935007557725854 stripped
@@ -1114,9 +1119,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -3677990310633283053, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
   m_PrefabInstance: {fileID: 5368807790722968521}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &6828565186807125320 stripped
+--- !u!4 &1544769904406251662 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -7763579146615603583, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
+  m_CorrespondingSourceObject: {fileID: 6913577617777828679, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
   m_PrefabInstance: {fileID: 5368807790722968521}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1384872279543013800 stripped
@@ -1349,24 +1354,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -1277988569044078790, guid: 97c33b5b5e467ff4982d18b3cea2fa0e, type: 3}
   m_PrefabInstance: {fileID: 5368807790722968521}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4380863743731464986
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1844243561232676345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28dd40a6d175d01498e0477360d6c070, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Eye: 0
-  ConfidenceThreshold: 0
-  ApplyPosition: 0
-  ApplyRotation: 1
-  ReferenceFrame: {fileID: 5842140497988325688}
-  TrackingMode: 0
 --- !u!114 &-2211786842126212116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1548,9 +1535,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 090e3f120851d224c9f4188469fdd8b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _smileEnabled: 1
   _facialExpressionDetector: {fileID: 2171668725617520317}
   _materialIndex: 0
-  _renderer: {fileID: 7066935007557725854}
+  _renderer: {fileID: 2404434375672670693}
   _glowCurve:
     serializedVersion: 2
     m_Curve:
@@ -1587,7 +1575,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b5c606c5c75f840b53490db779fa62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _skeleton: {fileID: 1716912598449810202}
   _recalculateNormals:
   - {fileID: 8860770673698801992}
   _hipPinnings: []
@@ -1638,6 +1625,24 @@ MonoBehaviour:
   _duplicateLayerName: Character
   _hiddenMeshLayerName: HiddenMesh
   _recalculateMaterialIndices: 00000000
+--- !u!114 &4380863743731464986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844243561232676345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28dd40a6d175d01498e0477360d6c070, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Eye: 0
+  ConfidenceThreshold: 0
+  ApplyPosition: 0
+  ApplyRotation: 1
+  ReferenceFrame: {fileID: 5842140497988325688}
+  TrackingMode: 0
 --- !u!114 &4901543203706419426
 MonoBehaviour:
   m_ObjectHideFlags: 0

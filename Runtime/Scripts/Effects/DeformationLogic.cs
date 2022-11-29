@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Movement.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -163,8 +164,17 @@ namespace Oculus.Movement.Effects
         /// The OVR Skeleton component.
         /// </summary>
         [SerializeField]
+        [ConditionalHide("_mirrorSkeleton", null)]
         [Tooltip(DeformationLogicTooltips.Skeleton)]
         protected OVRCustomSkeleton _skeleton;
+
+        /// <summary>
+        /// The Mirror Skeleton component.
+        /// </summary>
+        [SerializeField]
+        [ConditionalHide("_skeleton", null)]
+        [Tooltip(DeformationLogicTooltips.MirrorSkeleton)]
+        protected MirrorSkeleton _mirrorSkeleton;
 
         /// <summary>
         /// Animator component. Setting this will cause this script
@@ -221,12 +231,13 @@ namespace Oculus.Movement.Effects
 
         private List<Transform> _hipToHeadTransforms = new List<Transform>();
         private List<BoneDistanceInfo> _bones = new List<BoneDistanceInfo>();
+        private OVRCustomSkeleton _currentSkeleton;
+        private OVRCustomSkeleton _originalSkeleton;
         private Transform _hipTransform;
         private Transform _chestTransform;
         private Transform _headTransform;
         private float _hipToHeadDistance;
         private bool _shouldUpdate = true;
-
         private bool _hasRunSpineCorrection = false;
 
         /// <summary>
@@ -234,13 +245,23 @@ namespace Oculus.Movement.Effects
         /// </summary>
         private void Awake()
         {
-            Assert.IsTrue(_skeleton != null || _animator != null);
+            Assert.IsTrue(_skeleton != null || _mirrorSkeleton != null || _animator != null);
+            if (_mirrorSkeleton != null)
+            {
+                _currentSkeleton = _mirrorSkeleton.MirroredSkeleton;
+                _originalSkeleton = _mirrorSkeleton.OriginalSkeleton;
+            }
+            else
+            {
+                _currentSkeleton = _skeleton;
+                _originalSkeleton = _skeleton;
+            }
 
             if (_animator == null)
             {
                 for (int i = (int)OVRSkeleton.BoneId.Body_Hips; i <= (int)OVRSkeleton.BoneId.Body_Head; i++)
                 {
-                    _hipToHeadTransforms.Add(_skeleton.CustomBones[i].transform);
+                    _hipToHeadTransforms.Add(_currentSkeleton.CustomBones[i].transform);
                 }
             }
             else
@@ -255,15 +276,15 @@ namespace Oculus.Movement.Effects
 
             _hipTransform =
                 _animator == null ?
-                _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips].transform :
+                _currentSkeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips].transform :
                 _animator.GetBoneTransform(HumanBodyBones.Hips).transform;
             _chestTransform =
                 _animator == null ?
-                _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Chest].transform :
+                _currentSkeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Chest].transform :
                 _animator.GetBoneTransform(HumanBodyBones.Chest).transform;
             _headTransform =
                 _animator == null ?
-                _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Head].transform :
+                _currentSkeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Head].transform :
                 _animator.GetBoneTransform(HumanBodyBones.Head).transform;
 
             Assert.IsTrue(_hipToHeadTransforms.Count > 0);
@@ -352,7 +373,7 @@ namespace Oculus.Movement.Effects
                 return;
             }
 
-            if (_skeleton.IsDataValid)
+            if (_originalSkeleton.IsDataValid)
             {
                 _shouldUpdate = true;
             }
@@ -375,7 +396,7 @@ namespace Oculus.Movement.Effects
                     FixArms();
                 }
 
-                if (!_skeleton.IsDataValid)
+                if (!_originalSkeleton.IsDataValid)
                 {
                     _shouldUpdate = false;
                 }

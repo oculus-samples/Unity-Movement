@@ -20,6 +20,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2038134757, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
+      propertyPath: _dataProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2038134757, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
+      propertyPath: _mirrorSkeleton
+      value: 
+      objectReference: {fileID: -8931793001774784486}
+    - target: {fileID: 2038134757, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
       propertyPath: _hipPinningTargets.Array.data[0]
       value: 
       objectReference: {fileID: 0}
@@ -639,6 +647,7 @@ PrefabInstance:
     - {fileID: 7386947536449641382, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
     - {fileID: 5768694214254682536, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
     - {fileID: 2006963883397985578, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
+    - {fileID: 2038134762, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 4419724eef9cb8c409ac5c13015118f6, type: 3}
 --- !u!1 &5275667044770607249 stripped
 GameObject:

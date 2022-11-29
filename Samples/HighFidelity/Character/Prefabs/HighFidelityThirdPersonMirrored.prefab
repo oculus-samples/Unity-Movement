@@ -119,6 +119,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 11
       objectReference: {fileID: 0}
+    - target: {fileID: 2311206968940743281, guid: 2fe762aa8ab3a564eb11f93c9151fab4, type: 3}
+      propertyPath: _mirrorSkeleton
+      value: 
+      objectReference: {fileID: 589999306}
     - target: {fileID: 2419197305586131674, guid: 2fe762aa8ab3a564eb11f93c9151fab4, type: 3}
       propertyPath: m_Layer
       value: 11
@@ -575,6 +579,7 @@ PrefabInstance:
     - {fileID: 4931772549127845933, guid: 2fe762aa8ab3a564eb11f93c9151fab4, type: 3}
     - {fileID: 6023657874937492150, guid: 2fe762aa8ab3a564eb11f93c9151fab4, type: 3}
     - {fileID: 6884224818718407631, guid: 2fe762aa8ab3a564eb11f93c9151fab4, type: 3}
+    - {fileID: 6216032455438905581, guid: 2fe762aa8ab3a564eb11f93c9151fab4, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 2fe762aa8ab3a564eb11f93c9151fab4, type: 3}
 --- !u!1 &919132149155446097 stripped
 GameObject:

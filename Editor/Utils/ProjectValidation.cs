@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using UnityEditor;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -42,21 +43,56 @@ namespace Oculus.Movement.Utils
             return allLayersArePresent;
         }
 
-        /// <summary>
-        /// If the project is using URP, returns true if vulkan is set.
-        /// </summary>
-        /// <returns>True if vulkan is set and the project requires URP.</returns>
-        public static bool TestVulkan()
+        public static bool TestPreloadedShaders()
         {
-            bool vulkanFoundOrNotRequired = GraphicsSettings.renderPipelineAsset == null
-                                            || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan
-                                            || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D11;
-            return vulkanFoundOrNotRequired;
+            bool hasPreloadedShaders = false;
+            var settings = new SerializedObject(GraphicsSettings.GetGraphicsSettings());
+            var preloadedShaders = settings.FindProperty("m_PreloadedShaders");
+            var expectedSpecularKeywords = new string[]
+            {
+                "DIRECTIONAL",
+                "LIGHTPROBE_SH",
+                "_AREA_LIGHT_SPECULAR",
+                "_DIFFUSE_WRAP",
+                "_NORMALMAP",
+                "_RECALCULATE_NORMALS",
+                "_SPECGLOSSMAP",
+                "_SPECULAR_AFFECT_BY_NDOTL"
+            };
+            var expectedMetallicKeywords = new string[]
+            {
+                "DIRECTIONAL",
+                "LIGHTPROBE_SH",
+                "_AREA_LIGHT_SPECULAR",
+                "_EMISSION",
+                "_DIFFUSE_WRAP",
+                "_NORMALMAP",
+                "_RECALCULATE_NORMALS",
+                "_METALLICGLOSSMAP",
+                "_SPECULAR_AFFECT_BY_NDOTL"
+            };
+            for (int i = 0; i < preloadedShaders.arraySize; i++)
+            {
+                var shaderVariantCollection = (ShaderVariantCollection)preloadedShaders.GetArrayElementAtIndex(i).objectReferenceValue;
+                if (shaderVariantCollection != null)
+                {
+                    var specRecalcVariant = new ShaderVariantCollection.ShaderVariant(Shader.Find("Movement/PBR (Specular)"),
+                        PassType.ForwardBase, expectedSpecularKeywords);
+                    var metallicRecalcVariant = new ShaderVariantCollection.ShaderVariant(Shader.Find("Movement/PBR (Metallic)"),
+                        PassType.ForwardBase, expectedMetallicKeywords);
+                    if (shaderVariantCollection.Contains(specRecalcVariant) &&
+                        shaderVariantCollection.Contains(metallicRecalcVariant))
+                    {
+                        hasPreloadedShaders = true;
+                    }
+                }
+            }
+            return hasPreloadedShaders;
         }
 
         private static bool ShouldShowWindow()
         {
-            return !TestLayers() || !TestVulkan();
+            return !TestLayers() || !TestPreloadedShaders();
         }
     }
 
@@ -84,7 +120,7 @@ namespace Oculus.Movement.Utils
         {
             EditorWindow editorWindow = this;
 
-            Vector2 windowSize = new Vector2(600, 200);
+            Vector2 windowSize = new Vector2(600, 300);
             editorWindow.minSize = windowSize;
             editorWindow.maxSize = windowSize;
         }
@@ -92,7 +128,7 @@ namespace Oculus.Movement.Utils
         private void OnGUI()
         {
             bool layersValid = ProjectValidation.TestLayers();
-            bool vulkanValid = ProjectValidation.TestVulkan();
+            bool shaderVariantsValid = ProjectValidation.TestPreloadedShaders();
             GUIStyle labelStyle = new GUIStyle (EditorStyles.label);
             labelStyle.richText = true;
             labelStyle.wordWrap = true;
@@ -111,12 +147,12 @@ namespace Oculus.Movement.Utils
                 GUILayout.EndVertical();
                 GUI.enabled = true;
 
-                GUI.enabled = !vulkanValid;
+                GUI.enabled = !shaderVariantsValid;
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    GUILayout.Label("Vulkan", EditorStyles.boldLabel);
+                    GUILayout.Label("Shader Variant Collection", EditorStyles.boldLabel);
                     GUILayout.Label(
-                        "Set the primary graphics API to Vulkan in <b>Edit -> Project Settings -> Player -> Other Settings -> Graphics API</b>.",
+                        "For the sample scenes, the Recalculate Normals shader variants must be included in the project.\n\nA shader variant collection (MovementPBRVariants) containing these keywords is located inside of <b>Runtime/Shaders</b>. To include this collection, copy the <b>MovementPBRVariants</b> shader variant collection located in <b>Runtime/Shaders</b> into your project folder. Head to <b>Edit -> Project Settings -> Graphics</b> and in <b>Preloaded Shaders</b> near the bottom of the window, increase the size of the array by 1 and fill the empty entry with the copied <b>MovementPBRVariants</b> shader variant collection.",
                         labelStyle);
                     GUILayout.Space(5);
                 }
