@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/oculus-samples/Unity-Movement/compare/v1.3.0...v1.3.1) (2022-11-30)
+
+
+### Bug Fixes
+
+* **Editor:** Add additional copyright text to copyright header in ShaderBuildPreprocessor ([9ef2c9f](https://github.com/oculus-samples/Unity-Movement/commit/9ef2c9f3d26c4b6f9a552e09744a1d035d662e3f))
+
 # [1.3.0](https://github.com/oculus-samples/Unity-Movement/compare/v1.2.2...v1.3.0) (2022-11-29)
 
 
