@@ -2,7 +2,7 @@
 Unity-Movement is a package that uses OpenXR’s tracking layer APIs to expose Meta Quest Pro’s Body Tracking (BT), Eye Tracking (ET), and Face Tracking (FT) capabilities. With this package, developers can leverage tracking to populate VR environments with custom avatars that bring the expressiveness of users into the virtual environments that they create.
 
 ### Requirements
-- Unity 2020.3.40f1 (2020 LTS) or newer installed
+- Unity 2020.3.42f1 (2020 LTS) or newer installed
 - v46.0 or newer of the Oculus Integration SDK with OVRPlugin set to use OpenXR as backend. Make sure to include the VR and Interaction folders when importing into your project.
 - A project set up with these [configuration settings](https://developer.oculus.com/documentation/unity/unity-conf-settings/)
 
