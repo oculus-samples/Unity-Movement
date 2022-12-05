@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/oculus-samples/Unity-Movement/compare/v1.3.1...v1.3.2) (2022-12-05)
+
+
+### Bug Fixes
+
+* **Samples:** Set permission requests on startup for sample scenes, update Unity version in README ([7180d6f](https://github.com/oculus-samples/Unity-Movement/commit/7180d6f5e10b6d18424457da873100ee75e8e4a8))
+
 ## [1.3.1](https://github.com/oculus-samples/Unity-Movement/compare/v1.3.0...v1.3.1) (2022-11-30)
 
 
