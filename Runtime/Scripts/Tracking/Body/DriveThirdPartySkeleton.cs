@@ -341,8 +341,7 @@ namespace Oculus.Movement.Tracking
 
             _targetSkeletonTPoseData = new SkeletonMetadata(_animatorTargetTPose);
             _targetSkeletonTPoseData.BuildCoordinateAxesForAllBones();
-            _targetSkeletonData.BuildCoordinateAxesForAllBones(
-                _targetSkeletonTPoseData.BodyToBoneData);
+            _targetSkeletonData.BuildCoordinateAxesForAllBones();
         }
 
         private void CreateCustomBoneIdToHumanBodyBoneMapping()
@@ -675,8 +674,7 @@ namespace Oculus.Movement.Tracking
 
             if (_targetSkeletonData != null && _sourceSkeletonData != null)
             {
-                _targetSkeletonData.BuildCoordinateAxesForAllBones(
-                    _sourceSkeletonData.BodyToBoneData);
+                _targetSkeletonData.BuildCoordinateAxesForAllBones();
             }
         }
 
