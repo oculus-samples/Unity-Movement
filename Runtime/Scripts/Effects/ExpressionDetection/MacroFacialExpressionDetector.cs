@@ -103,6 +103,11 @@ namespace Oculus.Movement.Effects
             public readonly MacroExpressionState State;
 
             /// <summary>
+            /// Previous macro expression state.
+            /// </summary>
+            public readonly MacroExpressionState PreviousState;
+
+            /// <summary>
             /// Min value of blendshapes associated with macro expression.
             /// This "floor" gives an indication of how strong the macro expression is.
             /// </summary>
@@ -117,10 +122,12 @@ namespace Oculus.Movement.Effects
             public MacroExpressionStateChangeEventArgs(
                 MacroExpressionType expression,
                 MacroExpressionState state,
+                MacroExpressionState previousState,
                 float minExpressionValue)
             {
                 Expression = expression;
                 State = state;
+                PreviousState = previousState;
                 MinExpressionValue = minExpressionValue;
             }
         }
@@ -133,11 +140,19 @@ namespace Oculus.Movement.Effects
         private Dictionary<MacroExpressionType, MacroExpressionState> _macroExpressionTypeToState =
             new Dictionary<MacroExpressionType, MacroExpressionState>();
 
+        public Dictionary<MacroExpressionType, float> MacroExpressionTypeToStrength { get; private set; }
+
         private void Awake()
         {
             Assert.IsNotNull(_ovrFaceExpressions);
             Assert.IsTrue(_macroExpressionsToEvaluate != null &&
                 _macroExpressionsToEvaluate.Length > 0);
+
+            MacroExpressionTypeToStrength = new Dictionary<MacroExpressionType, float>();
+            foreach (var macroExpr in _macroExpressionsToEvaluate)
+            {
+                MacroExpressionTypeToStrength.Add(macroExpr.MacroExpressionTypeDetected, 0.0f);
+            }
         }
 
         private void Update()
@@ -175,7 +190,8 @@ namespace Oculus.Movement.Effects
             _macroExpressionTypeToState[macroExpressionType] = newMacroExpressionState;
             float lowestFaceExpressionValue = GetLowestFaceExpressionValue(
                 macroExpressionData.Thresholds);
-            FireExpressionStateEvent(
+            MacroExpressionTypeToStrength[macroExpressionType] = lowestFaceExpressionValue;
+            CheckExpressionStateEventChange(
                 currentMacroExpressionState,
                 newMacroExpressionState,
                 macroExpressionType,
@@ -265,7 +281,7 @@ namespace Oculus.Movement.Effects
         /// <param name="newMacroExpressionState">New macro expression state.</param>
         /// <param name="macroExpressionType">Macro expression type.</param>
         /// <param name="minFaceExpressionValue">Min face expression value.</param>
-        private void FireExpressionStateEvent(
+        private void CheckExpressionStateEventChange(
             MacroExpressionState currentMacroExpressionState,
             MacroExpressionState newMacroExpressionState,
             MacroExpressionType macroExpressionType,
@@ -277,6 +293,7 @@ namespace Oculus.Movement.Effects
                 MacroExpressionStateChange?.Invoke(new MacroExpressionStateChangeEventArgs(
                         macroExpressionType,
                         newMacroExpressionState,
+                        currentMacroExpressionState,
                         minFaceExpressionValue)
                     );
             }
