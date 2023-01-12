@@ -28,9 +28,10 @@ namespace Oculus.Movement.Tracking
         protected OVRFaceExpressions _ovrFaceExpressions;
 
         /// <summary>
-        /// Corrective shapes driver component.
+        /// Optional corrective shapes driver component.
         /// </summary>
         [SerializeField]
+        [Optional]
         [Tooltip(FaceTrackingSystemTooltips.CorrectiveShapesDriver)]
         protected CorrectiveShapesDriver _correctiveShapesDriver;
 
@@ -43,7 +44,7 @@ namespace Oculus.Movement.Tracking
         protected BlendshapeModifier _blendshapeModifier;
 
         /// <summary>
-        /// If true, the corrective driver will run and apply correctives.
+        /// If true, the correctives driver will apply correctives.
         /// </summary>
         public bool CorrectivesEnabled { get; set; }
 
@@ -61,7 +62,6 @@ namespace Oculus.Movement.Tracking
         {
             Assert.IsNotNull(_blendShapeMapping);
             Assert.IsNotNull(_ovrFaceExpressions);
-            Assert.IsNotNull(_correctiveShapesDriver);
             ExpressionWeights = new float[(int)OVRFaceExpressions.FaceExpression.Max];
 
             CorrectivesEnabled = true;
@@ -82,7 +82,7 @@ namespace Oculus.Movement.Tracking
                 UpdateAllMeshesUsingFaceTracking();
             }
 
-            if (CorrectivesEnabled)
+            if (CorrectivesEnabled && _correctiveShapesDriver != null)
             {
                 _correctiveShapesDriver.ApplyCorrectives();
             }

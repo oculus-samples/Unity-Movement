@@ -535,7 +535,7 @@ namespace Oculus.Movement
             "OVR face expressions component.";
 
         public const string CorrectiveShapesDriver =
-            "Corrective shapes driver component.";
+            "Optional corrective shapes driver component.";
 
         public const string BlendshapeModifier =
             "Optional blendshape modifier component.";
