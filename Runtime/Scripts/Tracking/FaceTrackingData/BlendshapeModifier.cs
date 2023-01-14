@@ -73,6 +73,7 @@ namespace Oculus.Movement.Tracking
         [SerializeField]
         [Tooltip(BlendshapeModifierTooltips.FaceExpressionsModifiers)]
         private FaceExpressionModifier[] _faceExpressionModifiers;
+        public IReadOnlyCollection<FaceExpressionModifier> Modifiers => _faceExpressionModifiers;
 
         /// <summary>
         /// Optional text asset containing the array of face expression modifier data to be used.
@@ -83,6 +84,9 @@ namespace Oculus.Movement.Tracking
         private TextAsset _defaultBlendshapeModifierPreset;
 
         private Dictionary<OVRFaceExpressions.FaceExpression, FaceExpressionModifier> _faceExpressionModifierMap;
+        public IReadOnlyDictionary<OVRFaceExpressions.FaceExpression, FaceExpressionModifier>
+            FaceExpressionModifierMap => _faceExpressionModifierMap;
+
         private float _globalMultiplier = 1.0f;
         private float _globalClampMin = 0.0f;
         private float _globalClampMax = 2.0f;

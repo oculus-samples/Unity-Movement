@@ -146,6 +146,7 @@ namespace Oculus.Movement.Tracking
                     if (_blendshapeModifier != null)
                     {
                         currentWeight = _blendshapeModifier.GetModifiedWeight(blendShapeToFaceExpression, currentWeight);
+
                     }
                     renderer.SetBlendShapeWeight(blendShapeIndex, currentWeight * 100.0f);
                 }
