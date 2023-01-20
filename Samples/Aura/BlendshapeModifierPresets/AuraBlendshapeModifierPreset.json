@@ -5,7 +5,7 @@
         63
       ],
       "MinValue": 0.0,
-      "MaxValue": 2.0,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -14,8 +14,8 @@
         13
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.03754783,
-      "Multiplier": 2.0
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -23,7 +23,7 @@
         15
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.00881648,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -32,7 +32,7 @@
         17
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.9798645,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -41,8 +41,8 @@
         19
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.02295935,
-      "Multiplier": 1.03944123
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -50,7 +50,7 @@
         21
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.00062835,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -59,8 +59,8 @@
         29
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.04812384,
-      "Multiplier": 1.00360215
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -68,15 +68,15 @@
         60
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.0,
-      "Multiplier": 0.0
+      "MaxValue": 1.0,
+      "Multiplier": 0.5
     },
     {
       "FaceExpressions": [
         24
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.0217824,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -85,7 +85,7 @@
         26
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.03177655,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -93,7 +93,7 @@
         27
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.0,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -102,8 +102,8 @@
         35
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.0483321,
-      "Multiplier": 1.50184667
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -111,8 +111,8 @@
         37
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.02913582,
-      "Multiplier": 1.51864386
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -120,8 +120,8 @@
         41
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.038818,
-      "Multiplier": 1.46745908
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -130,7 +130,7 @@
       ],
       "MinValue": 0.0,
       "MaxValue": 0.0,
-      "Multiplier": 1.03382564
+      "Multiplier": 0.0
     },
     {
       "FaceExpressions": [
@@ -139,7 +139,7 @@
       ],
       "MinValue": 0.0,
       "MaxValue": 0.0,
-      "Multiplier": 1.0
+      "Multiplier": 0.0
     },
     {
       "FaceExpressions": [
@@ -147,7 +147,7 @@
       ],
       "MinValue": 0.0,
       "MaxValue": 1.0,
-      "Multiplier": 1.0
+      "Multiplier": 0.5
     },
     {
       "FaceExpressions": [
@@ -155,8 +155,8 @@
         52
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.9998627,
-      "Multiplier": 1.01361632
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -164,7 +164,7 @@
         9
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.01625609,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -173,8 +173,8 @@
         31
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.9741072,
-      "Multiplier": 1.018076
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -182,8 +182,8 @@
         33
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.04310369,
-      "Multiplier": 1.4681288
+      "MaxValue": 1.0,
+      "Multiplier": 1.2
     },
     {
       "FaceExpressions": [
@@ -191,8 +191,8 @@
         43
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.04031849,
-      "Multiplier": 0.989614546
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -200,8 +200,8 @@
         54
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.03606462,
-      "Multiplier": 0.9731981
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -209,7 +209,7 @@
         39
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.9938622,
+      "MaxValue": 1.0,
       "Multiplier": 1.0
     },
     {
@@ -227,8 +227,8 @@
         62
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.965965033,
-      "Multiplier": 1.0
+      "MaxValue": 1.0,
+      "Multiplier": 0.5
     },
     {
       "FaceExpressions": [
@@ -236,8 +236,8 @@
         3
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.024452,
-      "Multiplier": 1.32050812
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
     },
     {
       "FaceExpressions": [
@@ -245,8 +245,8 @@
         5
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.00315547,
-      "Multiplier": 1.04045308
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -254,8 +254,8 @@
         7
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.9984256,
-      "Multiplier": 0.9549872
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -263,8 +263,8 @@
         11
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.0032661,
-      "Multiplier": 1.00879073
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -272,8 +272,8 @@
         56
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.04196811,
-      "Multiplier": 2.0
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
     },
     {
       "FaceExpressions": [
@@ -281,7 +281,7 @@
         1
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.03239882,
+      "MaxValue": 1.0,
       "Multiplier": 1.5
     },
     {
@@ -290,7 +290,7 @@
         23
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.04715312,
+      "MaxValue": 1.0,
       "Multiplier": 1.5
     },
     {
@@ -299,7 +299,7 @@
         58
       ],
       "MinValue": 0.0,
-      "MaxValue": 1.01463962,
+      "MaxValue": 1.0,
       "Multiplier": 1.5
     }
   ]

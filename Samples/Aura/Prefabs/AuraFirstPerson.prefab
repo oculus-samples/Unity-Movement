@@ -37,7 +37,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5062257003467462296, guid: 494f495b562c6304b90534df82a1408f, type: 3}
       propertyPath: m_Name
-      value: Aura
+      value: AuraFirstPerson
       objectReference: {fileID: 0}
     - target: {fileID: 5551653290356837410, guid: 494f495b562c6304b90534df82a1408f, type: 3}
       propertyPath: m_RootOrder
@@ -93,4 +93,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8860770673698801992, guid: 494f495b562c6304b90534df82a1408f, type: 3}
+    - {fileID: 3395331647892349681, guid: 494f495b562c6304b90534df82a1408f, type: 3}
+    - {fileID: 8100845712999224004, guid: 494f495b562c6304b90534df82a1408f, type: 3}
+    - {fileID: -2211786842126212116, guid: 494f495b562c6304b90534df82a1408f, type: 3}
+    - {fileID: 495875790411692473, guid: 494f495b562c6304b90534df82a1408f, type: 3}
+    - {fileID: 666620615124510092, guid: 494f495b562c6304b90534df82a1408f, type: 3}
+    - {fileID: 6374870323416236432, guid: 494f495b562c6304b90534df82a1408f, type: 3}
+    - {fileID: 2171668725617520317, guid: 494f495b562c6304b90534df82a1408f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 494f495b562c6304b90534df82a1408f, type: 3}

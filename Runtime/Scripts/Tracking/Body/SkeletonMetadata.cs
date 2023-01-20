@@ -243,19 +243,11 @@ namespace Oculus.Movement.Tracking
         /// collection has been passed in, use its coordinate system (per
         /// bone) as a reference for computation.
         /// </summary>
-        public void BuildCoordinateAxesForAllBones(
-             Dictionary<HumanBodyBones, BoneData> referenceBoneToData = null)
+        public void BuildCoordinateAxesForAllBones()
         {
             foreach (var key in _bodyToBoneData.Keys)
             {
                 var boneData = _bodyToBoneData[key];
-
-                Vector3? refUpVector = null;
-                if (referenceBoneToData != null && referenceBoneToData.ContainsKey(key))
-                {
-                    var boneDataT = referenceBoneToData[key];
-                    refUpVector = boneDataT.JointPairOrientation * Vector3.up;
-                }
 
                 var jointPairStartPosition = boneData.JointPairStart.position;
                 var jointPairEndPosition = Vector3.zero;
@@ -296,8 +288,7 @@ namespace Oculus.Movement.Tracking
                     boneData.JointPairOrientation =
                         CreateQuaternionForBoneData(
                             jointPairStartPosition,
-                            jointPairEndPosition,
-                            refUpVector);
+                            jointPairEndPosition);
                 }
 
                 boneData.FromPosition   = boneData.OriginalJoint.position;
@@ -359,36 +350,8 @@ namespace Oculus.Movement.Tracking
             {
                 forwardVec = Vector3.forward;
             }
-            Vector3 candidateUp = refUpVec.HasValue ? refUpVec.Value : Vector3.up;
 
-            // "Nudge" up vector until it's not perpendicular to forward vec.
-            // We do this because we want all bone coordinate systems to be very
-            // similar to each other, because eventually we want to align them
-            // consistently to a desired t-pose. It would be odd if adjacent
-            // bones have very different up vectors.
-            const int maxNumTries = 10;
-            int tryIndex = 0;
-            while (
-                IsAlmostParallel(candidateUp, forwardVec) &&
-                tryIndex < maxNumTries)
-            {
-                candidateUp[0] += 0.1f;
-                candidateUp.Normalize();
-                tryIndex++;
-            }
-
-            // If nudging didn't work, just try a completely different vector.
-            if (IsAlmostParallel(candidateUp, forwardVec))
-            {
-                candidateUp = Vector3.right;
-            }
-
-            return Quaternion.LookRotation(forwardVec, candidateUp);
-        }
-
-        private bool IsAlmostParallel(Vector3 first, Vector3 second)
-        {
-            return Mathf.Abs(Vector3.Dot(first, second)) > 0.98f;
+            return Quaternion.LookRotation(forwardVec);
         }
     }
 }

@@ -535,7 +535,7 @@ namespace Oculus.Movement
             "OVR face expressions component.";
 
         public const string CorrectiveShapesDriver =
-            "Corrective shapes driver component.";
+            "Optional corrective shapes driver component.";
 
         public const string BlendshapeModifier =
             "Optional blendshape modifier component.";
@@ -587,6 +587,18 @@ namespace Oculus.Movement
 
         public const string GlowCurve =
             "Glow curve that modulates emission strength on face.";
+
+        public const string Animator =
+            "Petal animator to affect when smiling.";
+
+        public const string SmileDelay =
+            "Delay until smile gets triggered (seconds).";
+
+        public const string SmileStateNake =
+            "State name for smile.";
+
+        public const string ReverseSmileStateName =
+            "State name for reverse smile (when it \"undoes\" itself).";
     }
 
     public static class ScreenshotFaceExpressionsTooltips
