@@ -1,3 +1,15 @@
+## [1.3.3](https://github.com/oculus-samples/Unity-Movement/compare/v1.3.2...v1.3.3) (2023-01-21)
+
+
+### Bug Fixes
+
+* **Runtime:** FaceTrackingSystem Correctives now optional ([213d5b0](https://github.com/oculus-samples/Unity-Movement/commit/213d5b05841dd25b4b20bce6260cfe306c3415d8))
+* **Runtime:** Remove maximum version in URP shader package requirements ([a3faab3](https://github.com/oculus-samples/Unity-Movement/commit/a3faab3b55a59da70e44523f57e7a12c6fc0c1ae))
+* **Runtime:** Retargeting cleanup ([0febd9f](https://github.com/oculus-samples/Unity-Movement/commit/0febd9fc95bc0da7ebf264da29371d7f34d9cc14))
+* **Samples:** Remove Aura's z-offset ([1193670](https://github.com/oculus-samples/Unity-Movement/commit/11936709db6c93780572738985edf40e28a4d3e1))
+* **Samples:** Simplify AuraFirstPerson prefab to required components ([436ffb4](https://github.com/oculus-samples/Unity-Movement/commit/436ffb4546aca2180b2d0f14922446ccf3657bad))
+* **Samples:** Updated smile effect ([f8bdd9f](https://github.com/oculus-samples/Unity-Movement/commit/f8bdd9f06502e7a8e0c8b3e789f7cb18b8c2e500))
+
 ## [1.3.2](https://github.com/oculus-samples/Unity-Movement/compare/v1.3.1...v1.3.2) (2022-12-05)
 
 
