@@ -62,16 +62,25 @@ namespace Oculus.Movement.Tracking
         {
             Assert.IsNotNull(_blendShapeMapping);
             Assert.IsNotNull(_ovrFaceExpressions);
-            ExpressionWeights = new float[(int)OVRFaceExpressions.FaceExpression.Max];
+            InitializeExpressionWeights();
 
             CorrectivesEnabled = true;
+        }
+
+        private void InitializeExpressionWeights()
+        {
+            ExpressionWeights = new float[(int)OVRFaceExpressions.FaceExpression.Max];
+            for (int i = 0; i < (int)OVRFaceExpressions.FaceExpression.Max; i++)
+            {
+                ExpressionWeights[i] = 0.0f;
+            }
         }
 
         private void Update()
         {
             if (ExpressionWeights == null || ExpressionWeights.Length != (int)OVRFaceExpressions.FaceExpression.Max)
             {
-                ExpressionWeights = new float[(int)OVRFaceExpressions.FaceExpression.Max];
+                InitializeExpressionWeights();
             }
 
             if (_ovrFaceExpressions.enabled &&
