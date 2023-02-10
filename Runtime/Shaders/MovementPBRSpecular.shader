@@ -75,7 +75,7 @@ Shader "Movement/PBR (Specular)"
 
         [HideInInspector] _AreaLightSampleToggle("_AreaLightSampleToggle", Float) = 0.0
         [HideInInspector] _DiffuseWrapEnabled("_DiffuseWrapEnabled", Float) = 0.0
-        [HideInInspector] _SpecularityNDotL("_SpecularityNDotL", Float) = 0.0
+        [HideInInspector] _SpecularityNDotL("_SpecularityNDotL", Float) = 1.0
         [HideInInspector] _RecalculateNormalsToggle("_RecalculateNormalsToggle", Float) = 0.0
     }
 
