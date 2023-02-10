@@ -18,6 +18,12 @@ namespace Oculus.Movement.Effects
         public System.Action GeneratedDuplicateMesh;
 
         /// <summary>
+        /// The layer of the duplicate mesh with recalculate normals, should
+        /// be on a visible layer.
+        /// </summary>
+        public string DuplicateLayerName { get => _duplicateLayerName; set => _duplicateLayerName = value; }
+
+        /// <summary>
         /// Skinned mesh renderer requiring normal recalc.
         /// </summary>
         [SerializeField]
@@ -40,6 +46,14 @@ namespace Oculus.Movement.Effects
         [SerializeField]
         [Tooltip(RecalculateNormalsTooltips.UseUnityFunction)]
         protected bool _useUnityFunction = false;
+
+        /// <summary>
+        /// Allows recalculate normals to be calculated independently on
+        /// LateUpdate, instead of being driven from DriveSkeletalLateUpdateLogic.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RecalculateNormalsTooltips.RecalculateIndependently)]
+        protected bool _recalculateIndependently = false;
 
         /// <summary>
         /// The layer of the duplicate mesh with recalculate normals, should
@@ -181,6 +195,15 @@ namespace Oculus.Movement.Effects
             }
 
             GeneratedDuplicateMesh?.Invoke();
+        }
+
+        private void LateUpdate()
+        {
+            if (!_recalculateIndependently)
+            {
+                return;
+            }
+            ApplyNormalRecalculation();
         }
 
         /// <summary>
