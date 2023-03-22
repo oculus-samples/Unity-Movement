@@ -118,7 +118,6 @@ Shader "Movement/PBR (Metallic)"
             // Material Keywords
             #pragma shader_feature _EMISSION
             #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _RECALCULATE_NORMALS
 
             #pragma shader_feature_local_fragment _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local_fragment _METALLICGLOSSMAP
@@ -144,6 +143,7 @@ Shader "Movement/PBR (Metallic)"
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
 
+            #pragma multi_compile_local _ _RECALCULATE_NORMALS
             #pragma multi_compile_instancing
 
             #pragma vertex VertexForwardBase
@@ -261,8 +261,8 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature_local _AREA_LIGHT_SPECULAR
             #pragma shader_feature_local _DIFFUSE_WRAP
             #pragma shader_feature_local _SPECULAR_AFFECT_BY_NDOTL
-            #pragma shader_feature_local _RECALCULATE_NORMALS
 
+            #pragma multi_compile_local _ _RECALCULATE_NORMALS
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
 
@@ -294,8 +294,8 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature_local _METALLICGLOSSMAP
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _SPECULAR_AFFECT_BY_NDOTL
-            #pragma shader_feature_local _RECALCULATE_NORMALS
 
+            #pragma multi_compile_local _ _RECALCULATE_NORMALS
             #pragma multi_compile_fwdadd_fullshadows
 
             #pragma vertex VertexForwardAdd
