@@ -301,15 +301,15 @@ namespace UnityEditor
 
         internal void DetermineWorkflow(MaterialProperty[] props)
         {
-            if (FindProperty("_SpecGlossMap", props, false) != null
+            if (FindProperty("_MetallicGlossMap", props, false) != null
+              && FindProperty("_Metallic", props, false) != null)
+            {
+                _workflowMode = WorkflowMode.Metallic;
+            }
+            else if (FindProperty("_SpecGlossMap", props, false) != null
                 && FindProperty("_SpecColor", props, false) != null)
             {
                 _workflowMode = WorkflowMode.Specular;
-            }
-            else if (FindProperty("_MetallicGlossMap", props, false) != null
-                && FindProperty("_Metallic", props, false) != null)
-            {
-                _workflowMode = WorkflowMode.Metallic;
             }
             else
             {

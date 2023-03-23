@@ -182,8 +182,7 @@ Shader "Movement/PBR (Specular)"
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementShadowCasterPass.hlsl"
             ENDHLSL
         }
 
@@ -218,8 +217,7 @@ Shader "Movement/PBR (Specular)"
             #pragma fragment UniversalFragmentMeta
 #endif
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementLitMetaPass.hlsl"
             ENDHLSL
         }
 	}

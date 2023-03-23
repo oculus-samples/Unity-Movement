@@ -44,6 +44,10 @@ Shader "Movement/PBR (Metallic)"
 
         [Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
         _MetallicGlossMap("Metallic", 2D) = "white" {}
+
+        [HideInInspector] _SpecColor("Specular", Color) = (0.2,0.2,0.2)
+        [HideInInspector] _SpecGlossMap("Specular", 2D) = "white" {}
+
         [ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 1.0
         [ToggleOff] _GlossyReflections("Glossy Reflections", Float) = 1.0
 
@@ -183,8 +187,7 @@ Shader "Movement/PBR (Metallic)"
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementShadowCasterPass.hlsl"
             ENDHLSL
         }
 
@@ -219,8 +222,7 @@ Shader "Movement/PBR (Metallic)"
             #pragma fragment UniversalFragmentMeta
 #endif
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementLitMetaPass.hlsl"
             ENDHLSL
         }
 	}

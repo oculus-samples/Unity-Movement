@@ -27,6 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Packing.hlsl"
 #include "MovementUnityStandardCore.hlsl"
 
@@ -38,24 +39,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   #define unity_ColorSpaceDielectricSpec half4(0.04, 0.04, 0.04, 1.0 - 0.04) // standard dielectric reflectivity coef at incident angle (= 4%)
 #endif
 
+// Setup the CBUFFER to make the shader compatible with SRP batching.
+// https://blog.unity.com/technology/srp-batcher-speed-up-your-rendering
+CBUFFER_START(UnityPerMaterial)
+float _VertexDisplShadows;
+float _AreaLightSampleDistance;
+half3 _DiffuseWrapColor;
+half _EmissionStrength;
+half _DiffuseWrapColorMult;
+half _DiffuseWrapDist;
+
 float4 _MainTex_ST;
 half4 _Color;
 half4 _SpecColor;
 half4 _EmissionColor;
+half _Cutoff;
 half _Metallic;
 half _BumpScale;
 half _Glossiness;
 half _GlossMapScale;
 half _OcclusionStrength;
 uint _TexUVSet;
+CBUFFER_END
 
 TEXTURE2D(_OcclusionMap);       SAMPLER(sampler_OcclusionMap);
 TEXTURE2D(_MetallicGlossMap);   SAMPLER(sampler_MetallicGlossMap);
 TEXTURE2D(_SpecGlossMap);       SAMPLER(sampler_SpecGlossMap);
-
 TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
-TEXTURE2D(_BumpMap);            SAMPLER(sampler_BumpMap);
-TEXTURE2D(_EmissionMap);        SAMPLER(sampler_EmissionMap);
 
 half4 ComputeSpecularGloss(float2 uv)
 {
@@ -313,7 +323,6 @@ inline half3 GetFresnelLerpFast(half3 F0, half3 F90, half cosA)
 }
 
 #ifdef _AREA_LIGHT_SPECULAR
-float _AreaLightSampleDistance;
 float CalculateAreaLightColor(UnityLight light, float invExposure,
     float3 shadingNormal, float3 worldViewDir, float roughness,
     float NdotV)
@@ -374,9 +383,6 @@ inline float3 GetSafeNormalizedVector(float3 inVec)
 }
 
 #ifdef _DIFFUSE_WRAP
-half3 _DiffuseWrapColor;
-half _DiffuseWrapColorMult;
-half _DiffuseWrapDist;
 half3 GetDiffuseWrap(float NDotLUnclamped)
 {
     // Blend red into the terminator of the diffuse light
