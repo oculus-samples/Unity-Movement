@@ -2,6 +2,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace UnityEditor
 {
@@ -519,6 +520,8 @@ namespace UnityEditor
                     material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
                     material.SetInt("_ZWrite", 1);
+                    material.SetShaderPassEnabled("ShadowCaster", true);
+                    material.DisableKeyword("_SURFACE_TYPE_TRANSPARENT");
                     material.DisableKeyword("_ALPHATEST_ON");
                     material.DisableKeyword("_ALPHABLEND_ON");
                     material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
@@ -528,6 +531,12 @@ namespace UnityEditor
                     material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
                     material.SetInt("_ZWrite", 1);
+                    // Transparent objects in URP should not cast shadows.
+                    if (GraphicsSettings.renderPipelineAsset != null)
+                    {
+                        material.SetShaderPassEnabled("ShadowCaster", false);
+                    }
+                    material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
                     material.EnableKeyword("_ALPHATEST_ON");
                     material.DisableKeyword("_ALPHABLEND_ON");
                     material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
@@ -537,6 +546,12 @@ namespace UnityEditor
                     material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
                     material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
                     material.SetInt("_ZWrite", 0);
+                    // Transparent objects in URP should not cast shadows.
+                    if (GraphicsSettings.renderPipelineAsset != null)
+                    {
+                        material.SetShaderPassEnabled("ShadowCaster", false);
+                    }
+                    material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
                     material.DisableKeyword("_ALPHATEST_ON");
                     material.EnableKeyword("_ALPHABLEND_ON");
                     material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
@@ -546,6 +561,12 @@ namespace UnityEditor
                     material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
                     material.SetInt("_ZWrite", 0);
+                    // Transparent objects in URP should not cast shadows.
+                    if (GraphicsSettings.renderPipelineAsset != null)
+                    {
+                        material.SetShaderPassEnabled("ShadowCaster", false);
+                    }
+                    material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
                     material.DisableKeyword("_ALPHATEST_ON");
                     material.DisableKeyword("_ALPHABLEND_ON");
                     material.EnableKeyword("_ALPHAPREMULTIPLY_ON");

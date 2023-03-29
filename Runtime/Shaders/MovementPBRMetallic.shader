@@ -123,6 +123,7 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature _EMISSION
             #pragma shader_feature_local _NORMALMAP
 
+            #pragma shader_feature_local_fragment _SURFACE_TYPE_TRANSPARENT
             #pragma shader_feature_local_fragment _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local_fragment _METALLICGLOSSMAP
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
@@ -182,12 +183,19 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature_local _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _METALLICGLOSSMAP
 
+            // This is used during shadow map generation to differentiate between directional and punctual light shadows, as they use different formulas to apply Normal Bias
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+
             #pragma multi_compile_instancing
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
+#if UNITY_VERSION >= 202120
             #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementShadowCasterPass.hlsl"
+#else
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementShadowCasterPass2020.hlsl"
+#endif
             ENDHLSL
         }
 
@@ -222,7 +230,11 @@ Shader "Movement/PBR (Metallic)"
             #pragma fragment UniversalFragmentMeta
 #endif
 
+#if UNITY_VERSION >= 202120
             #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementLitMetaPass.hlsl"
+#else
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementLitMetaPass2020.hlsl"
+#endif
             ENDHLSL
         }
 	}

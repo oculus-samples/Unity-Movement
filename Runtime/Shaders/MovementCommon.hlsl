@@ -67,6 +67,34 @@ TEXTURE2D(_MetallicGlossMap);   SAMPLER(sampler_MetallicGlossMap);
 TEXTURE2D(_SpecGlossMap);       SAMPLER(sampler_SpecGlossMap);
 TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
 
+half4 SampleMetallicSpecGloss(float2 uv, half albedoAlpha)
+{
+  half4 specGloss;
+
+#ifdef _METALLICGLOSSMAP
+  specGloss = half4(SAMPLE_METALLICSPECULAR(uv));
+#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+  specGloss.a = albedoAlpha * _Smoothness;
+#else
+  specGloss.a *= _Smoothness;
+#endif
+#else
+#if _SPECGLOSSMAP
+  specGloss.rgb = _SpecColor.rgb;
+#else
+  specGloss.rgb = _Metallic.rrr;
+#endif
+
+#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+  specGloss.a = albedoAlpha * _Glossiness;
+#else
+  specGloss.a = _Glossiness;
+#endif
+#endif
+
+  return specGloss;
+}
+
 half4 ComputeSpecularGloss(float2 uv)
 {
     half4 sg;
