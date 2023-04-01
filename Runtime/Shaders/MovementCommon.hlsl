@@ -72,11 +72,15 @@ half4 SampleMetallicSpecGloss(float2 uv, half albedoAlpha)
   half4 specGloss;
 
 #ifdef _METALLICGLOSSMAP
-  specGloss = half4(SAMPLE_METALLICSPECULAR(uv));
-#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-  specGloss.a = albedoAlpha * _Smoothness;
+#ifdef _SPECULAR_SETUP
+  specGloss = half4(SAMPLE_TEXTURE2D(_SpecGlossMap, sampler_SpecGlossMap, uv));
 #else
-  specGloss.a *= _Smoothness;
+  specGloss = half4(SAMPLE_TEXTURE2D(_MetallicGlossMap, sampler_MetallicGlossMap, uv));
+#endif
+#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+  specGloss.a = albedoAlpha * _Glossiness;
+#else
+  specGloss.a *= _Glossiness;
 #endif
 #else
 #if _SPECGLOSSMAP
