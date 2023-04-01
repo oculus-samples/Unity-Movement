@@ -60,8 +60,6 @@ struct VertexOutputBaseMovement
   UNITY_VERTEX_OUTPUT_STEREO
 };
 
-float _VertexDisplShadows;
-
 VertexOutputBaseMovement VertexForwardBase(VertexInputMovement v, uint vid : SV_VertexID)
 {
     VertexOutputBaseMovement output = (VertexOutputBaseMovement)0;
@@ -109,8 +107,6 @@ VertexOutputBaseMovement VertexForwardBase(VertexInputMovement v, uint vid : SV_
 
     return output;
 }
-
-half _EmissionStrength;
 
 // Based on fragForwardBaseInternal in UnityStandardCore
 half4 FragmentForwardBase(VertexOutputBaseMovement input) : SV_Target

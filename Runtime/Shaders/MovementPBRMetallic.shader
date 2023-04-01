@@ -44,6 +44,10 @@ Shader "Movement/PBR (Metallic)"
 
         [Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
         _MetallicGlossMap("Metallic", 2D) = "white" {}
+
+        [HideInInspector] _SpecColor("Specular", Color) = (0.2,0.2,0.2)
+        [HideInInspector] _SpecGlossMap("Specular", 2D) = "white" {}
+
         [ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 1.0
         [ToggleOff] _GlossyReflections("Glossy Reflections", Float) = 1.0
 
@@ -74,7 +78,7 @@ Shader "Movement/PBR (Metallic)"
 
         [HideInInspector] _AreaLightSampleToggle("_AreaLightSampleToggle", Float) = 0.0
         [HideInInspector] _DiffuseWrapEnabled("_DiffuseWrapEnabled", Float) = 0.0
-        [HideInInspector] _SpecularityNDotL("_SpecularityNDotL", Float) = 0.0
+        [HideInInspector] _SpecularityNDotL("_SpecularityNDotL", Float) = 1.0
         [HideInInspector] _RecalculateNormalsToggle("_RecalculateNormalsToggle", Float) = 0.0
     }
 
@@ -118,8 +122,8 @@ Shader "Movement/PBR (Metallic)"
             // Material Keywords
             #pragma shader_feature _EMISSION
             #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _RECALCULATE_NORMALS
 
+            #pragma shader_feature_local_fragment _SURFACE_TYPE_TRANSPARENT
             #pragma shader_feature_local_fragment _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local_fragment _METALLICGLOSSMAP
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
@@ -144,6 +148,7 @@ Shader "Movement/PBR (Metallic)"
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
             #pragma multi_compile _ LIGHTMAP_ON
 
+            #pragma multi_compile_local _ _RECALCULATE_NORMALS
             #pragma multi_compile_instancing
 
             #pragma vertex VertexForwardBase
@@ -178,13 +183,19 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature_local _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _METALLICGLOSSMAP
 
+            // This is used during shadow map generation to differentiate between directional and punctual light shadows, as they use different formulas to apply Normal Bias
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+
             #pragma multi_compile_instancing
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+#if UNITY_VERSION >= 202120
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementShadowCasterPass.hlsl"
+#else
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementShadowCasterPass2020.hlsl"
+#endif
             ENDHLSL
         }
 
@@ -219,8 +230,11 @@ Shader "Movement/PBR (Metallic)"
             #pragma fragment UniversalFragmentMeta
 #endif
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"
+#if UNITY_VERSION >= 202120
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementLitMetaPass.hlsl"
+#else
+            #include "Packages/com.meta.movement/Runtime/ThirdParty/Unity/MovementLitMetaPass2020.hlsl"
+#endif
             ENDHLSL
         }
 	}
@@ -261,8 +275,8 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature_local _AREA_LIGHT_SPECULAR
             #pragma shader_feature_local _DIFFUSE_WRAP
             #pragma shader_feature_local _SPECULAR_AFFECT_BY_NDOTL
-            #pragma shader_feature_local _RECALCULATE_NORMALS
 
+            #pragma multi_compile_local _ _RECALCULATE_NORMALS
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
 
@@ -294,8 +308,8 @@ Shader "Movement/PBR (Metallic)"
             #pragma shader_feature_local _METALLICGLOSSMAP
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local _SPECULAR_AFFECT_BY_NDOTL
-            #pragma shader_feature_local _RECALCULATE_NORMALS
 
+            #pragma multi_compile_local _ _RECALCULATE_NORMALS
             #pragma multi_compile_fwdadd_fullshadows
 
             #pragma vertex VertexForwardAdd

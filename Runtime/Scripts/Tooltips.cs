@@ -216,6 +216,9 @@ namespace Oculus.Movement
         public const string UseUnityFunction =
             "Allows using Unity's stock recalc instead. Cannot change at runtime.";
 
+        public const string RecalculateIndependently =
+            "Allows recalculate normals to be calculated independently on LateUpdate, instead of being driven from DriveSkeletalLateUpdateLogic.";
+
         public const string DuplicateLayerName =
             "The visible layer of the duplicate mesh with recalculate normals.";
 

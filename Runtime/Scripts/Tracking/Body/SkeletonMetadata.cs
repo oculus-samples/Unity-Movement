@@ -76,9 +76,12 @@ namespace Oculus.Movement.Tracking
         /// Main constructor.
         /// </summary>
         /// <param name="animator">Animator to build meta data from.</param>
-        public SkeletonMetadata(Animator animator)
+        /// <param name="createCopyOfBones">Option to copy original transforms, useful if one
+        /// wants to create a copy of an animator's starting T-pose transform data before
+        /// it moves, as opposed to relying on a separate animator stuck in T-pose.</param>
+        public SkeletonMetadata(Animator animator, bool createCopyOfBones = false)
         {
-            BuildBoneData(animator);
+            BuildBoneData(animator, createCopyOfBones);
         }
 
         /// <summary>
@@ -170,8 +173,11 @@ namespace Oculus.Movement.Tracking
         /// <summary>
         /// Builds body to bone data with an Animator.
         /// </summary>
-        /// <param name="animator"></param>
-        public void BuildBoneData(Animator animator)
+        /// <param name="animator">The character's animator component.</param>
+        /// <param name="createCopyOfBones">Option to copy original transforms, useful if one
+        /// wants to create a copy of an animator's starting T-pose transform data before
+        /// it moves, as opposed to relying on a separate animator stuck in T-pose.</param>
+        public void BuildBoneData(Animator animator, bool createCopyOfBones = false)
         {
             if (_bodyToBoneData.Count != 0)
             {
@@ -221,6 +227,112 @@ namespace Oculus.Movement.Tracking
                     Debug.LogWarning($"{key} has invalid end joint.");
                 }
             }
+
+            if (createCopyOfBones)
+            {
+                // copy transforms
+                Dictionary<Transform, Transform> originalTransformsToDuplicate =
+                    CopyAndReturnBoneTransformHierarchy(animator);
+                // assign duplicate transforms
+                foreach (var boneData in _bodyToBoneData.Values)
+                {
+                    if (boneData.ParentTransform != null)
+                    {
+                        boneData.ParentTransform = originalTransformsToDuplicate[boneData.ParentTransform];
+                    }
+                    if (boneData.JointPairStart != null)
+                    {
+                        boneData.JointPairStart = originalTransformsToDuplicate[boneData.JointPairStart];
+                    }
+                    // sometimes end joints are not assigned in animator
+                    if (boneData.JointPairEnd != null)
+                    {
+                        if (!originalTransformsToDuplicate.ContainsKey(boneData.JointPairEnd))
+                        {
+                            var newJointEnd = AddDuplicateTransform(boneData.JointPairEnd,
+                                originalTransformsToDuplicate);
+                            newJointEnd.parent = originalTransformsToDuplicate[boneData.JointPairEnd.parent];
+                            boneData.JointPairEnd = newJointEnd;
+                        }
+                        else
+                        {
+                            boneData.JointPairEnd = originalTransformsToDuplicate[boneData.JointPairEnd];
+                        }
+                    }
+                    if (boneData.OriginalJoint != null)
+                    {
+                        boneData.OriginalJoint = originalTransformsToDuplicate[boneData.OriginalJoint];
+                    }
+                }
+            }
+        }
+
+        private Dictionary<Transform, Transform> CopyAndReturnBoneTransformHierarchy(Animator animator)
+        {
+            Dictionary<Transform, Transform> originalTransformsToDuplicate =
+                new Dictionary<Transform, Transform>();
+            foreach (HumanBodyBones humanBodyBone in _boneEnumValues)
+            {
+                if (humanBodyBone == HumanBodyBones.LastBone)
+                {
+                    continue;
+                }
+
+                var currTransform = animator.GetBoneTransform(humanBodyBone);
+                if (currTransform == null)
+                {
+                    continue;
+                }
+
+                AddDuplicateTransform(currTransform, originalTransformsToDuplicate);
+            }
+
+
+            Transform rootOfDuplicate = null;
+            // set parents
+            foreach (HumanBodyBones humanBodyBone in _boneEnumValues)
+            {
+                if (humanBodyBone == HumanBodyBones.LastBone)
+                {
+                    continue;
+                }
+
+                var currTransform = animator.GetBoneTransform(humanBodyBone);
+                if (currTransform == null)
+                {
+                    continue;
+                }
+
+                var originalParent = currTransform.parent;
+                var duplicate = originalTransformsToDuplicate[currTransform];
+                Transform duplicateParent;
+                // likely root; there is no bone for it
+                if (!originalTransformsToDuplicate.ContainsKey(originalParent))
+                {
+                    duplicateParent = AddDuplicateTransform(originalParent, originalTransformsToDuplicate);
+                    rootOfDuplicate = duplicateParent;
+                }
+                else
+                {
+                    duplicateParent = originalTransformsToDuplicate[originalParent];
+                }
+
+                duplicate.SetParent(duplicateParent, true);
+            }
+
+            rootOfDuplicate.name = "Skeleton (Duplicate)";
+
+            return originalTransformsToDuplicate;
+        }
+
+        private Transform AddDuplicateTransform(Transform originalTransform,
+            Dictionary<Transform, Transform> originalTransformsToDuplicate)
+        {
+            var duplicateTransform = new GameObject(originalTransform.name).transform;
+            duplicateTransform.position = originalTransform.position;
+            duplicateTransform.rotation = originalTransform.rotation;
+            originalTransformsToDuplicate[originalTransform] = duplicateTransform;
+            return duplicateTransform;
         }
 
         /// <summary>
