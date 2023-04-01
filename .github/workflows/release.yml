@@ -15,6 +15,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
         with:
