@@ -77,7 +77,7 @@ namespace Oculus.Movement.Effects
         /// </summary>
         [SerializeField]
         [Tooltip(RecalculateNormalsTooltips.RecalculateMaterialIndices)]
-        protected int[] _recalculateMaterialIndices;
+        protected int[] _recalculateMaterialIndices = new int[1];
 
         private const string _recalculateNormalShaderKeyword = "_RECALCULATE_NORMALS";
         private NormalRecalculator _normalRecalculator = new NormalRecalculator();
@@ -119,6 +119,8 @@ namespace Oculus.Movement.Effects
         {
             Assert.IsNotNull(_skinnedMeshRenderer);
             Assert.IsTrue(_recalculateMaterialIndices.Length > 0);
+            Assert.IsTrue(LayerMask.NameToLayer(_hiddenMeshLayerName) > -1);
+            Assert.IsTrue(LayerMask.NameToLayer(_duplicateLayerName) > -1);
 
             _instantiatedMaterials = _skinnedMeshRenderer.materials;
             foreach (var recalculateMaterialIndex in _recalculateMaterialIndices)
