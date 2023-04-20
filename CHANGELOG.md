@@ -1,3 +1,12 @@
+## [1.4.1](https://github.com/oculus-samples/Unity-Movement/compare/v1.4.0...v1.4.1) (2023-04-20)
+
+
+### Bug Fixes
+
+* **Runtime:** Fix skybox shader so that it works with single pass stereo ([eae6c69](https://github.com/oculus-samples/Unity-Movement/commit/eae6c69ada18fea72e229b5d412c5245914b53e7))
+* **Runtime:** Fix transparent color shader so that it works with single pass stereo ([0e4b2ed](https://github.com/oculus-samples/Unity-Movement/commit/0e4b2edbd3b9e6358acf09e00a21a2cb9cebd8aa))
+* **Runtime:** Update RecalculateNormals to check that the required layers are present ([f3c7787](https://github.com/oculus-samples/Unity-Movement/commit/f3c778786cefbcdc81a95a7da415e4b157d6a42a))
+
 # [1.4.0](https://github.com/oculus-samples/Unity-Movement/compare/v1.3.3...v1.4.0) (2023-04-01)
 
 
