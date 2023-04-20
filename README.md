@@ -28,9 +28,9 @@ If the new scene or an existing scene doesn’t have a GameObject with the OVRCa
 4. On the Inspector tab, go to OVR Manager > Quest Features.
 5. In the General tab, there are options to enable body, face, and eye tracking support. Select Supported or Required for the type of tracking support you wish to add.
 6. Under OVRManager's "Permission Requests On Startup" section, enable  Body, Face and Eye Tracking.
-7. The Character (layer index 10), the MirroredCharacter (layer index 11), and HiddenMesh layers must be present in the project.
+7. Ensure that OVRManager's "Tracking Origin Type" is set to "Floor Level".
 
-TextMeshPro is required.
+The Character (layer index 10), the MirroredCharacter (layer index 11), and HiddenMesh layers must be present in the project for RecalculateNormals to work correctly.
 
 ## Rendering Quality
 Navigate to your Project Settings (Edit->Project Settings...) and click on
@@ -43,10 +43,10 @@ The following settings are recommended:
 2. 2x or 4x Multi Sampling Anti Aliasing.
 3. Full resolution textures.
 4. Shadow settings:
-  1. Hard and soft shadows.
-  2. Very high shadow resolution.
-  3. Stable fit.
-  4. Shadow distance of 3 meters with cascades. This will allow viewing shadows
+    - Hard and soft shadows.
+    - Very high shadow resolution.
+    - Stable fit.
+    - Shadow distance of 3 meters with cascades. This will allow viewing shadows
 nearby without experiencing poor quality.
 5. At least one pixel light.
 
@@ -56,10 +56,12 @@ Make sure that the color space is set to Linear.
 
 ## Build Settings
 
-In order for the SceneSelectMenu buttons to work, add the scenes located in the Samples folder of the package.
+In order for the SceneSelectMenu buttons to work, add the scenes located in the **Samples/../Scenes** folders of the package.
 
 ## Samples
-The project contains several sample scenes. For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-sample-aura/), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-sample-hip-pinning/), and [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-high-fidelity/).
+The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/../Scenes** folders to the project's Assets folder.
+
+For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-samples/#face-and-eye-tracking-with-aura), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-with-hip-pinning), and [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-sample).
 
 ## Documentation
 The documentation for this package can be found [here](https://developer.oculus.com/documentation/unity/move-overview/).
