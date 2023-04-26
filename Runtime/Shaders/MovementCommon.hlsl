@@ -392,8 +392,10 @@ float CalculateAreaLightColor(UnityLight light, float invExposure,
             //float NdotLWrap = NdotL; <- not used yet
             NdotL = saturate(NdotL);
             float NdotH = saturate(dot(shadingNormal, halfVector));
-            // GGX code similar to https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/master/source/Renderer/shaders/brdf.glsl
-            // TODO: check license!
+            // The following GGX code is based on:
+            // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/master/source/Renderer/shaders/brdf.glsl
+            // Which is licensed under Apache-2.0. See
+            // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/main/LICENSE.md
             float ggx = NdotL * sqrt(NdotV * NdotV * invR4 + r2) +
                 NdotV * sqrt(NdotL * NdotL * invR4 + r2);
             ggx = ggx > 0.0 ? (.5 / ggx) : 0.;
