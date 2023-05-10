@@ -199,7 +199,7 @@ Shader "Movement/PBR (Metallic)"
             ENDHLSL
         }
 
-		// ------------------------------------------------------------------
+        // ------------------------------------------------------------------
         // Extracts information for lightmapping, GI (emission, albedo, ...)
         // This pass is not used during regular rendering.
         Pass
@@ -237,7 +237,7 @@ Shader "Movement/PBR (Metallic)"
 #endif
             ENDHLSL
         }
-	}
+    }
 
     SubShader
     {

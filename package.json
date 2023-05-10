@@ -2,13 +2,14 @@
   "name": "com.meta.movement",
   "displayName": "Meta Movement",
   "version": "1.0.1",
-  "unity": "2020.3",
+  "unity": "2021.3",
   "keywords": [
     "Meta",
     "Movement"
   ],
   "description": "Meta Movement",
   "dependencies": {
-    "com.unity.textmeshpro": "3.0.6"
+    "com.unity.textmeshpro": "3.0.6",
+    "com.unity.animation.rigging": "1.2.1"
   }
 }

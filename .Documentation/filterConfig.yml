@@ -3,7 +3,7 @@ apiRules:
     uidRegex: ^Oculus.Movement$
     type: Namespace
 - include:
-    uidRegex: ^Oculus.Movement.Attributes$
+    uidRegex: ^Oculus.Movement.AnimationRigging$
     type: Namespace
 - include:
     uidRegex: ^Oculus.Movement.Effects$
