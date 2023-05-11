@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Movement.Attributes;
+using Oculus.Interaction;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -67,13 +67,19 @@ namespace Oculus.Movement.Tracking
             }
         }
 
+        /// <inheritdoc cref="_faceExpressionModifiers"/>
+        public IReadOnlyCollection<FaceExpressionModifier> Modifiers => _faceExpressionModifiers;
+
+        /// <inheritdoc cref="_faceExpressionModifierMap"/>
+        public IReadOnlyDictionary<OVRFaceExpressions.FaceExpression, FaceExpressionModifier>
+            FaceExpressionModifierMap => _faceExpressionModifierMap;
+
         /// <summary>
         /// The array of facial expression modifier data to be used.
         /// </summary>
         [SerializeField]
         [Tooltip(BlendshapeModifierTooltips.FaceExpressionsModifiers)]
-        private FaceExpressionModifier[] _faceExpressionModifiers;
-        public IReadOnlyCollection<FaceExpressionModifier> Modifiers => _faceExpressionModifiers;
+        protected FaceExpressionModifier[] _faceExpressionModifiers;
 
         /// <summary>
         /// Optional text asset containing the array of face expression modifier data to be used.
@@ -81,15 +87,40 @@ namespace Oculus.Movement.Tracking
         [SerializeField]
         [Optional]
         [Tooltip(BlendshapeModifierTooltips.DefaultBlendshapeModifierPreset)]
-        private TextAsset _defaultBlendshapeModifierPreset;
+        protected TextAsset _defaultBlendshapeModifierPreset;
 
+        /// <summary>
+        /// Global blendshape multiplier.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(BlendshapeModifierTooltips.GlobalMultiplier)]
+        protected float _globalMultiplier = 1.0f;
+
+        /// <summary>
+        /// Global blendshape clamp min.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(BlendshapeModifierTooltips.GlobalMin)]
+        protected float _globalClampMin = 0.0f;
+
+        /// <summary>
+        /// Global blendshape clamp max.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(BlendshapeModifierTooltips.GlobalMax)]
+        protected float _globalClampMax = 2.0f;
+
+        /// <summary>
+        /// Apply global clamping to non-mapped values.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(BlendshapeModifierTooltips.ApplyGlobalClampingNonMapped)]
+        protected bool _applyGlobalClampingNonMapped = false;
+
+        /// <summary>
+        /// The dictionary mapping a OVRFaceExpressions.FaceExpression to a FaceExpressionModifier.
+        /// </summary>
         private Dictionary<OVRFaceExpressions.FaceExpression, FaceExpressionModifier> _faceExpressionModifierMap;
-        public IReadOnlyDictionary<OVRFaceExpressions.FaceExpression, FaceExpressionModifier>
-            FaceExpressionModifierMap => _faceExpressionModifierMap;
-
-        private float _globalMultiplier = 1.0f;
-        private float _globalClampMin = 0.0f;
-        private float _globalClampMax = 2.0f;
 
         private void Awake()
         {
@@ -152,6 +183,12 @@ namespace Oculus.Movement.Tracking
         {
             if (!_faceExpressionModifierMap.ContainsKey(faceExpression))
             {
+                if (_applyGlobalClampingNonMapped)
+                {
+                    currentWeight = Mathf.Clamp(currentWeight * _globalMultiplier,
+                        _globalClampMin, _globalClampMax);
+                }
+
                 return currentWeight;
             }
             var faceExpressionModifier = _faceExpressionModifierMap[faceExpression];

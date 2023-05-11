@@ -16,7 +16,7 @@ namespace Oculus.Movement.UI
         /// </summary>
         [SerializeField]
         [Tooltip(BlendshapesMenuToggleTooltips.BlendShapesMenus)]
-        private GameObject[] _blendShapesMenus;
+        protected GameObject[] _blendShapesMenus;
 
         private void Awake()
         {

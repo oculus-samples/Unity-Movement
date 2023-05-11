@@ -514,6 +514,51 @@ namespace Oculus.Movement
         }
     }
 
+    public static class CorrectivesModuleTooltips
+    {
+        public static class InBetweenTooltips
+        {
+            public const string DrivenIndex =
+                "The blendshape index to be driven on the skinned mesh renderer.";
+
+            public const string DriverIndex =
+                "The target blendshape index used for calculating the blendshape weight.";
+
+            public const string Slope =
+                "The slope from the function curve of the in-between.";
+
+            public const string OffsetX =
+                "The x offset from the function curve of the in-between.";
+
+            public const string OffsetY =
+                "The y offset from the function curve of the in-between.";
+
+            public const string DomainStart =
+                "The domain range start from the function curve of the in-between.";
+
+            public const string DomainEnd =
+                "The domain range end from the function curve of the in-between.";
+        }
+
+        public static class CombinationTooltips
+        {
+            public const string DrivenIndex =
+                "The blendshape index to be driven on the skinned mesh renderer.";
+
+            public const string DriverIndices =
+                "The blendshape indices used in calculating the blendshape weight for the driven index.";
+        }
+
+        public static class RigLogicDataTooltips
+        {
+            public const string InBetweens =
+                "Array of all of the in-betweens data.";
+
+            public const string Combinations =
+                "Array of all of the combinations data.";
+        }
+    }
+
     public static class BlendshapeMappingTooltips
     {
         public const string Meshes =
@@ -542,6 +587,15 @@ namespace Oculus.Movement
 
         public const string BlendshapeModifier =
             "Optional blendshape modifier component.";
+    }
+
+    public static class CorrectivesFaceTooltips
+    {
+        public const string BlendshapeModifier =
+            "Optional blendshape modifier component.";
+
+        public const string CombinationShapesTextAsset =
+            "The json file containing the in-betweens and combinations data.";
     }
 
     public static class FacialExpressionDetectorTooltips
@@ -628,6 +682,27 @@ namespace Oculus.Movement
             "The path to the screenshots folder.";
     }
 
+    public static class ScreenshotFaceExpressionsCaptureTooltips
+    {
+        public const string CorrectivesFaceComponents =
+            "All face components to drive while capturing screenshots.";
+
+        public const string Camera =
+            "The camera which its viewport will be used to take the screenshot.";
+
+        public const string ScreenshotWidth =
+            "The width of the screenshot texture.";
+
+        public const string ScreenshotHeight =
+            "The height of the screenshot texture.";
+
+        public const string ScreenshotNeutral =
+            "If true, take a screenshot of the viewport without any blendshapes.";
+
+        public const string ScreenshotFolder =
+            "The path to the screenshots folder.";
+    }
+
     public static class BlendshapeModifierTooltips
     {
         public static class FaceExpressionModifier
@@ -650,6 +725,18 @@ namespace Oculus.Movement
 
         public const string DefaultBlendshapeModifierPreset =
             "Optional text asset containing the array of face expression modifier data to be used.";
+
+        public const string GlobalMultiplier =
+            "Global blendshape multiplier.";
+
+        public const string GlobalMin =
+            "Global blendshape clamp min.";
+
+        public const string GlobalMax =
+            "Global blendshape clamp max.";
+
+        public const string ApplyGlobalClampingNonMapped =
+            "Global blendshape clamp max.";
     }
 
     public static class MirrorSkeletonTooltips
@@ -659,6 +746,30 @@ namespace Oculus.Movement
 
         public const string MySkeleton =
             "The target blendshape mapping.";
+    }
+
+    public static class HandDeformationTooltips
+    {
+        public static class FingerOffset
+        {
+            public const string FingerId =
+                "The id of the finger to apply the offset to.";
+
+            public const string FingerPosOffset =
+                "The finger position offset.";
+
+            public const string FingerRotOffset =
+                "The finger rotation offset.";
+        }
+
+        public const string CustomSkeleton =
+            "Custom skeleton to reference.";
+
+        public const string CopyFingerDataInUpdate =
+            "If true, copy the finger offsets data into FingerInfo during every update.";
+
+        public const string FingerOffsets =
+            "Offsets that will be applied to the fingers.";
     }
 
     public static class DeformationLogicTooltips
@@ -797,5 +908,273 @@ namespace Oculus.Movement
 
         public const string DisplayTime =
             "The amount of time that this notification should be enabled for.";
+    }
+
+    public static class DeformationDataTooltips
+    {
+        public const string Skeleton =
+            "The OVR Skeleton component.";
+
+        public const string SpineTranslationCorrectionType =
+            "The type of spine translation correction that should be applied.";
+
+        public const string ApplyToArms =
+            "Apply deformation on arms.";
+
+        public const string CorrectSpineOnce =
+            "Allows the spine correction to run only once, assuming the skeleton's positions don't get updated multiple times.";
+
+        public const string MoveTowardsArms =
+            "If true, the arms will move towards the deformation target position.";
+
+        public const string SnapThreshold =
+            "The distance between the target and current position before the bone snaps to the target position.";
+
+        public const string ArmWeight =
+            "The weight for the deformation on arms.";
+
+        public const string ArmMoveSpeed =
+            "The move towards speed for the arms.";
+    }
+
+    public static class HipPinningDataTooltips
+    {
+        public const string Skeleton =
+            "The OVR Skeleton component.";
+
+        public const string HipPinningTargets =
+            "The list of hip pinning targets in the scene.";
+
+        public const string HipPinningHeightAdjustment =
+            "If true, hip pinning will adjust the height of the seat to match the tracked position.";
+
+        public const string HipPinningLeave =
+            "If true, hip pinning will be disabled when the character leaves a certain range.";
+
+        public const string HipPinningLeaveRange =
+            "The range from the hip pinning target before hip pinning is disabled.";
+    }
+
+    public static class AnimationRigSetupTooltips
+    {
+        public const string Skeleton =
+            "Skeletal component of character.";
+
+        public const string Animator =
+            "Animator component of character.";
+
+        public const string RigBuilder =
+            "Rig builder on character supporting Animation rigging.";
+
+        public const string OVRSkeletonConstraints =
+            "IOVRSkeletonConstraint-based components.";
+
+        public const string RebindAnimator =
+            "If true, rebind the animator upon a skeletal change.";
+
+        public const string ReEnableRig =
+            "If true, disable then re-enable the rig upon a skeletal change.";
+
+        public const string RetargetingLayer =
+            "Retargeting layer component to get data from.";
+    }
+
+    public static class HipPinningAnimationRiggingCalibrationTooltips
+    {
+        public const string MainChairProp =
+            "The hip pinning target for the main character.";
+
+        public const string MirroredChairProp =
+            "The hip pinning target for the mirrored character.";
+
+        public const string HipPinningConstraints =
+            "The hip pinning constraints.";
+
+        public const string MainCharacterRenderer =
+            "The game object that contains the mesh renderers for the main character.";
+
+        public const string MirroredCharacterRenderer =
+            "The game object that contains the mesh renderers for the main character.";
+
+        public const string DataProvider =
+            "The tracking data provider for the main character.";
+
+        public const string CalibrateMenu =
+            "The game object that contains the renderers for this calibration menu.";
+    }
+
+    public static class HipPinningConstraintNotificationTooltips
+    {
+        public const string HipPinningConstraint =
+            "The hip pinning constraint.";
+
+        public const string DisplayTime =
+            "The amount of time that this notification should be enabled for.";
+    }
+
+    public static class GroundingDataTooltips
+    {
+        public const string Skeleton =
+            "The OVR Skeleton component.";
+
+        public const string Pair =
+            "Optional. The other leg's grounding constraint, used to check if this leg can move.";
+
+        public const string GroundingLayers =
+            "The layers that the raycast will check against for grounding.";
+
+        public const string GroundRaycastDist =
+            "The maximum distance that the raycast will go when checking for grounding.";
+
+        public const string GroundOffset =
+            "The height offset from the grounded floor to be applied to the foot.";
+
+        public const string HipsTarget =
+            "The hips target transform.";
+
+        public const string KneeTarget =
+            "The knee target for the leg.";
+
+        public const string FootTarget =
+            "The foot target for the leg.";
+
+        public const string Leg =
+            "The leg transform.";
+
+        public const string Foot =
+            "The foot transform.";
+
+        public const string FootRotationOffset =
+            "The initial rotation offset for the feet.";
+
+        public const string StepCurve =
+            "The animation curve for evaluating the step height value.";
+
+        public const string StepDist =
+            "The distance before the step is triggered.";
+
+        public const string StepSpeed =
+            "The speed of the step for the foot.";
+
+        public const string StepHeight =
+            "The height of the step taken.";
+
+        public const string StepHeightScaleDist =
+            "The maximum distance for the step height to not be scaled.";
+
+        public const string MoveLowerThreshold =
+            "The lower bound of the move progress before the other foot can take a step.";
+
+        public const string MoveHigherThreshold =
+            "The upper bound of the move progress before the other foot can take a step.";
+    }
+
+    public static class TwistDistributionDataTooltips
+    {
+        public const string Skeleton =
+            "The OVR Skeleton component.";
+
+        public const string SegmentStart =
+            "The start transform on the opposite side of the twist source (like an elbow).";
+
+        public const string SegmentUp =
+            "Optional. Assign a different transform to be used for the Segment End up vector.";
+
+        public const string SegmentEnd =
+            "The target transform containing the twist (like a wrist).";
+
+        public const string TwistNodes =
+            "The list of twist nodes to affect by the source transform's rotation.";
+
+        public const string TwistForwardAxis =
+            "The forward axis for the twist joints, one that points along the twist axis toward segment end.";
+
+        public const string TwistUpAxis =
+            "The up axis for the twist joints, one that matches the segment end up axis.";
+
+        public const string InvertForwardAxis =
+            "If true, invert the forward axis.";
+
+        public const string InvertUpAxis =
+            "If true, invert the up axis.";
+    }
+
+    public static class RetargetingConstraintDataTooltips
+    {
+        public const string RetargetingLayer =
+            "Retargeting layer component to get data from.";
+
+        public const string AvatarMask =
+            "Avatar mask to restrict retargeting. While the humanoid retargeter " +
+            "class has similar fields, this one is easier to use.";
+    }
+
+    public static class RetargetingLayerTooltips
+    {
+        public const string DisableAvatar =
+            "Disable avatar for accurate positions, especially fingers.";
+        public const string PositionsToCorrectLateUpdate =
+            "Positions to correct after the fact. Avatar " +
+            "masks prevent setting positions of the hands precisely.";
+        public const string MaskToSetToTPose =
+            "Since some bones are not affected by retargeting, " +
+            "some joints should be reset to t-pose.";
+    }
+
+    public static class LateMirroredObjectTooltips
+    {
+        public static class MirroredTransformPairTooltips
+        {
+            public const string OriginalTransform =
+                "The original transform.";
+
+            public const string MirroredTransform =
+                "The mirrored transform.";
+        }
+
+        public const string TransformToCopy =
+            "The transform which transform values are being mirrored from.";
+
+        public const string MyTransform =
+            "The target transform which transform values are being mirrored to.";
+
+        public const string MirroredTransformPairs =
+            "The array of mirrored transform pairs.";
+    }
+
+    public static class LateMirroredSkeletonTooltips
+    {
+        public static class MirroredBonePairTooltips
+        {
+            public const string ShouldBeReparented =
+                "If true, this mirrored bone should be reparented to match the original bone.";
+
+            public const string OriginalBone =
+                "The original transform.";
+
+            public const string MirroredBone =
+                "The mirrored transform.";
+        }
+
+        public const string SkeletonToCopy =
+            "The skeleton which transform values are being mirrored from.";
+
+        public const string MySkeleton =
+            "The target skeleton which transform values are being mirrored to.";
+
+        public const string MirroredBonePairs =
+            "The array of mirrored bone pairs.";
+    }
+
+    public static class RetargetingMenuTooltips
+    {
+        public const string CharacterToSpawn =
+            "Main character prefab to spawn.";
+
+        public const string SpawnParent =
+            "Parent to spawn under.";
+
+        public const string SpawnOffset =
+            "Offset per spawn.";
     }
 }

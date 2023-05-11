@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Movement.Attributes;
+using Oculus.Interaction;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -19,14 +19,14 @@ namespace Oculus.Movement.UI
         /// </summary>
         [SerializeField]
         [Tooltip(BlendshapeMenuVisualTooltips.OvrFaceExpressions)]
-        private OVRFaceExpressions _ovrFaceExpressions;
+        protected OVRFaceExpressions _ovrFaceExpressions;
 
         /// <summary>
         /// Text mesh pro visual for blendshape values.
         /// </summary>
         [SerializeField]
         [Tooltip(BlendshapeMenuVisualTooltips.WorldText)]
-        private TMPro.TextMeshPro _worldText;
+        protected TMPro.TextMeshPro _worldText;
 
         /// <summary>
         /// Threshold that blendshapes must passed before
@@ -34,7 +34,7 @@ namespace Oculus.Movement.UI
         /// </summary>
         [SerializeField]
         [Tooltip(BlendshapeMenuVisualTooltips.MinBlendshapeThreshold)]
-        private float _minBlendshapeThreshold = 0.1f;
+        protected float _minBlendshapeThreshold = 0.1f;
 
         /// <summary>
         /// Can be used to filter blendshapes, in case all
@@ -42,14 +42,14 @@ namespace Oculus.Movement.UI
         /// </summary>
         [SerializeField, Optional]
         [Tooltip(BlendshapeMenuVisualTooltips.FilterArray)]
-        private string[] _filterArray;
+        protected string[] _filterArray;
 
         /// <summary>
         /// Prefix for rendered text.
         /// </summary>
         [SerializeField]
         [Tooltip(BlendshapeMenuVisualTooltips.ExpressionsPrefix)]
-        private string _ExpressionsPrefix = "Blendshapes:\n";
+        protected string _expressionsPrefix = "Blendshapes:\n";
 
         private const string _NO_EXPRESSIONS_TEXT = "N/A";
 
@@ -70,7 +70,7 @@ namespace Oculus.Movement.UI
             }
 
             StringBuilder expressionsText = new StringBuilder();
-            expressionsText.Append(_ExpressionsPrefix);
+            expressionsText.Append(_expressionsPrefix);
 
             for (var faceExpression = FaceExpression.BrowLowererL;
                 faceExpression < FaceExpression.Max;

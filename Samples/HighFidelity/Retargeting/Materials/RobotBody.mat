@@ -2,14 +2,16 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: RobotBody
   m_Shader: {fileID: 4800000, guid: 525663d260145d9458ce774a4fa0f04b, type: 3}
-  m_ShaderKeywords: 
+  m_ValidKeywords:
+  - _SPECULAR_AFFECT_BY_NDOTL
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -55,6 +57,11 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _AreaLightSampleDistance: 0.5
     - _AreaLightSampleToggle: 0
@@ -76,7 +83,7 @@ Material:
     - _RecalculateNormalsToggle: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SpecularityNDotL: 0
+    - _SpecularityNDotL: 1
     - _SrcBlend: 1
     - _StencilComp: 8
     - _StencilValue: 0
@@ -87,4 +94,5 @@ Material:
     - _Color: {r: 0.39643994, g: 0.56778884, b: 0.9056604, a: 0.4627451}
     - _DiffuseWrapColor: {r: 1, g: 0.29999998, b: 0.19999996, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

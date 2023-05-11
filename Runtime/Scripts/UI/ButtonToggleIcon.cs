@@ -56,6 +56,9 @@ namespace Oculus.Movement.UI
             }
         }
 
+        /// <summary>
+        /// Toggles the select icon state.
+        /// </summary>
         public void ToggleSelectIcon()
         {
             _selectState = !_selectState;

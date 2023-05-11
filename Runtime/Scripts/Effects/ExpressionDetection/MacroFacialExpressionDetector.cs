@@ -18,7 +18,14 @@ namespace Oculus.Movement.Effects
         /// </summary>
         public enum MacroExpressionType
         {
-            Happy = 0, Angry
+            /// <summary>
+            /// Smiling expression.
+            /// </summary>
+            Happy = 0,
+            /// <summary>
+            /// Angry or frowning expression.
+            /// </summary>
+            Angry = 1
         }
 
         /// <summary>
@@ -26,7 +33,18 @@ namespace Oculus.Movement.Effects
         /// </summary>
         public enum MacroExpressionState
         {
-            Active = 0, Maintain, Inactive
+            /// <summary>
+            /// When state becomes active.
+            /// </summary>
+            Active = 0,
+            /// <summary>
+            /// When state maintains itself.
+            /// </summary>
+            Maintain = 1,
+            /// <summary>
+            /// When state becomes inactive.
+            /// </summary>
+            Inactive = 2
         }
 
         /// <summary>
@@ -118,6 +136,7 @@ namespace Oculus.Movement.Effects
             /// </summary>
             /// <param name="expression">Macro expression type associated with state change.</param>
             /// <param name="state">Current macro expression state.</param>
+            /// <param name="previousState">Previous macro expression state.</param>
             /// <param name="minExpressionValue">Min value of blendshapes associated with macro expression.</param>
             public MacroExpressionStateChangeEventArgs(
                 MacroExpressionType expression,
@@ -140,6 +159,9 @@ namespace Oculus.Movement.Effects
         private Dictionary<MacroExpressionType, MacroExpressionState> _macroExpressionTypeToState =
             new Dictionary<MacroExpressionType, MacroExpressionState>();
 
+        /// <summary>
+        /// Returns the strength of a macro expression.
+        /// </summary>
         public Dictionary<MacroExpressionType, float> MacroExpressionTypeToStrength { get; private set; }
 
         private void Awake()

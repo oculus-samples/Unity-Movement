@@ -10,6 +10,7 @@ namespace Oculus.Movement.Effects
     /// Uses original skinned mesh renderer to drive a skinned mesh
     /// renderer with recalculated normals.
     /// </summary>
+    [DefaultExecutionOrder(500)]
     public class RecalculateNormals : MonoBehaviour
     {
         /// <summary>
