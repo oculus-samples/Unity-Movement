@@ -1,3 +1,47 @@
+# [2.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v1.4.1...v2.0.0) (2023-05-11)
+
+
+### Features
+
+* **Editor/Runtime/Samples:** Update for v53 ([efd3001](https://github.com/oculus-samples/Unity-Movement/commit/efd3001184d162e8e18749bae1614960e2e50bba))
+
+
+### BREAKING CHANGES
+
+* **Editor/Runtime/Samples:** Samples rely on scripts found in v53 of the Oculus Integration SDK.
+
+Editor:
+- Add editor scripts for the new classes: LateMirroredObject, LateMirroredSkeleton, ARKitFace, CorrectivesFace, DeformationConstraint, HipPinningConstraint, TwistDistributionConstraint.
+- Add HelperMenus to assist with setting up a new character with tracking.
+- ScreenshotFaceExpressions has been replaced with ScreenshotFaceExpressionsCapture.
+
+Runtime:
+- Add animation rigging constraints, and animation rig setup for integrating OVRSkeleton with the animation rigging system.
+- Added RetargetingLayer, which inherits from OVRUnityHumanoidSkeletonRetargeter to integrate animation rigging with retargeting. It is possible to play an animation on a retargeted character and mask specific bones.
+- The added animation rigging constraints are:
+  - DeformationConstraint
+  - GroundingConstraint
+  - HipPinningConstraint
+  - PositionalJointConstraint
+  - RetargetingAnimationConstraint
+  - TwistDistributionConstraint
+- Added new mirroring scripts, to consolidate MirrorSkeleton and TransformMirroredEyes.
+  - LateMirroredObject mirrors a transform and its children.
+  - LateMirroredSkeleton mirrors an OVRSkeleton.
+- Added HandDeformation, a new script that performs similar logic to DeformationLogic to keep the proportions of the hand the same.
+
+Samples:
+- Created new scenes that show the new skeletal animation constraints running with OVRSkeleton, and using CorrectivesFace inheriting from OVRFace. The updated V2 scenes for Aura, HighFidelity, HipPinning, and Retargeting scenes are: AuraV2, HighFidelityV2, HipPinningV2, and RetargetingV2.
+- Created a new sample scene, BlendshapeMappingExample that showcases how to use a character with ARKit blendshapes. By making use of ARKitFace, the blendshape mapping example character displays how a character rigged for ARKit blendshapes can use the face tracking output from OVRFaceExpressions.
+
+DEPRECATED:  Oculus.Movement.Attributes have been removed; use Oculus.Interaction.Attributes instead. All non-animation rigging skeletal scripts have been placed into Legacy folders, and the old versions of the scenes will no longer be updated. FaceTrackingSystem has been deprecated in favor of CorrectivesFace.
+
+Reviewed By: ethylee
+
+Differential Revision: D45672379
+
+fbshipit-source-id: 19b6494fb500f07fe1f5ad60d18e0d418e42987b
+
 ## [1.4.1](https://github.com/oculus-samples/Unity-Movement/compare/v1.4.0...v1.4.1) (2023-04-20)
 
 
