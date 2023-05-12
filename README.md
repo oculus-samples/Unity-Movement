@@ -59,9 +59,9 @@ Make sure that the color space is set to Linear.
 In order for the SceneSelectMenu buttons to work, add the scenes located in the **Samples/../Scenes** folders of the package.
 
 ## Samples
-The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/../Scenes** folders to the project's Assets folder.
+The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/../Scenes** folders to the project's Assets folder. The **V2** sample scenes should be used (**MovementAuraV2**, **MovementHighFidelityV2**, **MovementHipPinningV2**, **MovementRetargetingV2**), as the older scenes are deprecated.
 
-For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-samples/#face-and-eye-tracking-with-aura), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-with-hip-pinning), and [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-sample).
+For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-samples/#face-and-eye-tracking-with-aura), [Blendshape Mapping Example Sample](https://developer.oculus.com/documentation/unity/move-samples/#arkit-mapping-with-blendshape-mapping-example), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-with-hip-pinning), [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-sample), and [Retargeting Sample](https://developer.oculus.com/documentation/unity/move-samples/#retargeting-with-blue-robot).
 
 ## Documentation
 The documentation for this package can be found [here](https://developer.oculus.com/documentation/unity/move-overview/).
