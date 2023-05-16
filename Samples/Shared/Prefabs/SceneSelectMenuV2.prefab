@@ -954,15 +954,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _iconInformationArray:
   - LocalPosition: {x: -0.187, y: -0.0011, z: -0.01}
-    SceneName: MovementAuraV2
+    SceneName: MovementAura
   - LocalPosition: {x: -0.067, y: -0.0011, z: -0.01}
     SceneName: MovementBlendshapeMappingExample
   - LocalPosition: {x: 0.053, y: -0.0011, z: -0.01}
-    SceneName: MovementHighFidelityV2
+    SceneName: MovementHighFidelity
   - LocalPosition: {x: 0.173, y: -0.0011, z: -0.01}
-    SceneName: MovementHipPinningV2
+    SceneName: MovementHipPinning
   - LocalPosition: {x: 0.293, y: -0.0011, z: -0.01}
-    SceneName: MovementRetargetingV2
+    SceneName: MovementRetargeting
   _iconTransform: {fileID: 2560278188891738669}
 --- !u!1001 &291624500155126182
 PrefabInstance:
@@ -1150,7 +1150,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3718601612112823234, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: _whenRelease.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
-      value: MovementHighFidelityV2
+      value: MovementHighFidelity
       objectReference: {fileID: 0}
     - target: {fileID: 4171210596153234762, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: m_Name
@@ -1285,7 +1285,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3718601612112823234, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: _whenRelease.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
-      value: MovementRetargetingV2
+      value: MovementRetargeting
       objectReference: {fileID: 0}
     - target: {fileID: 4171210596153234762, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: m_Name
@@ -1420,7 +1420,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3718601612112823234, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: _whenRelease.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
-      value: MovementHipPinningV2
+      value: MovementHipPinning
       objectReference: {fileID: 0}
     - target: {fileID: 4171210596153234762, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: m_Name
@@ -1702,7 +1702,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3718601612112823234, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: _whenRelease.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_StringArgument
-      value: MovementAuraV2
+      value: MovementAura
       objectReference: {fileID: 0}
     - target: {fileID: 4171210596153234762, guid: 323cb65d2594c79499a11a99ff0fb347, type: 3}
       propertyPath: m_Name
