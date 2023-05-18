@@ -215,7 +215,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2406909326056993035, guid: 1ac7885a83f6c4741addf95e0ceea891, type: 3}
       propertyPath: m_Name
-      value: AuraV2FirstPerson
+      value: AuraFirstPerson
       objectReference: {fileID: 0}
     - target: {fileID: 3039050048987196337, guid: 1ac7885a83f6c4741addf95e0ceea891, type: 3}
       propertyPath: m_RootOrder
@@ -399,7 +399,7 @@ PrefabInstance:
       objectReference: {fileID: 338789857}
     - target: {fileID: 8658488230205805792, guid: d13bc4c12718d2a4f9222b0d93dd09f0, type: 3}
       propertyPath: m_Name
-      value: SceneSelectMenuV2
+      value: SceneSelectMenu
       objectReference: {fileID: 0}
     - target: {fileID: 8658488230205805794, guid: d13bc4c12718d2a4f9222b0d93dd09f0, type: 3}
       propertyPath: m_RootOrder
@@ -1215,7 +1215,7 @@ PrefabInstance:
       objectReference: {fileID: 732637564}
     - target: {fileID: 2550476028627066485, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
       propertyPath: m_Name
-      value: AuraV2Mirrored
+      value: AuraMirrored
       objectReference: {fileID: 0}
     - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
       propertyPath: m_RootOrder

@@ -609,7 +609,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2561547567721264650, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
       propertyPath: m_Name
-      value: HighFidelityV2FirstPerson
+      value: HighFidelityFirstPerson
       objectReference: {fileID: 0}
     - target: {fileID: 2938494700203207856, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
       propertyPath: m_RootOrder
@@ -1011,7 +1011,7 @@ PrefabInstance:
       objectReference: {fileID: 645097917}
     - target: {fileID: 8438906022740843477, guid: 87903eea09623ae4a9457dd17b46d93e, type: 3}
       propertyPath: m_Name
-      value: HighFidelityV2Mirrored
+      value: HighFidelityMirrored
       objectReference: {fileID: 0}
     - target: {fileID: 9103697882433651055, guid: 87903eea09623ae4a9457dd17b46d93e, type: 3}
       propertyPath: m_RootOrder
@@ -1803,7 +1803,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8658488230205805792, guid: d13bc4c12718d2a4f9222b0d93dd09f0, type: 3}
       propertyPath: m_Name
-      value: SceneSelectMenuV2
+      value: SceneSelectMenu
       objectReference: {fileID: 0}
     - target: {fileID: 8658488230205805794, guid: d13bc4c12718d2a4f9222b0d93dd09f0, type: 3}
       propertyPath: m_RootOrder

@@ -555,7 +555,7 @@ GameObject:
   - component: {fileID: 5558038247458039740}
   - component: {fileID: -2583283678734685087}
   m_Layer: 10
-  m_Name: HipPinningChairV2
+  m_Name: HipPinningChair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

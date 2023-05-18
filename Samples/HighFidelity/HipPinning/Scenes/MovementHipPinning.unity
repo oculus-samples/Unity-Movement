@@ -634,7 +634,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5558038247458039743, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
       propertyPath: m_Name
-      value: HipPinningChairV2
+      value: HipPinningChair
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
@@ -718,7 +718,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2558818635499076925, guid: 3766248d4977d5e4bb67e39bac133acb, type: 3}
       propertyPath: m_Name
-      value: HipPinningMenuV2
+      value: HipPinningMenu
       objectReference: {fileID: 0}
     - target: {fileID: 7125125211647871229, guid: 3766248d4977d5e4bb67e39bac133acb, type: 3}
       propertyPath: _skeleton
@@ -905,7 +905,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1741218239049055554, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
       propertyPath: m_Name
-      value: HighFidelityHipPinningV2FirstPerson
+      value: HighFidelityHipPinningFirstPerson
       objectReference: {fileID: 0}
     - target: {fileID: 2949926527234871885, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1295,7 +1295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8658488230205805792, guid: d13bc4c12718d2a4f9222b0d93dd09f0, type: 3}
       propertyPath: m_Name
-      value: SceneSelectMenuV2
+      value: SceneSelectMenu
       objectReference: {fileID: 0}
     - target: {fileID: 8658488230205805794, guid: d13bc4c12718d2a4f9222b0d93dd09f0, type: 3}
       propertyPath: m_RootOrder
@@ -1723,7 +1723,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5558038247458039743, guid: 1620c7a13bf63d74aa04e90ed9488f6e, type: 3}
       propertyPath: m_Name
-      value: HipPinningChairV2Mirrored
+      value: HipPinningChairMirrored
       objectReference: {fileID: 0}
     - target: {fileID: 6429549886781003042, guid: 1620c7a13bf63d74aa04e90ed9488f6e, type: 3}
       propertyPath: _transformToCopy
@@ -2559,7 +2559,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2561547567721264650, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
       propertyPath: m_Name
-      value: HighFidelityV2FirstPerson
+      value: HighFidelityFirstPerson
       objectReference: {fileID: 0}
     - target: {fileID: 2938494700203207856, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
       propertyPath: m_RootOrder
@@ -2901,7 +2901,7 @@ PrefabInstance:
       objectReference: {fileID: 804730351}
     - target: {fileID: 3916216772104349855, guid: aa6451b2c95f5584fa019e1eb42e1536, type: 3}
       propertyPath: m_Name
-      value: HighFidelityHipPinningV2Mirrored
+      value: HighFidelityHipPinningMirrored
       objectReference: {fileID: 0}
     - target: {fileID: 4400829148038476325, guid: aa6451b2c95f5584fa019e1eb42e1536, type: 3}
       propertyPath: m_RootOrder
@@ -3034,7 +3034,7 @@ PrefabInstance:
       objectReference: {fileID: 606752367}
     - target: {fileID: 109264207228036930, guid: d0b05013d96c67a4ea8bd0a0640632d9, type: 3}
       propertyPath: m_Name
-      value: HipPinningNotificationV2
+      value: HipPinningNotification
       objectReference: {fileID: 0}
     - target: {fileID: 109264207228036931, guid: d0b05013d96c67a4ea8bd0a0640632d9, type: 3}
       propertyPath: m_RootOrder

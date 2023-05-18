@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 2558818635499076924}
   - component: {fileID: 7125125211647871229}
   m_Layer: 0
-  m_Name: HipPinningMenuV2
+  m_Name: HipPinningMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

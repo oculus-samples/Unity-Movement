@@ -882,7 +882,7 @@ GameObject:
   - component: {fileID: 3805532802355760582}
   - component: {fileID: 3422149849476921334}
   m_Layer: 0
-  m_Name: SceneSelectMenuV2
+  m_Name: SceneSelectMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

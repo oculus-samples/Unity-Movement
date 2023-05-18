@@ -26,6 +26,7 @@ Transform:
   m_LocalRotation: {x: -0.5, y: 0.5, z: -0.5, w: 0.5}
   m_LocalPosition: {x: 0.19999997, y: 0, z: 0.395}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5558038247458039740}
   m_RootOrder: 2
@@ -56,6 +57,7 @@ Transform:
   m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
   m_LocalPosition: {x: -0.2, y: 0, z: 0.395}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5558038247458039740}
   m_RootOrder: 1
@@ -88,6 +90,7 @@ Transform:
   m_LocalRotation: {x: 0.000000021855694, y: 0.00000008742278, z: -1.9106855e-15, w: 1}
   m_LocalPosition: {x: -0.00207583, y: 0.00000002799988, z: -0.000000038146972}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5646293947150082851}
   m_RootOrder: 0
@@ -111,6 +114,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -141,37 +145,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &2424283014097532696
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2527458650730329668}
-  m_Layer: 10
-  m_Name: task_chair_SpineUpper
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2527458650730329668
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2424283014097532696}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.109367676, y: -0.025952995, z: 8.437417e-17}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 417547721833036310}
-  m_Father: {fileID: 508089921562853172}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2458869323168028775
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,6 +173,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.35819075, z: 0.0069113704}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6156963203879982171}
   m_RootOrder: 3
@@ -223,6 +197,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -253,67 +228,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &3229493788202320261
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 417547721833036310}
-  m_Layer: 10
-  m_Name: task_chair_Chest
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &417547721833036310
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3229493788202320261}
-  m_LocalRotation: {x: -0, y: -0, z: -0.047620617, w: 0.9988655}
-  m_LocalPosition: {x: -0.18433118, y: 0.010320425, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 2527458650730329668}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3391044465527795663
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4361439149766507348}
-  m_Layer: 10
-  m_Name: task_chair_SpineLower
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4361439149766507348
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3391044465527795663}
-  m_LocalRotation: {x: -0.00000001545431, y: -0.00000001545431, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -0.032535665, y: 0.0202201, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 508089921562853172}
-  m_Father: {fileID: 1914303655804538425}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3908865131035492316
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,6 +256,7 @@ Transform:
   m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1451088920734716465}
   m_RootOrder: 0
@@ -365,6 +280,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -419,12 +335,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4711821302058220041}
   m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalPosition: {x: 0, y: 0.6, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7198759753175955444}
   - {fileID: 8290174448249556598}
-  - {fileID: 4361439149766507348}
   m_Father: {fileID: 5504533049474937555}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -454,6 +370,7 @@ Transform:
   m_LocalRotation: {x: -0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4125661287277911189}
   - {fileID: 6729724803747633171}
@@ -489,6 +406,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.7752005, z: -0.15749052}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6156963203879982171}
   m_RootOrder: 1
@@ -512,6 +430,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -570,6 +489,7 @@ Transform:
   m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.00207583, y: -0.03560723, z: -0.00000002182202}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5646293947150082851}
   m_RootOrder: 1
@@ -593,6 +513,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -632,9 +553,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5558038247458039740}
-  - component: {fileID: 3442406060172460620}
+  - component: {fileID: 6429549886781003042}
   m_Layer: 10
-  m_Name: HipPinningChair
+  m_Name: HipPinningChairMirrored
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -650,6 +571,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5646293947150082851}
   - {fileID: 1188504392289641224}
@@ -657,7 +579,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3442406060172460620
+--- !u!114 &6429549886781003042
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -666,18 +588,57 @@ MonoBehaviour:
   m_GameObject: {fileID: 5558038247458039743}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a2493713676f604ea00e2cfc3446ce5, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a78b6686dabfbe46ae659e7d6f3824a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chairObject: {fileID: 4976612559267428761}
-  _hipTargetTransform: {fileID: 1914303655804538425}
-  _chairSeat: {fileID: 5504533049474937555}
-  _chairCylinder: {fileID: 1066807844683816777}
-  _chairCylinderScaleMultiplier: 1
-  _spineTargetTransforms:
-  - {fileID: 1914303655804538425}
-  _constrainedArea: {x: 0.1, y: 0, z: 0.1}
-  _constrainedAreaOffset: {x: 0, y: 0, z: 0.1}
+  _transformToCopy: {fileID: 0}
+  _myTransform: {fileID: 5558038247458039740}
+  _mirroredTransformPairs:
+  - Name: task_chair_RightFoot
+    OriginalTransform: {fileID: 1188504392089412552}
+    MirroredTransform: {fileID: 1188504392089412552}
+  - Name: task_chair_LeftFoot
+    OriginalTransform: {fileID: 1188504392289641224}
+    MirroredTransform: {fileID: 1188504392289641224}
+  - Name: tiltbox
+    OriginalTransform: {fileID: 3350530247479060347}
+    MirroredTransform: {fileID: 3350530247479060347}
+  - Name: piston
+    OriginalTransform: {fileID: 1066807844683816777}
+    MirroredTransform: {fileID: 1066807844683816777}
+  - Name: seat
+    OriginalTransform: {fileID: 1451088920734716465}
+    MirroredTransform: {fileID: 5504533049474937555}
+  - Name: outer_shell
+    OriginalTransform: {fileID: 8935649923192553964}
+    MirroredTransform: {fileID: 8935649923192553964}
+  - Name: knobs
+    OriginalTransform: {fileID: 7839913518083481627}
+    MirroredTransform: {fileID: 7839913518083481627}
+  - Name: task_chair_meshes
+    OriginalTransform: {fileID: 6156963203879982171}
+    MirroredTransform: {fileID: 6156963203879982171}
+  - Name: task_chair_RightKnee
+    OriginalTransform: {fileID: 8290174448249556598}
+    MirroredTransform: {fileID: 8290174448249556598}
+  - Name: task_chair_LeftKnee
+    OriginalTransform: {fileID: 7198759753175955444}
+    MirroredTransform: {fileID: 7198759753175955444}
+  - Name: task_chair_Hips
+    OriginalTransform: {fileID: 1914303655804538425}
+    MirroredTransform: {fileID: 1914303655804538425}
+  - Name: task_chair_seat
+    OriginalTransform: {fileID: 5504533049474937555}
+    MirroredTransform: {fileID: 5504533049474937555}
+  - Name: legs
+    OriginalTransform: {fileID: 6729724803747633171}
+    MirroredTransform: {fileID: 6729724803747633171}
+  - Name: feet
+    OriginalTransform: {fileID: 4125661287277911189}
+    MirroredTransform: {fileID: 4125661287277911189}
+  - Name: task_chair
+    OriginalTransform: {fileID: 5646293947150082851}
+    MirroredTransform: {fileID: 5646293947150082851}
 --- !u!1 &5707283769910924976
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,8 +663,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5707283769910924976}
   m_LocalRotation: {x: 0.7071068, y: 0.7071068, z: -0.00000001545431, w: 0.00000001545431}
-  m_LocalPosition: {x: -0.2, y: 0, z: 0.39500004}
+  m_LocalPosition: {x: -0.2, y: 0, z: 0.395}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1914303655804538425}
   m_RootOrder: 0
@@ -734,6 +696,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7839913518083481627}
   - {fileID: 8935649923192553964}
@@ -770,6 +733,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.00085464475, y: 0.36286396, z: -0.051918633}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6156963203879982171}
   m_RootOrder: 0
@@ -793,6 +757,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -849,6 +814,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1914303655804538425}
   - {fileID: 6156963203879982171}
@@ -881,40 +847,10 @@ Transform:
   m_LocalRotation: {x: -0.7071068, y: 0.7071068, z: -0.00000001545431, w: -0.00000001545431}
   m_LocalPosition: {x: 0.19999997, y: 0, z: 0.395}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1914303655804538425}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8484301487646465442
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 508089921562853172}
-  m_Layer: 10
-  m_Name: task_chair_SpineMiddle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &508089921562853172
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8484301487646465442}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.109367676, y: -0.025952995, z: 8.437417e-17}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 2527458650730329668}
-  m_Father: {fileID: 4361439149766507348}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9177560640408945760
 GameObject:
@@ -944,6 +880,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1066807844683816777}
   m_Father: {fileID: 6156963203879982171}
@@ -968,6 +905,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
