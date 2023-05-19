@@ -129,8 +129,8 @@
         45
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.0,
-      "Multiplier": 0.0
+      "MaxValue": 1.0,
+      "Multiplier": 0.03
     },
     {
       "FaceExpressions": [
@@ -138,8 +138,8 @@
         47
       ],
       "MinValue": 0.0,
-      "MaxValue": 0.0,
-      "Multiplier": 0.0
+      "MaxValue": 1.0,
+      "Multiplier": 0.03
     },
     {
       "FaceExpressions": [
@@ -228,7 +228,7 @@
       ],
       "MinValue": 0.0,
       "MaxValue": 1.0,
-      "Multiplier": 0.5
+      "Multiplier": 0.7
     },
     {
       "FaceExpressions": [
@@ -282,7 +282,7 @@
       ],
       "MinValue": 0.0,
       "MaxValue": 1.0,
-      "Multiplier": 1.5
+      "Multiplier": 2.0
     },
     {
       "FaceExpressions": [
@@ -291,7 +291,7 @@
       ],
       "MinValue": 0.0,
       "MaxValue": 1.0,
-      "Multiplier": 1.5
+      "Multiplier": 2.0
     },
     {
       "FaceExpressions": [
@@ -300,7 +300,7 @@
       ],
       "MinValue": 0.0,
       "MaxValue": 1.0,
-      "Multiplier": 1.5
+      "Multiplier": 2.0
     }
   ]
 }

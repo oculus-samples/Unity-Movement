@@ -100,6 +100,22 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 0.08340822
+      objectReference: {fileID: 0}
+    - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 0.07275189
+      objectReference: {fileID: 0}
+    - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 0.08840925
+      objectReference: {fileID: 0}
+    - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: e88c1c6d93413254ab36e53cebc1f111, type: 2}
@@ -144,12 +160,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 5b53d82759915e044a2e962e29f8f3f7, type: 2}
     - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 0.07926141
+      objectReference: {fileID: 0}
+    - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 0.07081104
+      objectReference: {fileID: 0}
+    - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 0.08431437
+      objectReference: {fileID: 0}
+    - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: e88c1c6d93413254ab36e53cebc1f111, type: 2}
     - target: {fileID: 919132149155446097, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_Name
-      value: ToonTonyARKIT
+      value: BlendshapeMappingExampleARKIT
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_IsActive
