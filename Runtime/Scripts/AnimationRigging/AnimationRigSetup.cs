@@ -92,6 +92,20 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// If true, disable then re-enable the rig upon a focus change.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(AnimationRigSetupTooltips.RigToggleOnFocus)]
+        protected bool _rigToggleOnFocus = true;
+
+        /// <inheritdoc cref="_rigToggleOnFocus"/>
+        public bool RigToggleOnFocus
+        {
+            get { return _rigToggleOnFocus; }
+            set { _rigToggleOnFocus = value; }
+        }
+
+        /// <summary>
         /// Retargeting layer component to get data from.
         /// </summary>
         [SerializeField, Optional]
@@ -137,7 +151,10 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private void Awake()
+        /// <summary>
+        /// Disable the animator and rig until the skeleton is ready to be used with animation rigging.
+        /// </summary>
+        protected virtual void Awake()
         {
             Assert.IsNotNull(_skeleton);
             Assert.IsNotNull(_animator);
@@ -159,7 +176,11 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private void Update()
+        /// <summary>
+        /// Initialize the animation rig if the skeleton is initialized, and check to re-enable the rig
+        /// if necessary.
+        /// </summary>
+        protected virtual void Update()
         {
             RunInitialSetup();
 
@@ -168,6 +189,26 @@ namespace Oculus.Movement.AnimationRigging
             {
                 ReEnableRigIfPendingSkeletalChange();
                 CheckForSkeletalChanges();
+            }
+        }
+
+        /// <summary>
+        /// Disable and re-enable the rig if <see cref="_rigToggleOnFocus"/> is enabled.
+        /// </summary>
+        /// <param name="hasFocus">True if the application is currently focused.</param>
+        protected virtual void OnApplicationFocus(bool hasFocus)
+        {
+            if (_rigToggleOnFocus)
+            {
+                if (!hasFocus)
+                {
+                    DisableRig();
+                    _rigBuilder.Evaluate(Time.deltaTime);
+                }
+                else
+                {
+                    EnableRig();
+                }
             }
         }
 
@@ -194,6 +235,41 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
+        private void DisableRig()
+        {
+            if (_rigBuilder)
+            {
+                _rigBuilder.enabled = false;
+            }
+
+            if (_iovrSkeletonConstraints != null)
+            {
+                foreach (var currentConstraint in _iovrSkeletonConstraints)
+                {
+                    currentConstraint.RegenerateData();
+                }
+            }
+
+            if (_retargetingLayer != null)
+            {
+                _lastRetargetedTransformCount = _retargetingLayer.GetNumberOfTransformsRetargeted();
+            }
+        }
+
+        private void EnableRig()
+        {
+            if (_rigBuilder)
+            {
+                _rigBuilder.enabled = true;
+            }
+            if (_rebindAnimator)
+            {
+                _animator.Rebind();
+                _animator.Update(0.0f);
+            }
+            _pendingSkeletalUpdateFromLastFrame = false;
+        }
+
         private void ReEnableRigIfPendingSkeletalChange()
         {
             if (!_ranSetup)
@@ -202,16 +278,7 @@ namespace Oculus.Movement.AnimationRigging
             }
             if (_pendingSkeletalUpdateFromLastFrame)
             {
-                if (_rigBuilder)
-                {
-                    _rigBuilder.enabled = true;
-                }
-                if (_rebindAnimator)
-                {
-                    _animator.Rebind();
-                    _animator.Update(0.0f);
-                }
-                _pendingSkeletalUpdateFromLastFrame = false;
+                EnableRig();
                 Debug.LogWarning("Re-enabled rig after skeletal update.");
             }
         }
@@ -230,24 +297,8 @@ namespace Oculus.Movement.AnimationRigging
                 _pendingSkeletalUpdateFromLastFrame = true;
                 _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
 
-                if (_rigBuilder)
-                {
-                    _rigBuilder.enabled = false;
-                }
+                DisableRig();
                 Debug.LogWarning("Detected skeletal change. Disabling the rig.");
-
-                if (_iovrSkeletonConstraints != null)
-                {
-                    foreach (var currentConstraint in _iovrSkeletonConstraints)
-                    {
-                        currentConstraint.RegenerateData();
-                    }
-                }
-
-                if (_retargetingLayer != null)
-                {
-                    _lastRetargetedTransformCount = _retargetingLayer.GetNumberOfTransformsRetargeted();
-                }
             }
         }
 

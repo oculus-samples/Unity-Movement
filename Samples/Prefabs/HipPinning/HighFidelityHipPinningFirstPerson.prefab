@@ -1403,6 +1403,7 @@ MonoBehaviour:
   _ovrSkeletonConstraints: []
   _rebindAnimator: 0
   _reEnableRig: 0
+  _rigToggleOnFocus: 0
   _retargetingLayer: {fileID: 0}
 --- !u!4 &1744467641500109490 stripped
 Transform:
