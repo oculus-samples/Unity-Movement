@@ -90,7 +90,7 @@ namespace Oculus.Movement.Utils
                 {
                     GUILayout.Label("Layers", EditorStyles.boldLabel);
                     GUILayout.Label(
-                        "For the sample scenes, the following layers must be present in the project: <b>Character (layer index 10), MirroredCharacter (layer index 11), and HiddenMesh</b>. \n\nImport the Layers preset in <b>Edit -> Project Settings -> Tags and Layers</b> by selecting the tiny settings icon located at the top right corner and choosing the <b>Layers</b> preset located in the <b>Samples/Shared/Presets</b> folder.",
+                        "For the sample scenes, the following layers must be present in the project: <b>Character (layer index 10), MirroredCharacter (layer index 11), and HiddenMesh</b>. \n\nImport the Layers preset in <b>Edit -> Project Settings -> Tags and Layers</b> by selecting the tiny settings icon located at the top right corner and choosing the <b>Layers</b> preset located in the <b>Samples/Settings</b> folder.",
                         labelStyle);
                     GUILayout.Space(5);
                 }
