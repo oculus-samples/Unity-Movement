@@ -341,7 +341,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e90520f3b2e75c34b84d96e20091eb25, type: 3}
       propertyPath: m_Name
-      value: HighFidelityV2
+      value: HighFidelity
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e90520f3b2e75c34b84d96e20091eb25, type: 3}
       propertyPath: m_Layer
@@ -511,6 +511,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 6348546292080583543, guid: e90520f3b2e75c34b84d96e20091eb25, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 17084abe494cb0e408c8e06e9cb22ecd, type: 2}
     - target: {fileID: 6429149967725454032, guid: e90520f3b2e75c34b84d96e20091eb25, type: 3}
       propertyPath: m_Layer
       value: 10

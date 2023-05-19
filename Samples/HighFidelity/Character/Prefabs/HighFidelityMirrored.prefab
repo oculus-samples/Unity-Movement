@@ -145,7 +145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2438560284076026643, guid: 3a4375d5a31401e47ac4555a2eacb587, type: 3}
       propertyPath: m_Name
-      value: HighFidelityV2Mirrored
+      value: HighFidelityMirrored
       objectReference: {fileID: 0}
     - target: {fileID: 2438560284076026643, guid: 3a4375d5a31401e47ac4555a2eacb587, type: 3}
       propertyPath: m_Layer
