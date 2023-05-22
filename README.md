@@ -17,7 +17,7 @@ Then, bring this package into the project.
 - To grab a specific version of the package, append the version number with a # to the git URL (i.e. https://github.com/oculus-samples/Unity-Movement.git#1.2.0)
 - Alternatively, in package manager, click on the add button below the window title and select **Add package from disk...**, using the package.json located after unzipping one of the releases here: https://github.com/oculus-samples/Unity-Movement/releases
 
-The sample scenes are located under the **Samples/../Scenes** folders.
+The sample scenes are located under the **Samples/Scenes** folder.
 
 ## Unity Setup
 
@@ -56,10 +56,10 @@ Make sure that the color space is set to Linear.
 
 ## Build Settings
 
-In order for the SceneSelectMenu buttons to work, add the scenes located in the **Samples/../Scenes** folders of the package.
+In order for the SceneSelectMenu buttons to work, add the scenes located in the **Samples/Scenes** folder of the package.
 
 ## Samples
-The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/../Scenes** folders to the project's Assets folder. The **V2** sample scenes should be used (**MovementAuraV2**, **MovementHighFidelityV2**, **MovementHipPinningV2**, **MovementRetargetingV2**), as the older scenes are deprecated.
+The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/Scenes** folder to the project's Assets folder.
 
 For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-samples/#face-and-eye-tracking-with-aura), [Blendshape Mapping Example Sample](https://developer.oculus.com/documentation/unity/move-samples/#arkit-mapping-with-blendshape-mapping-example), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-with-hip-pinning), [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-sample), and [Retargeting Sample](https://developer.oculus.com/documentation/unity/move-samples/#retargeting-with-blue-robot).
 
