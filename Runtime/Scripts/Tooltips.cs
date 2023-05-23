@@ -915,6 +915,9 @@ namespace Oculus.Movement
         public const string Skeleton =
             "The OVR Skeleton component.";
 
+        public const string Animator =
+            "The animator component.";
+
         public const string SpineTranslationCorrectionType =
             "The type of spine translation correction that should be applied.";
 

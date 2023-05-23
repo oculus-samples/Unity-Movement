@@ -24,6 +24,12 @@ namespace Oculus.Movement.AnimationRigging
                     var skeleton = constraint.GetComponentInParent<OVRSkeleton>();
                     constraint.data.AssignOVRSkeleton(skeleton);
                 }
+                if (GUILayout.Button("Find Animator"))
+                {
+                    Undo.RecordObject(constraint, "Find Animator");
+                    var animator = constraint.GetComponentInParent<Animator>();
+                    constraint.data.AssignAnimator(animator);
+                }
                 GUILayout.Space(EditorGUIUtility.standardVerticalSpacing);
             }
             DrawDefaultInspector();

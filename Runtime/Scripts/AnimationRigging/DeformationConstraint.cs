@@ -93,6 +93,11 @@ namespace Oculus.Movement.AnimationRigging
         public OVRSkeleton ConstraintSkeleton { get; }
 
         /// <summary>
+        /// The Animator component for the character.
+        /// </summary>
+        public Animator ConstraintAnimator { get; }
+
+        /// <summary>
         /// The array of transforms from the hips to the head bones.
         /// </summary>
         public Transform[] HipsToHeadBones { get; }
@@ -155,6 +160,9 @@ namespace Oculus.Movement.AnimationRigging
         OVRSkeleton IDeformationData.ConstraintSkeleton => _skeleton;
 
         /// <inheritdoc />
+        Animator IDeformationData.ConstraintAnimator => _animator;
+
+        /// <inheritdoc />
         SpineTranslationCorrectionType IDeformationData.SpineCorrectionType => _spineTranslationCorrectionType;
 
         /// <inheritdoc />
@@ -180,11 +188,15 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(DeformationDataTooltips.Skeleton)]
         private OVRSkeleton _skeleton;
 
+        /// <inheritdoc cref="IDeformationData.ConstraintAnimator"/>
+        [NotKeyable, SerializeField]
+        [Tooltip(DeformationDataTooltips.Animator)]
+        private Animator _animator;
+
         /// <inheritdoc cref="IDeformationData.SpineCorrectionType"/>
         [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.SpineTranslationCorrectionType)]
         private SpineTranslationCorrectionType _spineTranslationCorrectionType;
-
 
         /// <inheritdoc cref="IDeformationData.CorrectSpineOnce"/>
         [NotKeyable, SerializeField]
@@ -257,29 +269,38 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Assign the OVR Skeleton.
         /// </summary>
-        /// <param name="skeleton">The OVRSkeleton</param>
+        /// <param name="skeleton">The OVRSkeleton component.</param>
         public void AssignOVRSkeleton(OVRSkeleton skeleton)
         {
             _skeleton = skeleton;
         }
 
+        /// <summary>
+        /// Assign the Animator.
+        /// </summary>
+        /// <param name="skeleton">The Animator component.</param>
+        public void AssignAnimator(Animator animator)
+        {
+            _animator = animator;
+        }
+
+        private bool SkeletonOrAnimatorValid()
+        {
+            return (_skeleton != null && _skeleton.IsInitialized) ||
+                _animator != null;
+        }
+
         private void SetupHipsHeadData(Transform dummyOne, Transform dummyTwo)
         {
-            // Setup hips to head
             var hipToHeadBones = new List<Transform>();
-
-            if (_skeleton.IsInitialized)
+            if (SkeletonOrAnimatorValid())
             {
-                for (int boneId = (int)OVRSkeleton.BoneId.Body_Hips; boneId <= (int)OVRSkeleton.BoneId.Body_Head; boneId++)
+                for (int boneId = (int)OVRSkeleton.BoneId.Body_Hips; boneId <= (int)OVRSkeleton.BoneId.Body_Head;
+                    boneId++)
                 {
-                    var bones = _skeleton.Bones;
-                    for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
-                    {
-                        if (bones[boneIndex].Id == (OVRSkeleton.BoneId)boneId)
-                        {
-                            hipToHeadBones.Add(_skeleton.Bones[boneIndex].Transform);
-                        }
-                    }
+                    var foundBoneTransform = FindBoneTransform((OVRSkeleton.BoneId)boneId);
+                    hipToHeadBones.Add(foundBoneTransform != null ?
+                        foundBoneTransform.transform : dummyOne);
                 }
             }
             else
@@ -295,10 +316,22 @@ namespace Oculus.Movement.AnimationRigging
 
         private Transform FindBoneTransform(OVRSkeleton.BoneId boneId)
         {
-            if (!_skeleton.IsInitialized)
+            if (!SkeletonOrAnimatorValid())
             {
                 return null;
             }
+            if (_skeleton != null)
+            {
+                return FindBoneTransformFromSkeleton(boneId);
+            }
+            else
+            {
+                return FindBoneTransformAnimator(boneId);
+            }
+        }
+
+        private Transform FindBoneTransformFromSkeleton(OVRSkeleton.BoneId boneId)
+        {
             var bones = _skeleton.Bones;
             for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
             {
@@ -307,13 +340,21 @@ namespace Oculus.Movement.AnimationRigging
                     return bones[boneIndex].Transform;
                 }
             }
-
             return null;
+        }
+
+        private Transform FindBoneTransformAnimator(OVRSkeleton.BoneId boneId)
+        {
+            if (!CustomMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
+            {
+                return null;
+            }
+            return _animator.GetBoneTransform(CustomMappings.BoneIdToHumanBodyBone[boneId]);
         }
 
         private void SetupArmData(Transform dummyOne, Transform dummyTwo)
         {
-            bool skeletonInitialized = _skeleton.IsInitialized;
+            bool skeletonInitialized = SkeletonOrAnimatorValid();
             // Setup arm data
             _leftArmData = new ArmPosData()
             {
@@ -367,7 +408,7 @@ namespace Oculus.Movement.AnimationRigging
 
             if (_applyToArms)
             {
-                var chestBone = _skeleton.IsInitialized ?
+                var chestBone = SkeletonOrAnimatorValid() ?
                     FindBoneTransform(OVRSkeleton.BoneId.Body_Chest) :
                     dummyTransform;
                 var chestBonePos = chestBone.position;
@@ -427,7 +468,7 @@ namespace Oculus.Movement.AnimationRigging
 
         bool IAnimationJobData.IsValid()
         {
-            if (_skeleton == null)
+            if (_skeleton == null || _animator == null)
             {
                 return false;
             }
@@ -447,6 +488,7 @@ namespace Oculus.Movement.AnimationRigging
         void IAnimationJobData.SetDefaultValues()
         {
             _skeleton = null;
+            _animator = null;
             _spineTranslationCorrectionType = SpineTranslationCorrectionType.None;
             _applyToArms = false;
             _useMoveTowardsArms = false;
