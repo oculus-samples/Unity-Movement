@@ -207,7 +207,11 @@ namespace Oculus.Movement.AnimationRigging
                 }
                 else
                 {
-                    EnableRig();
+                    // edge case: don't call this if starting up for first time
+                    if (_skeleton.IsInitialized)
+                    {
+                        EnableRig();
+                    }
                 }
             }
         }
