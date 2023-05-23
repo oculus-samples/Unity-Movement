@@ -16,12 +16,12 @@ namespace Oculus.Movement.Utils
     {
         private const string _MOVEMENT_SAMPLES_MENU =
             "GameObject/Movement Samples/";
-        private const string _MOVEMENT_SAMPLES_FACE_MENU =
+        private const string _MOVEMENT_SAMPLES_BT_MENU =
             "Body Tracking/";
-        private const string _RETARGETING_MENU =
+        private const string _ANIM_RIGGING_RETARGETING_MENU =
             "Animation Rigging Retargeting";
 
-        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FACE_MENU + _RETARGETING_MENU)]
+        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU)]
         private static void SetupCharacterForAnimationRiggingRetargeting()
         {
             try

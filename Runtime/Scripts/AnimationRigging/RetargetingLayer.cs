@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
+// Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
 using System.Collections.Generic;
@@ -113,6 +113,14 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Optional]
         [Tooltip(RetargetingLayerTooltips.PositionsToCorrectLateUpdate)]
         protected AvatarMask _positionsToCorrectLateUpdate;
+        /// <summary>
+        /// Positions to correct accessors.
+        /// </summary>
+        public AvatarMask PositionsToCorrectLateUpdateComp
+        {
+            get { return _positionsToCorrectLateUpdate; }
+            set { _positionsToCorrectLateUpdate = value; }
+        }
 
         /// <summary>
         /// Since some bones are not affected by retargeting,
@@ -121,6 +129,14 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Optional]
         [Tooltip(RetargetingLayerTooltips.MaskToSetToTPose)]
         protected AvatarMask _maskToSetToTPose;
+        /// <summary>
+        /// Mask to set to TPose accessors.
+        /// </summary>
+        public AvatarMask MaskToSetToTPoseComp
+        {
+            get { return _maskToSetToTPose; }
+            set { _maskToSetToTPose = value; }
+        }
 
         private Pose[] _defaultPoses;
         private IJointConstraint[] _jointConstraints;

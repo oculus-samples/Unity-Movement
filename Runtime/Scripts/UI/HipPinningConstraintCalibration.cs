@@ -17,42 +17,49 @@ namespace Oculus.Movement.UI
         /// </summary>
         [Header("Hip Pinning Objects")]
         [SerializeField]
+        [Tooltip(HipPinningConstraintCalibrationTooltips.HipPinningConstraints)]
         protected HipPinningConstraint[] _hipPinningConstraints;
 
         /// <summary>
         /// The game object that contains the mesh renderers for the main hip pinning target.
         /// </summary>
         [SerializeField]
+        [Tooltip(HipPinningConstraintCalibrationTooltips.MainHipPinningTargetRenderer)]
         protected GameObject _mainHipPinningTargetRenderer;
 
         /// <summary>
         /// The game object that contains the mesh renderers for the mirrored hip pinning target.
         /// </summary>
         [SerializeField]
+        [Tooltip(HipPinningConstraintCalibrationTooltips.MirrorHipPinningTargetRenderer)]
         protected GameObject _mirrorHipPinningTargetRenderer;
 
         /// <summary>
         /// The game object that contains the mesh renderers for the main character.
         /// </summary>
         [SerializeField]
+        [Tooltip(HipPinningConstraintCalibrationTooltips.MainCharacterRenderer)]
         protected GameObject _mainCharacterRenderer;
 
         /// <summary>
         /// The game object that contains the mesh renderers for the mirrored character.
         /// </summary>
         [SerializeField]
+        [Tooltip(HipPinningConstraintCalibrationTooltips.MirroredCharacterRenderer)]
         protected GameObject _mirroredCharacterRenderer;
 
         /// <summary>
         /// The skeletal tracking data provider for the interface character.
         /// </summary>
         [SerializeField]
+        [Tooltip(HipPinningConstraintCalibrationTooltips.Skeleton)]
         protected OVRCustomSkeleton _skeleton;
 
         /// <summary>
         /// The game object that contains the renderers for this calibration menu.
         /// </summary>
         [Header("UI"), Space(10), SerializeField]
+        [Tooltip(HipPinningConstraintCalibrationTooltips.CalibrateMenu)]
         protected GameObject _calibrateMenu;
 
         private void Start()

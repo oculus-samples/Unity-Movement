@@ -975,17 +975,20 @@ namespace Oculus.Movement
         public const string ReEnableRig =
             "If true, disable then re-enable the rig upon a skeletal change.";
 
+        public const string RigToggleOnFocus =
+            "If true, disable then re-enable the rig upon a focus change.";
+
         public const string RetargetingLayer =
             "Retargeting layer component to get data from.";
     }
 
-    public static class HipPinningAnimationRiggingCalibrationTooltips
+    public static class HipPinningConstraintCalibrationTooltips
     {
-        public const string MainChairProp =
-            "The hip pinning target for the main character.";
+        public const string MainHipPinningTargetRenderer =
+            "The game object that contains the mesh renderers for the main hip pinning target.";
 
-        public const string MirroredChairProp =
-            "The hip pinning target for the mirrored character.";
+        public const string MirrorHipPinningTargetRenderer =
+            "The game object that contains the mesh renderers for the mirrored hip pinning target.";
 
         public const string HipPinningConstraints =
             "The hip pinning constraints.";
@@ -996,8 +999,8 @@ namespace Oculus.Movement
         public const string MirroredCharacterRenderer =
             "The game object that contains the mesh renderers for the main character.";
 
-        public const string DataProvider =
-            "The tracking data provider for the main character.";
+        public const string Skeleton =
+            "The skeletal tracking data provider for the interface character.";
 
         public const string CalibrateMenu =
             "The game object that contains the renderers for this calibration menu.";
