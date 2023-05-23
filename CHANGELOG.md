@@ -1,3 +1,20 @@
+# [2.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.0.0...v2.1.0) (2023-05-23)
+
+
+### Bug Fixes
+
+* **Editor:** Update copyright headers for editor scripts ([a6ba69a](https://github.com/oculus-samples/Unity-Movement/commit/a6ba69aef97e9c413c7fc99d96ba728dd6fd1b98))
+* **Runtime:** Fix copyright headers ([615beaa](https://github.com/oculus-samples/Unity-Movement/commit/615beaa188931d6a4cd166de9b16370380b37767))
+* **Samples:** Clean up high fidelity model ([218009d](https://github.com/oculus-samples/Unity-Movement/commit/218009d9c28d6c664a9d4b3bcfb1658d601cd3c4))
+* **Samples:** Old scene names use the word Legacy ([bbe1079](https://github.com/oculus-samples/Unity-Movement/commit/bbe10798977e6646f3bd1bcb05378bd840ae0f9d))
+
+
+### Features
+
+* **Runtime:** Add accessors for RetargetingLayer masks ([4eb4e99](https://github.com/oculus-samples/Unity-Movement/commit/4eb4e9900ae45eba3451c3080beae6a1b82efa36))
+* **Runtime:** Allow animation rig to be disabled then re-enabled for OnApplicationFocus ([7d17c4c](https://github.com/oculus-samples/Unity-Movement/commit/7d17c4c44a87f8ac39137f35f44755204004cb30))
+* **Samples:** Update blendshape modifiers and head in BlendshapeMappingExample ([3c0192c](https://github.com/oculus-samples/Unity-Movement/commit/3c0192c90f90a4b458ea01bf64142f22f68f8d14))
+
 # [2.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v1.4.1...v2.0.0) (2023-05-11)
 
 
