@@ -983,6 +983,11 @@ namespace Oculus.Movement
 
         public const string RetargetingLayer =
             "Retargeting layer component to get data from.";
+
+        public const string CheckSkeletalUpdatesByProxy =
+            "Use proxy transforms to check skeletal changes. " +
+            "Proxy transforms can be used in case the original " +
+            "skeleton updates too much.";
     }
 
     public static class HipPinningConstraintCalibrationTooltips
@@ -1138,12 +1143,19 @@ namespace Oculus.Movement
     {
         public const string DisableAvatar =
             "Disable avatar for accurate positions, especially fingers.";
+
         public const string PositionsToCorrectLateUpdate =
             "Positions to correct after the fact. Avatar " +
             "masks prevent setting positions of the hands precisely.";
+
         public const string MaskToSetToTPose =
             "Since some bones are not affected by retargeting, " +
             "some joints should be reset to t-pose.";
+
+        public const string EnableTrackingByProxy =
+            "Create proxy transforms that track the skeletal bones. If the " +
+            "skeletal bone transforms change, that won't necessitate creating new " +
+            "proxy transforms in most cases.";
     }
 
     public static class LateMirroredObjectTooltips
