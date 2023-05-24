@@ -15,7 +15,7 @@ namespace Oculus.Movement.AnimationRigging
     public interface IRetargetingData
     {
         /// <summary>
-        /// Source transforms used to retarget to.
+        /// Source transforms used for retargeting.
         /// </summary>
         public Transform[] SourceTransforms { get; }
 
@@ -81,13 +81,25 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(RetargetingConstraintDataTooltips.RetargetingLayer)]
         private RetargetingLayer _retargetingLayer;
 
-        /// <summary>
-        /// Retargeting layer accessors.
-        /// </summary>
+        /// <inheritdoc cref="_retargetingLayer"/>
         public RetargetingLayer RetargetingLayerComp
         {
             get { return _retargetingLayer; }
             set { _retargetingLayer = value; }
+        }
+
+        /// <summary>
+        /// Allow dynamic adjustments at runtime.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingConstraintDataTooltips.AllowDynamicAdjustmentsRuntime)]
+        private bool _allowDynamicAdjustmentsRuntime;
+
+        /// <inheritdoc cref="_allowDynamicAdjustmentsRuntime"/>
+        public bool AllowDynamicAdjustmentsRuntime
+        {
+            get { return _allowDynamicAdjustmentsRuntime; }
+            set { _allowDynamicAdjustmentsRuntime = value; }
         }
 
         /// <summary>
@@ -98,19 +110,29 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(RetargetingConstraintDataTooltips.AvatarMask)]
         private AvatarMask _avatarMask;
 
+        /// <inheritdoc cref="IRetargetingData.SourceTransforms"/>
         [SyncSceneToStream]
+        [Tooltip(RetargetingConstraintDataTooltips.SourceTransforms)]
         private Transform[] _sourceTransforms;
 
+        /// <inheritdoc cref="IRetargetingData.TargetTransforms"/>
         [SyncSceneToStream]
+        [Tooltip(RetargetingConstraintDataTooltips.TargetTransforms)]
         private Transform[] _targetTransforms;
 
+        /// <inheritdoc cref="IRetargetingData.ShouldUpdatePosition"/>
         [NotKeyable]
+        [Tooltip(RetargetingConstraintDataTooltips.ShouldUpdatePositions)]
         private bool[] _shouldUpdatePositions;
 
+        /// <inheritdoc cref="IRetargetingData.RotationOffsets"/>
         [NotKeyable]
+        [Tooltip(RetargetingConstraintDataTooltips.RotationOffsets)]
         private Quaternion[] _rotationOffsets;
 
+        /// <inheritdoc cref="IRetargetingData.RotationAdjustments"/>
         [NotKeyable]
+        [Tooltip(RetargetingConstraintDataTooltips.RotationAdjustments)]
         private Quaternion[] _rotationAdjustments;
 
         /// <inheritdoc />
@@ -123,6 +145,7 @@ namespace Oculus.Movement.AnimationRigging
         public void SetDefaultValues()
         {
             _retargetingLayer = null;
+            _allowDynamicAdjustmentsRuntime = true;
             _avatarMask = new AvatarMask();
             foreach (AvatarMaskBodyPart part in (AvatarMaskBodyPart[])Enum.GetValues(typeof(AvatarMaskBodyPart)))
             {
@@ -150,6 +173,10 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public void UpdateDynamicMetadata()
         {
+            if (!_allowDynamicAdjustmentsRuntime)
+            {
+                return;
+            }
             UpdateDataArraysWithAdjustments();
         }
 

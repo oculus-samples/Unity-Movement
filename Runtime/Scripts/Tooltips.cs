@@ -1110,9 +1110,28 @@ namespace Oculus.Movement
         public const string RetargetingLayer =
             "Retargeting layer component to get data from.";
 
+        public const string AllowDynamicAdjustmentsRuntime =
+            "Allow dynamic adjustments at runtime.";
+
         public const string AvatarMask =
             "Avatar mask to restrict retargeting. While the humanoid retargeter " +
             "class has similar fields, this one is easier to use.";
+
+        public const string SourceTransforms =
+            "Source transforms used for retargeting.";
+
+        public const string TargetTransforms =
+            "Target transforms affected by retargeting.";
+
+        public const string ShouldUpdatePositions =
+            "Indicates if target transform's position should be updated. " +
+            "Once a position is updated, the original position will be lost.";
+
+        public const string RotationOffsets =
+            "Rotation offset to be applied during retargeting.";
+
+        public const string RotationAdjustments =
+            "Optional rotational adjustment to be applied during retargeting.";
     }
 
     public static class RetargetingLayerTooltips
