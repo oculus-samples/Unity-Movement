@@ -469,6 +469,19 @@ namespace Oculus.Movement.AnimationRigging
                 var adjustment = FindAdjustment(targetHumanBodyBone);
                 bool bodySectionInPositionArray = IsBodySectionInArray(
                     bodySectionOfJoint, BodySectionToPosition);
+
+                // Skip if the job arrays are less in number compared to bones.
+                // This can happen if the skeleton regenerates its bones during update,
+                // however the arrays here have not been recreated yet. Note that the arrays
+                // are effectively recreated when AnimationRigSetup disables and re-enables the
+                // rig. Since AnimationRigSetup runs after skeletal updates, this edge case
+                // arises if this function is called after the bones are updated but before
+                // AnimationRigSetup notices.
+                if (arrayId >= rotationAdjustments.Length)
+                {
+                    continue;
+                }
+
                 if (adjustment == null)
                 {
                     SetUpDefaultAdjustment(rotationOffsets, shouldUpdatePositions,
