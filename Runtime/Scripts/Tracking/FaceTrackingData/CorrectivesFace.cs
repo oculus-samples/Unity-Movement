@@ -35,6 +35,13 @@ namespace Oculus.Movement.Tracking
         [Tooltip(CorrectivesFaceTooltips.BlendshapeModifier)]
         protected BlendshapeModifier _blendshapeModifier;
 
+        /// <inheritdoc cref="_blendshapeModifier"/>
+        public BlendshapeModifier BlendshapeModifier
+        {
+            get { return _blendshapeModifier; }
+            set { _blendshapeModifier = value; }
+        }
+
         /// <summary>
         /// The json file containing the in-betweens and combinations data.
         /// </summary>
@@ -42,6 +49,13 @@ namespace Oculus.Movement.Tracking
         [Optional]
         [Tooltip(CorrectivesFaceTooltips.CombinationShapesTextAsset)]
         protected TextAsset _combinationShapesTextAsset;
+
+        /// <inheritdoc cref="_combinationShapesTextAsset"/>
+        public TextAsset CombinationShapesTextAsset
+        {
+            get { return _combinationShapesTextAsset; }
+            set { _combinationShapesTextAsset = value; }
+        }
 
         /// <summary>
         /// Cached mesh blendshape values.
