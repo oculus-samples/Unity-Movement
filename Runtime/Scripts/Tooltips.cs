@@ -1177,6 +1177,9 @@ namespace Oculus.Movement
 
         public const string MirroredTransformPairs =
             "The array of mirrored transform pairs.";
+
+        public const string MirrorScale =
+            "Mirror scale.";
     }
 
     public static class LateMirroredSkeletonTooltips
