@@ -2,6 +2,7 @@ name: Cleanup deleted files from dev in main
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   merge-branch:
