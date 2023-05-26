@@ -66,6 +66,13 @@ namespace Oculus.Movement.Effects
         [Tooltip(LateMirroredObjectTooltips.MirroredTransformPairs)]
         protected MirroredTransformPair[] _mirroredTransformPairs;
 
+        /// <summary>
+        /// Mirror scale.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(LateMirroredObjectTooltips.MirrorScale)]
+        protected bool _mirrorScale = false;
+
         private void Awake()
         {
             Assert.IsNotNull(_transformToCopy);
@@ -84,10 +91,18 @@ namespace Oculus.Movement.Effects
         {
             _myTransform.localPosition = _transformToCopy.localPosition;
             _myTransform.localRotation = _transformToCopy.localRotation;
+            if (_mirrorScale)
+            {
+                _myTransform.localScale = _transformToCopy.localScale;
+            }
             foreach (var transformPair in _mirroredTransformPairs)
             {
                 transformPair.MirroredTransform.localPosition = transformPair.OriginalTransform.localPosition;
                 transformPair.MirroredTransform.localRotation = transformPair.OriginalTransform.localRotation;
+                if (_mirrorScale)
+                {
+                    transformPair.MirroredTransform.localScale = transformPair.OriginalTransform.localScale;
+                }
             }
         }
     }

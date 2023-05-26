@@ -915,6 +915,9 @@ namespace Oculus.Movement
         public const string Skeleton =
             "The OVR Skeleton component.";
 
+        public const string Animator =
+            "The animator component.";
+
         public const string SpineTranslationCorrectionType =
             "The type of spine translation correction that should be applied.";
 
@@ -980,6 +983,11 @@ namespace Oculus.Movement
 
         public const string RetargetingLayer =
             "Retargeting layer component to get data from.";
+
+        public const string CheckSkeletalUpdatesByProxy =
+            "Use proxy transforms to check skeletal changes. " +
+            "Proxy transforms can be used in case the original " +
+            "skeleton updates too much.";
     }
 
     public static class HipPinningConstraintCalibrationTooltips
@@ -1107,21 +1115,47 @@ namespace Oculus.Movement
         public const string RetargetingLayer =
             "Retargeting layer component to get data from.";
 
+        public const string AllowDynamicAdjustmentsRuntime =
+            "Allow dynamic adjustments at runtime.";
+
         public const string AvatarMask =
             "Avatar mask to restrict retargeting. While the humanoid retargeter " +
             "class has similar fields, this one is easier to use.";
+
+        public const string SourceTransforms =
+            "Source transforms used for retargeting.";
+
+        public const string TargetTransforms =
+            "Target transforms affected by retargeting.";
+
+        public const string ShouldUpdatePositions =
+            "Indicates if target transform's position should be updated. " +
+            "Once a position is updated, the original position will be lost.";
+
+        public const string RotationOffsets =
+            "Rotation offset to be applied during retargeting.";
+
+        public const string RotationAdjustments =
+            "Optional rotational adjustment to be applied during retargeting.";
     }
 
     public static class RetargetingLayerTooltips
     {
         public const string DisableAvatar =
             "Disable avatar for accurate positions, especially fingers.";
+
         public const string PositionsToCorrectLateUpdate =
             "Positions to correct after the fact. Avatar " +
             "masks prevent setting positions of the hands precisely.";
+
         public const string MaskToSetToTPose =
             "Since some bones are not affected by retargeting, " +
             "some joints should be reset to t-pose.";
+
+        public const string EnableTrackingByProxy =
+            "Create proxy transforms that track the skeletal bones. If the " +
+            "skeletal bone transforms change, that won't necessitate creating new " +
+            "proxy transforms in most cases.";
     }
 
     public static class LateMirroredObjectTooltips
@@ -1143,6 +1177,9 @@ namespace Oculus.Movement
 
         public const string MirroredTransformPairs =
             "The array of mirrored transform pairs.";
+
+        public const string MirrorScale =
+            "Mirror scale.";
     }
 
     public static class LateMirroredSkeletonTooltips

@@ -119,11 +119,28 @@ namespace Oculus.Movement.AnimationRigging
             set { _retargetingLayer = value; }
         }
 
+        /// <summary>
+        /// Use proxy transforms to check skeletal changes.
+        /// Proxy transforms can be used in case the original
+        /// skeleton updates too much.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(AnimationRigSetupTooltips.CheckSkeletalUpdatesByProxy)]
+        protected bool _checkSkeletalUpdatesByProxy = false;
+
+        /// <inheritdoc cref="_checkSkeletalUpdatesByProxy"/>
+        public bool CheckSkeletalUpdatesByProxy
+        {
+            get { return _checkSkeletalUpdatesByProxy; }
+            set { _checkSkeletalUpdatesByProxy = value;  }
+        }
+
         private bool _ranSetup;
         private int _lastSkeletonChangeCount = -1;
         private bool _pendingSkeletalUpdateFromLastFrame = false;
         private IOVRSkeletonConstraint[] _iovrSkeletonConstraints;
 
+        private int _proxyChangeCount = 0;
         private int _lastRetargetedTransformCount = -1;
 
         /// <summary>
@@ -202,12 +219,16 @@ namespace Oculus.Movement.AnimationRigging
             {
                 if (!hasFocus)
                 {
-                    DisableRig();
+                    DisableRigAndUpdateState();
                     _rigBuilder.Evaluate(Time.deltaTime);
                 }
                 else
                 {
-                    EnableRig();
+                    // edge case: don't call this if starting up for first time
+                    if (_skeleton.IsInitialized)
+                    {
+                        EnableRig();
+                    }
                 }
             }
         }
@@ -235,7 +256,7 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private void DisableRig()
+        private void DisableRigAndUpdateState()
         {
             if (_rigBuilder)
             {
@@ -253,6 +274,11 @@ namespace Oculus.Movement.AnimationRigging
             if (_retargetingLayer != null)
             {
                 _lastRetargetedTransformCount = _retargetingLayer.GetNumberOfTransformsRetargeted();
+            }
+
+            if (_checkSkeletalUpdatesByProxy && _retargetingLayer != null)
+            {
+                _proxyChangeCount = _retargetingLayer.ProxyChangeCount;
             }
         }
 
@@ -289,17 +315,36 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-            if (_lastSkeletonChangeCount != _skeleton.SkeletonChangedCount ||
-                HasRetargeterBeenUpdated())
+            if (_lastSkeletonChangeCount != _skeleton.SkeletonChangedCount)
             {
+                bool skeletalOrRetargeterChangeDetected =
+                   _checkSkeletalUpdatesByProxy && HasSkeletonProxiesBeenRecreated() ||
+                   HasRetargeterBeenUpdated();
+
+                // ONLY regenerate rig if change has been detected
+                if (!skeletalOrRetargeterChangeDetected)
+                {
+                    _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
+                    return;
+                }
+
                 // Allow rig to initialize next frame so that constraints can
                 // catch up to skeletal changes in this frame.
                 _pendingSkeletalUpdateFromLastFrame = true;
                 _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
 
-                DisableRig();
+                DisableRigAndUpdateState();
                 Debug.LogWarning("Detected skeletal change. Disabling the rig.");
             }
+        }
+
+        private bool HasSkeletonProxiesBeenRecreated()
+        {
+            if (_retargetingLayer == null)
+            {
+                return false;
+            }
+            return _proxyChangeCount != _retargetingLayer.ProxyChangeCount;
         }
 
         private bool HasRetargeterBeenUpdated()

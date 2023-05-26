@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
+using Oculus.Movement.AnimationRigging.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -138,11 +139,37 @@ namespace Oculus.Movement.AnimationRigging
             set { _maskToSetToTPose = value; }
         }
 
+        /// <summary>
+        /// Create proxy transforms that track the skeletal bones. If the
+        /// skeletal bone transforms change, that won't necessitate creating new
+        /// proxy transforms in most cases. This means any Animation jobs
+        /// that track the skeletal bone transform can use proxies
+        /// instead, which get re-allocated less often. Re-allocation would mean
+        /// having to create new animation jobs.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.EnableTrackingByProxy)]
+        private bool _enableTrackingByProxy = false;
+
+        /// <inheritdoc cref="_enableTrackingByProxy"/>
+        public bool EnableTrackingByProxy
+        {
+            get { return _enableTrackingByProxy; }
+            set { _enableTrackingByProxy = value; }
+        }
+
         private Pose[] _defaultPoses;
         private IJointConstraint[] _jointConstraints;
+        private ProxyTransformLogic _proxyTransformLogic = new ProxyTransformLogic();
 
         /// <summary>
-        /// Gets number of transforms being retargeted currently.
+        /// Triggered if proxy transforms were recreated.
+        /// </summary>
+        public int ProxyChangeCount => _proxyTransformLogic.ProxyChangeCount;
+
+        /// <summary>
+        /// Gets number of transforms being retargeted currently. This can change during
+        /// initialization.
         /// </summary>
         /// <returns>Number of transforms with a valid correction quaternion.</returns>
         public int GetNumberOfTransformsRetargeted()
@@ -209,6 +236,11 @@ namespace Oculus.Movement.AnimationRigging
             UpdateSkeleton();
 
             RecomputeSkeletalOffsetsIfNecessary();
+
+            if (_enableTrackingByProxy)
+            {
+                _proxyTransformLogic.UpdateState(Bones);
+            }
         }
 
         /// <summary>
@@ -376,7 +408,9 @@ namespace Oculus.Movement.AnimationRigging
                     }
                 }
 
-                sourceTransforms.Add(currentBone.Transform);
+                sourceTransforms.Add(_enableTrackingByProxy ?
+                    _proxyTransformLogic.ProxyTransforms[i].DrivenTransform :
+                    currentBone.Transform);
                 targetTransforms.Add(targetBoneData.OriginalJoint);
                 shouldUpdatePositions.Add(false);
                 rotationOffsets.Add(targetBoneData.CorrectionQuaternion.Value);
@@ -435,6 +469,19 @@ namespace Oculus.Movement.AnimationRigging
                 var adjustment = FindAdjustment(targetHumanBodyBone);
                 bool bodySectionInPositionArray = IsBodySectionInArray(
                     bodySectionOfJoint, BodySectionToPosition);
+
+                // Skip if the job arrays are less in number compared to bones.
+                // This can happen if the skeleton regenerates its bones during update,
+                // however the arrays here have not been recreated yet. Note that the arrays
+                // are effectively recreated when AnimationRigSetup disables and re-enables the
+                // rig. Since AnimationRigSetup runs after skeletal updates, this edge case
+                // arises if this function is called after the bones are updated but before
+                // AnimationRigSetup notices.
+                if (arrayId >= rotationAdjustments.Length)
+                {
+                    continue;
+                }
+
                 if (adjustment == null)
                 {
                     SetUpDefaultAdjustment(rotationOffsets, shouldUpdatePositions,

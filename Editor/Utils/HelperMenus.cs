@@ -1,8 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Movement.AnimationRigging;
+using Oculus.Movement.Tracking;
 using System;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -15,18 +17,28 @@ namespace Oculus.Movement.Utils
     internal static class HelperMenus
     {
         private const string _MOVEMENT_SAMPLES_MENU =
+
             "GameObject/Movement Samples/";
         private const string _MOVEMENT_SAMPLES_BT_MENU =
             "Body Tracking/";
         private const string _ANIM_RIGGING_RETARGETING_MENU =
             "Animation Rigging Retargeting";
 
+        private const string _MOVEMENT_SAMPLES_FT_MENU =
+            "Face Tracking/";
+        private const string _CORRECTIVES_FACE_MENU =
+            "Correctives Face";
+        private const string _CORRECTIVES_FACE_DUPLICATE_MENU =
+            "Correctives Face (allow duplicate mapping)";
+
         [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU)]
         private static void SetupCharacterForAnimationRiggingRetargeting()
         {
+            var activeGameObject = Selection.activeGameObject;
+
             try
             {
-                ValidGameObjectForAnimationRigging(Selection.activeGameObject);
+                ValidGameObjectForAnimationRigging(activeGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -36,23 +48,39 @@ namespace Oculus.Movement.Utils
 
             Undo.IncrementCurrentGroup();
 
-            var mainParent = Selection.activeGameObject;
-
             // Add the retargeting and body tracking components at root first.
-            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent);
+            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(activeGameObject);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
-            (rigBuilder, rigObject) = AddBasicAnimationRiggingComponents(mainParent);
+            (rigBuilder, rigObject) = AddBasicAnimationRiggingComponents(activeGameObject);
 
             RetargetingAnimationConstraint retargetConstraint =
                 AddRetargetingConstraint(rigObject, retargetingLayer);
 
             // Add final components to tie everything together.
-            AddAnimationRiggingLayer(mainParent, retargetingLayer, rigBuilder,
+            AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
                 retargetConstraint, retargetingLayer);
 
             Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
+        }
+
+        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _CORRECTIVES_FACE_MENU)]
+        private static void SetupCharacterForCorrectivesFace()
+        {
+            var activeGameObject = Selection.activeGameObject;
+
+            try
+            {
+                ValidateGameObjectForFaceMapping(activeGameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
+                return;
+            }
+
+            SetUpCharacterForCorrectivesFace(activeGameObject);
         }
 
         private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent)
@@ -170,5 +198,48 @@ namespace Oculus.Movement.Utils
             }
         }
 
+        public static void ValidateGameObjectForFaceMapping(GameObject go)
+        {
+            var renderer = go.GetComponent<SkinnedMeshRenderer>();
+            if (renderer == null || renderer.sharedMesh == null || renderer.sharedMesh.blendShapeCount == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Adding a Face Tracking component requires a {nameof(SkinnedMeshRenderer)} " +
+                    $"that contains blendshapes.");
+            }
+        }
+
+        private static void SetUpCharacterForCorrectivesFace(GameObject gameObject)
+        {
+            Undo.IncrementCurrentGroup();
+
+            var faceExpressions = gameObject.GetComponentInParent<OVRFaceExpressions>();
+            if (!faceExpressions)
+            {
+                faceExpressions = gameObject.AddComponent<OVRFaceExpressions>();
+                Undo.RegisterCreatedObjectUndo(faceExpressions, "Create OVRFaceExpressions component");
+            }
+
+            var face = gameObject.GetComponent<CorrectivesFace>();
+            if (!face)
+            {
+                face = gameObject.AddComponent<CorrectivesFace>();
+                face.FaceExpressions = faceExpressions;
+                Undo.RegisterCreatedObjectUndo(face, "Create CorrectivesFace component");
+            }
+
+            if (face.BlendshapeModifier == null)
+            {
+                face.BlendshapeModifier = gameObject.GetComponentInParent<BlendshapeModifier>();
+                Undo.RecordObject(face, "Assign to BlendshapeModifier field");
+            }
+
+            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correcives blendshapes");
+            face.AutoMapBlendshapes();
+            EditorUtility.SetDirty(face);
+            EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
+
+            Undo.SetCurrentGroupName($"Setup Character for CorrecivesFace Tracking");
+        }
     }
 }

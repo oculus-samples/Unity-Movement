@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _retargetingLayer: {fileID: 208026092}
+    _allowDynamicAdjustmentsRuntime: 1
     _avatarMask: {fileID: 0}
 --- !u!1 &720078949
 GameObject:
@@ -264,7 +265,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121803696401781268, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_Name
-      value: ArmatureSkinningUpdateRetargetV2
+      value: ArmatureSkinningUpdateRetarget
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
@@ -302,6 +303,7 @@ MonoBehaviour:
   - {fileID: 318886850}
   _rebindAnimator: 1
   _reEnableRig: 1
+  _rigToggleOnFocus: 1
   _retargetingLayer: {fileID: 208026092}
 --- !u!114 &208026091
 MonoBehaviour:

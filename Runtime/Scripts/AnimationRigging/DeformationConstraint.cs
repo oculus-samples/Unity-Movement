@@ -90,7 +90,12 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The OVR Skeleton component for the character.
         /// </summary>
-        public OVRCustomSkeleton ConstraintSkeleton { get; }
+        public OVRSkeleton ConstraintSkeleton { get; }
+
+        /// <summary>
+        /// The Animator component for the character.
+        /// </summary>
+        public Animator ConstraintAnimator { get; }
 
         /// <summary>
         /// The array of transforms from the hips to the head bones.
@@ -152,7 +157,10 @@ namespace Oculus.Movement.AnimationRigging
 
         // Interface implementation
         /// <inheritdoc />
-        OVRCustomSkeleton IDeformationData.ConstraintSkeleton => _skeleton;
+        OVRSkeleton IDeformationData.ConstraintSkeleton => _skeleton;
+
+        /// <inheritdoc />
+        Animator IDeformationData.ConstraintAnimator => _animator;
 
         /// <inheritdoc />
         SpineTranslationCorrectionType IDeformationData.SpineCorrectionType => _spineTranslationCorrectionType;
@@ -178,13 +186,17 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc cref="IDeformationData.ConstraintSkeleton"/>
         [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.Skeleton)]
-        private OVRCustomSkeleton _skeleton;
+        private OVRSkeleton _skeleton;
+
+        /// <inheritdoc cref="IDeformationData.ConstraintAnimator"/>
+        [NotKeyable, SerializeField]
+        [Tooltip(DeformationDataTooltips.Animator)]
+        private Animator _animator;
 
         /// <inheritdoc cref="IDeformationData.SpineCorrectionType"/>
         [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.SpineTranslationCorrectionType)]
         private SpineTranslationCorrectionType _spineTranslationCorrectionType;
-
 
         /// <inheritdoc cref="IDeformationData.CorrectSpineOnce"/>
         [NotKeyable, SerializeField]
@@ -245,57 +257,136 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Setup the deformation data struct for the deformation job.
         /// </summary>
-        public void Setup()
+        /// <param name="dummyOne">Dummy transform if skeleton is not ready.</param>
+        /// <param name="dummyTwo">Dummy transform if skeleton is not ready.</param>
+        public void Setup(Transform dummyOne, Transform dummyTwo)
         {
-            SetupHipsHeadData();
-            SetupArmData();
-            SetupBonePairs();
+            SetupHipsHeadData(dummyOne, dummyTwo);
+            SetupArmData(dummyOne, dummyTwo);
+            SetupBonePairs(dummyOne);
         }
 
         /// <summary>
         /// Assign the OVR Skeleton.
         /// </summary>
-        /// <param name="skeleton">The OVRSkeleton</param>
-        public void AssignOVRSkeleton(OVRCustomSkeleton skeleton)
+        /// <param name="skeleton">The OVRSkeleton component.</param>
+        public void AssignOVRSkeleton(OVRSkeleton skeleton)
         {
             _skeleton = skeleton;
         }
 
-        private void SetupHipsHeadData()
+        /// <summary>
+        /// Assign the Animator.
+        /// </summary>
+        /// <param name="skeleton">The Animator component.</param>
+        public void AssignAnimator(Animator animator)
         {
-            // Setup hips to head
+            _animator = animator;
+        }
+
+        private bool SkeletonOrAnimatorValid()
+        {
+            return (_skeleton != null && _skeleton.IsInitialized) ||
+                _animator != null;
+        }
+
+        private void SetupHipsHeadData(Transform dummyOne, Transform dummyTwo)
+        {
             var hipToHeadBones = new List<Transform>();
-            for (int i = (int)OVRSkeleton.BoneId.Body_Hips; i <= (int)OVRSkeleton.BoneId.Body_Head; i++)
+            if (SkeletonOrAnimatorValid())
             {
-                hipToHeadBones.Add(_skeleton.CustomBones[i].transform);
+                for (int boneId = (int)OVRSkeleton.BoneId.Body_Hips; boneId <= (int)OVRSkeleton.BoneId.Body_Head;
+                    boneId++)
+                {
+                    var foundBoneTransform = FindBoneTransform((OVRSkeleton.BoneId)boneId);
+                    hipToHeadBones.Add(foundBoneTransform != null ?
+                        foundBoneTransform.transform : dummyOne);
+                }
             }
+            else
+            {
+                hipToHeadBones.Add(dummyOne);
+                hipToHeadBones.Add(dummyTwo);
+            }
+
             _hipsToHeadDistance =
                 Vector3.Distance(hipToHeadBones[0].position, hipToHeadBones[^1].position);
             _hipsToHeadBones = hipToHeadBones.ToArray();
         }
 
-        private void SetupArmData()
+        private Transform FindBoneTransform(OVRSkeleton.BoneId boneId)
         {
+            if (!SkeletonOrAnimatorValid())
+            {
+                return null;
+            }
+            if (_skeleton != null)
+            {
+                return FindBoneTransformFromSkeleton(boneId);
+            }
+            else
+            {
+                return FindBoneTransformAnimator(boneId);
+            }
+        }
+
+        private Transform FindBoneTransformFromSkeleton(OVRSkeleton.BoneId boneId)
+        {
+            var bones = _skeleton.Bones;
+            for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
+            {
+                if (bones[boneIndex].Id == boneId)
+                {
+                    return bones[boneIndex].Transform;
+                }
+            }
+            return null;
+        }
+
+        private Transform FindBoneTransformAnimator(OVRSkeleton.BoneId boneId)
+        {
+            if (!CustomMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
+            {
+                return null;
+            }
+            return _animator.GetBoneTransform(CustomMappings.BoneIdToHumanBodyBone[boneId]);
+        }
+
+        private void SetupArmData(Transform dummyOne, Transform dummyTwo)
+        {
+            bool skeletonInitialized = SkeletonOrAnimatorValid();
             // Setup arm data
             _leftArmData = new ArmPosData()
             {
                 Weight = _armWeight,
                 MoveSpeed = _armMoveSpeed,
-                ShoulderBone = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_LeftShoulder],
-                UpperArmBone = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_LeftArmUpper],
-                LowerArmBone = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_LeftArmLower],
+                ShoulderBone = skeletonInitialized ?
+                    FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder) :
+                    dummyOne,
+                UpperArmBone = skeletonInitialized ?
+                    FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper) :
+                    dummyTwo,
+                LowerArmBone = skeletonInitialized ?
+                    FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower) :
+                    dummyTwo,
             };
             _rightArmData = new ArmPosData()
             {
                 Weight = _armWeight,
                 MoveSpeed = _armMoveSpeed,
-                ShoulderBone = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_RightShoulder],
-                UpperArmBone = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_RightArmUpper],
-                LowerArmBone = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_RightArmLower],
+                ShoulderBone = skeletonInitialized ?
+                    FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder) :
+                    dummyOne,
+                UpperArmBone = skeletonInitialized ?
+                    FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper) :
+                    dummyTwo,
+                LowerArmBone = skeletonInitialized ?
+                    FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower) :
+                    dummyTwo,
             };
         }
 
-        private void SetupBonePairs()
+        private void SetupBonePairs(Transform dummyTransform)
         {
             // Setup bone pairs
             var bonePairs = new List<BonePairData>();
@@ -317,7 +408,9 @@ namespace Oculus.Movement.AnimationRigging
 
             if (_applyToArms)
             {
-                var chestBone = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Chest].transform;
+                var chestBone = SkeletonOrAnimatorValid() ?
+                    FindBoneTransform(OVRSkeleton.BoneId.Body_Chest) :
+                    dummyTransform;
                 var chestBonePos = chestBone.position;
                 var leftShoulderBonePos = _leftArmData.ShoulderBone.position;
                 var rightShoulderBonePos = _rightArmData.ShoulderBone.position;
@@ -375,7 +468,7 @@ namespace Oculus.Movement.AnimationRigging
 
         bool IAnimationJobData.IsValid()
         {
-            if (_skeleton == null)
+            if (_skeleton == null || _animator == null)
             {
                 return false;
             }
@@ -395,6 +488,7 @@ namespace Oculus.Movement.AnimationRigging
         void IAnimationJobData.SetDefaultValues()
         {
             _skeleton = null;
+            _animator = null;
             _spineTranslationCorrectionType = SpineTranslationCorrectionType.None;
             _applyToArms = false;
             _useMoveTowardsArms = false;
@@ -416,14 +510,25 @@ namespace Oculus.Movement.AnimationRigging
         DeformationJobBinder<DeformationData>>,
         IOVRSkeletonConstraint
     {
+        private GameObject _dummyOne, _dummyTwo;
+
+        private void Awake()
+        {
+            _dummyOne = new GameObject("Deformation Constraint Dummy 1");
+            _dummyOne.transform.SetParent(this.transform);
+            _dummyTwo = new GameObject("Deformation Constraint Dummy 2");
+            _dummyTwo.transform.SetParent(this.transform);
+        }
+
         private void Start()
         {
-            data.Setup();
+            data.Setup(_dummyOne.transform, _dummyTwo.transform);
         }
 
         /// <inheritdoc />
         public void RegenerateData()
         {
+            data.Setup(_dummyOne.transform, _dummyTwo.transform);
         }
     }
 }

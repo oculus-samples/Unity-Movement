@@ -2,7 +2,6 @@ name: Merge dev into main
 
 on:
   workflow_dispatch:
-  workflow_call:
 
 jobs:
   merge-branch:

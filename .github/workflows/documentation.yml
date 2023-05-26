@@ -12,7 +12,6 @@ on:
       - 'package*'
       - 'LICENSE*'
   workflow_dispatch:
-  workflow_call:
 
 jobs:
   generate-docs:
