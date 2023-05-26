@@ -1,0 +1,22 @@
+name: Clean Release
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+  call-merge:
+    uses: ./.github/workflows/merge.yaml
+  call-cleanup:
+    needs: call-merge
+    uses: ./.github/workflows/cleanup.yaml
+  call-release:
+    needs: call-cleanup
+    uses: ./.github/workflows/release.yaml
+  call-documentation:
+    needs: call-release
+    uses: ./.github/workflows/documentation.yaml
+  
