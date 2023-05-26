@@ -7,14 +7,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
   call-merge:
-    uses: ./.github/workflows/merge.yaml
+    uses: ./.github/workflows/merge.yml
   call-cleanup:
     needs: call-merge
-    uses: ./.github/workflows/cleanup.yaml
+    uses: ./.github/workflows/cleanup.yml
   call-release:
     needs: call-cleanup
-    uses: ./.github/workflows/release.yaml
+    uses: ./.github/workflows/release.yml
   call-documentation:
     needs: call-release
-    uses: ./.github/workflows/documentation.yaml
+    uses: ./.github/workflows/documentation.yml
   
