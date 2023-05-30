@@ -1,3 +1,20 @@
+# [2.2.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.1.0...v2.2.0) (2023-05-30)
+
+
+### Bug Fixes
+
+* **Runtime:** Address retargeting job arrays edge case ([a0f6a92](https://github.com/oculus-samples/Unity-Movement/commit/a0f6a92155d6eb6e57e7416d7e315f151f874d7b))
+* **Runtime:** Do not enable rig on focus if skeleton is not initialized ([fd099f1](https://github.com/oculus-samples/Unity-Movement/commit/fd099f166f229096e54472c48a405e8635a8c5be))
+
+
+### Features
+
+* **Editor:** Add CorrectivesFace menu ([abbacfd](https://github.com/oculus-samples/Unity-Movement/commit/abbacfd945f7447315397883c441c3e2bc753330))
+* **Runtime:** Add tracking bone transforms by proxy ([c94580f](https://github.com/oculus-samples/Unity-Movement/commit/c94580f9c2c296f10fc5e16d402f4fa56f17b2d4))
+* **Runtime:** Allow mirroring scale in LateMirroredObject ([80e0357](https://github.com/oculus-samples/Unity-Movement/commit/80e0357bcff0f8ee93a05ec2276c9057818f18ba))
+* **Runtime:** Deformation constraint supports humanoid Animator ([ec91abf](https://github.com/oculus-samples/Unity-Movement/commit/ec91abfccc219f1ea82247388f9740f7152ddfd3))
+* **Runtime:** Deformation constraint supports OVRSkeleton ([cb922d1](https://github.com/oculus-samples/Unity-Movement/commit/cb922d132c09cae11b06c2b90939aea56e0770ad))
+
 # [2.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.0.0...v2.1.0) (2023-05-23)
 
 
