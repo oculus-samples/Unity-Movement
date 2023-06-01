@@ -175,6 +175,11 @@ namespace Oculus.Movement.AnimationRigging
         public int GetNumberOfTransformsRetargeted()
         {
             int numTransforms = 0;
+            // return default case if this is called before initialization.
+            if (TargetSkeletonData == null || TargetSkeletonData.BodyToBoneData == null)
+            {
+                return numTransforms;
+            }
             foreach (var boneData in TargetSkeletonData.BodyToBoneData.Values)
             {
                 if (boneData.CorrectionQuaternion != null)
