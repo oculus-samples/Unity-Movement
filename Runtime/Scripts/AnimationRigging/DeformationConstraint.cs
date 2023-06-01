@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -88,9 +89,15 @@ namespace Oculus.Movement.AnimationRigging
     public interface IDeformationData
     {
         /// <summary>
-        /// The OVR Skeleton component for the character.
+        /// [Deprecated] The OVR Skeleton component for the character.
+        /// NOTE: not recommended as this was experimental.
         /// </summary>
         public OVRSkeleton ConstraintSkeleton { get; }
+
+        /// <summary>
+        /// The OVRCustomSkeleton component for the character.
+        /// </summary>
+        public OVRCustomSkeleton ConstraintCustomSkeleton { get; }
 
         /// <summary>
         /// The Animator component for the character.
@@ -131,6 +138,12 @@ namespace Oculus.Movement.AnimationRigging
         /// Allows the spine correction to run only once, assuming the skeleton's positions don't get updated multiple times.
         /// </summary>
         public bool CorrectSpineOnce { get; }
+        
+        /// <summary>
+        /// Indicates if bone transforms are valid or not.
+        /// </summary>
+        /// <returns>True if bone transforms are valid, false if not.</returns>
+        public bool IsBoneTransformsDataValid();
     }
 
     /// <summary>
@@ -159,6 +172,9 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         OVRSkeleton IDeformationData.ConstraintSkeleton => _skeleton;
 
+        // <inheritdoc />
+        OVRCustomSkeleton IDeformationData.ConstraintCustomSkeleton => _customSkeleton;
+
         /// <inheritdoc />
         Animator IDeformationData.ConstraintAnimator => _animator;
 
@@ -184,9 +200,14 @@ namespace Oculus.Movement.AnimationRigging
         bool IDeformationData.CorrectSpineOnce => _correctSpineOnce;
 
         /// <inheritdoc cref="IDeformationData.ConstraintSkeleton"/>
-        [NotKeyable, SerializeField]
+        [NotKeyable, SerializeField, Optional]
         [Tooltip(DeformationDataTooltips.Skeleton)]
         private OVRSkeleton _skeleton;
+
+        /// <inheritdoc cref="IDeformationData.ConstraintCustomSkeleton"/>
+        [NotKeyable, SerializeField]
+        [Tooltip(DeformationDataTooltips.CustomSkeleton)]
+        private OVRCustomSkeleton _customSkeleton;
 
         /// <inheritdoc cref="IDeformationData.ConstraintAnimator"/>
         [NotKeyable, SerializeField]
@@ -270,9 +291,19 @@ namespace Oculus.Movement.AnimationRigging
         /// Assign the OVR Skeleton.
         /// </summary>
         /// <param name="skeleton">The OVRSkeleton component.</param>
+        [ObsoleteAttribute("This method is absolete. Use AssignOVRCustomSkeleton or AssignAnimator instead.")]
         public void AssignOVRSkeleton(OVRSkeleton skeleton)
         {
             _skeleton = skeleton;
+        }
+
+        /// <summary>
+        /// Assign the OVR Custom Skeleton.
+        /// </summary>
+        /// <param name="skeleton">The OVRCustomSkeleton component.</param>
+        public void AssignOVRCustomSkeleton(OVRCustomSkeleton skeleton)
+        {
+            _customSkeleton = skeleton;
         }
 
         /// <summary>
@@ -286,8 +317,18 @@ namespace Oculus.Movement.AnimationRigging
 
         private bool SkeletonOrAnimatorValid()
         {
-            return (_skeleton != null && _skeleton.IsInitialized) ||
-                _animator != null;
+            return
+                (_customSkeleton != null && _customSkeleton.IsInitialized) ||
+                (_animator != null && _animator.isInitialized) ||
+                (_skeleton != null && _skeleton.IsInitialized);
+        }
+
+        /// <inheritdoc />
+        public bool IsBoneTransformsDataValid()
+        {
+            return (_customSkeleton != null && _customSkeleton.IsDataValid) ||
+                (_animator != null && _animator.isInitialized) ||
+                (_skeleton != null && _skeleton.IsDataValid);
         }
 
         private void SetupHipsHeadData(Transform dummyOne, Transform dummyTwo)
@@ -320,36 +361,19 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return null;
             }
-            if (_skeleton != null)
+            if (_customSkeleton != null)
             {
-                return FindBoneTransformFromSkeleton(boneId);
+                return RiggingUtilities.FindBoneTransformFromSkeleton(_customSkeleton, boneId);
             }
+            else if (_animator != null)
+            {
+                return RiggingUtilities.FindBoneTransformAnimator(_animator, boneId);
+            }
+            // deprecated fields are last resort
             else
             {
-                return FindBoneTransformAnimator(boneId);
+                return RiggingUtilities.FindBoneTransformFromSkeleton(_skeleton, boneId);
             }
-        }
-
-        private Transform FindBoneTransformFromSkeleton(OVRSkeleton.BoneId boneId)
-        {
-            var bones = _skeleton.Bones;
-            for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
-            {
-                if (bones[boneIndex].Id == boneId)
-                {
-                    return bones[boneIndex].Transform;
-                }
-            }
-            return null;
-        }
-
-        private Transform FindBoneTransformAnimator(OVRSkeleton.BoneId boneId)
-        {
-            if (!CustomMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
-            {
-                return null;
-            }
-            return _animator.GetBoneTransform(CustomMappings.BoneIdToHumanBodyBone[boneId]);
         }
 
         private void SetupArmData(Transform dummyOne, Transform dummyTwo)

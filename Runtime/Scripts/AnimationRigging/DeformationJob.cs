@@ -320,7 +320,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void Update(DeformationJob job, ref T data)
         {
-            if (data.ConstraintSkeleton.IsDataValid)
+            if (data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = true;
             }
@@ -328,7 +328,7 @@ namespace Oculus.Movement.AnimationRigging
             job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
             base.Update(job, ref data);
 
-            if (!data.ConstraintSkeleton.IsDataValid)
+            if (!data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = false;
             }

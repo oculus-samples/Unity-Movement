@@ -16,13 +16,14 @@ namespace Oculus.Movement.AnimationRigging
         {
             var constraint = (DeformationConstraint)target;
             IDeformationData constraintData = constraint.data;
-            if (constraintData.ConstraintSkeleton == null)
+            if (constraintData.ConstraintCustomSkeleton == null &&
+                constraintData.ConstraintAnimator == null)
             {
-                if (GUILayout.Button("Find OVR Skeleton"))
+                if (GUILayout.Button("Find OVR Custom Skeleton"))
                 {
-                    Undo.RecordObject(constraint, "Find OVR Skeleton");
-                    var skeleton = constraint.GetComponentInParent<OVRSkeleton>();
-                    constraint.data.AssignOVRSkeleton(skeleton);
+                    Undo.RecordObject(constraint, "Find OVR Custom Skeleton");
+                    var skeleton = constraint.GetComponentInParent<OVRCustomSkeleton>();
+                    constraint.data.AssignOVRCustomSkeleton(skeleton);
                 }
                 if (GUILayout.Button("Find Animator"))
                 {

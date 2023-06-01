@@ -913,7 +913,11 @@ namespace Oculus.Movement
     public static class DeformationDataTooltips
     {
         public const string Skeleton =
-            "The OVR Skeleton component.";
+            "[Deprecated] The OVR Skeleton component. " +
+            "NOTE: not recommended as this was experimental.";
+
+        public const string CustomSkeleton =
+            "The OVRCustomSkeleton component for the character.";
 
         public const string Animator =
             "The animator component.";

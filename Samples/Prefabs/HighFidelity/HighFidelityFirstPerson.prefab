@@ -572,7 +572,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
-    _skeleton: {fileID: 1024561555539579727}
+    _skeleton: {fileID: 0}
+    _customSkeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _spineTranslationCorrectionType: 1
     _correctSpineOnce: 0
     _applyToArms: 1
@@ -727,7 +729,9 @@ MonoBehaviour:
   - {fileID: 4460941168362880823}
   _rebindAnimator: 0
   _reEnableRig: 0
+  _rigToggleOnFocus: 1
   _retargetingLayer: {fileID: 0}
+  _checkSkeletalUpdatesByProxy: 0
 --- !u!114 &4416254126646396801
 MonoBehaviour:
   m_ObjectHideFlags: 0
