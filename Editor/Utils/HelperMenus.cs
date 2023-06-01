@@ -28,8 +28,6 @@ namespace Oculus.Movement.Utils
             "Face Tracking/";
         private const string _CORRECTIVES_FACE_MENU =
             "Correctives Face";
-        private const string _CORRECTIVES_FACE_DUPLICATE_MENU =
-            "Correctives Face (allow duplicate mapping)";
 
         [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU)]
         private static void SetupCharacterForAnimationRiggingRetargeting()
@@ -234,12 +232,12 @@ namespace Oculus.Movement.Utils
                 Undo.RecordObject(face, "Assign to BlendshapeModifier field");
             }
 
-            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correcives blendshapes");
+            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correctives blendshapes");
             face.AutoMapBlendshapes();
             EditorUtility.SetDirty(face);
             EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
 
-            Undo.SetCurrentGroupName($"Setup Character for CorrecivesFace Tracking");
+            Undo.SetCurrentGroupName($"Setup Character for Correctives Tracking");
         }
     }
 }
