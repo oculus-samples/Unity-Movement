@@ -215,21 +215,28 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="hasFocus">True if the application is currently focused.</param>
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
-            if (_rigToggleOnFocus)
+            // Bail if we don't want the rig to toggle during focus events.
+            if (!_rigToggleOnFocus)
             {
-                if (!hasFocus)
-                {
-                    DisableRigAndUpdateState();
-                    _rigBuilder.Evaluate(Time.deltaTime);
-                }
-                else
-                {
-                    // edge case: don't call this if starting up for first time
-                    if (_skeleton.IsInitialized)
-                    {
-                        EnableRig();
-                    }
-                }
+                return;
+            }
+            // Don't do anything if the setup process has not run yet. We don't
+            // want to trigger the creation of any animation rigging jobs.
+            if (_ranSetup)
+            {
+                return;
+            }
+
+            if (!hasFocus)
+            {
+                // Run the constraints one more time so when paused, the
+                // constraints are applied to the latest skeleton.
+                DisableRigAndUpdateState();
+                _rigBuilder.Evaluate(Time.deltaTime);
+            }
+            else
+            {
+                EnableRig();
             }
         }
 
@@ -240,20 +247,22 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
-            if (_skeleton.IsInitialized)
+            if (!_skeleton.IsInitialized)
             {
-                _animator.enabled = true;
-                if (_rebindAnimator)
-                {
-                    _animator.Rebind();
-                    _animator.Update(0.0f);
-                }
-                if (_rigBuilder)
-                {
-                    _rigBuilder.enabled = true;
-                }
-                _ranSetup = true;
+                return;
             }
+
+            _animator.enabled = true;
+            if (_rebindAnimator)
+            {
+                _animator.Rebind();
+                _animator.Update(0.0f);
+            }
+            if (_rigBuilder)
+            {
+                _rigBuilder.enabled = true;
+            }
+            _ranSetup = true;
         }
 
         private void DisableRigAndUpdateState()
