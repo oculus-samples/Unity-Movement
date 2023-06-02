@@ -272,7 +272,7 @@ namespace Oculus.Movement.AnimationRigging
 
         bool IAnimationJobData.IsValid()
         {
-            if (_skeleton == null || _animator == null)
+            if (_skeleton == null && _animator == null)
             {
                 return false;
             }

@@ -7,6 +7,18 @@ namespace Oculus.Movement.AnimationRigging
     public class RiggingUtilities
     {
         /// <summary>
+        /// Find bone transform from custom skeleton assuming the bone exists.
+        /// </summary>
+        /// <param name="skeleton">Custom skeleton to query.</param>
+        /// <param name="boneId">ID of bone to find.</param>
+        /// <returns></returns>
+        public static Transform FindBoneTransformFromCustomSkeleton(OVRCustomSkeleton skeleton,
+            OVRSkeleton.BoneId boneId)
+        {
+            return skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips];
+        }
+
+        /// <summary>
         /// Find bone transform from skeleton assuming the bone exists.
         /// </summary>
         /// <param name="skeleton">Skeleton to query.</param>

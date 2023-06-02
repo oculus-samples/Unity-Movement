@@ -1030,7 +1030,10 @@ namespace Oculus.Movement
     public static class GroundingDataTooltips
     {
         public const string Skeleton =
-            "The OVR Skeleton component.";
+            "The OVR Skeleton component for the character.";
+
+        public const string Animator =
+            "The Animator component for the character.";
 
         public const string Pair =
             "Optional. The other leg's grounding constraint, used to check if this leg can move.";

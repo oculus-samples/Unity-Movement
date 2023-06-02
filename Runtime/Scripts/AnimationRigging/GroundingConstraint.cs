@@ -12,9 +12,14 @@ namespace Oculus.Movement.AnimationRigging
     public interface IGroundingData
     {
         /// <summary>
-        /// The original skeleton.
+        /// The original skeleton for the character.
         /// </summary>
         OVRCustomSkeleton ConstraintSkeleton { get; }
+
+        /// <summary>
+        /// The Animator component for the character.
+        /// </summary>
+        public Animator ConstraintAnimator { get; }
 
         /// <summary>
         /// Optional. The other leg's grounding constraint, used to check if this leg can move.
@@ -115,6 +120,12 @@ namespace Oculus.Movement.AnimationRigging
         /// Called on when the animation job is being created.
         /// </summary>
         public void Create();
+
+        /// <summary>
+        /// Indicates if bone transforms are valid or not.
+        /// </summary>
+        /// <returns>True if bone transforms are valid, false if not.</returns>
+        public bool IsBoneTransformsDataValid();
     }
 
     [System.Serializable]
@@ -123,6 +134,9 @@ namespace Oculus.Movement.AnimationRigging
         // Interface implementation
         /// <inheritdoc />
         OVRCustomSkeleton IGroundingData.ConstraintSkeleton => _skeleton;
+
+        /// <inheritdoc />
+        Animator IGroundingData.ConstraintAnimator => _animator;
 
         /// <inheritdoc />
         GroundingData IGroundingData.Pair => _pair.data;
@@ -185,6 +199,11 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         [Tooltip(GroundingDataTooltips.Skeleton)]
         private OVRCustomSkeleton _skeleton;
+
+        /// <inheritdoc cref="IGroundingData.ConstraintAnimator"/>
+        [NotKeyable, SerializeField]
+        [Tooltip(GroundingDataTooltips.Animator)]
+        private Animator _animator;
 
         /// <inheritdoc cref="IGroundingData.Pair"/>
         [NotKeyable, SerializeField]
@@ -291,7 +310,16 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public void Setup()
         {
-            _hips = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips];
+            if (_skeleton != null)
+            {
+                _hips = RiggingUtilities.FindBoneTransformFromCustomSkeleton(_skeleton,
+                    OVRSkeleton.BoneId.Body_Hips);
+            }
+            else
+            {
+                _hips = RiggingUtilities.FindBoneTransformAnimator(_animator,
+                    OVRSkeleton.BoneId.Body_Hips);
+            }
             _legPosOffset = _leg.localPosition;
             _legRotOffset = _leg.localRotation;
         }
@@ -336,7 +364,7 @@ namespace Oculus.Movement.AnimationRigging
                 return false;
             }
 
-            if (_skeleton == null)
+            if (_skeleton == null && _animator == null)
             {
                 return false;
             }
@@ -368,6 +396,13 @@ namespace Oculus.Movement.AnimationRigging
             _stepHeight = 0.0f;
             _stepHeightScaleDist = 0.0f;
             _stepDist = 0.0f;
+        }
+
+        /// <inheritdoc />
+        public bool IsBoneTransformsDataValid()
+        {
+            return (_skeleton != null && _skeleton.IsDataValid) ||
+                (_animator != null && _animator.isInitialized);
         }
     }
 
