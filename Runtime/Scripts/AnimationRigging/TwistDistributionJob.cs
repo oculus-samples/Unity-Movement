@@ -109,7 +109,7 @@ namespace Oculus.Movement.AnimationRigging
                     twistTransform.SetPosition(stream, SpacingPositions[i]);
 
                     // Apply twist
-                    Quaternion twistRotation = Quaternion.LookRotation(SegmentDirections[0],SegmentUpAxis[i]);
+                    Quaternion twistRotation = Quaternion.LookRotation(SegmentDirections[0], SegmentUpAxis[i]);
                     Quaternion targetRotation = Quaternion.Slerp(
                         parentRotation * TwistBindRotations[i],
                         twistRotation * TwistAxisOffset,
@@ -184,7 +184,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="data"></param>
         public override void Update(TwistDistributionJob job, ref T data)
         {
-            if (data.ConstraintSkeleton.IsDataValid)
+            if (data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = true;
             }
@@ -208,7 +208,7 @@ namespace Oculus.Movement.AnimationRigging
             job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
             base.Update(job, ref data);
 
-            if (!data.ConstraintSkeleton.IsDataValid)
+            if (!data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = false;
             }

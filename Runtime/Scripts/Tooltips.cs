@@ -1087,7 +1087,10 @@ namespace Oculus.Movement
     public static class TwistDistributionDataTooltips
     {
         public const string Skeleton =
-            "The OVR Skeleton component.";
+            "The OVR Skeleton component for the character.";
+
+        public const string Animator =
+            "The Animator component for the character.";
 
         public const string SegmentStart =
             "The start transform on the opposite side of the twist source (like an elbow).";

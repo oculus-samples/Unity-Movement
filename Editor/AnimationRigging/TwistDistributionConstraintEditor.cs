@@ -30,8 +30,15 @@ namespace Oculus.Movement.AnimationRigging
             ITwistDistributionData twistDistributionData = constraint.data;
             bool shouldShowButton = false;
 
-            if (twistDistributionData.ConstraintSkeleton == null)
+            if (twistDistributionData.ConstraintSkeleton == null &&
+                twistDistributionData.ConstraintAnimator == null)
             {
+                if (GUILayout.Button("Find Animator"))
+                {
+                    Undo.RecordObject(constraint, "Find Animator");
+                    var animator = constraint.GetComponentInParent<Animator>();
+                    constraint.data.AssignAnimator(animator);
+                }
                 if (GUILayout.Button("Find OVR Skeleton"))
                 {
                     Undo.RecordObject(constraint, "Find OVR Skeleton");
