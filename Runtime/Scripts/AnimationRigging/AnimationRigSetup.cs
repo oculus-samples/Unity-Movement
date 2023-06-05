@@ -343,6 +343,10 @@ namespace Oculus.Movement.AnimationRigging
                 _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
 
                 DisableRigAndUpdateState();
+
+                // allow constraints to run one last time
+                _rigBuilder.Evaluate(Time.deltaTime);
+
                 Debug.LogWarning("Detected skeletal change. Disabling the rig.");
             }
         }
