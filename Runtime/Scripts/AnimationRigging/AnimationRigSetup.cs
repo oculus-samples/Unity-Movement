@@ -327,12 +327,15 @@ namespace Oculus.Movement.AnimationRigging
             }
             if (_lastSkeletonChangeCount != _skeleton.SkeletonChangedCount)
             {
-                bool skeletalOrRetargeterChangeDetected =
-                   _checkSkeletalUpdatesByProxy && HasSkeletonProxiesBeenRecreated() ||
-                   HasRetargeterBeenUpdated();
+                var newProxyTransforms =
+                    _checkSkeletalUpdatesByProxy && HasSkeletonProxiesBeenRecreated();
 
-                // ONLY regenerate rig if change has been detected
-                if (!skeletalOrRetargeterChangeDetected)
+                // In case we check by proxy, we can skip all updates below if
+                // the proxies were not recreated. In all cases (proxy or not),
+                // make sure that the retargeter has not been updated at all.
+                // If these conditions pass (i.e. proxies the same if using proxy,
+                // retargeter is the same), then skip the rig update process.
+                if (!newProxyTransforms && !HasRetargeterBeenUpdated())
                 {
                     _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
                     return;
