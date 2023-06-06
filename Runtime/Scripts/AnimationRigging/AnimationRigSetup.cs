@@ -220,9 +220,10 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
+
             // Don't do anything if the setup process has not run yet. We don't
             // want to trigger the creation of any animation rigging jobs.
-            if (_ranSetup)
+            if (!_ranSetup)
             {
                 return;
             }
