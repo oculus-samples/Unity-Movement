@@ -105,15 +105,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_AABB.m_Extent.x
-      value: 0.08340822
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_AABB.m_Extent.y
-      value: 0.07275189
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_AABB.m_Extent.z
-      value: 0.08840925
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -3353626421446678658, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -156,6 +160,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 118783903618561573, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 118783903618561573, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 5b53d82759915e044a2e962e29f8f3f7, type: 2}
@@ -165,15 +173,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_AABB.m_Extent.x
-      value: 0.07926141
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_AABB.m_Extent.y
-      value: 0.07081104
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_AABB.m_Extent.z
-      value: 0.08431437
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 119842317167379012, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_Materials.Array.data[0]

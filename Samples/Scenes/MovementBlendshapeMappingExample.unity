@@ -1345,10 +1345,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BlendshapeMappingExampleARKITFirstPerson
       objectReference: {fileID: 0}
-    - target: {fileID: 1123534316221971162, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Weight
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1999650790780052334, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
       propertyPath: m_Data._twistNodes.m_Item0.weight
       value: 0.25
@@ -1369,10 +1365,6 @@ PrefabInstance:
       propertyPath: m_Data._twistNodes.m_Item1.weight
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 4031897247645224307, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Weight
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5690063220709021688, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -1388,30 +1380,6 @@ PrefabInstance:
     - target: {fileID: 5840725693833949711, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 7.038
-      objectReference: {fileID: 0}
-    - target: {fileID: 6614716284635253014, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Weight
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6614716284635253014, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Data.m_Offset.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6614716284635253014, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Data.m_Offset.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6614716284635253014, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Data.m_Offset.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6614716284635253014, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Data.m_MaintainOffset
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6614716284635253014, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
-      propertyPath: m_Data.m_SourceObjects.m_Item0.weight
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7119428898995491169, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
       propertyPath: m_Enabled
