@@ -167,6 +167,8 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public int ProxyChangeCount => _proxyTransformLogic.ProxyChangeCount;
 
+        private bool _isFocusedWhileInBuild = true;
+
         /// <summary>
         /// Gets number of transforms being retargeted currently. This can change during
         /// initialization.
@@ -233,6 +235,15 @@ namespace Oculus.Movement.AnimationRigging
             _jointConstraints = jointConstraints.ToArray();
         }
 
+        protected virtual void OnApplicationFocus(bool hasFocus)
+        {
+            if (Application.isEditor)
+            {
+                return;
+            }
+            _isFocusedWhileInBuild = hasFocus;
+        }
+
         /// <inheritdoc />
         protected override void Update()
         {
@@ -254,6 +265,10 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         protected virtual void LateUpdate()
         {
+            if (!_isFocusedWhileInBuild)
+            {
+                return;
+            }
             CorrectPositions();
             FixJointsToTPose();
             // apply constraints on character after fixing positions.

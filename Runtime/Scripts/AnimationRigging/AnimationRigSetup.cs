@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using JetBrains.Annotations;
 using Oculus.Interaction;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -206,10 +207,17 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <summary>
         /// Disable and re-enable the rig if <see cref="_rigToggleOnFocus"/> is enabled.
+        /// Do this for builds only. We don't want to stop everything if we run inside of the
+        /// editor.
         /// </summary>
         /// <param name="hasFocus">True if the application is currently focused.</param>
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
+            if (Application.isEditor)
+            {
+                return;
+            }
+
             // Bail if we don't want the rig to toggle during focus events.
             if (!_rigToggleOnFocus)
             {
