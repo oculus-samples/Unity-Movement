@@ -277,7 +277,7 @@ namespace Oculus.Movement.AnimationRigging
         public bool IsBoneTransformsDataValid()
         {
             return (_skeleton != null && _skeleton.IsDataValid) ||
-                (_animator != null && _animator.isInitialized);
+                (_animator != null);
         }
 
         bool IAnimationJobData.IsValid()

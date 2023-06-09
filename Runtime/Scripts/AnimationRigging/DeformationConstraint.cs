@@ -344,7 +344,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             return
                 (_customSkeleton != null && _customSkeleton.IsInitialized) ||
-                (_animator != null && _animator.isInitialized) ||
+                (_animator != null) ||
                 (_skeleton != null && _skeleton.IsInitialized);
         }
 
@@ -352,7 +352,7 @@ namespace Oculus.Movement.AnimationRigging
         public bool IsBoneTransformsDataValid()
         {
             return (_customSkeleton != null && _customSkeleton.IsDataValid) ||
-                (_animator != null && _animator.isInitialized) ||
+                (_animator != null) ||
                 (_skeleton != null && _skeleton.IsDataValid);
         }
 
