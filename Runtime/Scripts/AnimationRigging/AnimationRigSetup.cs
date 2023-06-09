@@ -175,11 +175,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             Assert.IsNotNull(_skeleton);
             Assert.IsNotNull(_animator);
-            _animator.enabled = false;
-            if (_rigBuilder)
-            {
-                _rigBuilder.enabled = false;
-            }
 
             if (_ovrSkeletonConstraints != null)
             {
@@ -327,15 +322,12 @@ namespace Oculus.Movement.AnimationRigging
             }
             if (_lastSkeletonChangeCount != _skeleton.SkeletonChangedCount)
             {
-                var newProxyTransforms =
-                    _checkSkeletalUpdatesByProxy && HasSkeletonProxiesBeenRecreated();
-
-                // In case we check by proxy, we can skip all updates below if
-                // the proxies were not recreated. In all cases (proxy or not),
-                // make sure that the retargeter has not been updated at all.
-                // If these conditions pass (i.e. proxies the same if using proxy,
-                // retargeter is the same), then skip the rig update process.
-                if (!newProxyTransforms && !HasRetargeterBeenUpdated())
+                // If checking by proxy, avoid updating rig only if
+                // a) skeletal proxies have not been recreated and
+                // b) retargeter has not been updated.
+                if (_checkSkeletalUpdatesByProxy &&
+                    !HasSkeletonProxiesBeenRecreated() &&
+                    !HasRetargeterBeenUpdated())
                 {
                     _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
                     return;

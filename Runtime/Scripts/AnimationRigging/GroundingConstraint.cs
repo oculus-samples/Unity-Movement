@@ -117,6 +117,11 @@ namespace Oculus.Movement.AnimationRigging
         public void GenerateThresholdMoveProgress();
 
         /// <summary>
+        /// Setup the grounding constraint.
+        /// </summary>
+        public void Setup();
+
+        /// <summary>
         /// Called on when the animation job is being created.
         /// </summary>
         public void Create();
@@ -128,6 +133,10 @@ namespace Oculus.Movement.AnimationRigging
         public bool IsBoneTransformsDataValid();
     }
 
+    /// <summary>
+    /// Grounding data used by grounding job.
+    /// TODO: allow for case where rig can be enabled, this means sync transform arrays must not be null by default
+    /// </summary>
     [System.Serializable]
     public struct GroundingData : IAnimationJobData, IGroundingData
     {
@@ -305,11 +314,16 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3 _legPosOffset;
         private Quaternion _legRotOffset;
 
-        /// <summary>
-        /// Setup the grounding constraint.
-        /// </summary>
+        private bool _ranSetup;
+
+        /// <inheritdoc cref="IGroundingData.Setup"/>
         public void Setup()
         {
+            if (_ranSetup)
+            {
+                return;
+            }
+
             if (_skeleton != null)
             {
                 _hips = RiggingUtilities.FindBoneTransformFromCustomSkeleton(_skeleton,
@@ -322,11 +336,10 @@ namespace Oculus.Movement.AnimationRigging
             }
             _legPosOffset = _leg.localPosition;
             _legRotOffset = _leg.localRotation;
+            _ranSetup = true;
         }
 
-        /// <summary>
-        /// Called on when the animation job is being created.
-        /// </summary>
+        /// <inheritdoc cref="IGroundingData.Create"/>
         public void Create()
         {
             if (_leg.parent != _hips.parent)
@@ -396,6 +409,7 @@ namespace Oculus.Movement.AnimationRigging
             _stepHeight = 0.0f;
             _stepHeightScaleDist = 0.0f;
             _stepDist = 0.0f;
+            _ranSetup = false;
         }
 
         /// <inheritdoc />

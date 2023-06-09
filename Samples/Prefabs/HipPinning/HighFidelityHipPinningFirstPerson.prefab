@@ -500,6 +500,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _pair: {fileID: 3838579491498633126}
     _groundLayers:
       serializedVersion: 2
@@ -598,6 +599,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 7124955169347283970}
     _segmentUp: {fileID: 1744467641500109490}
     _segmentEnd: {fileID: 8362510363615060496}
@@ -790,6 +792,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _pair: {fileID: 7470887448235373449}
     _groundLayers:
       serializedVersion: 2
@@ -970,6 +973,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 24274709243371028}
     _segmentUp: {fileID: 2223570764790469765}
     _segmentEnd: {fileID: 2827531660133311963}
@@ -1050,6 +1054,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 2827531660133311963}
     _segmentUp: {fileID: 231661889192982023}
     _segmentEnd: {fileID: 231661889192982023}
@@ -1130,6 +1135,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 8362510363615060496}
     _segmentUp: {fileID: 5535935693886961202}
     _segmentEnd: {fileID: 5535935693886961202}

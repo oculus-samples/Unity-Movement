@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 4319023010721011036}
     _segmentUp: {fileID: 2701536249310486477}
     _segmentEnd: {fileID: 2061263398344273555}
@@ -298,6 +299,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 2061263398344273555}
     _segmentUp: {fileID: 4076173765156699471}
     _segmentEnd: {fileID: 4076173765156699471}
@@ -378,6 +380,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 5740937155685247320}
     _segmentUp: {fileID: 8608038177421147514}
     _segmentEnd: {fileID: 8608038177421147514}
@@ -458,6 +461,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 6432989413210236746}
     _segmentUp: {fileID: 2563644540292334074}
     _segmentEnd: {fileID: 5740937155685247320}

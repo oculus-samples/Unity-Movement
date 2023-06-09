@@ -15,6 +15,12 @@ namespace Oculus.Movement.AnimationRigging
     public interface IRetargetingData
     {
         /// <summary>
+        /// Used to create job information in case it becomes
+        /// allocated before the constraint has a chance to run.
+        /// </summary>
+        public Transform DummyTransform { get; }
+
+        /// <summary>
         /// Source transforms used for retargeting.
         /// </summary>
         public Transform[] SourceTransforms { get; }
@@ -44,6 +50,12 @@ namespace Oculus.Movement.AnimationRigging
         /// Allows updating any dynamic data at runtime.
         /// </summary>
         public void UpdateDynamicMetadata();
+
+        /// <summary>
+        /// Indicates if data has initialized or not.
+        /// </summary>
+        /// <returns>True if data has initialized, false if not.</returns>
+        public bool HasDataInitialized();
     }
 
     /// <summary>
@@ -59,6 +71,9 @@ namespace Oculus.Movement.AnimationRigging
         public OVRSkeleton Skeleton => _retargetingLayer;
 
         // Interface implementation
+        /// <inheritdoc />
+        public Transform DummyTransform => _retargetingLayer.transform;
+
         /// <inheritdoc />
         Transform[] IRetargetingData.SourceTransforms => _sourceTransforms;
 
@@ -135,6 +150,14 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(RetargetingConstraintDataTooltips.RotationAdjustments)]
         private Quaternion[] _rotationAdjustments;
 
+        private bool _hasInitialized;
+
+        /// <inheritdoc />
+        public bool HasDataInitialized()
+        {
+            return _hasInitialized;
+        }
+
         /// <inheritdoc />
         public bool IsValid()
         {
@@ -166,6 +189,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             BuildArraysForJob(dummySourceObject, dummyTargetObject);
             UpdateDataArraysWithAdjustments();
+            _hasInitialized = true;
         }
 
         /// <summary>
@@ -258,11 +282,13 @@ namespace Oculus.Movement.AnimationRigging
             _rotationOffsets[0] = Quaternion.identity;
             _rotationAdjustments = new Quaternion[1];
             _rotationAdjustments[0] = Quaternion.identity;
+            _hasInitialized = false;
         }
     }
 
     /// <summary>
-    /// Retargeting constraint.
+    /// Retargeting constraint. Keep game object disabled until
+    /// RegenerateData is called.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Retargeting Constraint")]
     public class RetargetingAnimationConstraint : RigConstraint<
@@ -300,6 +326,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void RegenerateData()
         {
+            gameObject.SetActive(true);
             data.SetUp(_dummySource, _dummyTarget);
             Debug.LogWarning("Generated new constraint data.");
         }

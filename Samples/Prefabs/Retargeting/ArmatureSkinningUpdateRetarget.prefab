@@ -169,7 +169,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2015256377725734567, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2015256377725734567, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_ApplyRootMotion
@@ -305,6 +305,7 @@ MonoBehaviour:
   _reEnableRig: 1
   _rigToggleOnFocus: 1
   _retargetingLayer: {fileID: 208026092}
+  _checkSkeletalUpdatesByProxy: 0
 --- !u!114 &208026091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,7 +313,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6442339640571472327}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
   m_Name: 
@@ -341,6 +342,7 @@ MonoBehaviour:
   _disableAvatar: 0
   _positionsToCorrectLateUpdate: {fileID: 31900000, guid: 8aaeff1dd84dcdb468f621bf1ecfea63, type: 2}
   _maskToSetToTPose: {fileID: 31900000, guid: 7129d5b0eec7de64a93fce9a6ba8f4d7, type: 2}
+  _enableTrackingByProxy: 0
 --- !u!114 &208026093
 MonoBehaviour:
   m_ObjectHideFlags: 0

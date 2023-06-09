@@ -99,12 +99,52 @@ namespace Oculus.Movement.AnimationRigging
         {
             var retargetingAnimationJob = new RetargetingAnimationJob();
 
-            AllocateJobNativeArrays(animator, ref retargetingAnimationJob, ref data);
+            if (!data.HasDataInitialized())
+            {
+                SetupInvalidJob(animator, ref retargetingAnimationJob, ref data);
+            }
+            else
+            {
+                AllocateJobNativeArrays(animator, ref retargetingAnimationJob, ref data);
 
-            BindTransforms(animator, retargetingAnimationJob, ref data);
-            SyncMetaDataInformationToJob(retargetingAnimationJob, ref data);
+                BindTransforms(animator, retargetingAnimationJob, ref data);
+                SyncMetaDataInformationToJob(retargetingAnimationJob, ref data);
+            }
 
             return retargetingAnimationJob;
+        }
+
+        private void SetupInvalidJob(Animator animator, ref RetargetingAnimationJob job, ref T data)
+        {
+            job.SourceTransforms =
+                    new NativeArray<ReadOnlyTransformHandle>(1,
+                        Allocator.Persistent,
+                        NativeArrayOptions.UninitializedMemory);
+            job.TargetTransforms =
+                new NativeArray<ReadWriteTransformHandle>(1,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory);
+            job.ShouldUpdatePosition =
+                new NativeArray<bool>(1,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory);
+            job.RotationOffsets =
+                new NativeArray<Quaternion>(1,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory);
+
+            job.RotationAdjustments =
+                new NativeArray<Quaternion>(1,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory);
+
+            job.SourceTransforms[0] =
+                ReadOnlyTransformHandle.Bind(animator, data.DummyTransform);
+            job.TargetTransforms[0] =
+                ReadWriteTransformHandle.Bind(animator, data.DummyTransform);
+            job.ShouldUpdatePosition[0] = false;
+            job.RotationOffsets[0] = Quaternion.identity;
+            job.RotationAdjustments[0] = Quaternion.identity;
         }
 
         private void AllocateJobNativeArrays(Animator animator, ref RetargetingAnimationJob job, ref T data)

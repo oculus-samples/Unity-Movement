@@ -1373,6 +1373,10 @@ PrefabInstance:
       propertyPath: m_Weight
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5690063220709021688, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5840725693833949711, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -52.585
@@ -1408,6 +1412,10 @@ PrefabInstance:
     - target: {fileID: 6614716284635253014, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
       propertyPath: m_Data.m_SourceObjects.m_Item0.weight
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7119428898995491169, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7909666481897778741, guid: 4f6634390b1d87c488b90ffe9aa5d702, type: 3}
       propertyPath: m_IsActive

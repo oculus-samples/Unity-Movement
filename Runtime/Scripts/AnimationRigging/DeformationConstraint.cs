@@ -144,11 +144,18 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <returns>True if bone transforms are valid, false if not.</returns>
         public bool IsBoneTransformsDataValid();
+
+        /// <summary>
+        /// Inidicates if initialization has run again.
+        /// </summary>
+        /// <returns></returns>
+        bool HasInitialized();
     }
 
     /// <summary>
     /// Deformation data used by the deformation job.
     /// Implements the deformation data interface.
+    /// TODO: allow for case where rig can be enabled, this means sync transform arrays must not be null by default
     /// </summary>
     [System.Serializable]
     public struct DeformationData : IAnimationJobData, IDeformationData
@@ -275,6 +282,15 @@ namespace Oculus.Movement.AnimationRigging
         private BonePairData[] _bonePairData;
         private float _hipsToHeadDistance;
 
+        private bool _hasInitialized;
+        private bool _obtainedProperReferences;
+
+        /// <inheritdoc cref="IDeformationData.HasInitialized"/>
+        public bool HasInitialized()
+        {
+            return _hasInitialized;
+        }
+
         /// <summary>
         /// Setup the deformation data struct for the deformation job.
         /// </summary>
@@ -282,9 +298,18 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="dummyTwo">Dummy transform if skeleton is not ready.</param>
         public void Setup(Transform dummyOne, Transform dummyTwo)
         {
+            // don't run again if proper references were obtained.
+            if (_obtainedProperReferences)
+            {
+                return;
+            }
+
             SetupHipsHeadData(dummyOne, dummyTwo);
             SetupArmData(dummyOne, dummyTwo);
             SetupBonePairs(dummyOne);
+
+            _hasInitialized = true;
+            _obtainedProperReferences = SkeletonOrAnimatorValid();
         }
 
         /// <summary>
@@ -520,7 +545,7 @@ namespace Oculus.Movement.AnimationRigging
             _snapThreshold = 0.1f;
             _leftArmData = new ArmPosData();
             _rightArmData = new ArmPosData();
-
+            _hasInitialized = false;
         }
     }
 

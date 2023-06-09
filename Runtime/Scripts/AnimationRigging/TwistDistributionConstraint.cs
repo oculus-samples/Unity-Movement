@@ -12,6 +12,11 @@ namespace Oculus.Movement.AnimationRigging
     public interface ITwistDistributionData
     {
         /// <summary>
+        /// Sets up data for job.
+        /// </summary>
+        void Setup();
+
+        /// <summary>
         /// The OVR Skeleton component for the character.
         /// </summary>
         public OVRCustomSkeleton ConstraintSkeleton { get; }
@@ -186,11 +191,15 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3[] _twistNodeUps;
         private float[] _twistNodeSpacings;
 
-        /// <summary>
-        /// Caches specific transformation information before OVRSkeleton runs.
-        /// </summary>
+        private bool _ranSetup;
+
+        /// <inheritdoc cref="ITwistDistributionData.Setup"/>
         public void Setup()
         {
+            if (_ranSetup)
+            {
+                return;
+            }
             _twistNodeUps = new Vector3[_twistNodes.Count];
             _twistNodeSpacings = new float[_twistNodes.Count];
             Vector3 upAxis = Convert(_twistUpAxis, _invertUpAxis);
@@ -201,6 +210,7 @@ namespace Oculus.Movement.AnimationRigging
                 _twistNodeSpacings[i] = 1f - (_segmentEnd.position - sourceTransform.position).magnitude /
                                              (_segmentEnd.position - _segmentStart.position).magnitude;
             }
+            _ranSetup = true;
         }
 
         /// <summary>
@@ -299,6 +309,7 @@ namespace Oculus.Movement.AnimationRigging
             _twistForwardAxis = Axis.Z;
             _twistUpAxis = Axis.Y;
             _twistNodes.Clear();
+            _ranSetup = false;
         }
     }
 

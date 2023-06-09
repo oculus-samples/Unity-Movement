@@ -694,7 +694,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 607326578965322257}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 0}
   m_CullingMode: 0
@@ -819,8 +819,7 @@ MonoBehaviour:
   _skeleton: {fileID: 3946535142790877676}
   _animator: {fileID: 5690063220709021688}
   _rigBuilder: {fileID: 7119428898995491169}
-  _ovrSkeletonConstraints:
-  - {fileID: 0}
+  _ovrSkeletonConstraints: []
   _rebindAnimator: 0
   _reEnableRig: 0
   _rigToggleOnFocus: 1

@@ -151,6 +151,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new GroundingJob();
 
+            data.Setup();
             data.Create();
             data.GenerateThresholdMoveProgress();
             _prevKneePos = data.KneeTarget.position;
