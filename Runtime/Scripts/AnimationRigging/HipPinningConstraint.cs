@@ -150,17 +150,32 @@ namespace Oculus.Movement.AnimationRigging
         private Quaternion _initialHipLocalRotation;
         private HipPinningConstraintTarget _currentHipPinningTarget;
 
+        private bool _obtainedProperReferences;
+
         /// <summary>
         /// Setup the hip pinning constraint.
         /// </summary>
-        public void Setup()
+        /// <returns>Returns true if has setup runs or has already run.</returns>
+        public bool Setup()
         {
+            if (_obtainedProperReferences)
+            {
+                return true;
+            }
+
+            if (!_skeleton.IsInitialized || !_skeleton.IsDataValid)
+            {
+                return false;
+            }
+
             _bones = new Transform[_skeleton.CustomBones.Count];
             for (int i = 0; i < _bones.Length; i++)
             {
                 _bones[i] = _skeleton.CustomBones[i];
             }
             _initialHipLocalRotation = _bones[(int)OVRSkeleton.BoneId.Body_Hips].transform.localRotation;
+            _obtainedProperReferences = true;
+            return true;
         }
 
         /// <summary>
@@ -242,6 +257,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             _skeleton = null;
             _hipPinningTargets = null;
+            _obtainedProperReferences = false;
         }
     }
 
@@ -257,12 +273,29 @@ namespace Oculus.Movement.AnimationRigging
     {
         private void Start()
         {
-            data.Setup();
+            if (data.Setup())
+            {
+                gameObject.SetActive(true);
+            }
         }
 
         /// <inheritdoc />
         public void RegenerateData()
         {
+            if (data.Setup())
+            {
+                gameObject.SetActive(true);
+            }
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            if (gameObject.activeInHierarchy)
+            {
+                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready. Otherwise you" +
+                    $" might get an errors regarding invalid sync variables at runtime.");
+            }
         }
     }
 }

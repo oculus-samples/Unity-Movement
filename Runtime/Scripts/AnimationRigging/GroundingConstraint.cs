@@ -433,11 +433,24 @@ namespace Oculus.Movement.AnimationRigging
         private void Start()
         {
             data.Setup();
+            gameObject.SetActive(true);
         }
 
         /// <inheritdoc />
         public void RegenerateData()
         {
+            data.Setup();
+            gameObject.SetActive(true);
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            if (gameObject.activeInHierarchy)
+            {
+                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready. Otherwise you" +
+                    $" might get an errors regarding invalid sync variables at runtime.");
+            }
         }
     }
 }

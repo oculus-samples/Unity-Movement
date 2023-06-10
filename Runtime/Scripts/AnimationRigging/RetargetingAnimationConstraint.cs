@@ -181,7 +181,8 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Set up all job data.
+        /// Set up all job data. Even if the skeleton has been initialized, dummy data is used
+        /// as a fallback.
         /// </summary>
         /// <param name="dummySourceObject">Fallback source object if skeleton is not ready.</param>
         /// <param name="dummyTargetObject">Fallback target object if skeleton is not ready.</param>
@@ -310,11 +311,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private void Awake()
         {
-            _dummySource = new GameObject("Retargeting Constraint Dummy Source");
-            _dummyTarget = new GameObject("Retargeting Constraint Dummy Target");
-            _dummySource.transform.SetParent(this.transform);
-            _dummyTarget.transform.SetParent(this.transform);
-
+            CreateDummyGameObjects();
             data.SetUp(_dummySource, _dummyTarget);
         }
 
@@ -326,9 +323,31 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void RegenerateData()
         {
-            gameObject.SetActive(true);
+            CreateDummyGameObjects();
             data.SetUp(_dummySource, _dummyTarget);
+            gameObject.SetActive(true);
             Debug.LogWarning("Generated new constraint data.");
+        }
+
+        private void CreateDummyGameObjects()
+        {
+            if (_dummySource != null && _dummyTarget != null)
+            {
+                return;
+            }
+            _dummySource = new GameObject("Retargeting Constraint Dummy Source");
+            _dummyTarget = new GameObject("Retargeting Constraint Dummy Target");
+            _dummySource.transform.SetParent(this.transform);
+            _dummyTarget.transform.SetParent(this.transform);
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            if (gameObject.activeInHierarchy)
+            {
+                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready.");
+            }
         }
     }
 }

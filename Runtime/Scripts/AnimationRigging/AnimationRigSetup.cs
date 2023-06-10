@@ -256,6 +256,8 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
+            UpdateDependentConstraints();
+
             _animator.enabled = true;
             if (_rebindAnimator)
             {
@@ -266,6 +268,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _rigBuilder.enabled = true;
             }
+
             _ranSetup = true;
         }
 
@@ -276,13 +279,7 @@ namespace Oculus.Movement.AnimationRigging
                 _rigBuilder.enabled = false;
             }
 
-            if (_iovrSkeletonConstraints != null)
-            {
-                foreach (var currentConstraint in _iovrSkeletonConstraints)
-                {
-                    currentConstraint.RegenerateData();
-                }
-            }
+            UpdateDependentConstraints();
 
             if (_retargetingLayer != null)
             {
@@ -292,6 +289,17 @@ namespace Oculus.Movement.AnimationRigging
             if (_checkSkeletalUpdatesByProxy && _retargetingLayer != null)
             {
                 _proxyChangeCount = _retargetingLayer.ProxyChangeCount;
+            }
+        }
+
+        private void UpdateDependentConstraints()
+        {
+            if (_iovrSkeletonConstraints != null)
+            {
+                foreach (var currentConstraint in _iovrSkeletonConstraints)
+                {
+                    currentConstraint.RegenerateData();
+                }
             }
         }
 

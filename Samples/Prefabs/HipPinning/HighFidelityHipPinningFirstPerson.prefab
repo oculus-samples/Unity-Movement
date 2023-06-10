@@ -52,7 +52,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8724683950891529247
 Transform:
   m_ObjectHideFlags: 0
@@ -469,7 +469,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4132890708468496961
 Transform:
   m_ObjectHideFlags: 0
@@ -649,7 +649,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5437477247494237532
 Transform:
   m_ObjectHideFlags: 0
@@ -761,7 +761,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1097201848977875581
 Transform:
   m_ObjectHideFlags: 0
@@ -1408,7 +1408,11 @@ MonoBehaviour:
   _skeleton: {fileID: 729980574542687627}
   _animator: {fileID: 5008548947791101314}
   _rigBuilder: {fileID: 7447368640489583792}
-  _ovrSkeletonConstraints: []
+  _ovrSkeletonConstraints:
+  - {fileID: 2512888049583093171}
+  - {fileID: 7730228455810235689}
+  - {fileID: 3838579491498633126}
+  - {fileID: 7470887448235373449}
   _rebindAnimator: 0
   _reEnableRig: 0
   _rigToggleOnFocus: 0

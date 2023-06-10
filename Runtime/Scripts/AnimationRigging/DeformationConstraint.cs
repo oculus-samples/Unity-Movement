@@ -296,12 +296,14 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="dummyOne">Dummy transform if skeleton is not ready.</param>
         /// <param name="dummyTwo">Dummy transform if skeleton is not ready.</param>
-        public void Setup(Transform dummyOne, Transform dummyTwo)
+        /// <returns>True if constraint has been properly set-up; false otherwise.</returns>
+        public bool Setup(Transform dummyOne, Transform dummyTwo)
         {
             // don't run again if proper references were obtained.
+            // this initialization should only run once.
             if (_obtainedProperReferences)
             {
-                return;
+                return true;
             }
 
             SetupHipsHeadData(dummyOne, dummyTwo);
@@ -310,6 +312,7 @@ namespace Oculus.Movement.AnimationRigging
 
             _hasInitialized = true;
             _obtainedProperReferences = SkeletonOrAnimatorValid();
+            return _obtainedProperReferences;
         }
 
         /// <summary>
@@ -546,6 +549,7 @@ namespace Oculus.Movement.AnimationRigging
             _leftArmData = new ArmPosData();
             _rightArmData = new ArmPosData();
             _hasInitialized = false;
+            _obtainedProperReferences = false;
         }
     }
 
@@ -563,21 +567,47 @@ namespace Oculus.Movement.AnimationRigging
 
         private void Awake()
         {
+            CreateDummyGameObjects();
+        }
+
+        private void Start()
+        {
+            if (data.Setup(_dummyOne.transform, _dummyTwo.transform))
+            {
+                gameObject.SetActive(true);
+            }
+        }
+
+        /// <inheritdoc />
+        public void RegenerateData()
+        {
+            CreateDummyGameObjects();
+            if (data.Setup(_dummyOne.transform, _dummyTwo.transform))
+            {
+                gameObject.SetActive(true);
+            }
+        }
+
+        private void CreateDummyGameObjects()
+        {
+            if (_dummyOne != null && _dummyTwo != null)
+            {
+                return;
+            }
             _dummyOne = new GameObject("Deformation Constraint Dummy 1");
             _dummyOne.transform.SetParent(this.transform);
             _dummyTwo = new GameObject("Deformation Constraint Dummy 2");
             _dummyTwo.transform.SetParent(this.transform);
         }
 
-        private void Start()
+        protected override void OnValidate()
         {
-            data.Setup(_dummyOne.transform, _dummyTwo.transform);
-        }
-
-        /// <inheritdoc />
-        public void RegenerateData()
-        {
-            data.Setup(_dummyOne.transform, _dummyTwo.transform);
+            base.OnValidate();
+            if (gameObject.activeInHierarchy)
+            {
+                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready. Otherwise you" +
+                    $" might get an errors regarding invalid sync variables at runtime.");
+            }
         }
     }
 }
