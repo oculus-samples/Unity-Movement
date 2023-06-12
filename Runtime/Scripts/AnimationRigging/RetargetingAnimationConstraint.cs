@@ -344,7 +344,7 @@ namespace Oculus.Movement.AnimationRigging
         protected override void OnValidate()
         {
             base.OnValidate();
-            if (gameObject.activeInHierarchy)
+            if (gameObject.activeInHierarchy && !Application.isPlaying)
             {
                 Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready.");
             }
