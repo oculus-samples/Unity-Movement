@@ -15,6 +15,13 @@ namespace Oculus.Movement.AnimationRigging
     [DefaultExecutionOrder(220)]
     public partial class RetargetingLayer : OVRUnityHumanoidSkeletonRetargeter
     {
+        /// <summary>
+        /// Callback type, auditable and assignable in the Unity Editor.
+        /// Also assignable in code using
+        /// <see cref="UnityEditor.Events.UnityEventTools.AddPersistentListener"/>
+        /// </summary>
+        [System.Serializable] public class SkeletonPostProcessingEvent : UnityEngine.Events.UnityEvent<IList<OVRBone>> { }
+
         private static readonly Dictionary<HumanBodyBones, AvatarMaskBodyPart>
             _humanBoneToAvatarBodyPart = new Dictionary<HumanBodyBones, AvatarMaskBodyPart>()
             {
@@ -170,6 +177,12 @@ namespace Oculus.Movement.AnimationRigging
         private bool _isFocusedWhileInBuild = true;
 
         /// <summary>
+        /// Triggers methods that can alter bone translations and rotations, before rendering and physics
+        /// </summary>
+        [SerializeField, Optional]
+        protected SkeletonPostProcessingEvent SkeletonPostProcessing;
+
+        /// <summary>
         /// Gets number of transforms being retargeted currently. This can change during
         /// initialization.
         /// </summary>
@@ -250,7 +263,7 @@ namespace Oculus.Movement.AnimationRigging
             DisableAvatarIfNecessary();
 
             UpdateSkeleton();
-
+            SkeletonPostProcessing.Invoke(Bones);
             RecomputeSkeletalOffsetsIfNecessary();
 
             if (_enableTrackingByProxy)
