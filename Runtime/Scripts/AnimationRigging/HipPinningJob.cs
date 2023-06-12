@@ -62,13 +62,15 @@ namespace Oculus.Movement.AnimationRigging
                         if (bone.IsValid(stream))
                         {
                             var bonePos = bone.GetLocalPosition(stream);
-                            bone.SetLocalPosition(stream, bonePos + hipPosDelta);
+                            bone.SetLocalPosition(stream,
+                                Vector3.Lerp(bonePos, bonePos + hipPosDelta, weight));
                         }
                     }
                 }
 
                 // Set the hips position.
-                Hips.SetLocalPosition(stream, TargetHipPos[0]);
+                Hips.SetLocalPosition(stream,
+                    Vector3.Lerp(trackedHipPos, TargetHipPos[0], weight));
             }
             else
             {

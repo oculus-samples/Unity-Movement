@@ -104,8 +104,12 @@ namespace Oculus.Movement.AnimationRigging
                 // Leg position + rotation.
                 var hipsLocalRotation = Hips.GetLocalRotation(stream);
                 var hipsLocalPosition = Hips.GetLocalPosition(stream);
-                Leg.SetLocalPosition(stream, hipsLocalPosition + hipsLocalRotation * LegPosOffset);
-                Leg.SetLocalRotation(stream, hipsLocalRotation * LegRotOffset);
+                Leg.SetLocalPosition(stream,
+                    Vector3.Lerp(hipsLocalPosition,
+                        hipsLocalPosition + hipsLocalRotation * LegPosOffset, weight));
+                Leg.SetLocalRotation(stream,
+                    Quaternion.Slerp(hipsLocalRotation,
+                        hipsLocalRotation * LegRotOffset, weight));
 
                 // Foot position.
                 if (IsGrounding[0])
@@ -113,7 +117,7 @@ namespace Oculus.Movement.AnimationRigging
                     var footPos = Vector3.Lerp(_prevFootPos, TargetFootPos[0], MoveProgress[0]);
                     float footDist = Vector3.Distance(_prevFootPos, TargetFootPos[0]);
                     footPos.y += StepHeight * Mathf.Clamp01(footDist / StepHeightScaleDist) * StepProgress[0];
-                    FootTarget.SetPosition(stream, footPos);
+                    FootTarget.SetPosition(stream, Vector3.Lerp(FootTarget.GetPosition(stream), footPos, weight));
                 }
 
                 // Record foot position.
@@ -125,7 +129,8 @@ namespace Oculus.Movement.AnimationRigging
                 // Foot rotation.
                 var lookRot = Quaternion.LookRotation(HipsTarget.GetLocalPosition(stream) - KneeTarget.GetLocalPosition(stream)) *
                                         FootRotationOffset;
-                FootTarget.SetRotation(stream, lookRot);
+                FootTarget.SetRotation(stream,
+                    Quaternion.Slerp(FootTarget.GetRotation(stream), lookRot, weight));
             }
             else
             {

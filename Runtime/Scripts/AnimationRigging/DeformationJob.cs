@@ -172,11 +172,11 @@ namespace Oculus.Movement.AnimationRigging
                 if (SpineCorrectionType != DeformationData.SpineTranslationCorrectionType.None &&
                     (!CorrectSpineOnce || (CorrectSpineOnce && !_correctedSpine)))
                 {
-                    ProcessSpineCorrection(stream);
+                    ProcessSpineCorrection(stream, weight);
                     _correctedSpine = true;
                 }
-                ProcessDeformation(stream);
-                ProcessArms(stream);
+                ProcessDeformation(stream, weight);
+                ProcessArms(stream, weight);
             }
             else
             {
@@ -195,7 +195,7 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private void ProcessSpineCorrection(AnimationStream stream)
+        private void ProcessSpineCorrection(AnimationStream stream, float weight)
         {
             var currentDirection = HipsToHeadBones[HipsBonesIndex].GetPosition(stream) -
                                          HipsToHeadBones[HeadBonesIndex].GetPosition(stream);
@@ -211,13 +211,13 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 var bone = HipsToHeadBones[i];
-                var targetPos = bone.GetPosition(stream);
-                bone.SetPosition(stream, targetPos + offset);
+                var currentPosition = bone.GetPosition(stream);
+                bone.SetPosition(stream, Vector3.Lerp(currentPosition, currentPosition + offset, weight));
                 HipsToHeadBones[i] = bone;
             }
         }
 
-        private void ProcessDeformation(AnimationStream stream)
+        private void ProcessDeformation(AnimationStream stream, float weight)
         {
             for (int i = 0; i < StartBones.Length; i++)
             {
@@ -246,20 +246,22 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     BonePositions[i] = targetPos;
                 }
-                EndBones[i].SetPosition(stream, BonePositions[i]);
+                EndBones[i].SetPosition(stream, Vector3.Lerp(startPos, BonePositions[i], weight));
             }
 
             _initializedBonePositions = true;
         }
 
-        private void ProcessArms(AnimationStream stream)
+        private void ProcessArms(AnimationStream stream, float weight)
         {
             var leftLowerArmPos = LeftLowerArmBone.GetPosition(stream);
             var rightLowerArmPos = RightLowerArmBone.GetPosition(stream);
             var leftArmOffset = LeftUpperArmBone.GetPosition(stream) - _originalLeftUpperArmPos;
             var rightArmOffset = RightUpperArmBone.GetPosition(stream) - _originalRightUpperArmPos;
-            LeftLowerArmBone.SetPosition(stream, leftLowerArmPos + leftArmOffset * LeftArmOffsetWeight);
-            RightLowerArmBone.SetPosition(stream, rightLowerArmPos + rightArmOffset * RightArmOffsetWeight);
+            LeftLowerArmBone.SetPosition(stream,
+                Vector3.Lerp(leftLowerArmPos, leftLowerArmPos + leftArmOffset * LeftArmOffsetWeight, weight));
+            RightLowerArmBone.SetPosition(stream,
+                Vector3.Lerp(rightLowerArmPos, rightLowerArmPos + rightArmOffset * RightArmOffsetWeight, weight));
         }
     }
 

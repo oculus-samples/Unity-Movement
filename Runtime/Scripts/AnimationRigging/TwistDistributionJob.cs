@@ -106,7 +106,8 @@ namespace Oculus.Movement.AnimationRigging
                     ReadWriteTransformHandle twistTransform = TwistTransforms[i];
 
                     // Apply spacing
-                    twistTransform.SetPosition(stream, SpacingPositions[i]);
+                    twistTransform.SetPosition(stream,
+                        Vector3.Lerp(twistTransform.GetPosition(stream), SpacingPositions[i], weight));
 
                     // Apply twist
                     Quaternion twistRotation = Quaternion.LookRotation(SegmentDirections[0], SegmentUpAxis[i]);
@@ -114,7 +115,9 @@ namespace Oculus.Movement.AnimationRigging
                         parentRotation * TwistBindRotations[i],
                         twistRotation * TwistAxisOffset,
                         WeightBuffer[i] * weight);
-                    twistTransform.SetLocalRotation(stream, inverseParentRotation * targetRotation);
+                    twistTransform.SetLocalRotation(stream,
+                        Quaternion.Slerp(twistTransform.GetLocalRotation(stream),
+                            inverseParentRotation * targetRotation, weight));
                     TwistTransforms[i] = twistTransform;
                 }
             }
