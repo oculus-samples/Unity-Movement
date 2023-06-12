@@ -167,6 +167,9 @@ namespace Oculus.Movement.AnimationRigging
                 _ovrSkeletonConstraints[oldConstraints.Length] =
                     newConstraint;
             }
+
+            // Update the interface references in case this was called after awake, but before Update
+            UpdateSkeletalConstraintInterfaceReferences();
         }
 
         /// <summary>
@@ -179,13 +182,18 @@ namespace Oculus.Movement.AnimationRigging
 
             if (_ovrSkeletonConstraints != null)
             {
-                _iovrSkeletonConstraints = new IOVRSkeletonConstraint[_ovrSkeletonConstraints.Length];
-                for (int i = 0; i < _iovrSkeletonConstraints.Length; i++)
-                {
-                    _iovrSkeletonConstraints[i] =
-                        _ovrSkeletonConstraints[i] as IOVRSkeletonConstraint;
-                    Assert.IsNotNull(_iovrSkeletonConstraints[i]);
-                }
+                UpdateSkeletalConstraintInterfaceReferences();
+            }
+        }
+
+        private void UpdateSkeletalConstraintInterfaceReferences()
+        {
+            _iovrSkeletonConstraints = new IOVRSkeletonConstraint[_ovrSkeletonConstraints.Length];
+            for (int i = 0; i < _iovrSkeletonConstraints.Length; i++)
+            {
+                _iovrSkeletonConstraints[i] =
+                    _ovrSkeletonConstraints[i] as IOVRSkeletonConstraint;
+                Assert.IsNotNull(_iovrSkeletonConstraints[i]);
             }
         }
 
@@ -268,7 +276,6 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _rigBuilder.enabled = true;
             }
-
             _ranSetup = true;
         }
 
