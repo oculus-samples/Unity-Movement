@@ -131,11 +131,6 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public float RightArmOffsetWeight;
 
-        /// <summary>
-        /// Indicates if data is ready or not.
-        /// </summary>
-        public bool IsDataValid { get; set; }
-
         private Vector3 _originalLeftUpperArmPos;
         private Vector3 _originalRightUpperArmPos;
         private bool _correctedSpine;
@@ -150,11 +145,6 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void ProcessAnimation(AnimationStream stream)
         {
-            if (!IsDataValid)
-            {
-                return;
-            }
-
             float weight = jobWeight.Get(stream);
             if (weight > 0f && DeltaTime[0] > 0f)
             {
@@ -279,61 +269,52 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new DeformationJob();
 
-            if (!data.HasInitialized())
+            job.LeftUpperArmBone = ReadOnlyTransformHandle.Bind(animator, data.LeftArm.UpperArmBone);
+            job.LeftLowerArmBone = ReadWriteTransformHandle.Bind(animator, data.LeftArm.LowerArmBone);
+            job.RightUpperArmBone = ReadOnlyTransformHandle.Bind(animator, data.RightArm.UpperArmBone);
+            job.RightLowerArmBone = ReadWriteTransformHandle.Bind(animator, data.RightArm.LowerArmBone);
+
+            job.StartBones = new NativeArray<ReadWriteTransformHandle>(data.BonePairs.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.EndBones = new NativeArray<ReadWriteTransformHandle>(data.BonePairs.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.HipsToHeadBones = new NativeArray<ReadWriteTransformHandle>(data.HipsToHeadBones.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.BoneDirections = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.BonePositions = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.BoneAnimData = new NativeArray<DeformationJob.BoneAnimationData>(data.BonePairs.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.DeltaTime = new NativeArray<float>(1, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+
+            for (int i = 0; i < data.HipsToHeadBones.Length; i++)
             {
-                job.IsDataValid = false;
+                job.HipsToHeadBones[i] = ReadWriteTransformHandle.Bind(animator, data.HipsToHeadBones[i]);
             }
-            else
+            for (int i = 0; i < data.BonePairs.Length; i++)
             {
-                job.IsDataValid = true;
-
-                job.LeftUpperArmBone = ReadOnlyTransformHandle.Bind(animator, data.LeftArm.UpperArmBone);
-                job.LeftLowerArmBone = ReadWriteTransformHandle.Bind(animator, data.LeftArm.LowerArmBone);
-                job.RightUpperArmBone = ReadOnlyTransformHandle.Bind(animator, data.RightArm.UpperArmBone);
-                job.RightLowerArmBone = ReadWriteTransformHandle.Bind(animator, data.RightArm.LowerArmBone);
-
-                job.StartBones = new NativeArray<ReadWriteTransformHandle>(data.BonePairs.Length, Allocator.Persistent,
-                    NativeArrayOptions.UninitializedMemory);
-                job.EndBones = new NativeArray<ReadWriteTransformHandle>(data.BonePairs.Length, Allocator.Persistent,
-                    NativeArrayOptions.UninitializedMemory);
-                job.HipsToHeadBones = new NativeArray<ReadWriteTransformHandle>(data.HipsToHeadBones.Length, Allocator.Persistent,
-                    NativeArrayOptions.UninitializedMemory);
-                job.BoneDirections = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
-                    NativeArrayOptions.UninitializedMemory);
-                job.BonePositions = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
-                    NativeArrayOptions.UninitializedMemory);
-                job.BoneAnimData = new NativeArray<DeformationJob.BoneAnimationData>(data.BonePairs.Length, Allocator.Persistent,
-                    NativeArrayOptions.UninitializedMemory);
-                job.DeltaTime = new NativeArray<float>(1, Allocator.Persistent,
-                    NativeArrayOptions.UninitializedMemory);
-
-                for (int i = 0; i < data.HipsToHeadBones.Length; i++)
+                var boneAnimData = new DeformationJob.BoneAnimationData
                 {
-                    job.HipsToHeadBones[i] = ReadWriteTransformHandle.Bind(animator, data.HipsToHeadBones[i]);
-                }
-                for (int i = 0; i < data.BonePairs.Length; i++)
-                {
-                    var boneAnimData = new DeformationJob.BoneAnimationData
-                    {
-                        Distance = data.BonePairs[i].Distance,
-                        SnapThreshold = data.BonePairs[i].SnapThreshold,
-                        MoveTowardsSpeed = data.BonePairs[i].MoveTowardsSpeed,
-                        IsMoveTowards = data.BonePairs[i].IsMoveTowards
-                    };
-                    job.StartBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].StartBone);
-                    job.EndBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].EndBone);
-                    job.BoneAnimData[i] = boneAnimData;
-                }
-
-                job.SpineCorrectionType = data.SpineCorrectionType;
-                job.CorrectSpineOnce = data.CorrectSpineOnce;
-                job.HipsBonesIndex = 0;
-                job.HeadBonesIndex = data.HipsToHeadBones.Length - 1;
-                job.LeftArmOffsetWeight = data.LeftArm.Weight;
-                job.RightArmOffsetWeight = data.RightArm.Weight;
-                job.HipsToHeadDistance = data.HipsToHeadDistance;
-                job.DeltaTime[0] = Time.deltaTime;
+                    Distance = data.BonePairs[i].Distance,
+                    SnapThreshold = data.BonePairs[i].SnapThreshold,
+                    MoveTowardsSpeed = data.BonePairs[i].MoveTowardsSpeed,
+                    IsMoveTowards = data.BonePairs[i].IsMoveTowards
+                };
+                job.StartBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].StartBone);
+                job.EndBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].EndBone);
+                job.BoneAnimData[i] = boneAnimData;
             }
+
+            job.SpineCorrectionType = data.SpineCorrectionType;
+            job.CorrectSpineOnce = data.CorrectSpineOnce;
+            job.HipsBonesIndex = 0;
+            job.HeadBonesIndex = data.HipsToHeadBones.Length - 1;
+            job.LeftArmOffsetWeight = data.LeftArm.Weight;
+            job.RightArmOffsetWeight = data.RightArm.Weight;
+            job.HipsToHeadDistance = data.HipsToHeadDistance;
+            job.DeltaTime[0] = Time.deltaTime;
 
             return job;
         }
@@ -358,10 +339,6 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void Destroy(DeformationJob job)
         {
-            if (!job.IsDataValid)
-            {
-                return;
-            }
             job.StartBones.Dispose();
             job.EndBones.Dispose();
             job.BoneAnimData.Dispose();

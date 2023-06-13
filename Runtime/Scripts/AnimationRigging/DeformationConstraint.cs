@@ -138,18 +138,12 @@ namespace Oculus.Movement.AnimationRigging
         /// Allows the spine correction to run only once, assuming the skeleton's positions don't get updated multiple times.
         /// </summary>
         public bool CorrectSpineOnce { get; }
-        
+
         /// <summary>
         /// Indicates if bone transforms are valid or not.
         /// </summary>
         /// <returns>True if bone transforms are valid, false if not.</returns>
         public bool IsBoneTransformsDataValid();
-
-        /// <summary>
-        /// Inidicates if initialization has run again.
-        /// </summary>
-        /// <returns></returns>
-        bool HasInitialized();
     }
 
     /// <summary>
@@ -283,36 +277,31 @@ namespace Oculus.Movement.AnimationRigging
         private float _hipsToHeadDistance;
 
         private bool _hasInitialized;
-        private bool _obtainedProperReferences;
-
-        /// <inheritdoc cref="IDeformationData.HasInitialized"/>
-        public bool HasInitialized()
-        {
-            return _hasInitialized;
-        }
 
         /// <summary>
         /// Setup the deformation data struct for the deformation job.
         /// </summary>
-        /// <param name="dummyOne">Dummy transform if skeleton is not ready.</param>
-        /// <param name="dummyTwo">Dummy transform if skeleton is not ready.</param>
         /// <returns>True if constraint has been properly set-up; false otherwise.</returns>
-        public bool Setup(Transform dummyOne, Transform dummyTwo)
+        public bool Setup()
         {
-            // don't run again if proper references were obtained.
-            // this initialization should only run once.
-            if (_obtainedProperReferences)
+            if (!SkeletonOrAnimatorValid())
+            {
+                return false;
+            }
+
+            // Don't run again if proper references were obtained.
+            // This initialization should only run once.
+            if (_hasInitialized)
             {
                 return true;
             }
 
-            SetupHipsHeadData(dummyOne, dummyTwo);
-            SetupArmData(dummyOne, dummyTwo);
-            SetupBonePairs(dummyOne);
-
+            SetupHipsHeadData();
+            SetupArmData();
+            SetupBonePairs();
             _hasInitialized = true;
-            _obtainedProperReferences = SkeletonOrAnimatorValid();
-            return _obtainedProperReferences;
+
+            return true;
         }
 
         /// <summary>
@@ -337,7 +326,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Assign the Animator.
         /// </summary>
-        /// <param name="skeleton">The Animator component.</param>
+        /// <param name="animator">The Animator component.</param>
         public void AssignAnimator(Animator animator)
         {
             _animator = animator;
@@ -346,7 +335,7 @@ namespace Oculus.Movement.AnimationRigging
         private bool SkeletonOrAnimatorValid()
         {
             return
-                (_customSkeleton != null && _customSkeleton.IsInitialized) ||
+                (_customSkeleton != null) ||
                 (_animator != null) ||
                 (_skeleton != null && _skeleton.IsInitialized);
         }
@@ -359,23 +348,18 @@ namespace Oculus.Movement.AnimationRigging
                 (_skeleton != null && _skeleton.IsDataValid);
         }
 
-        private void SetupHipsHeadData(Transform dummyOne, Transform dummyTwo)
+        private void SetupHipsHeadData()
         {
             var hipToHeadBones = new List<Transform>();
-            if (SkeletonOrAnimatorValid())
+            for (int boneId = (int)OVRSkeleton.BoneId.Body_Hips; boneId <= (int)OVRSkeleton.BoneId.Body_Head;
+                 boneId++)
             {
-                for (int boneId = (int)OVRSkeleton.BoneId.Body_Hips; boneId <= (int)OVRSkeleton.BoneId.Body_Head;
-                    boneId++)
+                var foundBoneTransform = FindBoneTransform((OVRSkeleton.BoneId)boneId);
+                if (foundBoneTransform == null)
                 {
-                    var foundBoneTransform = FindBoneTransform((OVRSkeleton.BoneId)boneId);
-                    hipToHeadBones.Add(foundBoneTransform != null ?
-                        foundBoneTransform.transform : dummyOne);
+                    continue;
                 }
-            }
-            else
-            {
-                hipToHeadBones.Add(dummyOne);
-                hipToHeadBones.Add(dummyTwo);
+                hipToHeadBones.Add(foundBoneTransform.transform);
             }
 
             _hipsToHeadDistance =
@@ -385,60 +369,42 @@ namespace Oculus.Movement.AnimationRigging
 
         private Transform FindBoneTransform(OVRSkeleton.BoneId boneId)
         {
-            if (!SkeletonOrAnimatorValid())
-            {
-                return null;
-            }
             if (_customSkeleton != null)
             {
-                return RiggingUtilities.FindBoneTransformFromSkeleton(_customSkeleton, boneId);
+                return RiggingUtilities.FindBoneTransformFromCustomSkeleton(_customSkeleton, boneId);
             }
-            else if (_animator != null)
+
+            if (_animator != null)
             {
                 return RiggingUtilities.FindBoneTransformAnimator(_animator, boneId);
             }
-            // deprecated fields are last resort
-            else
-            {
-                return RiggingUtilities.FindBoneTransformFromSkeleton(_skeleton, boneId);
-            }
+
+            // Deprecated fields are last resort
+            return RiggingUtilities.FindBoneTransformFromSkeleton(_skeleton, boneId);
         }
 
-        private void SetupArmData(Transform dummyOne, Transform dummyTwo)
+        private void SetupArmData()
         {
-            bool skeletonInitialized = SkeletonOrAnimatorValid();
             // Setup arm data
             _leftArmData = new ArmPosData()
             {
                 Weight = _armWeight,
                 MoveSpeed = _armMoveSpeed,
-                ShoulderBone = skeletonInitialized ?
-                    FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder) :
-                    dummyOne,
-                UpperArmBone = skeletonInitialized ?
-                    FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper) :
-                    dummyTwo,
-                LowerArmBone = skeletonInitialized ?
-                    FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower) :
-                    dummyTwo,
+                ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder),
+                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper),
+                LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower),
             };
             _rightArmData = new ArmPosData()
             {
                 Weight = _armWeight,
                 MoveSpeed = _armMoveSpeed,
-                ShoulderBone = skeletonInitialized ?
-                    FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder) :
-                    dummyOne,
-                UpperArmBone = skeletonInitialized ?
-                    FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper) :
-                    dummyTwo,
-                LowerArmBone = skeletonInitialized ?
-                    FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower) :
-                    dummyTwo,
+                ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder),
+                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper),
+                LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower),
             };
         }
 
-        private void SetupBonePairs(Transform dummyTransform)
+        private void SetupBonePairs()
         {
             // Setup bone pairs
             var bonePairs = new List<BonePairData>();
@@ -460,9 +426,7 @@ namespace Oculus.Movement.AnimationRigging
 
             if (_applyToArms)
             {
-                var chestBone = SkeletonOrAnimatorValid() ?
-                    FindBoneTransform(OVRSkeleton.BoneId.Body_Chest) :
-                    dummyTransform;
+                var chestBone = FindBoneTransform(OVRSkeleton.BoneId.Body_Chest);
                 var chestBonePos = chestBone.position;
                 var leftShoulderBonePos = _leftArmData.ShoulderBone.position;
                 var rightShoulderBonePos = _rightArmData.ShoulderBone.position;
@@ -520,7 +484,7 @@ namespace Oculus.Movement.AnimationRigging
 
         bool IAnimationJobData.IsValid()
         {
-            if (_skeleton == null && _animator == null)
+            if (_skeleton == null && _animator == null && _customSkeleton == null)
             {
                 return false;
             }
@@ -549,7 +513,6 @@ namespace Oculus.Movement.AnimationRigging
             _leftArmData = new ArmPosData();
             _rightArmData = new ArmPosData();
             _hasInitialized = false;
-            _obtainedProperReferences = false;
         }
     }
 
@@ -563,16 +526,9 @@ namespace Oculus.Movement.AnimationRigging
         DeformationJobBinder<DeformationData>>,
         IOVRSkeletonConstraint
     {
-        private GameObject _dummyOne, _dummyTwo;
-
-        private void Awake()
-        {
-            CreateDummyGameObjects();
-        }
-
         private void Start()
         {
-            if (data.Setup(_dummyOne.transform, _dummyTwo.transform))
+            if (data.Setup())
             {
                 gameObject.SetActive(true);
             }
@@ -581,23 +537,10 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void RegenerateData()
         {
-            CreateDummyGameObjects();
-            if (data.Setup(_dummyOne.transform, _dummyTwo.transform))
+            if (data.Setup())
             {
                 gameObject.SetActive(true);
             }
-        }
-
-        private void CreateDummyGameObjects()
-        {
-            if (_dummyOne != null && _dummyTwo != null)
-            {
-                return;
-            }
-            _dummyOne = new GameObject("Deformation Constraint Dummy 1");
-            _dummyOne.transform.SetParent(this.transform);
-            _dummyTwo = new GameObject("Deformation Constraint Dummy 2");
-            _dummyTwo.transform.SetParent(this.transform);
         }
 
         protected override void OnValidate()
@@ -605,8 +548,14 @@ namespace Oculus.Movement.AnimationRigging
             base.OnValidate();
             if (gameObject.activeInHierarchy && !Application.isPlaying)
             {
+                IDeformationData deformationData = data;
+                // The constraint can be enabled when using an OVRCustomSkeleton, as the bone references are valid.
+                if (deformationData.ConstraintCustomSkeleton != null)
+                {
+                    return;
+                }
                 Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready. Otherwise you" +
-                    $" might get an errors regarding invalid sync variables at runtime.");
+                                 $" might get an errors regarding invalid sync variables at runtime.");
             }
         }
     }

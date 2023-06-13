@@ -15,7 +15,7 @@ namespace Oculus.Movement.AnimationRigging
         public static Transform FindBoneTransformFromCustomSkeleton(OVRCustomSkeleton skeleton,
             OVRSkeleton.BoneId boneId)
         {
-            return skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips];
+            return skeleton.CustomBones[(int)boneId];
         }
 
         /// <summary>
