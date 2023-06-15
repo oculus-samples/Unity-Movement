@@ -1158,6 +1158,11 @@ namespace Oculus.Movement
             "Positions to correct after the fact. Avatar " +
             "masks prevent setting positions of the hands precisely.";
 
+        public const string BonesToExcludeDuringCorrection =
+            "Bones to exclude when correcting positions. " +
+            "This can be necessary if you use a constraint that affects a specific bone, " +
+            "and the correction mask might include it.";
+
         public const string MaskToSetToTPose =
             "Since some bones are not affected by retargeting, " +
             "some joints should be reset to t-pose.";

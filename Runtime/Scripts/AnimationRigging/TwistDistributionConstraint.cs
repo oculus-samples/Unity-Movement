@@ -304,6 +304,8 @@ namespace Oculus.Movement.AnimationRigging
 
         void IAnimationJobData.SetDefaultValues()
         {
+            _skeleton = null;
+            _animator = null;
             _segmentStart = null;
             _segmentEnd = null;
             _twistForwardAxis = Axis.Z;
@@ -314,7 +316,9 @@ namespace Oculus.Movement.AnimationRigging
     }
 
     /// <summary>
-    /// Twist Distribution constraint.
+    /// Twist Distribution constraint. This should be enabled to
+    /// begin with, so that it can compute metadata before the
+    /// character can begin animating.
     /// </summary>
     [DisallowMultipleComponent]
     public class TwistDistributionConstraint : RigConstraint<
