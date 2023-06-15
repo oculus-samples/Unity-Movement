@@ -263,7 +263,7 @@ namespace Oculus.Movement.AnimationRigging
             DisableAvatarIfNecessary();
 
             UpdateSkeleton();
-            SkeletonPostProcessing.Invoke(Bones);
+            SkeletonPostProcessing?.Invoke(Bones);
             RecomputeSkeletalOffsetsIfNecessary();
 
             if (_enableTrackingByProxy)

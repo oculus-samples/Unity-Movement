@@ -120,8 +120,6 @@ namespace Oculus.Movement.Utils
                 {
                     new RigLayer(rigComponent, true)
                 };
-                // disabled until it needs to be used
-                rigBuilder.enabled = false;
                 Undo.RegisterCreatedObjectUndo(rigBuilder, "Create RigBuilder");
             }
 
@@ -153,6 +151,9 @@ namespace Oculus.Movement.Utils
                 retargetConstraint.transform.localPosition = Vector3.zero;
                 retargetConstraint.transform.localRotation = Quaternion.identity;
                 retargetConstraint.transform.localScale = Vector3.one;
+
+                // keep retargeter disabled until it initializes properly
+                retargetConstraint.gameObject.SetActive(false);
             }
             return retargetConstraint;
         }
@@ -170,8 +171,6 @@ namespace Oculus.Movement.Utils
             rigSetup = mainParent.AddComponent<AnimationRigSetup>();
             rigSetup.Skeleton = skeletalComponent;
             var animatorComponent = mainParent.GetComponent<Animator>();
-            // disabled until skeleton is initialized
-            animatorComponent.enabled = false;
             rigSetup.AnimatorComp = animatorComponent;
             rigSetup.RigbuilderComp = rigBuilder;
             if (constraintComponent != null)

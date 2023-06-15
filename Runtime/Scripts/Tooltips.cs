@@ -1231,5 +1231,13 @@ namespace Oculus.Movement
 
         public const string SpawnOffset =
             "Offset per spawn.";
+
+        public const string PositionsToCorrectLateUpdateMask =
+            "Positions to correct mask, intended to correct the finger positions of " +
+            "animation rigged characters during retargeting.";
+
+        public const string TPoseMask =
+            "Positions to correct mask, intended to set certain joints of " +
+            "animation rigged characters to T-Pose during retargeting.";
     }
 }

@@ -325,7 +325,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             CreateDummyGameObjects();
             data.SetUp(_dummySource, _dummyTarget);
-            gameObject.SetActive(true);
+                gameObject.SetActive(true);
             Debug.LogWarning("Generated new constraint data.");
         }
 

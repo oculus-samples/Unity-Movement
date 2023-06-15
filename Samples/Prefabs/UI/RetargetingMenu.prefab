@@ -1834,6 +1834,8 @@ MonoBehaviour:
   _characterToSpawn: {fileID: 3095215436059244498, guid: 5d5cf77ca551ff84cb219f05d1f9e349, type: 3}
   _spawnParent: {fileID: 0}
   _spawnOffset: {x: -1, y: 0, z: 0}
+  _positionsToCorrectLateUpdateMask: {fileID: 31900000, guid: 8aaeff1dd84dcdb468f621bf1ecfea63, type: 2}
+  _tPoseMask: {fileID: 31900000, guid: 7129d5b0eec7de64a93fce9a6ba8f4d7, type: 2}
 --- !u!1 &4797691732841845106
 GameObject:
   m_ObjectHideFlags: 0
