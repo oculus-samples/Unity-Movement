@@ -132,14 +132,19 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Optional]
         [Tooltip(RetargetingConstraintDataTooltips.AvatarMask)]
         private AvatarMask _avatarMask;
+
         /// <summary>
-        /// AvatarMask accessor. WARNING: Calling SetHumanoidBodyPartActive
-        /// on the value returned here will modify the original mask used.
+        /// Don't allow changing the original field directly, as that
+        /// has a side-effect of modifying the original mask object.
+        /// </summary>
+        private AvatarMask _avatarMaskInst;
+        /// <summary>
+        /// AvatarMask instance accessor.
         /// </summary>
         public AvatarMask AvatarMaskComp
         {
-            get => _avatarMask;
-            set => _avatarMask = value;
+            get => _avatarMaskInst;
+            set => _avatarMaskInst = value;
         }
 
         /// <inheritdoc cref="IRetargetingData.SourceTransforms"/>
@@ -193,6 +198,25 @@ namespace Oculus.Movement.AnimationRigging
             _allowDynamicAdjustmentsRuntime = true;
             _avatarMask = new AvatarMask();
             _avatarMask.InitializeDefaultValues(true);
+
+        }
+
+        /// <summary>
+        /// Initializes mask instances based on what value is set
+        /// in the corresponding fields.
+        /// </summary>
+        public void CreateAvatarMaskInstances()
+        {
+            if (_avatarMask != null)
+            {
+                _avatarMaskInst = new AvatarMask();
+                _avatarMaskInst.CopyOtherMaskBodyActiveValues(
+                    _avatarMask);
+            }
+            else
+            {
+                _avatarMaskInst = null;
+            }
         }
 
         /// <summary>
@@ -274,7 +298,7 @@ namespace Oculus.Movement.AnimationRigging
 
             _retargetingLayer.UpdateAdjustments(_rotationOffsets,
                 _shouldUpdatePositions, _shouldUpdateRotations,
-                _rotationAdjustments, _avatarMask);
+                _rotationAdjustments, _avatarMaskInst);
         }
 
         /// <summary>
@@ -284,7 +308,7 @@ namespace Oculus.Movement.AnimationRigging
         private void UpdateRetargetingLateUpdateMasks()
         {
             _retargetingLayer.CustomPositionsToCorrectLateUpdateMask =
-                _avatarMask;
+                _avatarMaskInst;
         }
 
         private bool IsSourceSkeletonNotInitialized()
@@ -342,6 +366,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             CreateDummyGameObjects();
             data.SetUp(_dummySource, _dummyTarget);
+            data.CreateAvatarMaskInstances();
         }
 
         private void Update()
