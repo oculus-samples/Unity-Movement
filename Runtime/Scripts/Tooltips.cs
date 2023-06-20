@@ -1142,6 +1142,10 @@ namespace Oculus.Movement
             "Indicates if target transform's position should be updated. " +
             "Once a position is updated, the original position will be lost.";
 
+        public const string ShouldUpdateRotations =
+            "Indicates if target transform's rotation should be updated. " +
+            "Once a rotation is updated, the original rotation will be lost.";
+
         public const string RotationOffsets =
             "Rotation offset to be applied during retargeting.";
 

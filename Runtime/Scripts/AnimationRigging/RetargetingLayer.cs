@@ -20,7 +20,10 @@ namespace Oculus.Movement.AnimationRigging
         /// Also assignable in code using
         /// <see cref="UnityEditor.Events.UnityEventTools.AddPersistentListener"/>
         /// </summary>
-        [System.Serializable] public class SkeletonPostProcessingEvent : UnityEngine.Events.UnityEvent<IList<OVRBone>> { }
+        [System.Serializable]
+        public class SkeletonPostProcessingEvent : UnityEngine.Events.UnityEvent<IList<OVRBone>>
+        {
+        }
 
         private static readonly Dictionary<HumanBodyBones, AvatarMaskBodyPart>
             _humanBoneToAvatarBodyPart = new Dictionary<HumanBodyBones, AvatarMaskBodyPart>()
@@ -121,13 +124,19 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Optional]
         [Tooltip(RetargetingLayerTooltips.PositionsToCorrectLateUpdate)]
         protected AvatarMask _positionsToCorrectLateUpdate;
+
+        /// <summary>
+        /// Don't allow changing the original field directly, as that
+        /// has a side-effect of modifying the original mask object.
+        /// </summary>
+        private AvatarMask _positionsToCorrectLateUpdateInstance;
         /// <summary>
         /// Positions to correct accessors.
         /// </summary>
         public AvatarMask PositionsToCorrectLateUpdateComp
         {
-            get { return _positionsToCorrectLateUpdate; }
-            set { _positionsToCorrectLateUpdate = value; }
+            get { return _positionsToCorrectLateUpdateInstance; }
+            set { _positionsToCorrectLateUpdateInstance = value; }
         }
 
         /// <summary>
@@ -137,13 +146,19 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Optional]
         [Tooltip(RetargetingLayerTooltips.MaskToSetToTPose)]
         protected AvatarMask _maskToSetToTPose;
+
+        /// <summary>
+        /// Don't allow changing the original field directly, as that
+        /// has a side-effect of modifying the original mask object.
+        /// </summary>
+        private AvatarMask _maskToSetToTPoseInstance;
         /// <summary>
         /// Mask to set to TPose accessors.
         /// </summary>
         public AvatarMask MaskToSetToTPoseComp
         {
-            get { return _maskToSetToTPose; }
-            set { _maskToSetToTPose = value; }
+            get { return _maskToSetToTPoseInstance; }
+            set { _maskToSetToTPoseInstance = value; }
         }
 
         /// <summary>
@@ -157,12 +172,22 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.EnableTrackingByProxy)]
         private bool _enableTrackingByProxy = false;
-
         /// <inheritdoc cref="_enableTrackingByProxy"/>
         public bool EnableTrackingByProxy
         {
             get { return _enableTrackingByProxy; }
             set { _enableTrackingByProxy = value; }
+        }
+
+        /// <summary>
+        /// Triggers methods that can alter bone translations and rotations, before rendering and physics
+        /// </summary>
+        [SerializeField, Optional]
+        protected SkeletonPostProcessingEvent SkeletonPostProcessing;
+        public SkeletonPostProcessingEvent SkeletonPostProcessingEv
+        {
+            get { return SkeletonPostProcessing; }
+            set { SkeletonPostProcessing = value; }
         }
 
         private Pose[] _defaultPoses;
@@ -174,13 +199,13 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public int ProxyChangeCount => _proxyTransformLogic.ProxyChangeCount;
 
-        private bool _isFocusedWhileInBuild = true;
-
         /// <summary>
-        /// Triggers methods that can alter bone translations and rotations, before rendering and physics
+        /// Allows one to specify which positions to correct during late update.
+        /// This is ANDed with <see cref="_positionsToCorrectLateUpdateInstance"/>
         /// </summary>
-        [SerializeField, Optional]
-        protected SkeletonPostProcessingEvent SkeletonPostProcessing;
+        public AvatarMask CustomPositionsToCorrectLateUpdateMask { get; set; }
+
+        private bool _isFocusedWhileInBuild = true;
 
         /// <summary>
         /// Gets number of transforms being retargeted currently. This can change during
@@ -203,6 +228,42 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
             return numTransforms;
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            CreateMaskInstances();
+        }
+
+        /// <summary>
+        /// Allows creating instances of masks used in this class at any time.
+        /// Effectively resets animation masks being used to what the corresponding
+        /// fields <see cref="_positionsToCorrectLateUpdate"/> and
+        /// <see cref="_maskToSetToTPose"/> specify. This is primarily used by
+        /// <see cref="RetargetingLayerEditor"/>.
+        /// </summary>
+        public void CreateMaskInstances()
+        {
+            if (_positionsToCorrectLateUpdate != null)
+            {
+                _positionsToCorrectLateUpdateInstance = new AvatarMask();
+                _positionsToCorrectLateUpdateInstance.CopyOtherMaskBodyActiveValues(
+                    _positionsToCorrectLateUpdate);
+            }
+            else
+            {
+                _positionsToCorrectLateUpdateInstance = null;
+            }
+            if (_maskToSetToTPose != null)
+            {
+                _maskToSetToTPoseInstance = new AvatarMask();
+                _maskToSetToTPoseInstance.CopyOtherMaskBodyActiveValues(_maskToSetToTPose);
+            }
+            else
+            {
+                _maskToSetToTPoseInstance = null;
+            }
         }
 
         /// <summary>
@@ -290,7 +351,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private void CorrectPositions()
         {
-            if (_positionsToCorrectLateUpdate == null)
+            if (_positionsToCorrectLateUpdateInstance == null)
             {
                 return;
             }
@@ -314,27 +375,32 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 var bodyPart = _humanBoneToAvatarBodyPart[humanBodyBone];
-                if (_positionsToCorrectLateUpdate.GetHumanoidBodyPartActive(bodyPart))
+                if (!_positionsToCorrectLateUpdateInstance.GetHumanoidBodyPartActive(bodyPart) ||
+                    (CustomPositionsToCorrectLateUpdateMask != null &&
+                    !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
+                    )
                 {
-                    var adjustment = FindAdjustment(humanBodyBone);
-                    var targetJoint = targetData.OriginalJoint;
-                    var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
-                    var shouldUpdatePosition = IsBodySectionInArray(
-                        bodySectionOfJoint, BodySectionToPosition);
+                    continue;
+                }
 
-                    if (adjustment == null)
+                var adjustment = FindAdjustment(humanBodyBone);
+                var targetJoint = targetData.OriginalJoint;
+                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+                var shouldUpdatePosition = IsBodySectionInArray(
+                    bodySectionOfJoint, BodySectionToPosition);
+
+                if (adjustment == null)
+                {
+                    if (shouldUpdatePosition)
                     {
-                        if (shouldUpdatePosition)
-                        {
-                            targetJoint.position = Bones[i].Transform.position;
-                        }
+                        targetJoint.position = Bones[i].Transform.position;
                     }
-                    else
+                }
+                else
+                {
+                    if (!adjustment.DisablePositionTransform && shouldUpdatePosition)
                     {
-                        if (!adjustment.DisablePositionTransform && shouldUpdatePosition)
-                        {
-                            targetJoint.position = Bones[i].Transform.position;
-                        }
+                        targetJoint.position = Bones[i].Transform.position;
                     }
                 }
             }
@@ -342,7 +408,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private void FixJointsToTPose()
         {
-            if (_maskToSetToTPose == null)
+            if (_maskToSetToTPoseInstance == null)
             {
                 return;
             }
@@ -354,7 +420,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     continue;
                 }
-                if (!_maskToSetToTPose.GetHumanoidBodyPartActive(_humanBoneToAvatarBodyPart[i]))
+                if (!_maskToSetToTPoseInstance.GetHumanoidBodyPartActive(_humanBoneToAvatarBodyPart[i]))
                 {
                     continue;
                 }
@@ -370,7 +436,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-            for(int i = 0; i < _jointConstraints.Length; i++)
+            for (int i = 0; i < _jointConstraints.Length; i++)
             {
                 var constraint = _jointConstraints[i];
                 constraint.Update();
@@ -397,13 +463,13 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="sourceTransforms">Source transforms.</param>
         /// <param name="targetTransforms">Target transforms.</param>
         /// <param name="shouldUpdatePositions">If joint positions should be updated or not.</param>
+        /// <param name="shouldUpdateRotations">If joint rotations should be updated or not.</param>
         /// <param name="rotationOffsets">Rotation offset per joint.</param>
         /// <param name="rotationAdjustments">Rotation tweak per joint.</param>
-        /// <param name="avatarMask">Mask to restrict retargeting.</param>
         public void FillTransformArrays(List<Transform> sourceTransforms,
             List<Transform> targetTransforms, List<bool> shouldUpdatePositions,
-            List<Quaternion> rotationOffsets, List<Quaternion> rotationAdjustments,
-            AvatarMask avatarMask)
+            List<bool> shouldUpdateRotations, List<Quaternion> rotationOffsets,
+            List<Quaternion> rotationAdjustments)
         {
             var skeletalBones = Bones;
             int numBones = skeletalBones.Count;
@@ -427,25 +493,12 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
-                if (avatarMask != null)
-                {
-                    // We can support runtime mask changes in future, but for that to work
-                    // we must undo any position and rotation updates done to joints that
-                    // are retargeted to once a mask change indicates that they must no
-                    // longer be retargeted.
-                    var jointInMask = avatarMask.GetHumanoidBodyPartActive(
-                    _humanBoneToAvatarBodyPart[targetHumanBodyBone]);
-                    if (!jointInMask)
-                    {
-                        continue;
-                    }
-                }
-
                 sourceTransforms.Add(_enableTrackingByProxy ?
                     _proxyTransformLogic.ProxyTransforms[i].DrivenTransform :
                     currentBone.Transform);
                 targetTransforms.Add(targetBoneData.OriginalJoint);
                 shouldUpdatePositions.Add(false);
+                shouldUpdateRotations.Add(false);
                 rotationOffsets.Add(targetBoneData.CorrectionQuaternion.Value);
                 rotationAdjustments.Add(Quaternion.identity);
             }
@@ -456,11 +509,12 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="rotationOffsets">Rotation offset per joint.</param>
         /// <param name="shouldUpdatePositions">If joint positions should be updated or not.</param>
+        /// <param name="shouldUpdateRotations">If joint rotations should be updated or not.</param>
         /// <param name="rotationAdjustments">Rotation tweak per joint</param>
         /// <param name="avatarMask">Mask to restrict retargeting.</param>
         public void UpdateAdjustments(Quaternion[] rotationOffsets,
-            bool[] shouldUpdatePositions, Quaternion[] rotationAdjustments,
-            AvatarMask avatarMask)
+            bool[] shouldUpdatePositions, bool[] shouldUpdateRotations,
+            Quaternion[] rotationAdjustments, AvatarMask avatarMask)
         {
             var skeletalBones = Bones;
             int numBones = skeletalBones.Count;
@@ -486,16 +540,6 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
-                if (avatarMask != null)
-                {
-                    var jointInMask = avatarMask.GetHumanoidBodyPartActive(
-                        _humanBoneToAvatarBodyPart[targetHumanBodyBone]);
-                    if (!jointInMask)
-                    {
-                        continue;
-                    }
-                }
-
                 // run this code each frame to pick up adjustments made to the editor
                 var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[targetHumanBodyBone];
 
@@ -515,17 +559,27 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
+                bool jointFailsMask = false;
+                if (avatarMask != null)
+                {
+                    jointFailsMask = !avatarMask.GetHumanoidBodyPartActive(
+                        _humanBoneToAvatarBodyPart[targetHumanBodyBone]);
+                }
+
                 if (adjustment == null)
                 {
                     SetUpDefaultAdjustment(rotationOffsets, shouldUpdatePositions,
-                        rotationAdjustments, arrayId,
-                        targetBoneData, bodySectionInPositionArray);
+                        shouldUpdateRotations, rotationAdjustments, arrayId,
+                        targetBoneData, bodySectionInPositionArray,
+                        jointFailsMask);
                 }
                 else
                 {
                     SetUpCustomAdjustment(rotationOffsets, shouldUpdatePositions,
+                        shouldUpdateRotations,
                         rotationAdjustments, adjustment, arrayId,
-                        targetBoneData, bodySectionInPositionArray);
+                        targetBoneData, bodySectionInPositionArray,
+                        jointFailsMask);
                 }
 
                 arrayId++;
@@ -533,27 +587,32 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         private void SetUpDefaultAdjustment(Quaternion[] rotationOffsets,
-            bool[] shouldUpdatePositions, Quaternion[] rotationAdjustments,
-            int arrayId, OVRSkeletonMetadata.BoneData targetBoneData,
-            bool bodySectionInPositionArray)
+            bool[] shouldUpdatePositions, bool[] shouldUpdateRotations,
+            Quaternion[] rotationAdjustments, int arrayId,
+            OVRSkeletonMetadata.BoneData targetBoneData,
+            bool bodySectionInPositionArray, bool jointFailsMask)
         {
             rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value;
-            shouldUpdatePositions[arrayId] = bodySectionInPositionArray;
+            shouldUpdatePositions[arrayId] = !jointFailsMask && bodySectionInPositionArray;
+            shouldUpdateRotations[arrayId] = !jointFailsMask;
             rotationAdjustments[arrayId] = Quaternion.identity;
         }
 
         private void SetUpCustomAdjustment(Quaternion[] rotationOffsets,
-            bool[] shouldUpdatePositions, Quaternion[] rotationAdjustments,
+            bool[] shouldUpdatePositions, bool[] shouldUpdateRotations,
+            Quaternion[] rotationAdjustments,
             JointAdjustment adjustment, int arrayId,
             OVRSkeletonMetadata.BoneData targetBoneData,
-            bool bodySectionInPositionArray)
+            bool bodySectionInPositionArray, bool jointFailsMask)
         {
-            rotationOffsets[arrayId] = adjustment.DisableRotationTransform ?
-                Quaternion.identity :
-                targetBoneData.CorrectionQuaternion.Value;
+            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value;
             shouldUpdatePositions[arrayId] =
                 !adjustment.DisablePositionTransform &&
-                bodySectionInPositionArray;
+                bodySectionInPositionArray &&
+                !jointFailsMask;
+            shouldUpdateRotations[arrayId] =
+                !adjustment.DisableRotationTransform &&
+                !jointFailsMask;
             rotationAdjustments[arrayId] = adjustment.RotationChange;
         }
 

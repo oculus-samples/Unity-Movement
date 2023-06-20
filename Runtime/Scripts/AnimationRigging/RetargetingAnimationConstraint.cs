@@ -1,7 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -35,6 +34,12 @@ namespace Oculus.Movement.AnimationRigging
         /// Once a position is updated, the original position will be lost.
         /// </summary>
         public bool[] ShouldUpdatePosition { get; }
+
+        /// <summary>
+        /// Indicates if target transform's rotation should be updated.
+        /// Once a rotation is updated, the original rotation will be lost.
+        /// </summary>
+        public bool[] ShouldUpdateRotation { get; }
 
         /// <summary>
         /// Rotation offset to be applied during retargeting.
@@ -84,6 +89,9 @@ namespace Oculus.Movement.AnimationRigging
         bool[] IRetargetingData.ShouldUpdatePosition => _shouldUpdatePositions;
 
         /// <inheritdoc />
+        bool[] IRetargetingData.ShouldUpdateRotation => _shouldUpdateRotations;
+
+        /// <inheritdoc />
         Quaternion[] IRetargetingData.RotationOffsets => _rotationOffsets;
 
         /// <inheritdoc />
@@ -124,6 +132,15 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Optional]
         [Tooltip(RetargetingConstraintDataTooltips.AvatarMask)]
         private AvatarMask _avatarMask;
+        /// <summary>
+        /// AvatarMask accessor. WARNING: Calling SetHumanoidBodyPartActive
+        /// on the value returned here will modify the original mask used.
+        /// </summary>
+        public AvatarMask AvatarMaskComp
+        {
+            get => _avatarMask;
+            set => _avatarMask = value;
+        }
 
         /// <inheritdoc cref="IRetargetingData.SourceTransforms"/>
         [SyncSceneToStream]
@@ -139,6 +156,11 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable]
         [Tooltip(RetargetingConstraintDataTooltips.ShouldUpdatePositions)]
         private bool[] _shouldUpdatePositions;
+
+        /// <inheritdoc cref="IRetargetingData.ShouldUpdateRotation"/>
+        [NotKeyable]
+        [Tooltip(RetargetingConstraintDataTooltips.ShouldUpdateRotations)]
+        private bool[] _shouldUpdateRotations;
 
         /// <inheritdoc cref="IRetargetingData.RotationOffsets"/>
         [NotKeyable]
@@ -170,14 +192,7 @@ namespace Oculus.Movement.AnimationRigging
             _retargetingLayer = null;
             _allowDynamicAdjustmentsRuntime = true;
             _avatarMask = new AvatarMask();
-            foreach (AvatarMaskBodyPart part in (AvatarMaskBodyPart[])Enum.GetValues(typeof(AvatarMaskBodyPart)))
-            {
-                if (part == AvatarMaskBodyPart.LastBodyPart)
-                {
-                    continue;
-                }
-                _avatarMask.SetHumanoidBodyPartActive(part, true);
-            }
+            _avatarMask.InitializeDefaultValues(true);
         }
 
         /// <summary>
@@ -203,6 +218,7 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             UpdateDataArraysWithAdjustments();
+            UpdateRetargetingLateUpdateMasks();
         }
 
         private void BuildArraysForJob(GameObject dummySourceObject, GameObject dummyTargetObject)
@@ -219,18 +235,20 @@ namespace Oculus.Movement.AnimationRigging
             List<Transform> targetTransforms = new List<Transform>();
 
             List<bool> shouldUpdatePositions = new List<bool>();
+            List<bool> shouldUpdateRotations = new List<bool>();
             List<Quaternion> rotationOffsets = new List<Quaternion>();
 
             List<Quaternion> rotationAdjustments = new List<Quaternion>();
 
             _retargetingLayer.FillTransformArrays(
                 sourceTransforms, targetTransforms,
-                shouldUpdatePositions, rotationOffsets,
-                rotationAdjustments, _avatarMask);
+                shouldUpdatePositions, shouldUpdateRotations,
+                rotationOffsets, rotationAdjustments);
 
             _sourceTransforms = sourceTransforms.ToArray();
             _targetTransforms = targetTransforms.ToArray();
             _shouldUpdatePositions = shouldUpdatePositions.ToArray();
+            _shouldUpdateRotations = shouldUpdateRotations.ToArray();
             _rotationOffsets = rotationOffsets.ToArray();
             _rotationAdjustments = rotationAdjustments.ToArray();
 
@@ -255,8 +273,18 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             _retargetingLayer.UpdateAdjustments(_rotationOffsets,
-                _shouldUpdatePositions, _rotationAdjustments,
-                _avatarMask);
+                _shouldUpdatePositions, _shouldUpdateRotations,
+                _rotationAdjustments, _avatarMask);
+        }
+
+        /// <summary>
+        /// Any LateUpdate masks that the RetargetingLayer uses should be
+        /// kept up-to-date.
+        /// </summary>
+        private void UpdateRetargetingLateUpdateMasks()
+        {
+            _retargetingLayer.CustomPositionsToCorrectLateUpdateMask =
+                _avatarMask;
         }
 
         private bool IsSourceSkeletonNotInitialized()
@@ -279,6 +307,7 @@ namespace Oculus.Movement.AnimationRigging
             _targetTransforms = new Transform[1];
             _targetTransforms[0] = dummyTargetObject.transform;
             _shouldUpdatePositions = new bool[1];
+            _shouldUpdateRotations = new bool[1];
             _rotationOffsets = new Quaternion[1];
             _rotationOffsets[0] = Quaternion.identity;
             _rotationAdjustments = new Quaternion[1];
@@ -325,7 +354,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             CreateDummyGameObjects();
             data.SetUp(_dummySource, _dummyTarget);
-                gameObject.SetActive(true);
+            gameObject.SetActive(true);
             Debug.LogWarning("Generated new constraint data.");
         }
 

@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using JetBrains.Annotations;
 using Oculus.Interaction;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;

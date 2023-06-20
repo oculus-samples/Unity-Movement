@@ -29,6 +29,11 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<bool> ShouldUpdatePosition;
 
         /// <summary>
+        /// Boolean indicating if rotation should be updated or not.
+        /// </summary>
+        public NativeArray<bool> ShouldUpdateRotation;
+
+        /// <summary>
         /// Rotation offsets per joint.
         /// </summary>
         public NativeArray<Quaternion> RotationOffsets;
@@ -57,16 +62,18 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     var targetTransform = TargetTransforms[i];
                     var sourceTransform = SourceTransforms[i];
-                    bool shouldUpdatePosition = ShouldUpdatePosition[i];
-                    var rotationOffset = RotationOffsets[i];
-                    var rotationAdjustment = RotationAdjustments[i];
 
-                    var originalRotation = sourceTransform.GetRotation(stream);
-                    var finalRotation = originalRotation * rotationOffset * rotationAdjustment;
-                    targetTransform.SetRotation(stream,
-                        Quaternion.Slerp(targetTransform.GetRotation(stream), finalRotation, weight));
+                    if (ShouldUpdateRotation[i])
+                    {
+                        var rotationOffset = RotationOffsets[i];
+                        var rotationAdjustment = RotationAdjustments[i];
+                        var originalRotation = sourceTransform.GetRotation(stream);
+                        var finalRotation = originalRotation * rotationOffset * rotationAdjustment;
+                        targetTransform.SetRotation(stream,
+                           Quaternion.Slerp(targetTransform.GetRotation(stream), finalRotation, weight));
+                    }
 
-                    if (shouldUpdatePosition)
+                    if (ShouldUpdatePosition[i])
                     {
                         var originalPosition = targetTransform.GetPosition(stream);
                         var finalPosition = sourceTransform.GetPosition(stream);
@@ -128,6 +135,10 @@ namespace Oculus.Movement.AnimationRigging
                 new NativeArray<bool>(1,
                     Allocator.Persistent,
                     NativeArrayOptions.UninitializedMemory);
+            job.ShouldUpdateRotation =
+                new NativeArray<bool>(1,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory);
             job.RotationOffsets =
                 new NativeArray<Quaternion>(1,
                     Allocator.Persistent,
@@ -143,6 +154,7 @@ namespace Oculus.Movement.AnimationRigging
             job.TargetTransforms[0] =
                 ReadWriteTransformHandle.Bind(animator, data.DummyTransform);
             job.ShouldUpdatePosition[0] = false;
+            job.ShouldUpdateRotation[0] = false;
             job.RotationOffsets[0] = Quaternion.identity;
             job.RotationAdjustments[0] = Quaternion.identity;
         }
@@ -159,6 +171,10 @@ namespace Oculus.Movement.AnimationRigging
                     NativeArrayOptions.UninitializedMemory);
             job.ShouldUpdatePosition =
                 new NativeArray<bool>(data.ShouldUpdatePosition.Length,
+                    Allocator.Persistent,
+                    NativeArrayOptions.UninitializedMemory);
+            job.ShouldUpdateRotation =
+                new NativeArray<bool>(data.ShouldUpdateRotation.Length,
                     Allocator.Persistent,
                     NativeArrayOptions.UninitializedMemory);
             job.RotationOffsets =
@@ -196,6 +212,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 job.RotationOffsets[i] = data.RotationOffsets[i];
                 job.ShouldUpdatePosition[i] = data.ShouldUpdatePosition[i];
+                job.ShouldUpdateRotation[i] = data.ShouldUpdateRotation[i];
                 job.RotationAdjustments[i] = data.RotationAdjustments[i];
             }
         }
@@ -213,6 +230,7 @@ namespace Oculus.Movement.AnimationRigging
             job.SourceTransforms.Dispose();
             job.TargetTransforms.Dispose();
             job.ShouldUpdatePosition.Dispose();
+            job.ShouldUpdateRotation.Dispose();
             job.RotationOffsets.Dispose();
             job.RotationAdjustments.Dispose();
         }
