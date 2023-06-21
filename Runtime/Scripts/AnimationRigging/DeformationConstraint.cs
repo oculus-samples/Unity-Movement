@@ -12,7 +12,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Information about the distance between two bone transforms.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct BonePairData
     {
         /// <summary>
@@ -51,7 +51,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Information about the positioning of an arm.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct ArmPosData
     {
         /// <summary>
@@ -61,7 +61,7 @@ namespace Oculus.Movement.AnimationRigging
         public Transform ShoulderBone;
 
         /// <summary>
-        /// The upper arm transform
+        /// The upper arm transform.
         /// </summary>
         [SyncSceneToStream]
         public Transform UpperArmBone;
@@ -71,6 +71,12 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SyncSceneToStream]
         public Transform LowerArmBone;
+
+        /// <summary>
+        /// The hand transform.
+        /// </summary>
+        [SyncSceneToStream]
+        public Transform HandBone;
 
         /// <summary>
         /// The weight for the deformation on arms.
@@ -388,19 +394,21 @@ namespace Oculus.Movement.AnimationRigging
             // Setup arm data
             _leftArmData = new ArmPosData()
             {
-                Weight = _armWeight,
+                Weight = _applyToArms ? _armWeight : 0,
                 MoveSpeed = _armMoveSpeed,
                 ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder),
                 UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper),
                 LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower),
+                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftHandWrist)
             };
             _rightArmData = new ArmPosData()
             {
-                Weight = _armWeight,
+                Weight = _applyToArms ? _armWeight : 0,
                 MoveSpeed = _armMoveSpeed,
                 ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder),
                 UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper),
                 LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower),
+                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightHandWrist)
             };
         }
 
@@ -549,8 +557,9 @@ namespace Oculus.Movement.AnimationRigging
             if (gameObject.activeInHierarchy && !Application.isPlaying)
             {
                 IDeformationData deformationData = data;
-                // The constraint can be enabled when using an OVRCustomSkeleton, as the bone references are valid.
-                if (deformationData.ConstraintCustomSkeleton != null)
+                // The constraint can be enabled when using an OVRCustomSkeleton or animator,
+                // as the bone references are valid.
+                if (deformationData.ConstraintCustomSkeleton != null || deformationData.ConstraintAnimator != null)
                 {
                     return;
                 }

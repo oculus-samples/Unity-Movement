@@ -53,13 +53,13 @@ namespace Oculus.Movement.AnimationRigging
             public Vector3 GetPositionOffset()
             {
                 var targetPositionOffset = FinalPosition - OriginalPosition;
-                // The recorded positions will be NaN when we regenerate data for the rig.
-                if (float.IsNaN(FinalPosition.x) ||
-                    float.IsNaN(FinalPosition.y) ||
-                    float.IsNaN(FinalPosition.z) ||
-                    float.IsNaN(OriginalPosition.x) ||
-                    float.IsNaN(OriginalPosition.y) ||
-                    float.IsNaN(OriginalPosition.z))
+                // The recorded positions will not be finite when we regenerate data for the rig.
+                if (!float.IsFinite(FinalPosition.x) ||
+                    !float.IsFinite(FinalPosition.y) ||
+                    !float.IsFinite(FinalPosition.z) ||
+                    !float.IsFinite(OriginalPosition.x) ||
+                    !float.IsFinite(OriginalPosition.y) ||
+                    !float.IsFinite(OriginalPosition.z))
                 {
                     return Vector3.zero;
                 }
