@@ -1120,6 +1120,19 @@ namespace Oculus.Movement
             "If true, invert the up axis.";
     }
 
+    public static class CopyPoseDataTooltips
+    {
+        public const string Animator =
+            "The Animator component for the character.";
+
+        public const string CopyPoseToOriginal =
+            "True if the pose being copied is the original pose. If false, the copied pose " +
+            "is assumed to be the final pose.";
+
+        public const string RetargetingLayer =
+            "Retargeting layer component to get data from.";
+    }
+
     public static class RetargetingConstraintDataTooltips
     {
         public const string RetargetingLayer =
@@ -1161,6 +1174,11 @@ namespace Oculus.Movement
         public const string PositionsToCorrectLateUpdate =
             "Positions to correct after the fact. Avatar " +
             "masks prevent setting positions of the hands precisely.";
+
+        public const string ApplyAnimationConstraintsToCorrectedPositions =
+            "Apply position offsets done by animation rigging constraints for corrected " +
+            "positions. Due to the limited motion of humanoid avatars, this should be set if any " +
+            "animation rigging constraints are applied after the retargeting job runs.";
 
         public const string BonesToExcludeDuringCorrection =
             "Bones to exclude when correcting positions. " +

@@ -194,6 +194,67 @@ namespace Oculus.Movement.AnimationRigging
                     _ovrSkeletonConstraints[i] as IOVRSkeletonConstraint;
                 Assert.IsNotNull(_iovrSkeletonConstraints[i]);
             }
+
+            // Add the copy original pose constraint that will be run after retargeting animation constraint.
+            if (_retargetingLayer != null && _retargetingLayer.ApplyAnimationConstraintsToCorrectedPositions)
+            {
+                RetargetingAnimationConstraint retargetConstraint =
+                    GetComponentInChildren<RetargetingAnimationConstraint>(true);
+                if (retargetConstraint != null)
+                {
+                    var copyPoseOriginalConstraint =
+                        CheckAndAddMissingCopyPoseAnimationConstraint(retargetConstraint, true);
+                    var copyPoseFinalConstraint =
+                        CheckAndAddMissingCopyPoseAnimationConstraint(retargetConstraint, false);
+
+                    if (copyPoseOriginalConstraint != null)
+                    {
+                        AddSkeletalConstraint(copyPoseOriginalConstraint);
+                    }
+
+                    if (copyPoseFinalConstraint != null)
+                    {
+                        AddSkeletalConstraint(copyPoseFinalConstraint);
+                    }
+                }
+            }
+        }
+
+        private CopyPoseConstraint CheckAndAddMissingCopyPoseAnimationConstraint(
+            RetargetingAnimationConstraint retargetConstraint, bool shouldCopyPoseToOriginal)
+        {
+            CopyPoseConstraint[] copyPoseConstraints =
+                GetComponentsInChildren<CopyPoseConstraint>(true);
+            foreach (var constraint in copyPoseConstraints)
+            {
+                if (constraint.data.CopyPoseToOriginal == shouldCopyPoseToOriginal)
+                {
+                    return null;
+                }
+            }
+
+            GameObject copyPoseConstraintObj = new GameObject(shouldCopyPoseToOriginal ?
+                    "CopyOriginalPoseConstraint" : "CopyFinalPoseConstraint");
+            copyPoseConstraintObj.SetActive(false);
+            CopyPoseConstraint copyPoseConstraint = copyPoseConstraintObj.AddComponent<CopyPoseConstraint>();
+            copyPoseConstraint.data.CopyPoseToOriginal = shouldCopyPoseToOriginal;
+            copyPoseConstraint.data.RetargetingLayerComp = _retargetingLayer;
+            copyPoseConstraint.data.ConstraintAnimator = _animator;
+            if (shouldCopyPoseToOriginal)
+            {
+                copyPoseConstraintObj.transform.SetParent(retargetConstraint.transform);
+                copyPoseConstraintObj.transform.SetAsFirstSibling();
+                Debug.Log("CopyPoseConstraint for the original pose has been added " +
+                          "to the animation rig for retargeting.");
+            }
+            else
+            {
+                copyPoseConstraintObj.transform.SetParent(retargetConstraint.transform.parent);
+                copyPoseConstraintObj.transform.SetAsLastSibling();
+                Debug.Log("CopyPoseConstraint for the final pose has been added " +
+                          "to the animation rig for retargeting.");
+            }
+            return copyPoseConstraint;
         }
 
         /// <summary>

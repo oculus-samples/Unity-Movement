@@ -25,6 +25,48 @@ namespace Oculus.Movement.AnimationRigging
         {
         }
 
+        /// <summary>
+        /// Joint position adjustment to be applied to corrected positions.
+        /// </summary>
+        [System.Serializable]
+        public class JointPositionAdjustment
+        {
+            /// <summary>
+            /// Joint to adjust.
+            /// </summary>
+            public HumanBodyBones Joint;
+
+            /// <summary>
+            /// The original position, post-retargeting but before any other animation constraints.
+            /// </summary>
+            public Vector3 OriginalPosition;
+
+            /// <summary>
+            /// The final position, post-animation constraints.
+            /// </summary>
+            public Vector3 FinalPosition;
+
+            /// <summary>
+            /// Get the difference between the original and final positions.
+            /// </summary>
+            /// <returns>Position offset between the original and final positions.</returns>
+            public Vector3 GetPositionOffset()
+            {
+                var targetPositionOffset = FinalPosition - OriginalPosition;
+                // The recorded positions will be NaN when we regenerate data for the rig.
+                if (float.IsNaN(FinalPosition.x) ||
+                    float.IsNaN(FinalPosition.y) ||
+                    float.IsNaN(FinalPosition.z) ||
+                    float.IsNaN(OriginalPosition.x) ||
+                    float.IsNaN(OriginalPosition.y) ||
+                    float.IsNaN(OriginalPosition.z))
+                {
+                    return Vector3.zero;
+                }
+                return targetPositionOffset;
+            }
+        }
+
         private static readonly Dictionary<HumanBodyBones, AvatarMaskBodyPart>
             _humanBoneToAvatarBodyPart = new Dictionary<HumanBodyBones, AvatarMaskBodyPart>()
             {
@@ -97,6 +139,15 @@ namespace Oculus.Movement.AnimationRigging
             };
 
         /// <summary>
+        /// The array of joint position adjustments.
+        /// </summary>
+        public JointPositionAdjustment[] JointPositionAdjustments
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Disable the target's avatar after building its meta data. There is an
         /// issue in Unity where the positions of all of the retargeted's
         /// bones are *not* set if an avatar is assigned during runtime, even if
@@ -140,6 +191,21 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Apply position offsets done by animation rigging constraints for corrected
+        /// positions. Due to the limited motion of humanoid avatars, this should be set if any
+        /// animation rigging constraints are applied after the retargeting job runs.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.ApplyAnimationConstraintsToCorrectedPositions)]
+        protected bool _applyAnimationConstraintsToCorrectedPositions = true;
+        /// <inheritdoc cref="_applyAnimationConstraintsToCorrectedPositions"/>
+        public bool ApplyAnimationConstraintsToCorrectedPositions
+        {
+            get { return _applyAnimationConstraintsToCorrectedPositions;}
+            set { _applyAnimationConstraintsToCorrectedPositions = value; }
+        }
+
+        /// <summary>
         /// Since some bones are not affected by retargeting,
         /// some joints should be reset to t-pose.
         /// </summary>
@@ -171,7 +237,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.EnableTrackingByProxy)]
-        private bool _enableTrackingByProxy = false;
+        protected bool _enableTrackingByProxy = false;
         /// <inheritdoc cref="_enableTrackingByProxy"/>
         public bool EnableTrackingByProxy
         {
@@ -275,6 +341,7 @@ namespace Oculus.Movement.AnimationRigging
             base.Start();
 
             ConstructDefaultPoseInformation();
+            ConstructBoneAdjustmentInformation();
             CacheJointConstraints();
         }
 
@@ -291,6 +358,15 @@ namespace Oculus.Movement.AnimationRigging
 
                 _defaultPoses[(int)i] = new Pose(boneTransform.localPosition,
                     boneTransform.localRotation);
+            }
+        }
+
+        private void ConstructBoneAdjustmentInformation()
+        {
+            JointPositionAdjustments = new JointPositionAdjustment[(int)HumanBodyBones.LastBone];
+            for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
+            {
+                JointPositionAdjustments[(int)i] = new JointPositionAdjustment { Joint = i };
             }
         }
 
@@ -377,8 +453,8 @@ namespace Oculus.Movement.AnimationRigging
                 var bodyPart = _humanBoneToAvatarBodyPart[humanBodyBone];
                 if (!_positionsToCorrectLateUpdateInstance.GetHumanoidBodyPartActive(bodyPart) ||
                     (CustomPositionsToCorrectLateUpdateMask != null &&
-                    !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
-                    )
+                     !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
+                   )
                 {
                     continue;
                 }
@@ -389,18 +465,23 @@ namespace Oculus.Movement.AnimationRigging
                 var shouldUpdatePosition = IsBodySectionInArray(
                     bodySectionOfJoint, BodySectionToPosition);
 
+                if (!shouldUpdatePosition)
+                {
+                    continue;
+                }
+
+                var positionOffset = _applyAnimationConstraintsToCorrectedPositions ?
+                    JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
+
                 if (adjustment == null)
                 {
-                    if (shouldUpdatePosition)
-                    {
-                        targetJoint.position = Bones[i].Transform.position;
-                    }
+                    targetJoint.position = Bones[i].Transform.position + positionOffset;
                 }
                 else
                 {
-                    if (!adjustment.DisablePositionTransform && shouldUpdatePosition)
+                    if (!adjustment.DisablePositionTransform)
                     {
-                        targetJoint.position = Bones[i].Transform.position;
+                        targetJoint.position = Bones[i].Transform.position + positionOffset;
                     }
                 }
             }
