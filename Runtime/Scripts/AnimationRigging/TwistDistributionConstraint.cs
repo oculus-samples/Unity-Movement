@@ -14,7 +14,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Sets up data for job.
         /// </summary>
-        void Setup();
+        public void Setup();
 
         /// <summary>
         /// The OVR Skeleton component for the character.
