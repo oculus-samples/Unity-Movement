@@ -101,6 +101,11 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<Vector3> BonePositions;
 
         /// <summary>
+        /// The array containing 1 element for the current scale ratio.
+        /// </summary>
+        public NativeArray<Vector3> ScaleFactor;
+
+        /// <summary>
         /// The array containing 1 element for the current delta time.
         /// </summary>
         public NativeArray<float> DeltaTime;
@@ -216,7 +221,8 @@ namespace Oculus.Movement.AnimationRigging
 
                 var bone = HipsToHeadBones[i];
                 var currentPosition = bone.GetPosition(stream);
-                bone.SetPosition(stream, Vector3.Lerp(currentPosition, currentPosition + offset, weight));
+                var targetPosition = currentPosition + Vector3.Scale(offset, ScaleFactor[0]);
+                bone.SetPosition(stream, Vector3.Lerp(currentPosition, targetPosition, weight));
                 HipsToHeadBones[i] = bone;
             }
         }
@@ -228,7 +234,7 @@ namespace Oculus.Movement.AnimationRigging
                 var startPos = StartBones[i].GetPosition(stream);
                 var endPos = EndBones[i].GetPosition(stream);
                 var data = BoneAnimData[i];
-                var targetPos = startPos + BoneDirections[i] * data.Distance;
+                var targetPos = startPos + Vector3.Scale(BoneDirections[i] * data.Distance, ScaleFactor[0]);
 
                 // Bone positions are invalid on initialization, which would cause
                 // MoveTowards to fail. Initialize to proper values on first frame.
@@ -262,12 +268,12 @@ namespace Oculus.Movement.AnimationRigging
             var rightLowerArmPos = RightLowerArmBone.GetPosition(stream);
             var leftArmOffset = LeftUpperArmBone.GetPosition(stream) - _originalLeftUpperArmPos;
             var rightArmOffset = RightUpperArmBone.GetPosition(stream) - _originalRightUpperArmPos;
-            LeftLowerArmBone.SetPosition(stream,
-                Vector3.Lerp(leftLowerArmPos,
-                    leftLowerArmPos + leftArmOffset * LeftArmOffsetWeight, weight));
-            RightLowerArmBone.SetPosition(stream,
-                Vector3.Lerp(rightLowerArmPos,
-                    rightLowerArmPos + rightArmOffset * RightArmOffsetWeight, weight));
+            var leftLowerArmTargetPos = leftLowerArmPos +
+                                        Vector3.Scale(leftArmOffset * LeftArmOffsetWeight, ScaleFactor[0]);
+            var rightLowerArmTargetPos = rightLowerArmPos +
+                                         Vector3.Scale(rightArmOffset * RightArmOffsetWeight, ScaleFactor[0]);
+            LeftLowerArmBone.SetPosition(stream,Vector3.Lerp(leftLowerArmPos, leftLowerArmTargetPos, weight));
+            RightLowerArmBone.SetPosition(stream,Vector3.Lerp(rightLowerArmPos,rightLowerArmTargetPos, weight));
 
             // Set tracked position for hand bones.
             LeftHandBone.SetPosition(stream, _originalLeftHandPos);
@@ -283,11 +289,14 @@ namespace Oculus.Movement.AnimationRigging
         where T : struct, IAnimationJobData, IDeformationData
     {
         private bool _shouldUpdate;
+        private Transform _animatorTransform;
 
         /// <inheritdoc />
         public override DeformationJob Create(Animator animator, ref T data, Component component)
         {
             var job = new DeformationJob();
+
+            _animatorTransform = animator.transform;
 
             job.LeftUpperArmBone = ReadOnlyTransformHandle.Bind(animator, data.LeftArm.UpperArmBone);
             job.LeftLowerArmBone = ReadWriteTransformHandle.Bind(animator, data.LeftArm.LowerArmBone);
@@ -307,6 +316,8 @@ namespace Oculus.Movement.AnimationRigging
             job.BonePositions = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
             job.BoneAnimData = new NativeArray<DeformationJob.BoneAnimationData>(data.BonePairs.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.ScaleFactor = new NativeArray<Vector3>(1, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
             job.DeltaTime = new NativeArray<float>(1, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
@@ -350,6 +361,8 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.ScaleFactor[0] =
+                DivideVector3(_animatorTransform.lossyScale, data.StartingScale);
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())
@@ -367,7 +380,24 @@ namespace Oculus.Movement.AnimationRigging
             job.HipsToHeadBones.Dispose();
             job.BoneDirections.Dispose();
             job.BonePositions.Dispose();
+            job.ScaleFactor.Dispose();
             job.DeltaTime.Dispose();
+        }
+
+        private Vector3 DivideVector3(Vector3 dividend, Vector3 divisor)
+        {
+            Vector3 targetScale = Vector3.one;
+            if (IsNonZero(divisor))
+            {
+                targetScale = new Vector3(
+                    dividend.x / divisor.x, dividend.y / divisor.y, dividend.z / divisor.z);
+            }
+            return targetScale;
+        }
+
+        private bool IsNonZero(Vector3 v)
+        {
+            return v.x != 0 && v.y != 0 && v.z != 0;
         }
     }
 }

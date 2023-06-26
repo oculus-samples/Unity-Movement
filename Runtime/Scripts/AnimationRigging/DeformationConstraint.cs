@@ -136,6 +136,11 @@ namespace Oculus.Movement.AnimationRigging
         public DeformationData.SpineTranslationCorrectionType SpineCorrectionType { get; }
 
         /// <summary>
+        /// The starting scale of the character, taken from the animator transform.
+        /// </summary>
+        public Vector3 StartingScale { get; }
+
+        /// <summary>
         /// The distance between the hips and head bones.
         /// </summary>
         public float HipsToHeadDistance { get; }
@@ -179,7 +184,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         OVRSkeleton IDeformationData.ConstraintSkeleton => _skeleton;
 
-        // <inheritdoc />
+        /// <inheritdoc />
         OVRCustomSkeleton IDeformationData.ConstraintCustomSkeleton => _customSkeleton;
 
         /// <inheritdoc />
@@ -199,6 +204,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         ArmPosData IDeformationData.RightArm => _rightArmData;
+
+        /// <inheritdoc />
+        Vector3 IDeformationData.StartingScale => _startingScale;
 
         /// <inheritdoc />
         float IDeformationData.HipsToHeadDistance => _hipsToHeadDistance;
@@ -280,6 +288,7 @@ namespace Oculus.Movement.AnimationRigging
         private ArmPosData _rightArmData;
 
         private BonePairData[] _bonePairData;
+        private Vector3 _startingScale;
         private float _hipsToHeadDistance;
 
         private bool _hasInitialized;
@@ -305,6 +314,16 @@ namespace Oculus.Movement.AnimationRigging
             SetupHipsHeadData();
             SetupArmData();
             SetupBonePairs();
+
+            if (_animator != null)
+            {
+                _startingScale = _animator.transform.lossyScale;
+            }
+            else if (_customSkeleton != null)
+            {
+                _startingScale = _customSkeleton.transform.lossyScale;
+            }
+
             _hasInitialized = true;
 
             return true;
@@ -518,6 +537,7 @@ namespace Oculus.Movement.AnimationRigging
             _useMoveTowardsArms = false;
             _correctSpineOnce = false;
             _snapThreshold = 0.1f;
+            _startingScale = Vector3.one;
             _leftArmData = new ArmPosData();
             _rightArmData = new ArmPosData();
             _hasInitialized = false;
