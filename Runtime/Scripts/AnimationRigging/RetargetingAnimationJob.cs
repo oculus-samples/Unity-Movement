@@ -81,6 +81,8 @@ namespace Oculus.Movement.AnimationRigging
                             Vector3.Lerp(originalPosition, finalPosition, weight));
                     }
 
+                    // update handles with binding info
+                    SourceTransforms[i] = sourceTransform;
                     TargetTransforms[i] = targetTransform;
                 }
             }
