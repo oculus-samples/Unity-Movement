@@ -11,7 +11,13 @@ namespace Oculus.Movement.Utils
     [InitializeOnLoad]
     public class ProjectValidation
     {
-        private static readonly string[] _expectedLayers = { "Character", "MirroredCharacter", "HiddenMesh" };
+        /// <summary>
+        /// All character and mirrored character layers should exist based on their indices.
+        /// That is because the scene assets are assigned based on layer index.
+        /// </summary>
+        private static readonly int[] _expectedLayersIndices =
+            { 10, 11 };
+        private static readonly string[] _expectedLayersNotIndexed = { "HiddenMesh" };
 
         static ProjectValidation()
         {
@@ -29,16 +35,23 @@ namespace Oculus.Movement.Utils
         /// <returns>True if all expected layers are in the project.</returns>
         public static bool TestLayers()
         {
-            bool allLayersArePresent = true;
-            foreach (var expectedLayer in _expectedLayers)
+            foreach (var expectedLayer in _expectedLayersNotIndexed)
             {
                 if (LayerMask.NameToLayer(expectedLayer) == -1)
                 {
-                    allLayersArePresent = false;
-                    break;
+                    return false;
                 }
             }
-            return allLayersArePresent;
+
+            foreach (var layerIndex in _expectedLayersIndices)
+            {
+                if (LayerMask.LayerToName(layerIndex) == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static bool ShouldShowWindow()
@@ -79,7 +92,7 @@ namespace Oculus.Movement.Utils
         private void OnGUI()
         {
             bool layersValid = ProjectValidation.TestLayers();
-            GUIStyle labelStyle = new GUIStyle (EditorStyles.label);
+            GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
             labelStyle.richText = true;
             labelStyle.wordWrap = true;
 
@@ -90,7 +103,11 @@ namespace Oculus.Movement.Utils
                 {
                     GUILayout.Label("Layers", EditorStyles.boldLabel);
                     GUILayout.Label(
-                        "For the sample scenes, the following layers must be present in the project: <b>Character (layer index 10), MirroredCharacter (layer index 11), and HiddenMesh</b>. \n\nImport the Layers preset in <b>Edit -> Project Settings -> Tags and Layers</b> by selecting the tiny settings icon located at the top right corner and choosing the <b>Layers</b> preset located in the <b>Samples/Settings</b> folder.",
+                        "For the sample scenes, the following layers must be present in the project: <b>layer index " +
+                        "10, layer index 11, and HiddenMesh</b>. \n\nTo help with this, you may import the Layers " +
+                        "preset by first navigating to layers (<b>Edit -> Project Settings -> Tags and Layers</b>), " +
+                        "then selecting the tiny settings icon located at the top right corner and choosing " +
+                        "the <b>Layers</b> preset located in the <b>Samples/Settings</b> folder.",
                         labelStyle);
                     GUILayout.Space(5);
                 }
