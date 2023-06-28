@@ -576,15 +576,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
-    _skeleton: {fileID: 0}
     _customSkeleton: {fileID: 1024561555539579727}
     _animator: {fileID: 0}
     _spineTranslationCorrectionType: 1
     _correctSpineOnce: 0
     _applyToArms: 1
+    _applyToHands: 0
     _useMoveTowardsArms: 0
     _snapThreshold: 0.1
-    _armWeight: 0.75
+    _armWeight: 0
+    _handWeight: 0
     _armMoveSpeed: 0
 --- !u!1001 &169993673699794201
 PrefabInstance:

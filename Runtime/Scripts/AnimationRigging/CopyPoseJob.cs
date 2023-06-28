@@ -45,11 +45,13 @@ namespace Oculus.Movement.AnimationRigging
             {
                 for (int i = 0; i < Bones.Length; i++)
                 {
-                    if (!Bones[i].IsValid(stream))
+                    var bone = Bones[i];
+                    if (!bone.IsValid(stream))
                     {
                         continue;
                     }
-                    Positions[i] = Bones[i].GetPosition(stream);
+                    Positions[i] = bone.GetPosition(stream);
+                    Bones[i] = bone;
                 }
             }
         }

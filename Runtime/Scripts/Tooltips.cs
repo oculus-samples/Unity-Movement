@@ -928,6 +928,9 @@ namespace Oculus.Movement
         public const string ApplyToArms =
             "Apply deformation on arms.";
 
+        public const string ApplyToHands =
+            "Apply deformation on hands.";
+
         public const string CorrectSpineOnce =
             "Allows the spine correction to run only once, assuming the skeleton's positions don't get updated multiple times.";
 
@@ -939,6 +942,9 @@ namespace Oculus.Movement
 
         public const string ArmWeight =
             "The weight for the deformation on arms.";
+
+        public const string HandWeight =
+            "The weight for the deformation on hands.";
 
         public const string ArmMoveSpeed =
             "The move towards speed for the arms.";
@@ -1241,6 +1247,21 @@ namespace Oculus.Movement
 
         public const string MirroredBonePairs =
             "The array of mirrored bone pairs.";
+    }
+
+    public static class RetargetedBoneTargetsTooltips
+    {
+        public static class RetargetedBoneTargetTooltips
+        {
+            public const string HumanBodyBone =
+                "The human body bone representation of this bone.";
+
+            public const string Target =
+                "The target transform to update with the retargeted bone data.";
+        }
+
+        public const string RetargetedBoneTargets =
+            "The array of retargeted bone targets.";
     }
 
     public static class RetargetingMenuTooltips

@@ -81,7 +81,12 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The weight for the deformation on arms.
         /// </summary>
-        public float Weight;
+        public float ArmWeight;
+
+        /// <summary>
+        /// The weight for the deformation on hands.
+        /// </summary>
+        public float HandWeight;
 
         /// <summary>
         /// The move towards speed for the arms.
@@ -237,6 +242,13 @@ namespace Oculus.Movement.AnimationRigging
         private bool _applyToArms;
 
         /// <summary>
+        /// Apply deformation on hands.
+        /// </summary>
+        [NotKeyable, SerializeField]
+        [Tooltip(DeformationDataTooltips.ApplyToHands)]
+        private bool _applyToHands;
+
+        /// <summary>
         /// If true, the arms will move towards the deformation target position.
         /// </summary>
         [NotKeyable, SerializeField]
@@ -259,6 +271,14 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(DeformationDataTooltips.ArmWeight)]
         [ConditionalHide("_applyToArms", true)]
         private float _armWeight;
+
+        /// <summary>
+        /// The weight for the deformation on hands.
+        /// </summary>
+        [NotKeyable, SerializeField]
+        [Tooltip(DeformationDataTooltips.HandWeight)]
+        [ConditionalHide("_applyToHands", true)]
+        private int _handWeight;
 
         /// <summary>
         /// The move towards speed for the arms.
@@ -390,7 +410,8 @@ namespace Oculus.Movement.AnimationRigging
             // Setup arm data
             _leftArmData = new ArmPosData()
             {
-                Weight = _applyToArms ? _armWeight : 0,
+                ArmWeight = _applyToArms ? _armWeight : 0,
+                HandWeight = _applyToHands ? _handWeight : 0,
                 MoveSpeed = _armMoveSpeed,
                 ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder),
                 UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper),
@@ -399,7 +420,8 @@ namespace Oculus.Movement.AnimationRigging
             };
             _rightArmData = new ArmPosData()
             {
-                Weight = _applyToArms ? _armWeight : 0,
+                ArmWeight = _applyToArms ? _armWeight : 0,
+                HandWeight = _applyToHands ? _handWeight : 0,
                 MoveSpeed = _armMoveSpeed,
                 ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder),
                 UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper),
@@ -428,13 +450,17 @@ namespace Oculus.Movement.AnimationRigging
                 bonePairs.Add(bonePair);
             }
 
+            var chestBone = FindBoneTransform(OVRSkeleton.BoneId.Body_Chest);
+            var chestBonePos = chestBone.position;
+            var leftShoulderBonePos = _leftArmData.ShoulderBone.position;
+            var rightShoulderBonePos = _rightArmData.ShoulderBone.position;
+            var leftUpperArmBonePos = _leftArmData.UpperArmBone.position;
+            var rightUpperArmBonePos = _rightArmData.UpperArmBone.position;
+            var leftLowerArmBonePos = _leftArmData.LowerArmBone.position;
+            var rightLowerArmBonePos = _rightArmData.LowerArmBone.position;
+
             if (_applyToArms)
             {
-                var chestBone = FindBoneTransform(OVRSkeleton.BoneId.Body_Chest);
-                var chestBonePos = chestBone.position;
-                var leftShoulderBonePos = _leftArmData.ShoulderBone.position;
-                var rightShoulderBonePos = _rightArmData.ShoulderBone.position;
-
                 // Chest to shoulder bones.
                 bonePairs.Add(new BonePairData
                 {
@@ -467,7 +493,7 @@ namespace Oculus.Movement.AnimationRigging
                     SnapThreshold = _snapThreshold,
                     MoveTowardsSpeed = _leftArmData.MoveSpeed,
                     Distance = Vector3.Distance(
-                        _leftArmData.UpperArmBone.position,
+                        leftUpperArmBonePos,
                         leftShoulderBonePos),
                     IsMoveTowards = _useMoveTowardsArms
                 });
@@ -478,11 +504,63 @@ namespace Oculus.Movement.AnimationRigging
                     SnapThreshold = _snapThreshold,
                     MoveTowardsSpeed = _rightArmData.MoveSpeed,
                     Distance = Vector3.Distance(
-                        _rightArmData.UpperArmBone.position,
+                        rightUpperArmBonePos,
                         rightShoulderBonePos),
                     IsMoveTowards = _useMoveTowardsArms
                 });
+
+                // Upper arm to lower arm bones.
+                bonePairs.Add(new BonePairData
+                {
+                    StartBone = _leftArmData.UpperArmBone,
+                    EndBone = _leftArmData.LowerArmBone,
+                    SnapThreshold = _snapThreshold,
+                    MoveTowardsSpeed = _leftArmData.MoveSpeed,
+                    Distance = Vector3.Distance(
+                        leftLowerArmBonePos,
+                        leftUpperArmBonePos),
+                    IsMoveTowards = _useMoveTowardsArms
+                });
+                bonePairs.Add(new BonePairData
+                {
+                    StartBone = _rightArmData.UpperArmBone,
+                    EndBone = _rightArmData.LowerArmBone,
+                    SnapThreshold = _snapThreshold,
+                    MoveTowardsSpeed = _rightArmData.MoveSpeed,
+                    Distance = Vector3.Distance(
+                        rightLowerArmBonePos,
+                        rightUpperArmBonePos),
+                    IsMoveTowards = _useMoveTowardsArms
+                });
             }
+
+            if (_applyToHands)
+            {
+                // Lower arm to hand bones.
+                bonePairs.Add(new BonePairData
+                {
+                    StartBone = _leftArmData.LowerArmBone,
+                    EndBone = _leftArmData.HandBone,
+                    SnapThreshold = _snapThreshold,
+                    MoveTowardsSpeed = _leftArmData.MoveSpeed,
+                    Distance = Vector3.Distance(
+                        _leftArmData.HandBone.position,
+                        leftLowerArmBonePos),
+                    IsMoveTowards = _useMoveTowardsArms
+                });
+                bonePairs.Add(new BonePairData
+                {
+                    StartBone = _rightArmData.LowerArmBone,
+                    EndBone = _rightArmData.HandBone,
+                    SnapThreshold = _snapThreshold,
+                    MoveTowardsSpeed = _rightArmData.MoveSpeed,
+                    Distance = Vector3.Distance(
+                        _rightArmData.HandBone.position,
+                        rightLowerArmBonePos),
+                    IsMoveTowards = _useMoveTowardsArms
+                });
+            }
+
             _bonePairData = bonePairs.ToArray();
         }
 
@@ -544,23 +622,6 @@ namespace Oculus.Movement.AnimationRigging
             if (data.Setup())
             {
                 gameObject.SetActive(true);
-            }
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            if (gameObject.activeInHierarchy && !Application.isPlaying)
-            {
-                IDeformationData deformationData = data;
-                // The constraint can be enabled when using an OVRCustomSkeleton or animator,
-                // as the bone references are valid.
-                if (deformationData.ConstraintCustomSkeleton != null || deformationData.ConstraintAnimator != null)
-                {
-                    return;
-                }
-                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready. Otherwise you" +
-                                 $" might get an errors regarding invalid sync variables at runtime.");
             }
         }
     }
