@@ -469,7 +469,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4132890708468496961
 Transform:
   m_ObjectHideFlags: 0
@@ -552,6 +552,10 @@ MonoBehaviour:
     _stepHeightScaleDist: 0.25
     _moveLowerThreshold: 0.3
     _moveHigherThreshold: 0.6
+    _hips: {fileID: 8911903714498386270}
+    _legPosOffset: {x: 0.025498962, y: -0.0052829897, z: -0.0798693}
+    _legRotOffset: {x: -0.05761964, y: 0.070019074, z: -0.024927199, w: 0.99556816}
+    _computedOffsets: 1
 --- !u!1 &4805430602368723742
 GameObject:
   m_ObjectHideFlags: 0
@@ -762,7 +766,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1097201848977875581
 Transform:
   m_ObjectHideFlags: 0
@@ -845,6 +849,10 @@ MonoBehaviour:
     _stepHeightScaleDist: 0.25
     _moveLowerThreshold: 0.3
     _moveHigherThreshold: 0.6
+    _hips: {fileID: 8911903714498386270}
+    _legPosOffset: {x: 0.025498886, y: -0.0052829897, z: 0.079869255}
+    _legRotOffset: {x: -0.07001962, y: -0.0576324, z: 0.9955674, w: 0.024926713}
+    _computedOffsets: 1
 --- !u!1 &5960742439412050645
 GameObject:
   m_ObjectHideFlags: 0
@@ -1527,5 +1535,10 @@ Transform:
 --- !u!4 &8362510363615060496 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 173986280367921454, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8911903714498386270 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 993875434627818080, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
   m_PrefabInstance: {fileID: 8531934559616596798}
   m_PrefabAsset: {fileID: 0}

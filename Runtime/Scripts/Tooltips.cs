@@ -1068,6 +1068,9 @@ namespace Oculus.Movement
         public const string Foot =
             "The foot transform.";
 
+        public const string Hips =
+            "The hips transform.";
+
         public const string FootRotationOffset =
             "The initial rotation offset for the feet.";
 

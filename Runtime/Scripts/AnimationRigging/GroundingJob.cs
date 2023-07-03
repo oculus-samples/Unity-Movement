@@ -102,14 +102,14 @@ namespace Oculus.Movement.AnimationRigging
             if (weight > 0f && DeltaTime[0] > 0f)
             {
                 // Leg position + rotation.
-                var hipsLocalRotation = Hips.GetLocalRotation(stream);
-                var hipsLocalPosition = Hips.GetLocalPosition(stream);
-                Leg.SetLocalPosition(stream,
-                    Vector3.Lerp(hipsLocalPosition,
-                        hipsLocalPosition + hipsLocalRotation * LegPosOffset, weight));
-                Leg.SetLocalRotation(stream,
-                    Quaternion.Slerp(hipsLocalRotation,
-                        hipsLocalRotation * LegRotOffset, weight));
+                var hipsWorldRotation = Hips.GetRotation(stream);
+                var hipsWorldPosition = Hips.GetPosition(stream);
+                Quaternion legRotation = hipsWorldRotation * LegRotOffset;
+                Vector3 legPosition = hipsWorldPosition + hipsWorldRotation * LegPosOffset;
+                Leg.SetRotation(stream,
+                    Quaternion.Slerp(Leg.GetRotation(stream), legRotation, weight));
+                Leg.SetPosition(stream, 
+                    Vector3.Lerp(Leg.GetPosition(stream), legPosition, weight));
 
                 // Foot position.
                 if (IsGrounding[0])
@@ -156,8 +156,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new GroundingJob();
 
-            data.Setup();
-            data.Create();
             data.GenerateThresholdMoveProgress();
             _prevKneePos = data.KneeTarget.position;
 

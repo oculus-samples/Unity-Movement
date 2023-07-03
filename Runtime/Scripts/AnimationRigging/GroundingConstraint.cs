@@ -117,16 +117,6 @@ namespace Oculus.Movement.AnimationRigging
         public void GenerateThresholdMoveProgress();
 
         /// <summary>
-        /// Setup the grounding constraint.
-        /// </summary>
-        public void Setup();
-
-        /// <summary>
-        /// Called on when the animation job is being created.
-        /// </summary>
-        public void Create();
-
-        /// <summary>
         /// Indicates if bone transforms are valid or not.
         /// </summary>
         /// <returns>True if bone transforms are valid, false if not.</returns>
@@ -307,45 +297,61 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(GroundingDataTooltips.MoveHigherThreshold)]
         private float _moveHigherThreshold;
 
-        [SyncSceneToStream]
+        /// <inheritdoc cref="IGroundingData.Hips"/>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(GroundingDataTooltips.Hips)]
         private Transform _hips;
+
         private float _progress;
         private float _thresholdMoveProgress;
+
+        [NotKeyable, SerializeField, HideInInspector]
         private Vector3 _legPosOffset;
+        [NotKeyable, SerializeField, HideInInspector]
         private Quaternion _legRotOffset;
+        [NotKeyable, SerializeField, HideInInspector]
+        private bool _computedOffsets;
+        public bool ComputedOffsets => _computedOffsets;
 
-        private bool _ranSetup;
-
-        /// <inheritdoc cref="IGroundingData.Setup"/>
-        public void Setup()
+        /// <summary>
+        /// Assign the OVR Skeleton component.
+        /// </summary>
+        /// <param name="skeleton">The OVRSkeleton to be assigned.</param>
+        public void AssignOVRSkeleton(OVRCustomSkeleton skeleton)
         {
-            if (_ranSetup)
-            {
-                return;
-            }
+            _skeleton = skeleton;
+        }
 
-            if (_skeleton != null)
+        /// <summary>
+        /// Assign the Animator component.
+        /// </summary>
+        /// <param name="skeleton">The Animator to be assigned.</param>
+        public void AssignAnimator(Animator animator)
+        {
+            _animator = animator;
+        }
+
+        /// <summary>
+        /// Assign the hips transform.
+        /// </summary>
+        /// <param name="skeleton">The hips transform to be assigned.</param>
+        public void AssignHips(Transform hipsTransform)
+        {
+            _hips = hipsTransform;
+        }
+
+        /// <summary>
+        /// Computes offsets necessary for initialization.
+        /// </summary>
+        public void ComputeOffsets()
+        {
+            if (_leg == null)
             {
-                _hips = RiggingUtilities.FindBoneTransformFromCustomSkeleton(_skeleton,
-                    OVRSkeleton.BoneId.Body_Hips);
-            }
-            else
-            {
-                _hips = RiggingUtilities.FindBoneTransformAnimator(_animator,
-                    OVRSkeleton.BoneId.Body_Hips);
+                Debug.LogError("Please assign a leg transform before computing offsets.");
             }
             _legPosOffset = _leg.localPosition;
             _legRotOffset = _leg.localRotation;
-            _ranSetup = true;
-        }
-
-        /// <inheritdoc cref="IGroundingData.Create"/>
-        public void Create()
-        {
-            if (_leg.parent != _hips.parent)
-            {
-                _leg.SetParent(_hips.parent);
-            }
+            _computedOffsets = true;
         }
 
         /// <summary>
@@ -387,6 +393,11 @@ namespace Oculus.Movement.AnimationRigging
                 return false;
             }
 
+            if (!_computedOffsets)
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -399,6 +410,8 @@ namespace Oculus.Movement.AnimationRigging
             _groundLayers = new LayerMask();
             _groundRaycastDist = 10.0f;
             _groundOffset = 0.0f;
+            _hips = null;
+            _leg = null;
             _hipsTarget = null;
             _kneeTarget = null;
             _footTarget = null;
@@ -409,7 +422,7 @@ namespace Oculus.Movement.AnimationRigging
             _stepHeight = 0.0f;
             _stepHeightScaleDist = 0.0f;
             _stepDist = 0.0f;
-            _ranSetup = false;
+            _computedOffsets = false;
         }
 
         /// <inheritdoc />
@@ -432,25 +445,15 @@ namespace Oculus.Movement.AnimationRigging
     {
         private void Start()
         {
-            data.Setup();
-            gameObject.SetActive(true);
+            if (!data.ComputedOffsets)
+            {
+                Debug.LogError("Constraint needs to compute offsets before running!");
+            }
         }
 
         /// <inheritdoc />
         public void RegenerateData()
         {
-            data.Setup();
-            gameObject.SetActive(true);
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            if (gameObject.activeInHierarchy && !Application.isPlaying)
-            {
-                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready. Otherwise you" +
-                    $" might get an errors regarding invalid sync variables at runtime.");
-            }
         }
     }
 }
