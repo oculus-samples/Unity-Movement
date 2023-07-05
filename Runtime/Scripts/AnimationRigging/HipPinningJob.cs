@@ -171,7 +171,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _shouldUpdate = false;
             }
-            job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
             if (!data.ConstraintSkeleton.IsDataValid)

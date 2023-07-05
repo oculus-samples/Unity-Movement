@@ -108,7 +108,7 @@ namespace Oculus.Movement.AnimationRigging
                 Vector3 legPosition = hipsWorldPosition + hipsWorldRotation * LegPosOffset;
                 Leg.SetRotation(stream,
                     Quaternion.Slerp(Leg.GetRotation(stream), legRotation, weight));
-                Leg.SetPosition(stream, 
+                Leg.SetPosition(stream,
                     Vector3.Lerp(Leg.GetPosition(stream), legPosition, weight));
 
                 // Foot position.
@@ -189,7 +189,7 @@ namespace Oculus.Movement.AnimationRigging
             job.MoveProgress[0] = 1.0f;
             job.StepProgress[0] = 1.0f;
             job.TargetFootPos[0] = data.FootTarget.position;
-            job.DeltaTime[0] = Time.deltaTime;
+            job.DeltaTime[0] = Time.unscaledDeltaTime;
             return job;
         }
 
@@ -230,7 +230,7 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())

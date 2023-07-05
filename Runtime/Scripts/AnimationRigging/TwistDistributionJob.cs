@@ -209,7 +209,7 @@ namespace Oculus.Movement.AnimationRigging
             var segmentDirection = (segmentEndPos - segmentStartPos) * 2f;
             job.SegmentDirections[0] = segmentDirection;
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())

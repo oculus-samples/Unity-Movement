@@ -383,7 +383,7 @@ namespace Oculus.Movement.AnimationRigging
             job.LeftHandOffsetWeight = data.LeftArm.HandWeight;
             job.RightHandOffsetWeight = data.RightArm.HandWeight;
             job.HipsToHeadDistance = data.HipsToHeadDistance;
-            job.DeltaTime[0] = Time.deltaTime;
+            job.DeltaTime[0] = Time.unscaledDeltaTime;
 
             return job;
         }
@@ -396,7 +396,7 @@ namespace Oculus.Movement.AnimationRigging
                 _shouldUpdate = true;
             }
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             job.ScaleFactor[0] =
                 DivideVector3(_animatorTransform.lossyScale, data.StartingScale);
             base.Update(job, ref data);
