@@ -201,7 +201,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc cref="_applyAnimationConstraintsToCorrectedPositions"/>
         public bool ApplyAnimationConstraintsToCorrectedPositions
         {
-            get { return _applyAnimationConstraintsToCorrectedPositions;}
+            get { return _applyAnimationConstraintsToCorrectedPositions; }
             set { _applyAnimationConstraintsToCorrectedPositions = value; }
         }
 
@@ -299,17 +299,23 @@ namespace Oculus.Movement.AnimationRigging
         protected override void Awake()
         {
             base.Awake();
-            CreateMaskInstances();
+            if (_positionsToCorrectLateUpdateInstance == null)
+            {
+                CreatePositionsToCorrectLateUpdateMaskInstance();
+            }
+            if (_maskToSetToTPoseInstance == null)
+            {
+                CreateTPoseMaskInstance();
+            }
         }
 
         /// <summary>
-        /// Allows creating instances of masks used in this class at any time.
+        /// Allows creating instance of position correction mask used in this class at any time.
         /// Effectively resets animation masks being used to what the corresponding
-        /// fields <see cref="_positionsToCorrectLateUpdate"/> and
-        /// <see cref="_maskToSetToTPose"/> specify. This is primarily used by
+        /// field <see cref="_positionsToCorrectLateUpdate"/> specify. This is primarily used by
         /// <see cref="RetargetingLayerEditor"/>.
         /// </summary>
-        public void CreateMaskInstances()
+        public void CreatePositionsToCorrectLateUpdateMaskInstance()
         {
             if (_positionsToCorrectLateUpdate != null)
             {
@@ -321,6 +327,16 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _positionsToCorrectLateUpdateInstance = null;
             }
+        }
+
+        /// <summary>
+        /// Allows creating instance of T-Pose mask used in this class at any time.
+        /// Effectively resets animation masks being used to what the corresponding
+        /// field <see cref="_maskToSetToTPose"/> specify. This is primarily used by
+        /// <see cref="RetargetingLayerEditor"/>.
+        /// </summary>
+        public void CreateTPoseMaskInstance()
+        {
             if (_maskToSetToTPose != null)
             {
                 _maskToSetToTPoseInstance = new AvatarMask();
@@ -330,6 +346,19 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _maskToSetToTPoseInstance = null;
             }
+        }
+
+        /// <summary>
+        /// Allows creating instances of masks used in this class at any time.
+        /// Effectively resets animation masks being used to what the corresponding
+        /// fields <see cref="_positionsToCorrectLateUpdate"/> and
+        /// <see cref="_maskToSetToTPose"/> specify. This is primarily used by
+        /// <see cref="RetargetingLayerEditor"/>.
+        /// </summary>
+        public void CreateMaskInstances()
+        {
+            CreatePositionsToCorrectLateUpdateMaskInstance();
+            CreateTPoseMaskInstance();
         }
 
         /// <summary>

@@ -32,11 +32,16 @@ namespace Oculus.Movement.AnimationRigging
 
             serializedObject.Update();
 
-            if ((Application.isEditor && Application.isPlaying) &&
-                (_tPoseMask.objectReferenceValue != previousTPoseValue ||
-                _positionCorrectMask.objectReferenceValue != previousPositionsCorrectValue))
+            if (Application.isEditor && Application.isPlaying)
             {
-                retargetingLayer.CreateMaskInstances();
+                if (_tPoseMask.objectReferenceValue != previousTPoseValue)
+                {
+                    retargetingLayer.CreatePositionsToCorrectLateUpdateMaskInstance();
+                }
+                if (_positionCorrectMask.objectReferenceValue != previousPositionsCorrectValue)
+                {
+                    retargetingLayer.CreateTPoseMaskInstance();
+                }
             }
 
             serializedObject.ApplyModifiedProperties();

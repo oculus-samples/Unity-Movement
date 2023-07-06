@@ -54,8 +54,11 @@ namespace Oculus.Movement.Utils
 
             // Add the retargeting and body tracking components at root first.
             RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent, disableAvatar);
-            retargetingLayer.PositionsToCorrectLateUpdateComp = lateUpdateMask;
-            retargetingLayer.MaskToSetToTPoseComp = tPoseMask;
+            retargetingLayer.PositionsToCorrectLateUpdateComp = new AvatarMask();
+            retargetingLayer.PositionsToCorrectLateUpdateComp.CopyOtherMaskBodyActiveValues(
+                lateUpdateMask);
+            retargetingLayer.MaskToSetToTPoseComp = new AvatarMask();
+            retargetingLayer.MaskToSetToTPoseComp.CopyOtherMaskBodyActiveValues(tPoseMask);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
