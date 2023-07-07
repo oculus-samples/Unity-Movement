@@ -637,6 +637,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 0
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: -0.8500198, y: 0.020306736, z: -0.5263601}
+    - {x: -0.8500198, y: 0.020306736, z: -0.5263601}
+    - {x: -0.8500198, y: 0.020306736, z: -0.5263601}
+    _twistNodeSpacings:
+    - 0
+    - 0.34631848
+    - 0.6926367
 --- !u!1 &4994664485943194642
 GameObject:
   m_ObjectHideFlags: 0
@@ -1115,6 +1123,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 1
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: -0.8500448, y: 0.020295262, z: -0.52631927}
+    - {x: -0.8500448, y: 0.020295262, z: -0.52631927}
+    - {x: -0.8500448, y: 0.020295262, z: -0.52631927}
+    _twistNodeSpacings:
+    - 0
+    - 0.34631228
+    - 0.6926246
 --- !u!1 &6629226668042296422
 GameObject:
   m_ObjectHideFlags: 0
@@ -1196,6 +1212,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 1
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: 0.00000004065537, y: -1.0000001, z: 0.00000011920929}
+    - {x: 0.00000004065537, y: -1.0000001, z: 0.00000011920929}
+    - {x: 0.00000004065537, y: -1.0000001, z: 0.00000011920929}
+    _twistNodeSpacings:
+    - 0.3902205
+    - 0.7023965
+    - 0.9999959
 --- !u!1 &7127696881513123657
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,6 +1301,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 0
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: 0.00000003299839, y: -1.0000007, z: 0.00000011920929}
+    - {x: 0.00000003299839, y: -1.0000007, z: 0.00000011920929}
+    - {x: 0.00000003299839, y: -1.0000007, z: 0.00000011920929}
+    _twistNodeSpacings:
+    - 0.3902133
+    - 0.7023841
+    - 0.999989
 --- !u!1 &7591702345266992917
 GameObject:
   m_ObjectHideFlags: 0

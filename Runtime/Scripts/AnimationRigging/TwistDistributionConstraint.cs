@@ -12,11 +12,6 @@ namespace Oculus.Movement.AnimationRigging
     public interface ITwistDistributionData
     {
         /// <summary>
-        /// Sets up data for job.
-        /// </summary>
-        public void Setup();
-
-        /// <summary>
         /// The OVR Skeleton component for the character.
         /// </summary>
         public OVRCustomSkeleton ConstraintSkeleton { get; }
@@ -188,30 +183,11 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(TwistDistributionDataTooltips.InvertUpAxis)]
         private bool _invertUpAxis;
 
+        [NotKeyable, SerializeField, HideInInspector]
         private Vector3[] _twistNodeUps;
+
+        [NotKeyable, SerializeField, HideInInspector]
         private float[] _twistNodeSpacings;
-
-        private bool _ranSetup;
-
-        /// <inheritdoc cref="ITwistDistributionData.Setup"/>
-        public void Setup()
-        {
-            if (_ranSetup)
-            {
-                return;
-            }
-            _twistNodeUps = new Vector3[_twistNodes.Count];
-            _twistNodeSpacings = new float[_twistNodes.Count];
-            Vector3 upAxis = Convert(_twistUpAxis, _invertUpAxis);
-            for (int i = 0; i < _twistNodeUps.Length; i++)
-            {
-                var sourceTransform = _twistNodes[i].transform;
-                _twistNodeUps[i] = _segmentUp.InverseTransformVector(sourceTransform.TransformVector(upAxis));
-                _twistNodeSpacings[i] = 1f - (_segmentEnd.position - sourceTransform.position).magnitude /
-                                             (_segmentEnd.position - _segmentStart.position).magnitude;
-            }
-            _ranSetup = true;
-        }
 
         /// <summary>
         /// Assign the OVR Skeleton component.
@@ -234,13 +210,30 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Assign twist nodes.
         /// </summary>
-        /// <param name="twistNodes"></param>
+        /// <param name="twistNodes">Twist node transforms.</param>
         public void AssignTwistNodes(Transform[] twistNodes)
         {
             _twistNodes.Clear();
             foreach (var twistNode in twistNodes)
             {
                 _twistNodes.Add(new WeightedTransform(twistNode, 1.0f));
+            }
+        }
+
+        /// <summary>
+        /// Computes twist node data required for constraint to work.
+        /// </summary>
+        public void ComputeTwistNodeData()
+        {
+            _twistNodeUps = new Vector3[_twistNodes.Count];
+            _twistNodeSpacings = new float[_twistNodes.Count];
+            Vector3 upAxis = Convert(_twistUpAxis, _invertUpAxis);
+            for (int i = 0; i < _twistNodeUps.Length; i++)
+            {
+                var sourceTransform = _twistNodes[i].transform;
+                _twistNodeUps[i] = _segmentUp.InverseTransformVector(sourceTransform.TransformVector(upAxis));
+                _twistNodeSpacings[i] = 1f - (_segmentEnd.position - sourceTransform.position).magnitude /
+                                             (_segmentEnd.position - _segmentStart.position).magnitude;
             }
         }
 
@@ -284,11 +277,20 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (_skeleton == null && _animator == null)
             {
+                Debug.LogError("Skeleton or animator not set up.");
                 return false;
             }
 
             if (_segmentStart == null || _segmentEnd == null)
             {
+                Debug.LogError("Segments not set up.");
+                return false;
+            }
+
+            if (_twistNodeSpacings == null || _twistNodeUps == null ||
+                _twistNodeSpacings.Length == 0 || _twistNodeUps.Length == 0)
+            {
+                Debug.LogError("Twist node data arrays not set up.");
                 return false;
             }
 
@@ -296,9 +298,18 @@ namespace Oculus.Movement.AnimationRigging
             {
                 if (_twistNodes[i].transform == null)
                 {
+                    Debug.LogError("Twist node transform reference is null.");
                     return false;
                 }
             }
+
+            if (_twistNodeSpacings.Length != _twistNodes.Count ||
+                _twistNodeSpacings.Length != _twistNodes.Count)
+            {
+                Debug.LogError("Twist node data arrays do not match the length of twist node array.");
+                return false;
+            }
+
             return true;
         }
 
@@ -311,7 +322,8 @@ namespace Oculus.Movement.AnimationRigging
             _twistForwardAxis = Axis.Z;
             _twistUpAxis = Axis.Y;
             _twistNodes.Clear();
-            _ranSetup = false;
+            _twistNodeUps = null;
+            _twistNodeSpacings = null;
         }
     }
 
@@ -327,11 +339,6 @@ namespace Oculus.Movement.AnimationRigging
         TwistDistributionJobBinder<TwistDistributionData>>,
         IOVRSkeletonConstraint
     {
-        private void Start()
-        {
-            data.Setup();
-        }
-
         /// <inheritdoc />
         public void RegenerateData()
         {

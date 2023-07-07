@@ -145,7 +145,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new TwistDistributionJob();
 
-            data.Setup();
             var twistNodes = data.TwistNodes;
             WeightedTransformArrayBinder.BindReadWriteTransforms(animator, component, twistNodes, out job.TwistTransforms);
             WeightedTransformArrayBinder.BindWeights(animator, component, twistNodes, data.TwistNodesProperty, out job.TwistWeights);
