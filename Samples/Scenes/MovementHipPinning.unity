@@ -847,6 +847,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1344247002}
     m_Modifications:
+    - target: {fileID: 108281309112446358, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 747047141393442697, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
       propertyPath: m_Data.m_Target
       value: 
@@ -903,6 +907,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1700615025576171956, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1741218239049055554, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
       propertyPath: m_Name
       value: HighFidelityHipPinningFirstPerson
@@ -930,6 +938,10 @@ PrefabInstance:
     - target: {fileID: 4358668238228419541, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5157524381134081549, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6174854157505779820, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2899,6 +2911,14 @@ PrefabInstance:
       propertyPath: _mirroredBonePairs.Array.data[51].OriginalBone
       value: 
       objectReference: {fileID: 804730351}
+    - target: {fileID: -117247804865975333, guid: aa6451b2c95f5584fa019e1eb42e1536, type: 3}
+      propertyPath: _mirroredBonePairs.Array.data[6].ShouldBeReparented
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -117247804865975333, guid: aa6451b2c95f5584fa019e1eb42e1536, type: 3}
+      propertyPath: _mirroredBonePairs.Array.data[13].ShouldBeReparented
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3916216772104349855, guid: aa6451b2c95f5584fa019e1eb42e1536, type: 3}
       propertyPath: m_Name
       value: HighFidelityHipPinningMirrored

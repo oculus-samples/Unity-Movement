@@ -106,15 +106,18 @@ namespace Oculus.Movement.AnimationRigging
                     ReadWriteTransformHandle twistTransform = TwistTransforms[i];
 
                     // Apply spacing
-                    twistTransform.SetPosition(stream, SpacingPositions[i]);
+                    twistTransform.SetPosition(stream,
+                        Vector3.Lerp(twistTransform.GetPosition(stream), SpacingPositions[i], weight));
 
                     // Apply twist
-                    Quaternion twistRotation = Quaternion.LookRotation(SegmentDirections[0],SegmentUpAxis[i]);
+                    Quaternion twistRotation = Quaternion.LookRotation(SegmentDirections[0], SegmentUpAxis[i]);
                     Quaternion targetRotation = Quaternion.Slerp(
                         parentRotation * TwistBindRotations[i],
                         twistRotation * TwistAxisOffset,
                         WeightBuffer[i] * weight);
-                    twistTransform.SetLocalRotation(stream, inverseParentRotation * targetRotation);
+                    twistTransform.SetLocalRotation(stream,
+                        Quaternion.Slerp(twistTransform.GetLocalRotation(stream),
+                            inverseParentRotation * targetRotation, weight));
                     TwistTransforms[i] = twistTransform;
                 }
             }
@@ -142,6 +145,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new TwistDistributionJob();
 
+            data.Setup();
             var twistNodes = data.TwistNodes;
             WeightedTransformArrayBinder.BindReadWriteTransforms(animator, component, twistNodes, out job.TwistTransforms);
             WeightedTransformArrayBinder.BindWeights(animator, component, twistNodes, data.TwistNodesProperty, out job.TwistWeights);
@@ -184,7 +188,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="data"></param>
         public override void Update(TwistDistributionJob job, ref T data)
         {
-            if (data.ConstraintSkeleton.IsDataValid)
+            if (data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = true;
             }
@@ -205,10 +209,10 @@ namespace Oculus.Movement.AnimationRigging
             var segmentDirection = (segmentEndPos - segmentStartPos) * 2f;
             job.SegmentDirections[0] = segmentDirection;
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
-            if (!data.ConstraintSkeleton.IsDataValid)
+            if (!data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = false;
             }

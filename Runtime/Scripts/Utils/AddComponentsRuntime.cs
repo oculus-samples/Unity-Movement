@@ -28,8 +28,15 @@ namespace Oculus.Movement.Utils
         /// </summary>
         /// <param name="selectedGameObject">GameObject to add animation rigging + retargeting too.</param>
         /// <param name="disableAvatar">Disable avatar upon initialization.</param>
-        public static void SetupCharacterForAnimationRiggingRetargeting(GameObject selectedGameObject,
-            bool disableAvatar)
+        /// <param name="lateUpdateMask">Late update mask, intended for
+        /// <see cref="RetargetingLayer"/> component created.</param>
+        /// <param name="tPoseMask">T-pose mask, intended for
+        /// <see cref="RetargetingLayer"/> component created.</param>
+        public static void SetupCharacterForAnimationRiggingRetargeting(
+            GameObject selectedGameObject,
+            bool disableAvatar,
+            AvatarMask lateUpdateMask = null,
+            AvatarMask tPoseMask = null)
         {
             try
             {
@@ -47,6 +54,11 @@ namespace Oculus.Movement.Utils
 
             // Add the retargeting and body tracking components at root first.
             RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent, disableAvatar);
+            retargetingLayer.PositionsToCorrectLateUpdateComp = new AvatarMask();
+            retargetingLayer.PositionsToCorrectLateUpdateComp.CopyOtherMaskBodyActiveValues(
+                lateUpdateMask);
+            retargetingLayer.MaskToSetToTPoseComp = new AvatarMask();
+            retargetingLayer.MaskToSetToTPoseComp.CopyOtherMaskBodyActiveValues(tPoseMask);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
@@ -98,8 +110,6 @@ namespace Oculus.Movement.Utils
                 {
                     new RigLayer(rigComponent, true)
                 };
-                // disabled until it needs to be used
-                rigBuilder.enabled = false;
             }
 
             rigComponent.transform.SetParent(mainParent.transform, true);
@@ -129,6 +139,9 @@ namespace Oculus.Movement.Utils
                 retargetConstraint.transform.localPosition = Vector3.zero;
                 retargetConstraint.transform.localRotation = Quaternion.identity;
                 retargetConstraint.transform.localScale = Vector3.one;
+
+                // keep retargeter disabled until it initializes properly
+                retargetConstraint.gameObject.SetActive(false);
             }
             return retargetConstraint;
         }
@@ -153,8 +166,6 @@ namespace Oculus.Movement.Utils
                 rigSetup.AddSkeletalConstraint(constraintComponent);
             }
 
-            // disabled until skeleton is initialized
-            animatorComponent.enabled = false;
             rigSetup.RebindAnimator = true;
             rigSetup.ReEnableRig = true;
             rigSetup.RetargetingLayerComp = retargetingLayer;

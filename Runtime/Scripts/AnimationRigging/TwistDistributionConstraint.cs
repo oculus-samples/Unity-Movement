@@ -12,9 +12,20 @@ namespace Oculus.Movement.AnimationRigging
     public interface ITwistDistributionData
     {
         /// <summary>
+        /// Sets up data for job.
+        /// </summary>
+        public void Setup();
+
+        /// <summary>
         /// The OVR Skeleton component for the character.
         /// </summary>
         public OVRCustomSkeleton ConstraintSkeleton { get; }
+
+        /// <summary>
+        /// The Animator component for the character.
+        /// </summary>
+
+        public Animator ConstraintAnimator { get; }
 
         /// <summary>
         /// The start transform on the opposite side of the twist source (like an elbow).
@@ -60,6 +71,12 @@ namespace Oculus.Movement.AnimationRigging
         /// The name of the twist nodes weighted transform array property.
         /// </summary>
         public string TwistNodesProperty { get; }
+
+        /// <summary>
+        /// Indicates if bone transforms are valid or not.
+        /// </summary>
+        /// <returns>True if bone transforms are valid, false if not.</returns>
+        public bool IsBoneTransformsDataValid();
     }
 
     /// <summary>
@@ -85,6 +102,9 @@ namespace Oculus.Movement.AnimationRigging
         // Interface implementation
         /// <inheritdoc />
         OVRCustomSkeleton ITwistDistributionData.ConstraintSkeleton => _skeleton;
+
+        /// <inheritdoc />
+        Animator ITwistDistributionData.ConstraintAnimator => _animator;
 
         /// <inheritdoc />
         Transform ITwistDistributionData.SegmentStart => _segmentStart;
@@ -118,6 +138,11 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         [Tooltip(TwistDistributionDataTooltips.Skeleton)]
         private OVRCustomSkeleton _skeleton;
+
+        /// <inheritdoc cref="ITwistDistributionData.ConstraintAnimator"/>
+        [NotKeyable, SerializeField]
+        [Tooltip(TwistDistributionDataTooltips.Animator)]
+        private Animator _animator;
 
         /// <inheritdoc cref="ITwistDistributionData.SegmentStart"/>
         [SyncSceneToStream, SerializeField]
@@ -166,11 +191,15 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3[] _twistNodeUps;
         private float[] _twistNodeSpacings;
 
-        /// <summary>
-        /// Caches specific transformation information before OVRSkeleton runs.
-        /// </summary>
+        private bool _ranSetup;
+
+        /// <inheritdoc cref="ITwistDistributionData.Setup"/>
         public void Setup()
         {
+            if (_ranSetup)
+            {
+                return;
+            }
             _twistNodeUps = new Vector3[_twistNodes.Count];
             _twistNodeSpacings = new float[_twistNodes.Count];
             Vector3 upAxis = Convert(_twistUpAxis, _invertUpAxis);
@@ -181,15 +210,25 @@ namespace Oculus.Movement.AnimationRigging
                 _twistNodeSpacings[i] = 1f - (_segmentEnd.position - sourceTransform.position).magnitude /
                                              (_segmentEnd.position - _segmentStart.position).magnitude;
             }
+            _ranSetup = true;
         }
 
         /// <summary>
-        /// Assign the OVR Skeleton.
+        /// Assign the OVR Skeleton component.
         /// </summary>
-        /// <param name="skeleton">The OVRSkeleton</param>
+        /// <param name="skeleton">The OVRSkeleton to be assigned.</param>
         public void AssignOVRSkeleton(OVRCustomSkeleton skeleton)
         {
             _skeleton = skeleton;
+        }
+
+        /// <summary>
+        /// Assign the Animator component.
+        /// </summary>
+        /// <param name="skeleton">The Animator to be assigned.</param>
+        public void AssignAnimator(Animator animator)
+        {
+            _animator = animator;
         }
 
         /// <summary>
@@ -234,9 +273,16 @@ namespace Oculus.Movement.AnimationRigging
             return sign * Vector3.forward;
         }
 
+        /// <inheritdoc />
+        public bool IsBoneTransformsDataValid()
+        {
+            return (_skeleton != null && _skeleton.IsDataValid) ||
+                (_animator != null);
+        }
+
         bool IAnimationJobData.IsValid()
         {
-            if (_skeleton == null)
+            if (_skeleton == null && _animator == null)
             {
                 return false;
             }
@@ -258,19 +304,24 @@ namespace Oculus.Movement.AnimationRigging
 
         void IAnimationJobData.SetDefaultValues()
         {
+            _skeleton = null;
+            _animator = null;
             _segmentStart = null;
             _segmentEnd = null;
             _twistForwardAxis = Axis.Z;
             _twistUpAxis = Axis.Y;
             _twistNodes.Clear();
+            _ranSetup = false;
         }
     }
 
     /// <summary>
-    /// Twist Distribution constraint.
+    /// Twist Distribution constraint. This should be enabled to
+    /// begin with, so that it can compute metadata before the
+    /// character can begin animating.
     /// </summary>
     [DisallowMultipleComponent]
-    public class TwistDistributionConstraint :  RigConstraint<
+    public class TwistDistributionConstraint : RigConstraint<
         TwistDistributionJob,
         TwistDistributionData,
         TwistDistributionJobBinder<TwistDistributionData>>,

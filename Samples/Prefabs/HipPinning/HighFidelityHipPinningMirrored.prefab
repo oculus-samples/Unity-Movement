@@ -729,7 +729,7 @@ MonoBehaviour:
     OriginalBone: {fileID: 0}
     MirroredBone: {fileID: 6753656548266053141}
   - Name: RightLegUpper
-    ShouldBeReparented: 1
+    ShouldBeReparented: 0
     OriginalBone: {fileID: 0}
     MirroredBone: {fileID: 1066544652558430818}
   - Name: LeftLegLowerHelper
@@ -757,7 +757,7 @@ MonoBehaviour:
     OriginalBone: {fileID: 0}
     MirroredBone: {fileID: 8900622258005689547}
   - Name: LeftLegUpper
-    ShouldBeReparented: 1
+    ShouldBeReparented: 0
     OriginalBone: {fileID: 0}
     MirroredBone: {fileID: 4728744686802592903}
   - Name: RightArmUpperTwist3

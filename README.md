@@ -30,7 +30,7 @@ If the new scene or an existing scene doesn’t have a GameObject with the OVRCa
 6. Under OVRManager's "Permission Requests On Startup" section, enable  Body, Face and Eye Tracking.
 7. Ensure that OVRManager's "Tracking Origin Type" is set to "Floor Level".
 
-The Character (layer index 10), the MirroredCharacter (layer index 11), and HiddenMesh layers must be present in the project for RecalculateNormals to work correctly.
+Layer index 10, layer index 11, and the HiddenMesh layer must be present in the project for RecalculateNormals to work correctly.
 
 ## Rendering Quality
 Navigate to your Project Settings (Edit->Project Settings...) and click on

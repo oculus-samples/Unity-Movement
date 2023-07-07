@@ -28,8 +28,6 @@ namespace Oculus.Movement.Utils
             "Face Tracking/";
         private const string _CORRECTIVES_FACE_MENU =
             "Correctives Face";
-        private const string _CORRECTIVES_FACE_DUPLICATE_MENU =
-            "Correctives Face (allow duplicate mapping)";
 
         [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU)]
         private static void SetupCharacterForAnimationRiggingRetargeting()
@@ -122,8 +120,6 @@ namespace Oculus.Movement.Utils
                 {
                     new RigLayer(rigComponent, true)
                 };
-                // disabled until it needs to be used
-                rigBuilder.enabled = false;
                 Undo.RegisterCreatedObjectUndo(rigBuilder, "Create RigBuilder");
             }
 
@@ -155,6 +151,9 @@ namespace Oculus.Movement.Utils
                 retargetConstraint.transform.localPosition = Vector3.zero;
                 retargetConstraint.transform.localRotation = Quaternion.identity;
                 retargetConstraint.transform.localScale = Vector3.one;
+
+                // keep retargeter disabled until it initializes properly
+                retargetConstraint.gameObject.SetActive(false);
             }
             return retargetConstraint;
         }
@@ -172,8 +171,6 @@ namespace Oculus.Movement.Utils
             rigSetup = mainParent.AddComponent<AnimationRigSetup>();
             rigSetup.Skeleton = skeletalComponent;
             var animatorComponent = mainParent.GetComponent<Animator>();
-            // disabled until skeleton is initialized
-            animatorComponent.enabled = false;
             rigSetup.AnimatorComp = animatorComponent;
             rigSetup.RigbuilderComp = rigBuilder;
             if (constraintComponent != null)
@@ -234,12 +231,12 @@ namespace Oculus.Movement.Utils
                 Undo.RecordObject(face, "Assign to BlendshapeModifier field");
             }
 
-            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correcives blendshapes");
+            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correctives blendshapes");
             face.AutoMapBlendshapes();
             EditorUtility.SetDirty(face);
             EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
 
-            Undo.SetCurrentGroupName($"Setup Character for CorrecivesFace Tracking");
+            Undo.SetCurrentGroupName($"Setup Character for Correctives Tracking");
         }
     }
 }

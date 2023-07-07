@@ -1,7 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -14,6 +13,12 @@ namespace Oculus.Movement.AnimationRigging
     /// </summary>
     public interface IRetargetingData
     {
+        /// <summary>
+        /// Used to create job information in case it becomes
+        /// allocated before the constraint has a chance to run.
+        /// </summary>
+        public Transform DummyTransform { get; }
+
         /// <summary>
         /// Source transforms used for retargeting.
         /// </summary>
@@ -31,6 +36,12 @@ namespace Oculus.Movement.AnimationRigging
         public bool[] ShouldUpdatePosition { get; }
 
         /// <summary>
+        /// Indicates if target transform's rotation should be updated.
+        /// Once a rotation is updated, the original rotation will be lost.
+        /// </summary>
+        public bool[] ShouldUpdateRotation { get; }
+
+        /// <summary>
         /// Rotation offset to be applied during retargeting.
         /// </summary>
         public Quaternion[] RotationOffsets { get; }
@@ -44,6 +55,12 @@ namespace Oculus.Movement.AnimationRigging
         /// Allows updating any dynamic data at runtime.
         /// </summary>
         public void UpdateDynamicMetadata();
+
+        /// <summary>
+        /// Indicates if data has initialized or not.
+        /// </summary>
+        /// <returns>True if data has initialized, false if not.</returns>
+        public bool HasDataInitialized();
     }
 
     /// <summary>
@@ -60,6 +77,9 @@ namespace Oculus.Movement.AnimationRigging
 
         // Interface implementation
         /// <inheritdoc />
+        public Transform DummyTransform => _retargetingLayer.transform;
+
+        /// <inheritdoc />
         Transform[] IRetargetingData.SourceTransforms => _sourceTransforms;
 
         /// <inheritdoc />
@@ -67,6 +87,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         bool[] IRetargetingData.ShouldUpdatePosition => _shouldUpdatePositions;
+
+        /// <inheritdoc />
+        bool[] IRetargetingData.ShouldUpdateRotation => _shouldUpdateRotations;
 
         /// <inheritdoc />
         Quaternion[] IRetargetingData.RotationOffsets => _rotationOffsets;
@@ -110,6 +133,20 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(RetargetingConstraintDataTooltips.AvatarMask)]
         private AvatarMask _avatarMask;
 
+        /// <summary>
+        /// Don't allow changing the original field directly, as that
+        /// has a side-effect of modifying the original mask object.
+        /// </summary>
+        private AvatarMask _avatarMaskInst;
+        /// <summary>
+        /// AvatarMask instance accessor.
+        /// </summary>
+        public AvatarMask AvatarMaskComp
+        {
+            get => _avatarMaskInst;
+            set => _avatarMaskInst = value;
+        }
+
         /// <inheritdoc cref="IRetargetingData.SourceTransforms"/>
         [SyncSceneToStream]
         [Tooltip(RetargetingConstraintDataTooltips.SourceTransforms)]
@@ -125,6 +162,11 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(RetargetingConstraintDataTooltips.ShouldUpdatePositions)]
         private bool[] _shouldUpdatePositions;
 
+        /// <inheritdoc cref="IRetargetingData.ShouldUpdateRotation"/>
+        [NotKeyable]
+        [Tooltip(RetargetingConstraintDataTooltips.ShouldUpdateRotations)]
+        private bool[] _shouldUpdateRotations;
+
         /// <inheritdoc cref="IRetargetingData.RotationOffsets"/>
         [NotKeyable]
         [Tooltip(RetargetingConstraintDataTooltips.RotationOffsets)]
@@ -134,6 +176,14 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable]
         [Tooltip(RetargetingConstraintDataTooltips.RotationAdjustments)]
         private Quaternion[] _rotationAdjustments;
+
+        private bool _hasInitialized;
+
+        /// <inheritdoc />
+        public bool HasDataInitialized()
+        {
+            return _hasInitialized;
+        }
 
         /// <inheritdoc />
         public bool IsValid()
@@ -147,18 +197,31 @@ namespace Oculus.Movement.AnimationRigging
             _retargetingLayer = null;
             _allowDynamicAdjustmentsRuntime = true;
             _avatarMask = new AvatarMask();
-            foreach (AvatarMaskBodyPart part in (AvatarMaskBodyPart[])Enum.GetValues(typeof(AvatarMaskBodyPart)))
+            _avatarMask.InitializeDefaultValues(true);
+
+        }
+
+        /// <summary>
+        /// Initializes mask instances based on what value is set
+        /// in the corresponding fields.
+        /// </summary>
+        public void CreateAvatarMaskInstances()
+        {
+            if (_avatarMask != null)
             {
-                if (part == AvatarMaskBodyPart.LastBodyPart)
-                {
-                    continue;
-                }
-                _avatarMask.SetHumanoidBodyPartActive(part, true);
+                _avatarMaskInst = new AvatarMask();
+                _avatarMaskInst.CopyOtherMaskBodyActiveValues(
+                    _avatarMask);
+            }
+            else
+            {
+                _avatarMaskInst = null;
             }
         }
 
         /// <summary>
-        /// Set up all job data.
+        /// Set up all job data. Even if the skeleton has been initialized, dummy data is used
+        /// as a fallback.
         /// </summary>
         /// <param name="dummySourceObject">Fallback source object if skeleton is not ready.</param>
         /// <param name="dummyTargetObject">Fallback target object if skeleton is not ready.</param>
@@ -166,6 +229,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             BuildArraysForJob(dummySourceObject, dummyTargetObject);
             UpdateDataArraysWithAdjustments();
+            _hasInitialized = true;
         }
 
         /// <summary>
@@ -178,6 +242,7 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             UpdateDataArraysWithAdjustments();
+            UpdateRetargetingLateUpdateMasks();
         }
 
         private void BuildArraysForJob(GameObject dummySourceObject, GameObject dummyTargetObject)
@@ -194,18 +259,20 @@ namespace Oculus.Movement.AnimationRigging
             List<Transform> targetTransforms = new List<Transform>();
 
             List<bool> shouldUpdatePositions = new List<bool>();
+            List<bool> shouldUpdateRotations = new List<bool>();
             List<Quaternion> rotationOffsets = new List<Quaternion>();
 
             List<Quaternion> rotationAdjustments = new List<Quaternion>();
 
             _retargetingLayer.FillTransformArrays(
                 sourceTransforms, targetTransforms,
-                shouldUpdatePositions, rotationOffsets,
-                rotationAdjustments, _avatarMask);
+                shouldUpdatePositions, shouldUpdateRotations,
+                rotationOffsets, rotationAdjustments);
 
             _sourceTransforms = sourceTransforms.ToArray();
             _targetTransforms = targetTransforms.ToArray();
             _shouldUpdatePositions = shouldUpdatePositions.ToArray();
+            _shouldUpdateRotations = shouldUpdateRotations.ToArray();
             _rotationOffsets = rotationOffsets.ToArray();
             _rotationAdjustments = rotationAdjustments.ToArray();
 
@@ -230,8 +297,18 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             _retargetingLayer.UpdateAdjustments(_rotationOffsets,
-                _shouldUpdatePositions, _rotationAdjustments,
-                _avatarMask);
+                _shouldUpdatePositions, _shouldUpdateRotations,
+                _rotationAdjustments, _avatarMaskInst);
+        }
+
+        /// <summary>
+        /// Any LateUpdate masks that the RetargetingLayer uses should be
+        /// kept up-to-date.
+        /// </summary>
+        private void UpdateRetargetingLateUpdateMasks()
+        {
+            _retargetingLayer.CustomPositionsToCorrectLateUpdateMask =
+                _avatarMaskInst;
         }
 
         private bool IsSourceSkeletonNotInitialized()
@@ -254,15 +331,18 @@ namespace Oculus.Movement.AnimationRigging
             _targetTransforms = new Transform[1];
             _targetTransforms[0] = dummyTargetObject.transform;
             _shouldUpdatePositions = new bool[1];
+            _shouldUpdateRotations = new bool[1];
             _rotationOffsets = new Quaternion[1];
             _rotationOffsets[0] = Quaternion.identity;
             _rotationAdjustments = new Quaternion[1];
             _rotationAdjustments[0] = Quaternion.identity;
+            _hasInitialized = false;
         }
     }
 
     /// <summary>
-    /// Retargeting constraint.
+    /// Retargeting constraint. Keep game object disabled until
+    /// RegenerateData is called.
     /// </summary>
     [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Retargeting Constraint")]
     public class RetargetingAnimationConstraint : RigConstraint<
@@ -284,12 +364,9 @@ namespace Oculus.Movement.AnimationRigging
 
         private void Awake()
         {
-            _dummySource = new GameObject("Retargeting Constraint Dummy Source");
-            _dummyTarget = new GameObject("Retargeting Constraint Dummy Target");
-            _dummySource.transform.SetParent(this.transform);
-            _dummyTarget.transform.SetParent(this.transform);
-
+            CreateDummyGameObjects();
             data.SetUp(_dummySource, _dummyTarget);
+            data.CreateAvatarMaskInstances();
         }
 
         private void Update()
@@ -300,8 +377,31 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void RegenerateData()
         {
+            CreateDummyGameObjects();
             data.SetUp(_dummySource, _dummyTarget);
+            gameObject.SetActive(true);
             Debug.LogWarning("Generated new constraint data.");
+        }
+
+        private void CreateDummyGameObjects()
+        {
+            if (_dummySource != null && _dummyTarget != null)
+            {
+                return;
+            }
+            _dummySource = new GameObject("Retargeting Constraint Dummy Source");
+            _dummyTarget = new GameObject("Retargeting Constraint Dummy Target");
+            _dummySource.transform.SetParent(this.transform);
+            _dummyTarget.transform.SetParent(this.transform);
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            if (gameObject.activeInHierarchy && !Application.isPlaying)
+            {
+                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready.");
+            }
         }
     }
 }

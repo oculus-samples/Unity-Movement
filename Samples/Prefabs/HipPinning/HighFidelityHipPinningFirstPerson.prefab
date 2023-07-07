@@ -52,7 +52,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8724683950891529247
 Transform:
   m_ObjectHideFlags: 0
@@ -500,6 +500,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _pair: {fileID: 3838579491498633126}
     _groundLayers:
       serializedVersion: 2
@@ -551,6 +552,10 @@ MonoBehaviour:
     _stepHeightScaleDist: 0.25
     _moveLowerThreshold: 0.3
     _moveHigherThreshold: 0.6
+    _hips: {fileID: 8911903714498386270}
+    _legPosOffset: {x: 0.025498962, y: -0.0052829897, z: -0.0798693}
+    _legRotOffset: {x: -0.05761964, y: 0.070019074, z: -0.024927199, w: 0.99556816}
+    _computedOffsets: 1
 --- !u!1 &4805430602368723742
 GameObject:
   m_ObjectHideFlags: 0
@@ -598,6 +603,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 7124955169347283970}
     _segmentUp: {fileID: 1744467641500109490}
     _segmentEnd: {fileID: 8362510363615060496}
@@ -677,13 +683,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
-    _skeleton: {fileID: 729980574542687627}
+    _customSkeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _spineTranslationCorrectionType: 1
     _correctSpineOnce: 0
     _applyToArms: 1
+    _applyToHands: 0
     _useMoveTowardsArms: 0
     _snapThreshold: 0.1
-    _armWeight: 0.75
+    _armWeight: 0
+    _handWeight: 0
     _armMoveSpeed: 0
 --- !u!1 &5157524381134081549
 GameObject:
@@ -788,6 +797,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _pair: {fileID: 7470887448235373449}
     _groundLayers:
       serializedVersion: 2
@@ -839,6 +849,10 @@ MonoBehaviour:
     _stepHeightScaleDist: 0.25
     _moveLowerThreshold: 0.3
     _moveHigherThreshold: 0.6
+    _hips: {fileID: 8911903714498386270}
+    _legPosOffset: {x: 0.025498886, y: -0.0052829897, z: 0.079869255}
+    _legRotOffset: {x: -0.07001962, y: -0.0576324, z: 0.9955674, w: 0.024926713}
+    _computedOffsets: 1
 --- !u!1 &5960742439412050645
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,6 +982,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 24274709243371028}
     _segmentUp: {fileID: 2223570764790469765}
     _segmentEnd: {fileID: 2827531660133311963}
@@ -1048,6 +1063,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 2827531660133311963}
     _segmentUp: {fileID: 231661889192982023}
     _segmentEnd: {fileID: 231661889192982023}
@@ -1128,6 +1144,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 729980574542687627}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 8362510363615060496}
     _segmentUp: {fileID: 5535935693886961202}
     _segmentEnd: {fileID: 5535935693886961202}
@@ -1400,11 +1417,16 @@ MonoBehaviour:
   _skeleton: {fileID: 729980574542687627}
   _animator: {fileID: 5008548947791101314}
   _rigBuilder: {fileID: 7447368640489583792}
-  _ovrSkeletonConstraints: []
+  _ovrSkeletonConstraints:
+  - {fileID: 2512888049583093171}
+  - {fileID: 7730228455810235689}
+  - {fileID: 3838579491498633126}
+  - {fileID: 7470887448235373449}
   _rebindAnimator: 0
   _reEnableRig: 0
   _rigToggleOnFocus: 0
   _retargetingLayer: {fileID: 0}
+  _checkSkeletalUpdatesByProxy: 0
 --- !u!4 &1744467641500109490 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7949448542854345100, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
@@ -1513,5 +1535,10 @@ Transform:
 --- !u!4 &8362510363615060496 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 173986280367921454, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8911903714498386270 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 993875434627818080, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
   m_PrefabInstance: {fileID: 8531934559616596798}
   m_PrefabAsset: {fileID: 0}

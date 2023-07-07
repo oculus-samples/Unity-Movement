@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 4319023010721011036}
     _segmentUp: {fileID: 2701536249310486477}
     _segmentEnd: {fileID: 2061263398344273555}
@@ -298,6 +299,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 2061263398344273555}
     _segmentUp: {fileID: 4076173765156699471}
     _segmentEnd: {fileID: 4076173765156699471}
@@ -378,6 +380,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 5740937155685247320}
     _segmentUp: {fileID: 8608038177421147514}
     _segmentEnd: {fileID: 8608038177421147514}
@@ -458,6 +461,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _segmentStart: {fileID: 6432989413210236746}
     _segmentUp: {fileID: 2563644540292334074}
     _segmentEnd: {fileID: 5740937155685247320}
@@ -572,13 +576,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
-    _skeleton: {fileID: 1024561555539579727}
+    _customSkeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
     _spineTranslationCorrectionType: 1
     _correctSpineOnce: 0
     _applyToArms: 1
+    _applyToHands: 0
     _useMoveTowardsArms: 0
     _snapThreshold: 0.1
-    _armWeight: 0.75
+    _armWeight: 0
+    _handWeight: 0
     _armMoveSpeed: 0
 --- !u!1001 &169993673699794201
 PrefabInstance:
@@ -727,7 +734,9 @@ MonoBehaviour:
   - {fileID: 4460941168362880823}
   _rebindAnimator: 0
   _reEnableRig: 0
+  _rigToggleOnFocus: 1
   _retargetingLayer: {fileID: 0}
+  _checkSkeletalUpdatesByProxy: 0
 --- !u!114 &4416254126646396801
 MonoBehaviour:
   m_ObjectHideFlags: 0

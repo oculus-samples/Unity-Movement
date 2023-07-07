@@ -913,7 +913,11 @@ namespace Oculus.Movement
     public static class DeformationDataTooltips
     {
         public const string Skeleton =
-            "The OVR Skeleton component.";
+            "[Deprecated] The OVR Skeleton component. " +
+            "NOTE: not recommended as this was experimental.";
+
+        public const string CustomSkeleton =
+            "The OVRCustomSkeleton component for the character.";
 
         public const string Animator =
             "The animator component.";
@@ -923,6 +927,9 @@ namespace Oculus.Movement
 
         public const string ApplyToArms =
             "Apply deformation on arms.";
+
+        public const string ApplyToHands =
+            "Apply deformation on hands.";
 
         public const string CorrectSpineOnce =
             "Allows the spine correction to run only once, assuming the skeleton's positions don't get updated multiple times.";
@@ -935,6 +942,9 @@ namespace Oculus.Movement
 
         public const string ArmWeight =
             "The weight for the deformation on arms.";
+
+        public const string HandWeight =
+            "The weight for the deformation on hands.";
 
         public const string ArmMoveSpeed =
             "The move towards speed for the arms.";
@@ -1026,7 +1036,10 @@ namespace Oculus.Movement
     public static class GroundingDataTooltips
     {
         public const string Skeleton =
-            "The OVR Skeleton component.";
+            "The OVR Skeleton component for the character.";
+
+        public const string Animator =
+            "The Animator component for the character.";
 
         public const string Pair =
             "Optional. The other leg's grounding constraint, used to check if this leg can move.";
@@ -1054,6 +1067,9 @@ namespace Oculus.Movement
 
         public const string Foot =
             "The foot transform.";
+
+        public const string Hips =
+            "The hips transform.";
 
         public const string FootRotationOffset =
             "The initial rotation offset for the feet.";
@@ -1083,7 +1099,10 @@ namespace Oculus.Movement
     public static class TwistDistributionDataTooltips
     {
         public const string Skeleton =
-            "The OVR Skeleton component.";
+            "The OVR Skeleton component for the character.";
+
+        public const string Animator =
+            "The Animator component for the character.";
 
         public const string SegmentStart =
             "The start transform on the opposite side of the twist source (like an elbow).";
@@ -1110,6 +1129,19 @@ namespace Oculus.Movement
             "If true, invert the up axis.";
     }
 
+    public static class CopyPoseDataTooltips
+    {
+        public const string Animator =
+            "The Animator component for the character.";
+
+        public const string CopyPoseToOriginal =
+            "True if the pose being copied is the original pose. If false, the copied pose " +
+            "is assumed to be the final pose.";
+
+        public const string RetargetingLayer =
+            "Retargeting layer component to get data from.";
+    }
+
     public static class RetargetingConstraintDataTooltips
     {
         public const string RetargetingLayer =
@@ -1132,6 +1164,10 @@ namespace Oculus.Movement
             "Indicates if target transform's position should be updated. " +
             "Once a position is updated, the original position will be lost.";
 
+        public const string ShouldUpdateRotations =
+            "Indicates if target transform's rotation should be updated. " +
+            "Once a rotation is updated, the original rotation will be lost.";
+
         public const string RotationOffsets =
             "Rotation offset to be applied during retargeting.";
 
@@ -1147,6 +1183,16 @@ namespace Oculus.Movement
         public const string PositionsToCorrectLateUpdate =
             "Positions to correct after the fact. Avatar " +
             "masks prevent setting positions of the hands precisely.";
+
+        public const string ApplyAnimationConstraintsToCorrectedPositions =
+            "Apply position offsets done by animation rigging constraints for corrected " +
+            "positions. Due to the limited motion of humanoid avatars, this should be set if any " +
+            "animation rigging constraints are applied after the retargeting job runs.";
+
+        public const string BonesToExcludeDuringCorrection =
+            "Bones to exclude when correcting positions. " +
+            "This can be necessary if you use a constraint that affects a specific bone, " +
+            "and the correction mask might include it.";
 
         public const string MaskToSetToTPose =
             "Since some bones are not affected by retargeting, " +
@@ -1206,6 +1252,21 @@ namespace Oculus.Movement
             "The array of mirrored bone pairs.";
     }
 
+    public static class RetargetedBoneTargetsTooltips
+    {
+        public static class RetargetedBoneTargetTooltips
+        {
+            public const string HumanBodyBone =
+                "The human body bone representation of this bone.";
+
+            public const string Target =
+                "The target transform to update with the retargeted bone data.";
+        }
+
+        public const string RetargetedBoneTargets =
+            "The array of retargeted bone targets.";
+    }
+
     public static class RetargetingMenuTooltips
     {
         public const string CharacterToSpawn =
@@ -1216,5 +1277,13 @@ namespace Oculus.Movement
 
         public const string SpawnOffset =
             "Offset per spawn.";
+
+        public const string PositionsToCorrectLateUpdateMask =
+            "Positions to correct mask, intended to correct the finger positions of " +
+            "animation rigged characters during retargeting.";
+
+        public const string TPoseMask =
+            "Positions to correct mask, intended to set certain joints of " +
+            "animation rigged characters to T-Pose during retargeting.";
     }
 }

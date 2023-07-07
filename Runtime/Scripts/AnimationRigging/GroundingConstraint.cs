@@ -12,9 +12,14 @@ namespace Oculus.Movement.AnimationRigging
     public interface IGroundingData
     {
         /// <summary>
-        /// The original skeleton.
+        /// The original skeleton for the character.
         /// </summary>
         OVRCustomSkeleton ConstraintSkeleton { get; }
+
+        /// <summary>
+        /// The Animator component for the character.
+        /// </summary>
+        public Animator ConstraintAnimator { get; }
 
         /// <summary>
         /// Optional. The other leg's grounding constraint, used to check if this leg can move.
@@ -112,17 +117,25 @@ namespace Oculus.Movement.AnimationRigging
         public void GenerateThresholdMoveProgress();
 
         /// <summary>
-        /// Called on when the animation job is being created.
+        /// Indicates if bone transforms are valid or not.
         /// </summary>
-        public void Create();
+        /// <returns>True if bone transforms are valid, false if not.</returns>
+        public bool IsBoneTransformsDataValid();
     }
 
+    /// <summary>
+    /// Grounding data used by grounding job.
+    /// TODO: allow for case where rig can be enabled, this means sync transform arrays must not be null by default
+    /// </summary>
     [System.Serializable]
     public struct GroundingData : IAnimationJobData, IGroundingData
     {
         // Interface implementation
         /// <inheritdoc />
         OVRCustomSkeleton IGroundingData.ConstraintSkeleton => _skeleton;
+
+        /// <inheritdoc />
+        Animator IGroundingData.ConstraintAnimator => _animator;
 
         /// <inheritdoc />
         GroundingData IGroundingData.Pair => _pair.data;
@@ -185,6 +198,11 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         [Tooltip(GroundingDataTooltips.Skeleton)]
         private OVRCustomSkeleton _skeleton;
+
+        /// <inheritdoc cref="IGroundingData.ConstraintAnimator"/>
+        [NotKeyable, SerializeField]
+        [Tooltip(GroundingDataTooltips.Animator)]
+        private Animator _animator;
 
         /// <inheritdoc cref="IGroundingData.Pair"/>
         [NotKeyable, SerializeField]
@@ -279,32 +297,61 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(GroundingDataTooltips.MoveHigherThreshold)]
         private float _moveHigherThreshold;
 
-        [SyncSceneToStream]
+        /// <inheritdoc cref="IGroundingData.Hips"/>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(GroundingDataTooltips.Hips)]
         private Transform _hips;
+
         private float _progress;
         private float _thresholdMoveProgress;
+
+        [NotKeyable, SerializeField, HideInInspector]
         private Vector3 _legPosOffset;
+        [NotKeyable, SerializeField, HideInInspector]
         private Quaternion _legRotOffset;
+        [NotKeyable, SerializeField, HideInInspector]
+        private bool _computedOffsets;
+        public bool ComputedOffsets => _computedOffsets;
 
         /// <summary>
-        /// Setup the grounding constraint.
+        /// Assign the OVR Skeleton component.
         /// </summary>
-        public void Setup()
+        /// <param name="skeleton">The OVRSkeleton to be assigned.</param>
+        public void AssignOVRSkeleton(OVRCustomSkeleton skeleton)
         {
-            _hips = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips];
-            _legPosOffset = _leg.localPosition;
-            _legRotOffset = _leg.localRotation;
+            _skeleton = skeleton;
         }
 
         /// <summary>
-        /// Called on when the animation job is being created.
+        /// Assign the Animator component.
         /// </summary>
-        public void Create()
+        /// <param name="skeleton">The Animator to be assigned.</param>
+        public void AssignAnimator(Animator animator)
         {
-            if (_leg.parent != _hips.parent)
+            _animator = animator;
+        }
+
+        /// <summary>
+        /// Assign the hips transform.
+        /// </summary>
+        /// <param name="skeleton">The hips transform to be assigned.</param>
+        public void AssignHips(Transform hipsTransform)
+        {
+            _hips = hipsTransform;
+        }
+
+        /// <summary>
+        /// Computes offsets necessary for initialization.
+        /// </summary>
+        public void ComputeOffsets()
+        {
+            if (_leg == null)
             {
-                _leg.SetParent(_hips.parent);
+                Debug.LogError("Please assign a leg transform before computing offsets.");
             }
+            _legPosOffset = _leg.localPosition;
+            _legRotOffset = _leg.localRotation;
+            _computedOffsets = true;
         }
 
         /// <summary>
@@ -336,12 +383,17 @@ namespace Oculus.Movement.AnimationRigging
                 return false;
             }
 
-            if (_skeleton == null)
+            if (_skeleton == null && _animator == null)
             {
                 return false;
             }
 
             if (_pair == null)
+            {
+                return false;
+            }
+
+            if (!_computedOffsets)
             {
                 return false;
             }
@@ -358,6 +410,8 @@ namespace Oculus.Movement.AnimationRigging
             _groundLayers = new LayerMask();
             _groundRaycastDist = 10.0f;
             _groundOffset = 0.0f;
+            _hips = null;
+            _leg = null;
             _hipsTarget = null;
             _kneeTarget = null;
             _footTarget = null;
@@ -368,6 +422,14 @@ namespace Oculus.Movement.AnimationRigging
             _stepHeight = 0.0f;
             _stepHeightScaleDist = 0.0f;
             _stepDist = 0.0f;
+            _computedOffsets = false;
+        }
+
+        /// <inheritdoc />
+        public bool IsBoneTransformsDataValid()
+        {
+            return (_skeleton != null && _skeleton.IsDataValid) ||
+                (_animator != null);
         }
     }
 
@@ -383,7 +445,10 @@ namespace Oculus.Movement.AnimationRigging
     {
         private void Start()
         {
-            data.Setup();
+            if (!data.ComputedOffsets)
+            {
+                Debug.LogError("Constraint needs to compute offsets before running!");
+            }
         }
 
         /// <inheritdoc />

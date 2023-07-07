@@ -62,13 +62,15 @@ namespace Oculus.Movement.AnimationRigging
                         if (bone.IsValid(stream))
                         {
                             var bonePos = bone.GetLocalPosition(stream);
-                            bone.SetLocalPosition(stream, bonePos + hipPosDelta);
+                            bone.SetLocalPosition(stream,
+                                Vector3.Lerp(bonePos, bonePos + hipPosDelta, weight));
                         }
                     }
                 }
 
                 // Set the hips position.
-                Hips.SetLocalPosition(stream, TargetHipPos[0]);
+                Hips.SetLocalPosition(stream,
+                    Vector3.Lerp(trackedHipPos, TargetHipPos[0], weight));
             }
             else
             {
@@ -169,7 +171,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _shouldUpdate = false;
             }
-            job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
             if (!data.ConstraintSkeleton.IsDataValid)

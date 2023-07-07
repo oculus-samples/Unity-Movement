@@ -166,6 +166,9 @@ namespace Oculus.Movement.AnimationRigging
                 _ovrSkeletonConstraints[oldConstraints.Length] =
                     newConstraint;
             }
+
+            // Update the interface references in case this was called after awake, but before Update
+            UpdateSkeletalConstraintInterfaceReferences();
         }
 
         /// <summary>
@@ -175,22 +178,83 @@ namespace Oculus.Movement.AnimationRigging
         {
             Assert.IsNotNull(_skeleton);
             Assert.IsNotNull(_animator);
-            _animator.enabled = false;
-            if (_rigBuilder)
-            {
-                _rigBuilder.enabled = false;
-            }
 
             if (_ovrSkeletonConstraints != null)
             {
-                _iovrSkeletonConstraints = new IOVRSkeletonConstraint[_ovrSkeletonConstraints.Length];
-                for (int i = 0; i < _iovrSkeletonConstraints.Length; i++)
+                UpdateSkeletalConstraintInterfaceReferences();
+            }
+        }
+
+        private void UpdateSkeletalConstraintInterfaceReferences()
+        {
+            _iovrSkeletonConstraints = new IOVRSkeletonConstraint[_ovrSkeletonConstraints.Length];
+            for (int i = 0; i < _iovrSkeletonConstraints.Length; i++)
+            {
+                _iovrSkeletonConstraints[i] =
+                    _ovrSkeletonConstraints[i] as IOVRSkeletonConstraint;
+                Assert.IsNotNull(_iovrSkeletonConstraints[i]);
+            }
+
+            // Add the copy original pose constraint that will be run after retargeting animation constraint.
+            if (_retargetingLayer != null && _retargetingLayer.ApplyAnimationConstraintsToCorrectedPositions)
+            {
+                RetargetingAnimationConstraint retargetConstraint =
+                    GetComponentInChildren<RetargetingAnimationConstraint>(true);
+                if (retargetConstraint != null)
                 {
-                    _iovrSkeletonConstraints[i] =
-                        _ovrSkeletonConstraints[i] as IOVRSkeletonConstraint;
-                    Assert.IsNotNull(_iovrSkeletonConstraints[i]);
+                    var copyPoseOriginalConstraint =
+                        CheckAndAddMissingCopyPoseAnimationConstraint(retargetConstraint, true);
+                    var copyPoseFinalConstraint =
+                        CheckAndAddMissingCopyPoseAnimationConstraint(retargetConstraint, false);
+
+                    if (copyPoseOriginalConstraint != null)
+                    {
+                        AddSkeletalConstraint(copyPoseOriginalConstraint);
+                    }
+
+                    if (copyPoseFinalConstraint != null)
+                    {
+                        AddSkeletalConstraint(copyPoseFinalConstraint);
+                    }
                 }
             }
+        }
+
+        private CopyPoseConstraint CheckAndAddMissingCopyPoseAnimationConstraint(
+            RetargetingAnimationConstraint retargetConstraint, bool shouldCopyPoseToOriginal)
+        {
+            CopyPoseConstraint[] copyPoseConstraints =
+                GetComponentsInChildren<CopyPoseConstraint>(true);
+            foreach (var constraint in copyPoseConstraints)
+            {
+                if (constraint.data.CopyPoseToOriginal == shouldCopyPoseToOriginal)
+                {
+                    return null;
+                }
+            }
+
+            GameObject copyPoseConstraintObj = new GameObject(shouldCopyPoseToOriginal ?
+                    "CopyOriginalPoseConstraint" : "CopyFinalPoseConstraint");
+            copyPoseConstraintObj.SetActive(false);
+            CopyPoseConstraint copyPoseConstraint = copyPoseConstraintObj.AddComponent<CopyPoseConstraint>();
+            copyPoseConstraint.data.CopyPoseToOriginal = shouldCopyPoseToOriginal;
+            copyPoseConstraint.data.RetargetingLayerComp = _retargetingLayer;
+            copyPoseConstraint.data.ConstraintAnimator = _animator;
+            if (shouldCopyPoseToOriginal)
+            {
+                copyPoseConstraintObj.transform.SetParent(retargetConstraint.transform);
+                copyPoseConstraintObj.transform.SetAsFirstSibling();
+                Debug.Log("CopyPoseConstraint for the original pose has been added " +
+                          "to the animation rig for retargeting.");
+            }
+            else
+            {
+                copyPoseConstraintObj.transform.SetParent(retargetConstraint.transform.parent);
+                copyPoseConstraintObj.transform.SetAsLastSibling();
+                Debug.Log("CopyPoseConstraint for the final pose has been added " +
+                          "to the animation rig for retargeting.");
+            }
+            return copyPoseConstraint;
         }
 
         /// <summary>
@@ -211,25 +275,40 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <summary>
         /// Disable and re-enable the rig if <see cref="_rigToggleOnFocus"/> is enabled.
+        /// Do this for builds only. We don't want to stop everything if we run inside of the
+        /// editor.
         /// </summary>
         /// <param name="hasFocus">True if the application is currently focused.</param>
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
-            if (_rigToggleOnFocus)
+            if (Application.isEditor)
             {
-                if (!hasFocus)
-                {
-                    DisableRigAndUpdateState();
-                    _rigBuilder.Evaluate(Time.deltaTime);
-                }
-                else
-                {
-                    // edge case: don't call this if starting up for first time
-                    if (_skeleton.IsInitialized)
-                    {
-                        EnableRig();
-                    }
-                }
+                return;
+            }
+
+            // Bail if we don't want the rig to toggle during focus events.
+            if (!_rigToggleOnFocus)
+            {
+                return;
+            }
+
+            // Don't do anything if the setup process has not run yet. We don't
+            // want to trigger the creation of any animation rigging jobs.
+            if (!_ranSetup)
+            {
+                return;
+            }
+
+            if (!hasFocus)
+            {
+                // Run the constraints one more time so when paused, the
+                // constraints are applied to the latest skeleton.
+                DisableRigAndUpdateState();
+                _rigBuilder.Evaluate(Time.deltaTime);
+            }
+            else
+            {
+                EnableRig();
             }
         }
 
@@ -240,20 +319,24 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
-            if (_skeleton.IsInitialized)
+            if (!_skeleton.IsInitialized)
             {
-                _animator.enabled = true;
-                if (_rebindAnimator)
-                {
-                    _animator.Rebind();
-                    _animator.Update(0.0f);
-                }
-                if (_rigBuilder)
-                {
-                    _rigBuilder.enabled = true;
-                }
-                _ranSetup = true;
+                return;
             }
+
+            UpdateDependentConstraints();
+
+            _animator.enabled = true;
+            if (_rebindAnimator)
+            {
+                _animator.Rebind();
+                _animator.Update(0.0f);
+            }
+            if (_rigBuilder)
+            {
+                _rigBuilder.enabled = true;
+            }
+            _ranSetup = true;
         }
 
         private void DisableRigAndUpdateState()
@@ -263,13 +346,7 @@ namespace Oculus.Movement.AnimationRigging
                 _rigBuilder.enabled = false;
             }
 
-            if (_iovrSkeletonConstraints != null)
-            {
-                foreach (var currentConstraint in _iovrSkeletonConstraints)
-                {
-                    currentConstraint.RegenerateData();
-                }
-            }
+            UpdateDependentConstraints();
 
             if (_retargetingLayer != null)
             {
@@ -279,6 +356,17 @@ namespace Oculus.Movement.AnimationRigging
             if (_checkSkeletalUpdatesByProxy && _retargetingLayer != null)
             {
                 _proxyChangeCount = _retargetingLayer.ProxyChangeCount;
+            }
+        }
+
+        private void UpdateDependentConstraints()
+        {
+            if (_iovrSkeletonConstraints != null)
+            {
+                foreach (var currentConstraint in _iovrSkeletonConstraints)
+                {
+                    currentConstraint.RegenerateData();
+                }
             }
         }
 
@@ -317,12 +405,12 @@ namespace Oculus.Movement.AnimationRigging
             }
             if (_lastSkeletonChangeCount != _skeleton.SkeletonChangedCount)
             {
-                bool skeletalOrRetargeterChangeDetected =
-                   _checkSkeletalUpdatesByProxy && HasSkeletonProxiesBeenRecreated() ||
-                   HasRetargeterBeenUpdated();
-
-                // ONLY regenerate rig if change has been detected
-                if (!skeletalOrRetargeterChangeDetected)
+                // If checking by proxy, avoid updating rig only if
+                // a) skeletal proxies have not been recreated and
+                // b) retargeter has not been updated.
+                if (_checkSkeletalUpdatesByProxy &&
+                    !HasSkeletonProxiesBeenRecreated() &&
+                    !HasRetargeterBeenUpdated())
                 {
                     _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
                     return;
@@ -334,6 +422,10 @@ namespace Oculus.Movement.AnimationRigging
                 _lastSkeletonChangeCount = _skeleton.SkeletonChangedCount;
 
                 DisableRigAndUpdateState();
+
+                // allow constraints to run one last time
+                _rigBuilder.Evaluate(Time.deltaTime);
+
                 Debug.LogWarning("Detected skeletal change. Disabling the rig.");
             }
         }

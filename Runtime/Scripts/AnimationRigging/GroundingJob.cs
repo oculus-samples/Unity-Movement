@@ -102,10 +102,14 @@ namespace Oculus.Movement.AnimationRigging
             if (weight > 0f && DeltaTime[0] > 0f)
             {
                 // Leg position + rotation.
-                var hipsLocalRotation = Hips.GetLocalRotation(stream);
-                var hipsLocalPosition = Hips.GetLocalPosition(stream);
-                Leg.SetLocalPosition(stream, hipsLocalPosition + hipsLocalRotation * LegPosOffset);
-                Leg.SetLocalRotation(stream, hipsLocalRotation * LegRotOffset);
+                var hipsWorldRotation = Hips.GetRotation(stream);
+                var hipsWorldPosition = Hips.GetPosition(stream);
+                Quaternion legRotation = hipsWorldRotation * LegRotOffset;
+                Vector3 legPosition = hipsWorldPosition + hipsWorldRotation * LegPosOffset;
+                Leg.SetRotation(stream,
+                    Quaternion.Slerp(Leg.GetRotation(stream), legRotation, weight));
+                Leg.SetPosition(stream,
+                    Vector3.Lerp(Leg.GetPosition(stream), legPosition, weight));
 
                 // Foot position.
                 if (IsGrounding[0])
@@ -113,7 +117,7 @@ namespace Oculus.Movement.AnimationRigging
                     var footPos = Vector3.Lerp(_prevFootPos, TargetFootPos[0], MoveProgress[0]);
                     float footDist = Vector3.Distance(_prevFootPos, TargetFootPos[0]);
                     footPos.y += StepHeight * Mathf.Clamp01(footDist / StepHeightScaleDist) * StepProgress[0];
-                    FootTarget.SetPosition(stream, footPos);
+                    FootTarget.SetPosition(stream, Vector3.Lerp(FootTarget.GetPosition(stream), footPos, weight));
                 }
 
                 // Record foot position.
@@ -125,7 +129,8 @@ namespace Oculus.Movement.AnimationRigging
                 // Foot rotation.
                 var lookRot = Quaternion.LookRotation(HipsTarget.GetLocalPosition(stream) - KneeTarget.GetLocalPosition(stream)) *
                                         FootRotationOffset;
-                FootTarget.SetRotation(stream, lookRot);
+                FootTarget.SetRotation(stream,
+                    Quaternion.Slerp(FootTarget.GetRotation(stream), lookRot, weight));
             }
             else
             {
@@ -151,7 +156,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new GroundingJob();
 
-            data.Create();
             data.GenerateThresholdMoveProgress();
             _prevKneePos = data.KneeTarget.position;
 
@@ -185,14 +189,14 @@ namespace Oculus.Movement.AnimationRigging
             job.MoveProgress[0] = 1.0f;
             job.StepProgress[0] = 1.0f;
             job.TargetFootPos[0] = data.FootTarget.position;
-            job.DeltaTime[0] = Time.deltaTime;
+            job.DeltaTime[0] = Time.unscaledDeltaTime;
             return job;
         }
 
         /// <inheritdoc />
         public override void Update(GroundingJob job, ref T data)
         {
-            if (data.ConstraintSkeleton.IsDataValid)
+            if (data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = true;
             }
@@ -226,10 +230,10 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.deltaTime : 0.0f;
+            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
-            if (!data.ConstraintSkeleton.IsDataValid)
+            if (!data.IsBoneTransformsDataValid())
             {
                 _shouldUpdate = false;
             }
