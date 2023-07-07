@@ -1,3 +1,45 @@
+# [2.3.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.2.0...v2.3.0) (2023-07-07)
+
+
+### Bug Fixes
+
+* **Editor:** Validation checks certain names by layer and others by index ([20582e1](https://github.com/oculus-samples/Unity-Movement/commit/20582e12b3b425e40dd9be0fd574697f048be4f1))
+* **Runtime:** Address edge case where GetNumberOfTransformsRetargeted is called too early ([01878e7](https://github.com/oculus-samples/Unity-Movement/commit/01878e7971cb654161f17b60daf152b70904b7f8))
+* **Runtime:** Deprecate OVRSkeleton, use OVRCustomSkeleton in DeformationConstraint ([b4ffada](https://github.com/oculus-samples/Unity-Movement/commit/b4ffada0ab99c60ba9188811717685cd5e752ddd))
+* **Runtime:** Disable constraint game objects until data has been prepared ([57bfdc8](https://github.com/oculus-samples/Unity-Movement/commit/57bfdc838b4449f4637e7250952b047b80d39958))
+* **Runtime:** Disambiguate between focus changes in build and editor ([6761a7e](https://github.com/oculus-samples/Unity-Movement/commit/6761a7e31c9d3d4990f0f7108bc83a8c978a0707))
+* **Runtime:** Do not disable animator and rig before skeleton is initialized ([d1f4f55](https://github.com/oculus-samples/Unity-Movement/commit/d1f4f5509beb53eee1566caed9721a941ba10289))
+* **Runtime:** Don't call DisableRigAndUpdateState before Setup in focus function ([f5c8e61](https://github.com/oculus-samples/Unity-Movement/commit/f5c8e613c9f77e7f2c4d13deb7b81e07e2ce751e))
+* **Runtime:** Don't check for animator initialized state in constraints ([c1cca0f](https://github.com/oculus-samples/Unity-Movement/commit/c1cca0f7752e7d1ed536a86c1600ae11d77475e8))
+* **Runtime:** Enlarge bounds of robot, call rig evaluate during disabling ([ef79190](https://github.com/oculus-samples/Unity-Movement/commit/ef79190ec0fa24ba20dd8d226dca9ffa0a1bc8eb))
+* **Runtime:** Fix and update the code that adds animation rigging retargeting ([2f4a4be](https://github.com/oculus-samples/Unity-Movement/commit/2f4a4be1288d857aaf2f04ac32d570e3bcf7abde))
+* **Runtime:** Fix AnimationRigSetup ranSetup condition ([25fb689](https://github.com/oculus-samples/Unity-Movement/commit/25fb689206f337e1507f01b00f444bf4679dfded))
+* **Runtime:** Fix deformation job starting without required data ([9bb822c](https://github.com/oculus-samples/Unity-Movement/commit/9bb822c305a39b32588bf37eac5703f54969bdcc))
+* **Runtime:** Fix proxy, retargeter update check logic in CheckForSkeletalChanges ([1ac2a51](https://github.com/oculus-samples/Unity-Movement/commit/1ac2a51384658cb36e46525439dbad3085d626a8))
+* **Runtime:** OnValidate function check should make sure editor is not playing ([f2ae6f7](https://github.com/oculus-samples/Unity-Movement/commit/f2ae6f747f76b4e459c6a6d7b59192d9b4416e4c))
+* **Runtime:** Rebuilt skeletal constraint interface reference if constraint is added ([89e017f](https://github.com/oculus-samples/Unity-Movement/commit/89e017ffe0da640dce653dd13bef775477426d3e))
+* **Runtime:** Regenerate masks instance if not set ([beceb70](https://github.com/oculus-samples/Unity-Movement/commit/beceb708b7538b0d46b3059a1a7adfaaae783f9b))
+* **Runtime:** RetargetingConstraint uses AvatarMask instances ([fab08ca](https://github.com/oculus-samples/Unity-Movement/commit/fab08ca8fac1546a397d81311d7faada40658ef8))
+* **Runtime:** Update animation rigging jobs to ignore Time.timeScale ([a7b719f](https://github.com/oculus-samples/Unity-Movement/commit/a7b719f8a6e6ed0ebd55b317bcb87740860b3a79))
+* **Runtime:** Update deformation constraint to restore tracked hand positions ([c515630](https://github.com/oculus-samples/Unity-Movement/commit/c515630fa8a0aea1ae0c7a4de4462d80899b3f08))
+* **Runtime:** Update deformation constraint to run with OVRCustomSkeleton ([b9ad911](https://github.com/oculus-samples/Unity-Movement/commit/b9ad911175c2c281d5e27a9cd59efe02f04279ad))
+* **Runtime:** Update deformation constraint to take into account scale ([a6fe8ed](https://github.com/oculus-samples/Unity-Movement/commit/a6fe8ed528451cd76275d61257f88b6efb37e737))
+* **Runtime:** Update transform handles ([1a51588](https://github.com/oculus-samples/Unity-Movement/commit/1a515887229b8fcfec2c93745a14162268eb1f48))
+
+
+### Features
+
+* **Runtime:** Add animator support to TwistDistributionConstraint ([930d473](https://github.com/oculus-samples/Unity-Movement/commit/930d473d72503695c25c728e71d341af91e25dc2))
+* **Runtime:** Add RetargetingLayer skeleton postprocessing ([e6af064](https://github.com/oculus-samples/Unity-Movement/commit/e6af0644f814a398fada720f151c845aeb5ec034))
+* **Runtime:** All animation rigging jobs use the weight field ([5999837](https://github.com/oculus-samples/Unity-Movement/commit/5999837e32dd64b9892fe61e0118e2273c56c4e9))
+* **Runtime:** Apply animation rigging constraints to positions to correct in late update ([8d0e81d](https://github.com/oculus-samples/Unity-Movement/commit/8d0e81d294826e0d7f8a3033ac2a20c9827003bd))
+* **Runtime:** Grounding constraint finds hips and computes offsets at edit time ([6c85e34](https://github.com/oculus-samples/Unity-Movement/commit/6c85e348051d7bf15df05467629b34e3e3f9f29c))
+* **Runtime:** GroundingConstraint supports Animator; fix IsValid functions ([0a0a00c](https://github.com/oculus-samples/Unity-Movement/commit/0a0a00c9507f856865ea0c59bf04335a715309ed))
+* **Runtime:** Retargeting job supports runtime mask changes ([d18f8f3](https://github.com/oculus-samples/Unity-Movement/commit/d18f8f32c8fc08eae135fe75dca6a30e7157ea0c))
+* **Runtime:** Update deformation to optionally affect both arms and hands ([3534557](https://github.com/oculus-samples/Unity-Movement/commit/35345578818d92337812c48460496385122a0f52))
+* **Samples:** Add twists for the neck in the blendshape mapping sample ([30d9b3b](https://github.com/oculus-samples/Unity-Movement/commit/30d9b3b79fe6aeee844e0f3c73487c88ec70a8c7))
+* **Samples:** Update BlendshapeMapping character constraints ([e94e75a](https://github.com/oculus-samples/Unity-Movement/commit/e94e75a40fa30685f8e78557cc48998a890b4bd8))
+
 # [2.2.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.1.0...v2.2.0) (2023-05-30)
 
 
