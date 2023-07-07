@@ -246,6 +246,110 @@ MonoBehaviour:
     _armWeight: 1
     _handWeight: 1
     _armMoveSpeed: 0
+    _hipsToHeadBones:
+    - {fileID: 24668466978050337}
+    - {fileID: 4136407814712997250}
+    - {fileID: 4150047613444537597}
+    - {fileID: 167868239173931932}
+    - {fileID: 8568777009844315901}
+    - {fileID: 813562241272511791}
+    _leftArmData:
+      ShoulderBone: {fileID: 372011279931233274}
+      UpperArmBone: {fileID: 2853792523736699549}
+      LowerArmBone: {fileID: 4776154206678009637}
+      HandBone: {fileID: 8362296397940282678}
+      ArmWeight: 1
+      HandWeight: 1
+      MoveSpeed: 0
+    _rightArmData:
+      ShoulderBone: {fileID: 6698092073795100007}
+      UpperArmBone: {fileID: 1235701047022314321}
+      LowerArmBone: {fileID: 3796135998893025026}
+      HandBone: {fileID: 2494227819838822627}
+      ArmWeight: 1
+      HandWeight: 1
+      MoveSpeed: 0
+    _bonePairData:
+    - StartBone: {fileID: 24668466978050337}
+      EndBone: {fileID: 4136407814712997250}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.058242228
+      IsMoveTowards: 0
+    - StartBone: {fileID: 4136407814712997250}
+      EndBone: {fileID: 4150047613444537597}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.10340428
+      IsMoveTowards: 0
+    - StartBone: {fileID: 4150047613444537597}
+      EndBone: {fileID: 167868239173931932}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.10340428
+      IsMoveTowards: 0
+    - StartBone: {fileID: 167868239173931932}
+      EndBone: {fileID: 8568777009844315901}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.25151414
+      IsMoveTowards: 0
+    - StartBone: {fileID: 8568777009844315901}
+      EndBone: {fileID: 813562241272511791}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.12747405
+      IsMoveTowards: 0
+    - StartBone: {fileID: 167868239173931932}
+      EndBone: {fileID: 372011279931233274}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.19169338
+      IsMoveTowards: 0
+    - StartBone: {fileID: 167868239173931932}
+      EndBone: {fileID: 6698092073795100007}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.19169505
+      IsMoveTowards: 0
+    - StartBone: {fileID: 372011279931233274}
+      EndBone: {fileID: 2853792523736699549}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.16743502
+      IsMoveTowards: 0
+    - StartBone: {fileID: 6698092073795100007}
+      EndBone: {fileID: 1235701047022314321}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.16743432
+      IsMoveTowards: 0
+    - StartBone: {fileID: 2853792523736699549}
+      EndBone: {fileID: 4776154206678009637}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.28508064
+      IsMoveTowards: 0
+    - StartBone: {fileID: 1235701047022314321}
+      EndBone: {fileID: 3796135998893025026}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.285085
+      IsMoveTowards: 0
+    - StartBone: {fileID: 4776154206678009637}
+      EndBone: {fileID: 8362296397940282678}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.24036232
+      IsMoveTowards: 0
+    - StartBone: {fileID: 3796135998893025026}
+      EndBone: {fileID: 2494227819838822627}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.24036369
+      IsMoveTowards: 0
+    _startingScale: {x: 1, y: 1, z: 1}
+    _hipsToHeadDistance: 0.6426209
 --- !u!1 &1473924905461991896
 GameObject:
   m_ObjectHideFlags: 0
@@ -605,6 +709,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+--- !u!4 &24668466978050337 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2857325278740409074, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &167868239173931932 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2712436511663056975, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &372011279931233274 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2511117075805431849, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &813562241272511791 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3223094540932368124, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1235701047022314321 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3951616662085982338, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
@@ -628,6 +752,16 @@ Transform:
 --- !u!4 &3817605947884828321 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1371976685920341362, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4136407814712997250 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2204398875919224401, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4150047613444537597 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2190737017092966190, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
   m_PrefabInstance: {fileID: 2878048534688545747}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &4325497552437736820 stripped
@@ -748,14 +882,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _retargetedBoneTargets:
-  - BoneId: 0
-    HumanBodyBone: 17
+  - HumanBodyBone: 17
     Target: {fileID: 583436289584067096}
-  - BoneId: 0
-    HumanBodyBone: 18
+  - HumanBodyBone: 18
     Target: {fileID: 5868464488973929034}
+--- !u!4 &6698092073795100007 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8864358005623957172, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8362296397940282678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6051775358866550501, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+  m_PrefabInstance: {fileID: 2878048534688545747}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8568777009844315901 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5844133748634574126, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
   m_PrefabInstance: {fileID: 2878048534688545747}
   m_PrefabAsset: {fileID: 0}

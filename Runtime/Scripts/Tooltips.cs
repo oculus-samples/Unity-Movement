@@ -948,6 +948,30 @@ namespace Oculus.Movement
 
         public const string ArmMoveSpeed =
             "The move towards speed for the arms.";
+
+        public const string HipsToHeadBones =
+            "Array of transform bones from hips to head.";
+
+        public const string LeftArmData =
+            "Left arm data.";
+
+        public const string LeftArmDataInitialized =
+            "Whether the left arm data is initialized or not.";
+
+        public const string RightArmData =
+            "Right arm data.";
+
+        public const string RightArmDataInitialized =
+            "Whether the right arm data is initialized or not.";
+
+        public const string BonePairData =
+            "All bone pair data.";
+
+        public const string StartingScale =
+            "Starting scale of character.";
+
+        public const string HipsToHeadDistance =
+            "Distances between head and hips.";
     }
 
     public static class HipPinningDataTooltips

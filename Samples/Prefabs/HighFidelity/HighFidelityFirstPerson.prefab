@@ -587,6 +587,105 @@ MonoBehaviour:
     _armWeight: 0
     _handWeight: 0
     _armMoveSpeed: 0
+    _hipsToHeadBones:
+    - {fileID: 4614795461479404054}
+    - {fileID: 7185562945170467144}
+    - {fileID: 4255657312160527834}
+    - {fileID: 8123629613239412764}
+    - {fileID: 8571687220460749114}
+    - {fileID: 7218135907072257976}
+    - {fileID: 6369423367587295010}
+    _leftArmData:
+      ShoulderBone: {fileID: 2701536249310486477}
+      UpperArmBone: {fileID: 4319023010721011036}
+      LowerArmBone: {fileID: 2061263398344273555}
+      HandBone: {fileID: 4076173765156699471}
+      ArmWeight: 0
+      HandWeight: 0
+      MoveSpeed: 0
+    _rightArmData:
+      ShoulderBone: {fileID: 2563644540292334074}
+      UpperArmBone: {fileID: 6432989413210236746}
+      LowerArmBone: {fileID: 5740937155685247320}
+      HandBone: {fileID: 8608038177421147514}
+      ArmWeight: 0
+      HandWeight: 0
+      MoveSpeed: 0
+    _bonePairData:
+    - StartBone: {fileID: 4614795461479404054}
+      EndBone: {fileID: 7185562945170467144}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.038306892
+      IsMoveTowards: 0
+    - StartBone: {fileID: 7185562945170467144}
+      EndBone: {fileID: 4255657312160527834}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.11096214
+      IsMoveTowards: 0
+    - StartBone: {fileID: 4255657312160527834}
+      EndBone: {fileID: 8123629613239412764}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.11240488
+      IsMoveTowards: 0
+    - StartBone: {fileID: 8123629613239412764}
+      EndBone: {fileID: 8571687220460749114}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.1846194
+      IsMoveTowards: 0
+    - StartBone: {fileID: 8571687220460749114}
+      EndBone: {fileID: 7218135907072257976}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.13176535
+      IsMoveTowards: 0
+    - StartBone: {fileID: 7218135907072257976}
+      EndBone: {fileID: 6369423367587295010}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.07068894
+      IsMoveTowards: 0
+    - StartBone: {fileID: 8571687220460749114}
+      EndBone: {fileID: 2701536249310486477}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.119189434
+      IsMoveTowards: 0
+    - StartBone: {fileID: 8571687220460749114}
+      EndBone: {fileID: 2563644540292334074}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.119189434
+      IsMoveTowards: 0
+    - StartBone: {fileID: 2701536249310486477}
+      EndBone: {fileID: 4319023010721011036}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.17650495
+      IsMoveTowards: 0
+    - StartBone: {fileID: 2563644540292334074}
+      EndBone: {fileID: 6432989413210236746}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.17650484
+      IsMoveTowards: 0
+    - StartBone: {fileID: 4319023010721011036}
+      EndBone: {fileID: 2061263398344273555}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.25680098
+      IsMoveTowards: 0
+    - StartBone: {fileID: 6432989413210236746}
+      EndBone: {fileID: 5740937155685247320}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.25679642
+      IsMoveTowards: 0
+    _startingScale: {x: 1, y: 1, z: 1}
+    _hipsToHeadDistance: 0.6140263
 --- !u!1001 &169993673699794201
 PrefabInstance:
   m_ObjectHideFlags: 0

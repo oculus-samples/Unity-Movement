@@ -329,7 +329,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new DeformationJob();
 
-            data.Setup();
             _animatorTransform = animator.transform;
 
             job.LeftUpperArmBone = ReadWriteTransformHandle.Bind(animator, data.LeftArm.UpperArmBone);
