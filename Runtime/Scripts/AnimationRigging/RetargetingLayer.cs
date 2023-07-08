@@ -372,6 +372,8 @@ namespace Oculus.Movement.AnimationRigging
             ConstructDefaultPoseInformation();
             ConstructBoneAdjustmentInformation();
             CacheJointConstraints();
+
+            ValidateHumanoid();
         }
 
         private void ConstructDefaultPoseInformation()
@@ -412,6 +414,17 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
             _jointConstraints = jointConstraints.ToArray();
+        }
+
+        private void ValidateHumanoid()
+        {
+            foreach(var bodyBone in CustomBoneIdToHumanBodyBone.Values)
+            {
+                if (!AnimatorTargetSkeleton.GetBoneTransform(bodyBone))
+                {
+                    Debug.LogError($"Did not find {bodyBone} in {AnimatorTargetSkeleton}.");
+                }
+            }
         }
 
         protected virtual void OnApplicationFocus(bool hasFocus)
