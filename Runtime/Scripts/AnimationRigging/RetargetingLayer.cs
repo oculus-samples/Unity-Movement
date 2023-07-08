@@ -418,12 +418,35 @@ namespace Oculus.Movement.AnimationRigging
 
         private void ValidateHumanoid()
         {
+            bool validHumanoid = true;
             foreach(var bodyBone in CustomBoneIdToHumanBodyBone.Values)
             {
                 if (!AnimatorTargetSkeleton.GetBoneTransform(bodyBone))
                 {
                     Debug.LogError($"Did not find {bodyBone} in {AnimatorTargetSkeleton}.");
+                    validHumanoid = false;
                 }
+            }
+
+            if (!validHumanoid)
+            {
+                return;
+            }
+
+            // specific checks follow.
+            var upperChest = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.UpperChest);
+            var leftShoulder = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.LeftShoulder);
+            var rightShoulder = AnimatorTargetSkeleton.GetBoneTransform (HumanBodyBones.RightShoulder);
+
+            if (leftShoulder.parent != upperChest)
+            {
+                Debug.LogWarning($"In the ideal case, the parent of left shoulder ({leftShoulder}) should be the" +
+                    $" upper chest ({upperChest}).");
+            }
+            if (rightShoulder.parent != upperChest)
+            {
+                Debug.LogWarning($"In the ideal case, the parent of right shoulder ({rightShoulder}) should be the" +
+                    $" upper chest ({upperChest}).");
             }
         }
 
