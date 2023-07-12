@@ -23,6 +23,11 @@ namespace Oculus.Movement.AnimationRigging
         public Animator ConstraintAnimator { get; }
 
         /// <summary>
+        /// If true, update this job.
+        /// </summary>
+        public bool ShouldUpdate { get; set; }
+
+        /// <summary>
         /// The start transform on the opposite side of the twist source (like an elbow).
         /// </summary>
         public Transform SegmentStart { get; }
@@ -100,6 +105,13 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         Animator ITwistDistributionData.ConstraintAnimator => _animator;
+
+        /// <inheritdoc />
+        bool ITwistDistributionData.ShouldUpdate
+        {
+            get => _shouldUpdate;
+            set => _shouldUpdate = value;
+        }
 
         /// <inheritdoc />
         Transform ITwistDistributionData.SegmentStart => _segmentStart;
@@ -188,6 +200,8 @@ namespace Oculus.Movement.AnimationRigging
 
         [NotKeyable, SerializeField, HideInInspector]
         private float[] _twistNodeSpacings;
+
+        private bool _shouldUpdate;
 
         /// <summary>
         /// Assign the OVR Skeleton component.

@@ -22,6 +22,11 @@ namespace Oculus.Movement.AnimationRigging
         public Animator ConstraintAnimator { get; }
 
         /// <summary>
+        /// If true, update this job.
+        /// </summary>
+        public bool ShouldUpdate { get; set; }
+
+        /// <summary>
         /// Optional. The other leg's grounding constraint, used to check if this leg can move.
         /// </summary>
         public GroundingData Pair { get; }
@@ -112,6 +117,16 @@ namespace Oculus.Movement.AnimationRigging
         public float Progress { set; }
 
         /// <summary>
+        /// The previous knee position.
+        /// </summary>
+        public Vector3 PreviousKneePos { get; set; }
+
+        /// <summary>
+        /// The ground raycast hit.
+        /// </summary>
+        public RaycastHit GroundRaycastHit { get; set; }
+
+        /// <summary>
         /// Generates a new value for the threshold move progress.
         /// </summary>
         public void GenerateThresholdMoveProgress();
@@ -136,6 +151,13 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         Animator IGroundingData.ConstraintAnimator => _animator;
+
+        /// <inheritdoc />
+        bool IGroundingData.ShouldUpdate
+        {
+            get => _shouldUpdate;
+            set => _shouldUpdate = value;
+        }
 
         /// <inheritdoc />
         GroundingData IGroundingData.Pair => _pair.data;
@@ -192,6 +214,20 @@ namespace Oculus.Movement.AnimationRigging
         float IGroundingData.Progress
         {
             set => _progress = value;
+        }
+
+        /// <inheritdoc />
+        Vector3 IGroundingData.PreviousKneePos
+        {
+            get => _prevKneePos;
+            set => _prevKneePos = value;
+        }
+
+        /// <inheritdoc />
+        RaycastHit IGroundingData.GroundRaycastHit
+        {
+            get => _groundRaycastHit;
+            set => _groundRaycastHit = value;
         }
 
         /// <inheritdoc cref="IGroundingData.ConstraintSkeleton"/>
@@ -304,6 +340,9 @@ namespace Oculus.Movement.AnimationRigging
 
         private float _progress;
         private float _thresholdMoveProgress;
+        private Vector3 _prevKneePos;
+        private RaycastHit _groundRaycastHit;
+        private bool _shouldUpdate;
 
         [NotKeyable, SerializeField, HideInInspector]
         private Vector3 _legPosOffset;
@@ -311,7 +350,9 @@ namespace Oculus.Movement.AnimationRigging
         private Quaternion _legRotOffset;
         [NotKeyable, SerializeField, HideInInspector]
         private bool _computedOffsets;
+
         public bool ComputedOffsets => _computedOffsets;
+
 
         /// <summary>
         /// Assign the OVR Skeleton component.
@@ -325,7 +366,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Assign the Animator component.
         /// </summary>
-        /// <param name="skeleton">The Animator to be assigned.</param>
+        /// <param name="animator">The Animator to be assigned.</param>
         public void AssignAnimator(Animator animator)
         {
             _animator = animator;
@@ -334,7 +375,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Assign the hips transform.
         /// </summary>
-        /// <param name="skeleton">The hips transform to be assigned.</param>
+        /// <param name="hipsTransform">The hips transform to be assigned.</param>
         public void AssignHips(Transform hipsTransform)
         {
             _hips = hipsTransform;

@@ -147,17 +147,13 @@ namespace Oculus.Movement.AnimationRigging
     public class GroundingJobBinder<T> : AnimationJobBinder<GroundingJob, T>
         where T : struct, IAnimationJobData, IGroundingData
     {
-        private RaycastHit _groundRaycastHit;
-        private Vector3 _prevKneePos;
-        private bool _shouldUpdate;
-
         /// <inheritdoc />
         public override GroundingJob Create(Animator animator, ref T data, Component component)
         {
             var job = new GroundingJob();
 
             data.GenerateThresholdMoveProgress();
-            _prevKneePos = data.KneeTarget.position;
+            data.PreviousKneePos = data.KneeTarget.position;
 
             job.HipsTarget = ReadOnlyTransformHandle.Bind(animator, data.HipsTarget);
             job.KneeTarget = ReadOnlyTransformHandle.Bind(animator, data.KneeTarget);
@@ -198,7 +194,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (data.IsBoneTransformsDataValid())
             {
-                _shouldUpdate = true;
+                data.ShouldUpdate = true;
             }
 
             var kneePos = data.KneeTarget.position;
@@ -211,18 +207,19 @@ namespace Oculus.Movement.AnimationRigging
                 job.IsGrounding[0] = true;
                 job.MoveProgress[0] += Time.deltaTime * data.StepSpeed;
                 job.StepProgress[0] = data.StepCurve.Evaluate(job.MoveProgress[0]);
-                if (Physics.Raycast(kneePos, Vector3.down, out _groundRaycastHit, data.GroundRaycastDist,
+                if (Physics.Raycast(kneePos, Vector3.down, out var hit, data.GroundRaycastDist,
                         data.GroundLayers))
                 {
-                    job.TargetFootPos[0] = _groundRaycastHit.point + Vector3.up * data.GroundOffset;
+                    data.GroundRaycastHit = hit;
+                    job.TargetFootPos[0] = data.GroundRaycastHit.point + Vector3.up * data.GroundOffset;
                 }
             }
             else
             {
                 if (!data.Pair.IsValid() || (data.Pair.FinishedMoving() &&
-                    Vector3.Distance(_prevKneePos, kneePos) > data.StepDist))
+                    Vector3.Distance(data.PreviousKneePos, kneePos) > data.StepDist))
                 {
-                    _prevKneePos = kneePos;
+                    data.PreviousKneePos = kneePos;
                     job.IsMovable[0] = true;
                     job.MoveProgress[0] = 0.0f;
                     data.Progress = 0.0f;
@@ -230,12 +227,12 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
+            job.DeltaTime[0] = data.ShouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())
             {
-                _shouldUpdate = false;
+                data.ShouldUpdate = false;
             }
         }
 

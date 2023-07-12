@@ -321,15 +321,10 @@ namespace Oculus.Movement.AnimationRigging
     public class DeformationJobBinder<T> : AnimationJobBinder<DeformationJob, T>
         where T : struct, IAnimationJobData, IDeformationData
     {
-        private bool _shouldUpdate;
-        private Transform _animatorTransform;
-
         /// <inheritdoc />
         public override DeformationJob Create(Animator animator, ref T data, Component component)
         {
             var job = new DeformationJob();
-
-            _animatorTransform = animator.transform;
 
             job.LeftUpperArmBone = ReadWriteTransformHandle.Bind(animator, data.LeftArm.UpperArmBone);
             job.LeftLowerArmBone = ReadWriteTransformHandle.Bind(animator, data.LeftArm.LowerArmBone);
@@ -392,17 +387,20 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (data.IsBoneTransformsDataValid())
             {
-                _shouldUpdate = true;
+                data.ShouldUpdate = true;
             }
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
+            job.DeltaTime[0] = data.ShouldUpdate ? Time.unscaledDeltaTime : 0.0f;
+            var currentScale = data.ConstraintCustomSkeleton != null
+                ? data.ConstraintCustomSkeleton.transform.lossyScale
+                : data.ConstraintAnimator.transform.lossyScale;
             job.ScaleFactor[0] =
-                DivideVector3(_animatorTransform.lossyScale, data.StartingScale);
+                DivideVector3(currentScale, data.StartingScale);
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())
             {
-                _shouldUpdate = false;
+                data.ShouldUpdate = false;
             }
         }
 

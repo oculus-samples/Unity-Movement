@@ -57,25 +57,21 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The shoulder transform.
         /// </summary>
-        [SyncSceneToStream]
         public Transform ShoulderBone;
 
         /// <summary>
         /// The upper arm transform.
         /// </summary>
-        [SyncSceneToStream]
         public Transform UpperArmBone;
 
         /// <summary>
         /// The lower arm transform.
         /// </summary>
-        [SyncSceneToStream]
         public Transform LowerArmBone;
 
         /// <summary>
         /// The hand transform.
         /// </summary>
-        [SyncSceneToStream]
         public Transform HandBone;
 
         /// <summary>
@@ -134,6 +130,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The Animator component for the character.
         /// </summary>
         public Animator ConstraintAnimator { get; }
+
+        /// <summary>
+        /// If true, update this job.
+        /// </summary>
+        public bool ShouldUpdate { get; set; }
 
         /// <summary>
         /// The array of transforms from the hips to the head bones.
@@ -252,6 +253,13 @@ namespace Oculus.Movement.AnimationRigging
         Animator IDeformationData.ConstraintAnimator => _animator;
 
         /// <inheritdoc />
+        bool IDeformationData.ShouldUpdate
+        {
+            get => _shouldUpdate;
+            set => _shouldUpdate = value;
+        }
+
+        /// <inheritdoc />
         SpineTranslationCorrectionType IDeformationData.SpineCorrectionType => _spineTranslationCorrectionType;
 
         /// <inheritdoc />
@@ -263,13 +271,13 @@ namespace Oculus.Movement.AnimationRigging
         ArmPosData IDeformationData.LeftArm => _leftArmData;
 
         /// <inheritdoc />
-        public bool LeftArmDataInitialized => _leftArmData.IsInitialized;
+        bool IDeformationData.LeftArmDataInitialized => _leftArmData.IsInitialized;
 
         /// <inheritdoc />
         ArmPosData IDeformationData.RightArm => _rightArmData;
 
         /// <inheritdoc />
-        public bool RightArmDataInitialized => _rightArmData.IsInitialized;
+        bool IDeformationData.RightArmDataInitialized => _rightArmData.IsInitialized;
 
         /// <inheritdoc />
         Vector3 IDeformationData.StartingScale => _startingScale;
@@ -364,14 +372,14 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Left arm data.
         /// </summary>
-        [SerializeField]
+        [SyncSceneToStream, SerializeField]
         [Tooltip(DeformationDataTooltips.LeftArmData)]
         private ArmPosData _leftArmData;
 
         /// <summary>
         /// Right arm data.
         /// </summary>
-        [SerializeField]
+        [SyncSceneToStream, SerializeField]
         [Tooltip(DeformationDataTooltips.RightArmData)]
         private ArmPosData _rightArmData;
 
@@ -395,6 +403,8 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.HipsToHeadDistance)]
         private float _hipsToHeadDistance;
+
+        private bool _shouldUpdate;
 
         /// <summary>
         /// Assign the OVR Custom Skeleton.
@@ -495,13 +505,13 @@ namespace Oculus.Movement.AnimationRigging
                     "set up bone pairs");
                 return;
             }
-            if (!LeftArmDataInitialized)
+            if (!_leftArmData.IsInitialized)
             {
                 Debug.LogError("Please set up left arm data before trying to " +
                     "set up bone pairs");
                 return;
             }
-            if (!RightArmDataInitialized)
+            if (!_rightArmData.IsInitialized)
             {
                 Debug.LogError("Please set up right arm data before trying to " +
                     "set up bone pairs");

@@ -18,6 +18,11 @@ namespace Oculus.Movement.AnimationRigging
         public OVRCustomSkeleton ConstraintSkeleton { get; }
 
         /// <summary>
+        /// If true, update this job.
+        /// </summary>
+        public bool ShouldUpdate { get; set; }
+
+        /// <summary>
         /// The array of available hip pinning targets.
         /// </summary>
         public HipPinningConstraintTarget[] HipPinningTargets { get; }
@@ -31,6 +36,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The bones that compose the skeleton.
         /// </summary>
         public Transform[] Bones  { get; }
+
+        /// <summary>
+        /// The root bone of this transform.
+        /// </summary>
+        public Transform Root { get; }
 
         /// <summary>
         /// The calibrated hip position.
@@ -51,6 +61,11 @@ namespace Oculus.Movement.AnimationRigging
         /// If true, hip pinning will be disabled when the character leaves a certain range.
         /// </summary>
         public bool HipPinningLeave { get; }
+
+        /// <summary>
+        /// If true, this is the first frame that the newly created job is running on.
+        /// </summary>
+        public bool IsFirstFrame { get; set; }
 
         /// <summary>
         /// Event when the user enters a hip pinning area.
@@ -91,6 +106,13 @@ namespace Oculus.Movement.AnimationRigging
         OVRCustomSkeleton IHipPinningData.ConstraintSkeleton => _skeleton;
 
         /// <inheritdoc />
+        bool IHipPinningData.ShouldUpdate
+        {
+            get => _shouldUpdate;
+            set => _shouldUpdate = value;
+        }
+
+        /// <inheritdoc />
         HipPinningConstraintTarget[] IHipPinningData.HipPinningTargets => _hipPinningTargets;
 
         /// <inheritdoc />
@@ -98,6 +120,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         Transform[] IHipPinningData.Bones => _bones;
+
+        /// <inheritdoc />
+        Transform IHipPinningData.Root => _root;
 
         /// <inheritdoc />
         Vector3 IHipPinningData.CalibratedHipPos => _calibratedHipTranslation;
@@ -110,6 +135,13 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         bool IHipPinningData.HipPinningLeave => _enableHipPinningLeave;
+
+        /// <inheritdoc />
+        public bool IsFirstFrame
+        {
+            get => _isFirstFrame;
+            set => _isFirstFrame = value;
+        }
 
         /// <inheritdoc cref="IHipPinningData.EnterHipPinningArea"/>
         public event Action<HipPinningConstraintTarget> OnEnterHipPinningArea;
@@ -149,6 +181,9 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3 _calibratedHipTranslation;
         private Quaternion _initialHipLocalRotation;
         private HipPinningConstraintTarget _currentHipPinningTarget;
+        private Transform _root;
+        private bool _shouldUpdate;
+        private bool _isFirstFrame;
 
         private bool _obtainedProperReferences;
 
@@ -174,6 +209,7 @@ namespace Oculus.Movement.AnimationRigging
                 _bones[i] = _skeleton.CustomBones[i];
             }
             _initialHipLocalRotation = _bones[(int)OVRSkeleton.BoneId.Body_Hips].transform.localRotation;
+            _root = _bones[(int)OVRSkeleton.BoneId.Body_Hips].parent;
             _obtainedProperReferences = true;
             return true;
         }
