@@ -1310,4 +1310,22 @@ namespace Oculus.Movement
             "Positions to correct mask, intended to set certain joints of " +
             "animation rigged characters to T-Pose during retargeting.";
     }
+
+    public static class AnimatorBoneVisualizerTooltips
+    {
+        public const string AnimatorComp =
+            "Animator component to visualize bones for.";
+
+        public const string VisualizationGuideType =
+            "The type of guide used to visualize bones.";
+
+        public const string MaskToVisualize =
+            "Mask to use for visualization.";
+
+        public const string BonesCollection =
+            "Bone collection to use for visualization.";
+
+        public const string LineRendererPrefab =
+            "Line renderer to use for visualization.";
+    }
 }

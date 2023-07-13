@@ -67,77 +67,6 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private static readonly Dictionary<HumanBodyBones, AvatarMaskBodyPart>
-            _humanBoneToAvatarBodyPart = new Dictionary<HumanBodyBones, AvatarMaskBodyPart>()
-            {
-                { HumanBodyBones.Neck, AvatarMaskBodyPart.Head },
-
-                { HumanBodyBones.Head, AvatarMaskBodyPart.Head },
-                { HumanBodyBones.LeftEye, AvatarMaskBodyPart.Head },
-                { HumanBodyBones.RightEye, AvatarMaskBodyPart.Head },
-                { HumanBodyBones.Jaw, AvatarMaskBodyPart.Head },
-
-                { HumanBodyBones.Hips, AvatarMaskBodyPart.Body },
-
-                { HumanBodyBones.Spine, AvatarMaskBodyPart.Body },
-                { HumanBodyBones.Chest, AvatarMaskBodyPart.Body },
-                { HumanBodyBones.UpperChest, AvatarMaskBodyPart.Body },
-
-                { HumanBodyBones.RightShoulder, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightUpperArm, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLowerArm, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightHand, AvatarMaskBodyPart.RightArm },
-
-                { HumanBodyBones.LeftShoulder, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftUpperArm, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLowerArm, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftHand, AvatarMaskBodyPart.LeftArm },
-
-                { HumanBodyBones.LeftUpperLeg, AvatarMaskBodyPart.LeftLeg },
-                { HumanBodyBones.LeftLowerLeg, AvatarMaskBodyPart.LeftLeg },
-
-                { HumanBodyBones.LeftFoot, AvatarMaskBodyPart.LeftLeg },
-                { HumanBodyBones.LeftToes, AvatarMaskBodyPart.LeftLeg },
-
-                { HumanBodyBones.RightUpperLeg, AvatarMaskBodyPart.RightLeg },
-                { HumanBodyBones.RightLowerLeg, AvatarMaskBodyPart.RightLeg },
-
-                { HumanBodyBones.RightFoot, AvatarMaskBodyPart.RightLeg },
-                { HumanBodyBones.RightToes, AvatarMaskBodyPart.RightLeg },
-
-                { HumanBodyBones.LeftThumbProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftThumbIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftThumbDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftIndexProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftIndexIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftIndexDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftMiddleProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftMiddleIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftMiddleDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftRingProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftRingIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftRingDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLittleProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLittleIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLittleDistal, AvatarMaskBodyPart.LeftArm },
-
-                { HumanBodyBones.RightThumbProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightThumbIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightThumbDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightIndexProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightIndexIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightIndexDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightMiddleProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightMiddleIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightMiddleDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightRingProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightRingIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightRingDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLittleProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLittleIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLittleDistal, AvatarMaskBodyPart.RightArm }
-            };
-
         /// <summary>
         /// The array of joint position adjustments.
         /// </summary>
@@ -515,7 +444,7 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
-                var bodyPart = _humanBoneToAvatarBodyPart[humanBodyBone];
+                var bodyPart = CustomMappings.HumanBoneToAvatarBodyPart[humanBodyBone];
                 if (!_positionsToCorrectLateUpdateInstance.GetHumanoidBodyPartActive(bodyPart) ||
                     (CustomPositionsToCorrectLateUpdateMask != null &&
                      !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
@@ -566,7 +495,8 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     continue;
                 }
-                if (!_maskToSetToTPoseInstance.GetHumanoidBodyPartActive(_humanBoneToAvatarBodyPart[i]))
+                if (!_maskToSetToTPoseInstance.GetHumanoidBodyPartActive(
+                    CustomMappings.HumanBoneToAvatarBodyPart[i]))
                 {
                     continue;
                 }
@@ -709,7 +639,7 @@ namespace Oculus.Movement.AnimationRigging
                 if (avatarMask != null)
                 {
                     jointFailsMask = !avatarMask.GetHumanoidBodyPartActive(
-                        _humanBoneToAvatarBodyPart[targetHumanBodyBone]);
+                        CustomMappings.HumanBoneToAvatarBodyPart[targetHumanBodyBone]);
                 }
 
                 if (adjustment == null)
