@@ -1327,5 +1327,11 @@ namespace Oculus.Movement
 
         public const string LineRendererPrefab =
             "Line renderer to use for visualization.";
+
+        public const string AxisRendererPrefab =
+            "Axis renderer to use for visualization.";
+
+        public const string VisualType =
+            "Indicates what kind of visual is desired.";
     }
 }

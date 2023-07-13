@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BoneVisual
+  m_Name: RightAxis
   m_Shader: {fileID: 4800000, guid: 6c3ece0d3244abe4eb86e1f8fafabeb3, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -75,6 +75,6 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0, g: 1, b: 0.13840461, a: 1}
+    - _Color: {r: 1, g: 0, b: 0.058037758, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

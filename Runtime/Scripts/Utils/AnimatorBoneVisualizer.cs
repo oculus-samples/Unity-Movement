@@ -65,6 +65,13 @@ namespace Oculus.Movement.Utils
             Mask = 0,
             BoneVisualData
         }
+        public enum VisualType
+        {
+            None = 0,
+            Lines,
+            Axes,
+            Both
+        }
 
         /// <summary>
         /// Animator component to visualize bones for.
@@ -101,10 +108,27 @@ namespace Oculus.Movement.Utils
         [Tooltip(AnimatorBoneVisualizerTooltips.LineRendererPrefab)]
         protected GameObject _lineRendererPrefab;
 
-        private const string _BONE_VISUAL_NAME_PREFIX = "BoneVisual.";
+        /// <summary>
+        /// Axis renderer to use for visualization.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(AnimatorBoneVisualizerTooltips.AxisRendererPrefab)]
+        protected GameObject _axisRendererPrefab;
+
+        /// <summary>
+        /// Indicates what kind of visual is desired.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(AnimatorBoneVisualizerTooltips.VisualType)]
+        protected VisualType _visualType = VisualType.None;
+
+        private const string _LINE_VISUAL_NAME_SUFFIX_TOKEN = "-LineVisual.";
+        private const string _AXIS_VISUAL_NAME_SUFFIX_TOKEN = "-AxisVisual.";
 
         private Dictionary<HumanBodyBones, LineRenderer> _humanBoneToLineRenderer
             = new Dictionary<HumanBodyBones, LineRenderer>();
+        private Dictionary<HumanBodyBones, Transform> _humanBoneToAxisObject
+            = new Dictionary<HumanBodyBones, Transform>();
 
         private void Awake()
         {
@@ -118,6 +142,8 @@ namespace Oculus.Movement.Utils
                 _boneVisualData.Validate();
             }
             Assert.IsNotNull(_lineRendererPrefab);
+
+            Assert.IsNotNull(_axisRendererPrefab);
         }
 
         /// <summary>
@@ -156,35 +182,30 @@ namespace Oculus.Movement.Utils
                     continue;
                 }
 
-                if (!_humanBoneToLineRenderer.ContainsKey(currentBone))
+                switch (_visualType)
                 {
-                    var newObject = GameObject.Instantiate(_lineRendererPrefab);
-                    newObject.name += $"{_BONE_VISUAL_NAME_PREFIX}{currentBone}";
-                    var lineRenderer = newObject.GetComponent<LineRenderer>();
-                    _humanBoneToLineRenderer[currentBone] = lineRenderer;
-                }
+                    case VisualType.Axes:
+                        SetUpAxisRenderer(currentBone);
+                        EnforceLineRendererEnableState(false);
+                        EnforceAxisRendererEnableState(true);
+                        break;
+                    case VisualType.Lines:
+                        SetUpLineRenderer(currentBone);
+                        EnforceLineRendererEnableState(true);
+                        EnforceAxisRendererEnableState(false);
+                        break;
+                    case VisualType.Both:
+                        SetUpLineRenderer(currentBone);
+                        SetUpAxisRenderer(currentBone);
+                        EnforceLineRendererEnableState(true);
+                        EnforceAxisRendererEnableState(true);
+                        break;
+                    case VisualType.None:
+                        EnforceLineRendererEnableState(false);
+                        EnforceAxisRendererEnableState(false);
+                        break;
 
-                var lineRendererComp = _humanBoneToLineRenderer[currentBone];
-
-                // each joint has a bone tupe that we can use to visualize the bones.
-                var boneTuple = CustomMappings.BoneToJointPair[currentBone];
-                var firstJoint = _animatorComp.GetBoneTransform(boneTuple.Item1);
-                Transform secondJoint = null;
-                if (boneTuple.Item2 == HumanBodyBones.LastBone)
-                {
-                    secondJoint = firstJoint.GetChild(0);
                 }
-                else
-                {
-                    secondJoint = _animatorComp.GetBoneTransform(boneTuple.Item2);
-                }
-                if (secondJoint == null)
-                {
-                    continue;
-                }
-
-                lineRendererComp.SetPosition(0, firstJoint.position);
-                lineRendererComp.SetPosition(1, secondJoint.position);
             }
         }
 
@@ -198,6 +219,84 @@ namespace Oculus.Movement.Utils
             else
             {
                 return _boneVisualData.BoneShouldBeVisualized(bone);
+            }
+        }
+
+        private void SetUpLineRenderer(HumanBodyBones currentBone)
+        {
+            // each joint has a bone tupe that we can use to visualize the bones.
+            var boneTuple = CustomMappings.BoneToJointPair[currentBone];
+            var firstJoint = _animatorComp.GetBoneTransform(boneTuple.Item1);
+
+            if (firstJoint == null)
+            {
+                return;
+            }
+
+            Transform secondJoint = null;
+            if (boneTuple.Item2 == HumanBodyBones.LastBone)
+            {
+                secondJoint = firstJoint.GetChild(0);
+            }
+            else
+            {
+                secondJoint = _animatorComp.GetBoneTransform(boneTuple.Item2);
+            }
+
+            if (secondJoint == null)
+            {
+                return;
+            }
+
+            if (!_humanBoneToLineRenderer.ContainsKey(currentBone))
+            {
+                var newObject = GameObject.Instantiate(_lineRendererPrefab);
+                newObject.name += $"{_LINE_VISUAL_NAME_SUFFIX_TOKEN}{currentBone}";
+                newObject.transform.SetParent(transform);
+                var lineRenderer = newObject.GetComponent<LineRenderer>();
+                _humanBoneToLineRenderer[currentBone] = lineRenderer;
+            }
+
+            var lineRendererComp = _humanBoneToLineRenderer[currentBone];
+            lineRendererComp.SetPosition(0, firstJoint.position);
+            lineRendererComp.SetPosition(1, secondJoint.position);
+        }
+
+        private void SetUpAxisRenderer(HumanBodyBones currentBone)
+        {
+            var boneTransform = _animatorComp.GetBoneTransform(currentBone);
+            if (boneTransform == null)
+            {
+                return;
+            }
+
+            if (!_humanBoneToAxisObject.ContainsKey(currentBone))
+            {
+                var newObject = GameObject.Instantiate(_axisRendererPrefab);
+                newObject.name += $"{_AXIS_VISUAL_NAME_SUFFIX_TOKEN}{currentBone}";
+                newObject.transform.SetParent(transform);
+                _humanBoneToAxisObject[currentBone] = newObject.transform;
+            }
+
+            var axisComp = _humanBoneToAxisObject[currentBone];
+
+            axisComp.position = boneTransform.position;
+            axisComp.rotation = boneTransform.rotation;
+        }
+
+        private void EnforceLineRendererEnableState(bool enableValue)
+        {
+            foreach (var value in _humanBoneToLineRenderer.Values)
+            {
+                value.enabled = enableValue;
+            }
+        }
+
+        private void EnforceAxisRendererEnableState(bool enableValue)
+        {
+            foreach (var value in _humanBoneToAxisObject.Values)
+            {
+                value.gameObject.SetActive(enableValue);
             }
         }
     }
