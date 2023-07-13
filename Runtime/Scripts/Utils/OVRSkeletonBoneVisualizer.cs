@@ -383,7 +383,7 @@ namespace Oculus.Movement.Utils
             if (!_humanBoneToLineRenderer.ContainsKey(currentBone))
             {
                 var newObject = GameObject.Instantiate(_lineRendererPrefab);
-                newObject.name += $"{_LINE_VISUAL_NAME_SUFFIX_TOKEN}{currentBone}";
+                newObject.name += $"{_LINE_VISUAL_NAME_SUFFIX_TOKEN}{(CustomMappings.BodyTrackingBoneId)currentBone}";
                 newObject.transform.SetParent(transform);
                 var lineRenderer = newObject.GetComponent<LineRenderer>();
                 _humanBoneToLineRenderer[currentBone] = lineRenderer;
@@ -448,7 +448,7 @@ namespace Oculus.Movement.Utils
             if (!_humanBoneToAxisObject.ContainsKey(currentBone))
             {
                 var newObject = GameObject.Instantiate(_axisRendererPrefab);
-                newObject.name += $"{_AXIS_VISUAL_NAME_SUFFIX_TOKEN}{currentBone}";
+                newObject.name += $"{_AXIS_VISUAL_NAME_SUFFIX_TOKEN}{(CustomMappings.BodyTrackingBoneId)currentBone}";
                 newObject.transform.SetParent(transform);
                 _humanBoneToAxisObject[currentBone] = newObject.transform;
             }

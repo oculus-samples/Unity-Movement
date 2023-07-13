@@ -784,7 +784,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     OVRSkeleton.BoneId.Body_LeftHandLittleTip,
                     new Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>(OVRSkeleton.BoneId.Body_LeftHandLittleDistal,
-                        OVRSkeleton.BoneId.Body_LeftHandRingTip)
+                        OVRSkeleton.BoneId.Body_LeftHandLittleTip)
                 },
 
                 {
@@ -944,7 +944,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     OVRSkeleton.BoneId.Body_RightHandLittleTip,
                     new Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>(OVRSkeleton.BoneId.Body_RightHandLittleDistal,
-                        OVRSkeleton.BoneId.Body_RightHandRingTip)
+                        OVRSkeleton.BoneId.Body_RightHandLittleTip)
                 },
             };
     }
