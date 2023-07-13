@@ -11,6 +11,7 @@ namespace Oculus.Movement.Utils
     /// <summary>
     /// Allows visualizing bones found in an Animator component.
     /// </summary>
+    [DefaultExecutionOrder(230)]
     public class AnimatorBoneVisualizer : MonoBehaviour
     {
         [Serializable]
@@ -294,7 +295,7 @@ namespace Oculus.Movement.Utils
             return allBonesMask;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             VisualizeBones();
         }

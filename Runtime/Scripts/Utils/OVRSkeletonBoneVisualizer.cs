@@ -11,6 +11,7 @@ namespace Oculus.Movement.Utils
     /// <summary>
     /// Allows visualizing bones found in an OVRSkeleton component.
     /// </summary>
+    [DefaultExecutionOrder(230)]
     public class OVRSkeletonBoneVisualizer : MonoBehaviour
     {
         [Serializable]
@@ -304,7 +305,7 @@ namespace Oculus.Movement.Utils
             return allBonesMask;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             VisualizeBones();
         }
