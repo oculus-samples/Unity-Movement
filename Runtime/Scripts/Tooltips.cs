@@ -1322,7 +1322,7 @@ namespace Oculus.Movement
         public const string MaskToVisualize =
             "Mask to use for visualization.";
 
-        public const string BonesCollection =
+        public const string BoneVisualData =
             "Bone collection to use for visualization.";
 
         public const string LineRendererPrefab =

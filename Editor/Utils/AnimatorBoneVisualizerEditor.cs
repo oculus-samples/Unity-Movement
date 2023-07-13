@@ -14,12 +14,20 @@ namespace Oculus.Movement.Utils
         /// <inheritdoc />
         public override void OnInspectorGUI()
         {
+            var script = target as AnimatorBoneVisualizer;
             if (GUILayout.Button("Select all bones"))
             {
-                var script = target as AnimatorBoneVisualizer;
                 if (script)
                 {
                     script.SelectAllBones();
+                }
+            }
+
+            if (GUILayout.Button("Clear all data"))
+            {
+                if (script)
+                {
+                    script.ClearData();
                 }
             }
             DrawDefaultInspector();
