@@ -31,12 +31,20 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="skeleton"><see cref="OVRSkeleton"/> to query.</param>
         /// <param name="boneId"><see cref="OVRSkeleton.BoneId"/> of transform to find.</param>
-        /// <returns></returns>
+        /// <param name="isBindPose">If bone is obtained via bind pose.</param>
+        /// <returns>Bone transform.</returns>
         public static Transform FindBoneTransformFromSkeleton(
             OVRSkeleton skeleton,
-            OVRSkeleton.BoneId boneId)
+            OVRSkeleton.BoneId boneId,
+            bool isBindPose = false)
         {
-            var bones = skeleton.Bones;
+            if (!skeleton.IsInitialized ||
+                !skeleton.IsDataValid)
+            {
+                return null;
+            }
+
+            var bones = isBindPose ? skeleton.BindPoses : skeleton.Bones;
             for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
             {
                 if (bones[boneIndex].Id == boneId)

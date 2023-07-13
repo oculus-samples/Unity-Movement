@@ -191,6 +191,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!319 &52514089
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements: []
 --- !u!4 &87392205 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 942435568972493560, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
@@ -884,10 +893,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animatorComp: {fileID: 2878048534481306166}
-  _useMaskForBoneVisualization: 1
+  _visualizationGuideType: 0
   _maskToVisualize: {fileID: 31900000, guid: 8267e3d56146c7e43bd0296dc7f86558, type: 2}
   _boneVisualData:
     BonesToVisualize: 
+  _customBoneVisualData:
+    BoneTuples: []
   _lineRendererPrefab: {fileID: 7812178534108119229, guid: 6d28b0d0a0ff2234cbf60710c8c912dc, type: 3}
   _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}
   _visualType: 1
@@ -1075,6 +1086,60 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8702160152427063123, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
   m_PrefabInstance: {fileID: 2878048534481306165}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1639108941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1639108943}
+  - component: {fileID: 1639108944}
+  m_Layer: 0
+  m_Name: DebugBonesOVRSkeleton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1639108943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639108941}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.81499124, y: 1.347516, z: 0.12875414}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1639108944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639108941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab1e3682a8676d84faba89a2aee068e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ovrSkeletonComp: {fileID: 2878048534481306169}
+  _visualizationGuideType: 0
+  _maskToVisualize: {fileID: 52514089}
+  _boneVisualData:
+    BonesToVisualize: 
+  _customBoneVisualData:
+    BoneTuples: []
+  _lineRendererPrefab: {fileID: 7812178534108119229, guid: 91a281e92421c464e837420766cafd02, type: 3}
+  _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}
+  _visualType: 1
 --- !u!4 &1648597920 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5429506017946967965, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
@@ -2225,6 +2290,17 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 4325497552437736820, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
   m_PrefabInstance: {fileID: 2878048534481306165}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2878048534481306169 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 208026092, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
+  m_PrefabInstance: {fileID: 2878048534481306165}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31e3b6438933e1945a67ef8d4db811bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3138635617795618172
 PrefabInstance:
   m_ObjectHideFlags: 0

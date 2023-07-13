@@ -1334,4 +1334,31 @@ namespace Oculus.Movement
         public const string VisualType =
             "Indicates what kind of visual is desired.";
     }
+
+    public static class OVRSkeletonBoneVisualizerTooltips
+    {
+        public const string OVRSkeletonComp =
+            "OVRSkeleton component to visualize bones for.";
+
+        public const string VisualizeBindPose =
+            "Whether to visualize bind pose or not.";
+
+        public const string VisualizationGuideType =
+            "The type of guide used to visualize bones.";
+
+        public const string MaskToVisualize =
+            "Mask to use for visualization.";
+
+        public const string BoneVisualData =
+            "Bone collection to use for visualization.";
+
+        public const string LineRendererPrefab =
+            "Line renderer to use for visualization.";
+
+        public const string AxisRendererPrefab =
+            "Axis renderer to use for visualization.";
+
+        public const string VisualType =
+            "Indicates what kind of visual is desired.";
+    }
 }
