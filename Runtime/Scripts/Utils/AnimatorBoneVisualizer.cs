@@ -242,7 +242,10 @@ namespace Oculus.Movement.Utils
         private Dictionary<HumanBodyBones, Transform> _humanBoneToAxisObject
             = new Dictionary<HumanBodyBones, Transform>();
 
-        private void Awake()
+        /// <summary>
+        /// MonoBehaviour.Awake
+        /// </summary>
+        protected virtual void Awake()
         {
             Assert.IsNotNull(_animatorComp);
             Assert.IsNotNull(_lineRendererPrefab);
@@ -295,7 +298,10 @@ namespace Oculus.Movement.Utils
             return allBonesMask;
         }
 
-        private void LateUpdate()
+        /// <summary>
+        /// MonoBehaviour.LateUpdate
+        /// </summary>
+        protected virtual void LateUpdate()
         {
             VisualizeBones();
         }
