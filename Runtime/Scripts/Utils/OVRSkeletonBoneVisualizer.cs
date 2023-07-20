@@ -62,8 +62,18 @@ namespace Oculus.Movement.Utils
         /// Bone tuple class.
         /// </summary>
         [Serializable]
-        public class BoneTuple
+        public class BoneTuple : ISerializationCallbackReceiver
         {
+            public BoneTuple()
+            {
+                FirstBone = CustomMappings.BodyTrackingBoneId.Body_Hips;
+                SecondBone = CustomMappings.BodyTrackingBoneId.Body_Hips;
+
+                BonePair =
+                    new Tuple<CustomMappings.BodyTrackingBoneId,
+                     CustomMappings.BodyTrackingBoneId>(FirstBone, SecondBone);
+            }
+
             /// <summary>
             /// Bone tuple constructor.
             /// </summary>
@@ -75,6 +85,22 @@ namespace Oculus.Movement.Utils
             {
                 FirstBone = firstBone;
                 SecondBone = secondBone;
+
+                BonePair =
+                    new Tuple<CustomMappings.BodyTrackingBoneId,
+                     CustomMappings.BodyTrackingBoneId>(FirstBone, SecondBone);
+            }
+
+            public void OnBeforeSerialize()
+            {
+                // Nothing to see here.
+            }
+
+            public void OnAfterDeserialize()
+            {
+                // always keep this up-to-date
+                BonePair =
+                    new Tuple<CustomMappings.BodyTrackingBoneId, CustomMappings.BodyTrackingBoneId>(FirstBone, SecondBone);
             }
 
             /// <summary>
@@ -85,6 +111,13 @@ namespace Oculus.Movement.Utils
             /// Second bone in tuple.
             /// </summary>
             public CustomMappings.BodyTrackingBoneId SecondBone;
+
+            /// <summary>
+            /// Use this as a key for dictionary look-ups. That way multiple pairs
+            /// with the same first and second bones will map to the same key.
+            /// </summary>
+            [HideInInspector]
+            public Tuple<CustomMappings.BodyTrackingBoneId, CustomMappings.BodyTrackingBoneId> BonePair;
         }
 
         /// <summary>
@@ -94,11 +127,14 @@ namespace Oculus.Movement.Utils
         public class CustomBoneVisualData
         {
             /// <summary>
-            /// Indicates if bone should be visualized or not.
+            /// Indicates if tuple exists
             /// </summary>
-            /// <param name="bone">Bone in question.</param>
+            /// <param name="firstBone">First bone in question.</param>
+            /// <param name="secondBone">Second bone in question.</param>
             /// <returns>True if so, false if not.</returns>
-            public bool BoneShouldBeVisualized(OVRSkeleton.BoneId bone)
+            public bool DoesTupleExist(
+                OVRSkeleton.BoneId firstBone,
+                OVRSkeleton.BoneId secondBone)
             {
                 if (BoneTuples == null || BoneTuples.Length == 0)
                 {
@@ -106,7 +142,8 @@ namespace Oculus.Movement.Utils
                 }
                 foreach (var currentBoneTuple in BoneTuples)
                 {
-                    if ((OVRSkeleton.BoneId)currentBoneTuple.FirstBone == bone)
+                    if ((OVRSkeleton.BoneId)currentBoneTuple.FirstBone == firstBone &&
+                        (OVRSkeleton.BoneId)currentBoneTuple.SecondBone == secondBone)
                     {
                         return true;
                     }
@@ -131,24 +168,6 @@ namespace Oculus.Movement.Utils
                     BoneTuples[(int)currentBone] = new BoneTuple((CustomMappings.BodyTrackingBoneId)firstJoint,
                         (CustomMappings.BodyTrackingBoneId)secondJoint);
                 }
-            }
-
-            /// <summary>
-            /// Find bone tuple corresponding to start bone.
-            /// </summary>
-            /// <param name="startingBone">Start bone.</param>
-            /// <returns>Bone tuple found, if any.</returns>
-            public BoneTuple GetBoneTupleForStartingBone(OVRSkeleton.BoneId startingBone)
-            {
-                foreach (var boneTuple in BoneTuples)
-                {
-                    if (startingBone == (OVRSkeleton.BoneId)boneTuple.FirstBone)
-                    {
-                        return boneTuple;
-                    }
-                }
-
-                return null;
             }
 
             /// <summary>
@@ -245,12 +264,18 @@ namespace Oculus.Movement.Utils
         protected VisualType _visualType = VisualType.None;
 
         private const string _LINE_VISUAL_NAME_SUFFIX_TOKEN = "-LineVisual.";
+        private const string _CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN = "-CustomLineVisual.";
         private const string _AXIS_VISUAL_NAME_SUFFIX_TOKEN = "-AxisVisual.";
 
         private Dictionary<OVRSkeleton.BoneId, LineRenderer> _humanBoneToLineRenderer
             = new Dictionary<OVRSkeleton.BoneId, LineRenderer>();
+        private Dictionary<Tuple<CustomMappings.BodyTrackingBoneId, CustomMappings.BodyTrackingBoneId>, LineRenderer> _boneTupeToLineRenderer
+            = new Dictionary<Tuple<CustomMappings.BodyTrackingBoneId, CustomMappings.BodyTrackingBoneId>, LineRenderer>();
         private Dictionary<OVRSkeleton.BoneId, Transform> _humanBoneToAxisObject
             = new Dictionary<OVRSkeleton.BoneId, Transform>();
+
+        private List<Tuple<CustomMappings.BodyTrackingBoneId, CustomMappings.BodyTrackingBoneId>> _itemsToDelete =
+            new List<Tuple<CustomMappings.BodyTrackingBoneId, CustomMappings.BodyTrackingBoneId>>();
 
         private void Awake()
         {
@@ -286,16 +311,28 @@ namespace Oculus.Movement.Utils
             _maskToVisualize = null;
             _boneVisualData = new BoneVisualData();
             _customBoneVisualData = new CustomBoneVisualData();
+            _customBoneVisualData.BoneTuples = new BoneTuple[0];
             foreach (var value in _humanBoneToLineRenderer.Values)
             {
                 Destroy(value.gameObject);
             }
+            ClearBoneTupleVisualObjects();
             foreach (var value in _humanBoneToAxisObject.Values)
             {
                 Destroy(value.gameObject);
             }
             _humanBoneToAxisObject.Clear();
             _humanBoneToLineRenderer.Clear();
+        }
+
+        private void ClearBoneTupleVisualObjects()
+        {
+            foreach (var value in _boneTupeToLineRenderer)
+            {
+                Destroy(value.Value.gameObject);
+            }
+
+            _boneTupeToLineRenderer.Clear();
         }
 
         private AvatarMask CreateAllBonesMask()
@@ -307,10 +344,11 @@ namespace Oculus.Movement.Utils
 
         private void LateUpdate()
         {
-            VisualizeBones();
+            VisualizeNonCustomData();
+            VisualizeCustomData();
         }
 
-        private void VisualizeBones()
+        private void VisualizeNonCustomData()
         {
             for (var currentBone = OVRSkeleton.BoneId.Body_Hips; currentBone < OVRSkeleton.BoneId.Body_End;
                     currentBone++)
@@ -330,12 +368,12 @@ namespace Oculus.Movement.Utils
                         EnforceAxisRendererEnableState(currentBone, true);
                         break;
                     case VisualType.Lines:
-                        SetUpLineRenderer(currentBone);
+                        SetUpFixedTransformPairLineRenderer(currentBone);
                         EnforceLineRendererEnableState(currentBone, true);
                         EnforceAxisRendererEnableState(currentBone, false);
                         break;
                     case VisualType.LinesAxes:
-                        SetUpLineRenderer(currentBone);
+                        SetUpFixedTransformPairLineRenderer(currentBone);
                         SetUpAxisRenderer(currentBone);
                         EnforceLineRendererEnableState(currentBone, true);
                         EnforceAxisRendererEnableState(currentBone, true);
@@ -345,6 +383,60 @@ namespace Oculus.Movement.Utils
                         EnforceAxisRendererEnableState(currentBone, false);
                         break;
                 }
+            }
+        }
+
+        private void VisualizeCustomData()
+        {
+            if (_visualizationGuideType != VisualizationGuideType.CustomBoneVisualData)
+            {
+                ClearBoneTupleVisualObjects();
+                return;
+            }
+
+            foreach (var tupleItem in _customBoneVisualData.BoneTuples)
+            {
+                switch (_visualType)
+                {
+                    case VisualType.Axes:
+                        SetUpAxisRenderer((OVRSkeleton.BoneId)tupleItem.FirstBone);
+                        EnforceCustomLineRendererEnableState(tupleItem.BonePair, false);
+                        EnforceAxisRendererEnableState((OVRSkeleton.BoneId)tupleItem.FirstBone, true);
+                        break;
+                    case VisualType.Lines:
+                        SetupBoneTupleLineRenderer(tupleItem);
+                        EnforceCustomLineRendererEnableState(tupleItem.BonePair, true);
+                        EnforceAxisRendererEnableState((OVRSkeleton.BoneId)tupleItem.FirstBone, false);
+                        break;
+                    case VisualType.LinesAxes:
+                        SetupBoneTupleLineRenderer(tupleItem);
+                        SetUpAxisRenderer((OVRSkeleton.BoneId)tupleItem.FirstBone);
+                        EnforceCustomLineRendererEnableState(tupleItem.BonePair, true);
+                        EnforceAxisRendererEnableState((OVRSkeleton.BoneId)tupleItem.FirstBone, true);
+                        break;
+                    case VisualType.None:
+                        EnforceCustomLineRendererEnableState(tupleItem.BonePair, false);
+                        EnforceAxisRendererEnableState((OVRSkeleton.BoneId)tupleItem.FirstBone, false);
+                        break;
+                }
+            }
+
+            _itemsToDelete.Clear();
+            // remove previously-rendered tuples, if any
+            foreach (var key in _boneTupeToLineRenderer.Keys)
+            {
+                if (!_customBoneVisualData.DoesTupleExist(
+                        (OVRSkeleton.BoneId)key.Item1,
+                        (OVRSkeleton.BoneId)key.Item2))
+                {
+                    _itemsToDelete.Add(key);
+                }
+            }
+            foreach (var item in _itemsToDelete)
+            {
+                var lineRend = _boneTupeToLineRenderer[item];
+                Destroy(lineRend.gameObject);
+                _boneTupeToLineRenderer.Remove(item);
             }
         }
 
@@ -363,17 +455,16 @@ namespace Oculus.Movement.Utils
             }
             else
             {
-                return _customBoneVisualData != null &&
-                    _customBoneVisualData.BoneShouldBeVisualized(bone);
+                return false;
             }
         }
 
-        private void SetUpLineRenderer(OVRSkeleton.BoneId currentBone)
+        private void SetUpFixedTransformPairLineRenderer(OVRSkeleton.BoneId currentBone)
         {
             Transform firstJoint = null;
             Transform secondJoint = null;
 
-            (firstJoint, secondJoint) = GetVisualTransformPair(currentBone);
+            (firstJoint, secondJoint) = GetFixedTransformPairForBone(currentBone);
 
             if (firstJoint == null || secondJoint == null)
             {
@@ -394,45 +485,26 @@ namespace Oculus.Movement.Utils
             lineRendererComp.SetPosition(1, secondJoint.position);
         }
 
-        private (Transform, Transform) GetVisualTransformPair(OVRSkeleton.BoneId currentBone)
+        private (Transform, Transform) GetFixedTransformPairForBone(OVRSkeleton.BoneId currentBone)
         {
             Transform firstJoint = null;
             Transform secondJoint = null;
-            // If using mask or standard bone visual data, then default to hardcoded
-            // mapped pairs
-            if (_visualizationGuideType == VisualizationGuideType.Mask ||
-                _visualizationGuideType == VisualizationGuideType.BoneVisualData)
-            {
-                var boneTuple = CustomMappings.OVRSkeletonBoneIdToJointPair[currentBone];
-                firstJoint =
-                    RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp, boneTuple.Item1,
-                        _visualizeBindPose);
 
-                if (boneTuple.Item2 == OVRSkeleton.BoneId.Body_End)
-                {
-                    secondJoint = firstJoint.GetChild(0);
-                }
-                else
-                {
-                    secondJoint = RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
-                        boneTuple.Item2, _visualizeBindPose);
-                }
-            }
-            else if (_visualizationGuideType == VisualizationGuideType.CustomBoneVisualData)
+            var boneTuple = CustomMappings.OVRSkeletonBoneIdToJointPair[currentBone];
+            firstJoint =
+                RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp, boneTuple.Item1,
+                    _visualizeBindPose);
+
+            if (boneTuple.Item2 == OVRSkeleton.BoneId.Body_End)
             {
-                var boneTuple = _customBoneVisualData.GetBoneTupleForStartingBone(currentBone);
-                if (boneTuple != null)
-                {
-                    firstJoint = (OVRSkeleton.BoneId)boneTuple.FirstBone != OVRSkeleton.BoneId.Body_End ?
-                        RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
-                            (OVRSkeleton.BoneId)boneTuple.FirstBone, _visualizeBindPose) :
-                        null;
-                    secondJoint = (OVRSkeleton.BoneId)boneTuple.SecondBone != OVRSkeleton.BoneId.Body_End ?
-                        RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
-                            (OVRSkeleton.BoneId)boneTuple.SecondBone, _visualizeBindPose) :
-                        null;
-                }
+                secondJoint = firstJoint.GetChild(0);
             }
+            else
+            {
+                secondJoint = RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
+                    boneTuple.Item2, _visualizeBindPose);
+            }
+
             return (firstJoint, secondJoint);
         }
 
@@ -458,6 +530,47 @@ namespace Oculus.Movement.Utils
             axisComp.rotation = boneTransform.rotation;
         }
 
+        private void SetupBoneTupleLineRenderer(BoneTuple tupleItem)
+        {
+            if (!_boneTupeToLineRenderer.ContainsKey(tupleItem.BonePair))
+            {
+                var newObject = GameObject.Instantiate(_lineRendererPrefab);
+                newObject.name +=
+                    $"{_CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN}{tupleItem.FirstBone}-{tupleItem.SecondBone}";
+                newObject.transform.SetParent(transform);
+                var lineRenderer = newObject.GetComponent<LineRenderer>();
+                _boneTupeToLineRenderer[tupleItem.BonePair] = lineRenderer;
+            }
+         
+            var firstJoint = RiggingUtilities.FindBoneTransformFromSkeleton(
+                _ovrSkeletonComp,
+                (OVRSkeleton.BoneId)tupleItem.FirstBone,
+                _visualizeBindPose);
+
+            Transform secondJoint = null;
+            if (tupleItem.SecondBone >= CustomMappings.BodyTrackingBoneId.Body_End)
+            {
+                secondJoint = firstJoint.GetChild(0);
+            }
+            else
+            {
+                secondJoint = RiggingUtilities.FindBoneTransformFromSkeleton(
+                    _ovrSkeletonComp,
+                    (OVRSkeleton.BoneId)tupleItem.SecondBone,
+                    _visualizeBindPose);
+            }
+
+            if (firstJoint == null || secondJoint == null)
+            {
+                Debug.LogWarning($"Cannot find transform for tuple " +
+                    $"{tupleItem.FirstBone}-{tupleItem.SecondBone}");
+                return;
+            }
+            var lineRendererComp = _boneTupeToLineRenderer[tupleItem.BonePair];
+            lineRendererComp.SetPosition(0, firstJoint.position);
+            lineRendererComp.SetPosition(1, secondJoint.position);
+        }
+
         private void EnforceLineRendererEnableState(OVRSkeleton.BoneId bone, bool enableValue)
         {
             if (!_humanBoneToLineRenderer.ContainsKey(bone))
@@ -465,6 +578,16 @@ namespace Oculus.Movement.Utils
                 return;
             }
             _humanBoneToLineRenderer[bone].enabled = enableValue;
+        }
+
+        private void EnforceCustomLineRendererEnableState(
+            Tuple<CustomMappings.BodyTrackingBoneId, CustomMappings.BodyTrackingBoneId> tuple, bool enableValue)
+        {
+            if (!_boneTupeToLineRenderer.ContainsKey(tuple))
+            {
+                return;
+            }
+            _boneTupeToLineRenderer[tuple].enabled = enableValue;
         }
 
         private void EnforceAxisRendererEnableState(OVRSkeleton.BoneId bone, bool enableValue)
