@@ -1226,6 +1226,9 @@ namespace Oculus.Movement
             "Create proxy transforms that track the skeletal bones. If the " +
             "skeletal bone transforms change, that won't necessitate creating new " +
             "proxy transforms in most cases.";
+
+        public const string RetargetingAnimationContraint =
+            "Related retargeting constraint.";
     }
 
     public static class LateMirroredObjectTooltips

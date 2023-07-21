@@ -5,6 +5,7 @@ using Oculus.Movement.AnimationRigging.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Assertions;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -185,6 +186,18 @@ namespace Oculus.Movement.AnimationRigging
             set { SkeletonPostProcessing = value; }
         }
 
+        /// <summary>
+        /// Related retargeting constraint.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.RetargetingAnimationContraint)]
+        protected RetargetingAnimationConstraint _retargetingAnimationConstraint;
+        public RetargetingAnimationConstraint RetargetingConstraint
+        {
+            get { return _retargetingAnimationConstraint; }
+            set { _retargetingAnimationConstraint = value; }
+        }
+
         private Pose[] _defaultPoses;
         private IJointConstraint[] _jointConstraints;
         private ProxyTransformLogic _proxyTransformLogic = new ProxyTransformLogic();
@@ -236,6 +249,9 @@ namespace Oculus.Movement.AnimationRigging
             {
                 CreateTPoseMaskInstance();
             }
+
+            Assert.IsNotNull(_retargetingAnimationConstraint,
+                "Please assign the retargeting constraint to RetargetingLayer.");
         }
 
         /// <summary>
@@ -348,7 +364,7 @@ namespace Oculus.Movement.AnimationRigging
         private void ValidateHumanoid()
         {
             bool validHumanoid = true;
-            foreach(var bodyBone in CustomBoneIdToHumanBodyBone.Values)
+            foreach (var bodyBone in CustomBoneIdToHumanBodyBone.Values)
             {
                 if (!AnimatorTargetSkeleton.GetBoneTransform(bodyBone))
                 {
@@ -365,7 +381,7 @@ namespace Oculus.Movement.AnimationRigging
             // specific checks follow.
             var upperChest = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.UpperChest);
             var leftShoulder = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.LeftShoulder);
-            var rightShoulder = AnimatorTargetSkeleton.GetBoneTransform (HumanBodyBones.RightShoulder);
+            var rightShoulder = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.RightShoulder);
 
             if (leftShoulder.parent != upperChest)
             {
@@ -466,16 +482,20 @@ namespace Oculus.Movement.AnimationRigging
 
                 var positionOffset = _applyAnimationConstraintsToCorrectedPositions ?
                     JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
+                var oldPosition = targetJoint.position;
+                float rtWeight = _retargetingAnimationConstraint.weight;
 
                 if (adjustment == null)
                 {
-                    targetJoint.position = Bones[i].Transform.position + positionOffset;
+                    targetJoint.position =
+                        Vector3.Lerp(oldPosition, Bones[i].Transform.position + positionOffset, rtWeight);
                 }
                 else
                 {
                     if (!adjustment.DisablePositionTransform)
                     {
-                        targetJoint.position = Bones[i].Transform.position + positionOffset;
+                        targetJoint.position =
+                            Vector3.Lerp(oldPosition, Bones[i].Transform.position + positionOffset, rtWeight);
                     }
                 }
             }
@@ -501,8 +521,7 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
                 var defaultPose = _defaultPoses[(int)i];
-                boneTransform.SetLocalPositionAndRotation(defaultPose.position,
-                  defaultPose.rotation);
+                boneTransform.SetLocalPositionAndRotation(defaultPose.position, defaultPose.rotation);
             }
         }
 

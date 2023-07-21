@@ -72,6 +72,7 @@ namespace Oculus.Movement.Utils
 
             RetargetingAnimationConstraint retargetConstraint =
                 AddRetargetingConstraint(rigObject, retargetingLayer);
+            retargetingLayer.RetargetingConstraint = retargetConstraint;
 
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(mainParent, retargetingLayer, rigBuilder,
