@@ -1318,6 +1318,22 @@ namespace Oculus.Movement
     {
         public const string AnimatorComp =
             "Animator component to visualize bones for.";
+    }
+
+    public static class OVRSkeletonBoneVisualizerTooltips
+    {
+        public const string OVRSkeletonComp =
+            "OVRSkeleton component to visualize bones for.";
+
+        public const string VisualizeBindPose =
+            "Whether to visualize bind pose or not.";
+    }
+
+    public static class BoneVisualizerTooltips
+    {
+
+        public const string WhenToRender =
+            "When to render this skeleton during the Unity gameloop.";
 
         public const string VisualizationGuideType =
             "The type of guide used to visualize bones.";
@@ -1338,30 +1354,12 @@ namespace Oculus.Movement
             "Indicates what kind of visual is desired.";
     }
 
-    public static class OVRSkeletonBoneVisualizerTooltips
+    public static class BoneVisualizerLineColorTooltips
     {
-        public const string OVRSkeletonComp =
-            "OVRSkeleton component to visualize bones for.";
+        public const string BoneVisualizer =
+            nameof(Utils.BoneVisualizer) + " to change the color of";
 
-        public const string VisualizeBindPose =
-            "Whether to visualize bind pose or not.";
-
-        public const string VisualizationGuideType =
-            "The type of guide used to visualize bones.";
-
-        public const string MaskToVisualize =
-            "Mask to use for visualization.";
-
-        public const string BoneVisualData =
-            "Bone collection to use for visualization.";
-
-        public const string LineRendererPrefab =
-            "Line renderer to use for visualization.";
-
-        public const string AxisRendererPrefab =
-            "Axis renderer to use for visualization.";
-
-        public const string VisualType =
-            "Indicates what kind of visual is desired.";
+        public const string LineColor =
+            "The color to change the " + nameof(Utils.BoneVisualizer) + " to";
     }
 }
