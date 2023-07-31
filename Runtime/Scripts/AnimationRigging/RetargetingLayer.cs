@@ -471,11 +471,7 @@ namespace Oculus.Movement.AnimationRigging
 
                 var adjustment = FindAdjustment(humanBodyBone);
                 var targetJoint = targetData.OriginalJoint;
-                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
-                var shouldUpdatePosition = IsBodySectionInArray(
-                    bodySectionOfJoint, BodySectionToPosition);
-
-                if (!shouldUpdatePosition)
+                if (!ShouldUpdatePositionOfBone(humanBodyBone))
                 {
                     continue;
                 }
@@ -499,6 +495,12 @@ namespace Oculus.Movement.AnimationRigging
                     }
                 }
             }
+        }
+
+        protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
+        {
+            var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+            return IsBodySectionInArray(bodySectionOfJoint, BodySectionToPosition);
         }
 
         private void FixJointsToTPose()
@@ -636,11 +638,8 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 // run this code each frame to pick up adjustments made to the editor
-                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[targetHumanBodyBone];
-
                 var adjustment = FindAdjustment(targetHumanBodyBone);
-                bool bodySectionInPositionArray = IsBodySectionInArray(
-                    bodySectionOfJoint, BodySectionToPosition);
+                bool bodySectionInPositionArray = ShouldUpdatePositionOfBone(targetHumanBodyBone);
 
                 // Skip if the job arrays are less in number compared to bones.
                 // This can happen if the skeleton regenerates its bones during update,
