@@ -55,12 +55,8 @@ namespace Oculus.Movement.AnimationRigging
             {
                 var targetPositionOffset = FinalPosition - OriginalPosition;
                 // The recorded positions will not be finite when we regenerate data for the rig.
-                if (!float.IsFinite(FinalPosition.x) ||
-                    !float.IsFinite(FinalPosition.y) ||
-                    !float.IsFinite(FinalPosition.z) ||
-                    !float.IsFinite(OriginalPosition.x) ||
-                    !float.IsFinite(OriginalPosition.y) ||
-                    !float.IsFinite(OriginalPosition.z))
+                if (!RiggingUtilities.IsFiniteVector3(FinalPosition) ||
+                    !RiggingUtilities.IsFiniteVector3(OriginalPosition))
                 {
                     return Vector3.zero;
                 }

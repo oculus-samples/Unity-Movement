@@ -72,6 +72,17 @@ namespace Oculus.Movement.AnimationRigging
             }
             return animator.GetBoneTransform(CustomMappings.BoneIdToHumanBodyBone[boneId]);
         }
+
+        /// <summary>
+        /// Returns true if this vector3 is finite and not NaN.
+        /// </summary>
+        /// <param name="v">The Vector3 to be checked.</param>
+        /// <returns>True if valid.</returns>
+        public static bool IsFiniteVector3(Vector3 v)
+        {
+            return float.IsFinite(v.x) && float.IsFinite(v.y) && float.IsFinite(v.z) &&
+                   !float.IsNaN(v.x) && !float.IsNaN(v.y) && !float.IsNaN(v.z);
+        }
     }
 
     public static class AvatarMaskExtensionMethods
