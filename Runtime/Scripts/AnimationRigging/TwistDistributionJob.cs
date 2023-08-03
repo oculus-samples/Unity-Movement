@@ -194,6 +194,11 @@ namespace Oculus.Movement.AnimationRigging
             for (int i = 0; i < twistNodes.Count; i++)
             {
                 var segmentUp = data.SegmentUp.TransformVector(job.TwistUpDirections[i]);
+                if (job.SegmentDirections[0].sqrMagnitude <= Mathf.Epsilon ||
+                    segmentUp.sqrMagnitude <= Mathf.Epsilon)
+                {
+                    continue;
+                }
                 job.SegmentUpAxis[i] = segmentUp;
             }
 

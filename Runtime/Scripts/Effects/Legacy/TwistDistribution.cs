@@ -170,6 +170,12 @@ namespace Oculus.Movement.Effects.Deprecated
 
             for (int i = 0; i < _twistJoints.Length; i++)
             {
+                if (_currentLookAtDir.sqrMagnitude <= Mathf.Epsilon ||
+                    _currentEndUpTransform.TransformVector(_twistJoints[i].SegmentEndUpAxis).sqrMagnitude <= Mathf.Epsilon)
+                {
+                    continue;
+                }
+
                 // Reset joint.
                 _twistJoints[i].Joint.localRotation = _twistJoints[i].RestQuaternion;
 
