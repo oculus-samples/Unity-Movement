@@ -475,8 +475,14 @@ namespace Oculus.Movement.AnimationRigging
                 var positionOffset = _applyAnimationConstraintsToCorrectedPositions ?
                     JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
                 var oldPosition = targetJoint.position;
-                float rtWeight = _retargetingAnimationConstraint.weight;
+                // Make sure the joint position is valid before fixing it.
+                if (!RiggingUtilities.IsFiniteVector3(oldPosition))
+                {
+                    continue;
+                }
 
+                float rtWeight = _retargetingAnimationConstraint.weight;
+                
                 if (adjustment == null)
                 {
                     targetJoint.position =
