@@ -123,6 +123,7 @@ namespace Oculus.Movement.Utils
                 retargetingAnimConstraintObj.SetActive(true);
 
                 retargetConstraint.transform.SetParent(rigObject.transform, true);
+                retargetConstraint.transform.SetAsLastSibling();
                 retargetConstraint.transform.localPosition = Vector3.zero;
                 retargetConstraint.transform.localRotation = Quaternion.identity;
                 retargetConstraint.transform.localScale = Vector3.one;

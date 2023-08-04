@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using System.Text;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
