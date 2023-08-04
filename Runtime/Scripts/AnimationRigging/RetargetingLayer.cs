@@ -143,6 +143,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Since some bones are not affected by retargeting,
         /// some joints should be reset to t-pose.
+        /// NOTE: Deprecated.
         /// </summary>
         [SerializeField, Optional]
         [Tooltip(RetargetingLayerTooltips.MaskToSetToTPose)]
@@ -433,7 +434,6 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             CorrectPositions();
-            FixJointsToTPose();
             // apply constraints on character after fixing positions.
             RunConstraints();
         }
@@ -515,30 +515,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
             return IsBodySectionInArray(bodySectionOfJoint, BodySectionToPosition);
-        }
-
-        private void FixJointsToTPose()
-        {
-            if (_maskToSetToTPoseInstance == null)
-            {
-                return;
-            }
-
-            for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
-            {
-                var boneTransform = AnimatorTargetSkeleton.GetBoneTransform(i);
-                if (boneTransform == null)
-                {
-                    continue;
-                }
-                if (!_maskToSetToTPoseInstance.GetHumanoidBodyPartActive(
-                    CustomMappings.HumanBoneToAvatarBodyPart[i]))
-                {
-                    continue;
-                }
-                var defaultPose = _defaultPoses[(int)i];
-                boneTransform.SetLocalPositionAndRotation(defaultPose.position, defaultPose.rotation);
-            }
         }
 
         private void RunConstraints()

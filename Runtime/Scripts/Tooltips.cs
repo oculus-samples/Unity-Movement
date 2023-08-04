@@ -1225,7 +1225,8 @@ namespace Oculus.Movement
 
         public const string MaskToSetToTPose =
             "Since some bones are not affected by retargeting, " +
-            "some joints should be reset to t-pose.";
+            "some joints should be reset to t-pose." +
+            "NOTE: Deprecated.";
 
         public const string EnableTrackingByProxy =
             "Create proxy transforms that track the skeletal bones. If the " +
