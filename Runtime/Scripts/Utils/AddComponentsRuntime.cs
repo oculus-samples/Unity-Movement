@@ -27,15 +27,10 @@ namespace Oculus.Movement.Utils
         /// no undo actions since those are not allowed at runtime.
         /// </summary>
         /// <param name="selectedGameObject">GameObject to add animation rigging + retargeting too.</param>
-        /// <param name="disableAvatar">Disable avatar upon initialization.</param>
-        /// <param name="lateUpdateMask">Late update mask, intended for
-        /// <see cref="RetargetingLayer"/> component created.</param>
         /// <param name="tPoseMask">T-pose mask, intended for
         /// <see cref="RetargetingLayer"/> component created.</param>
         public static void SetupCharacterForAnimationRiggingRetargeting(
             GameObject selectedGameObject,
-            bool disableAvatar,
-            AvatarMask lateUpdateMask = null,
             AvatarMask tPoseMask = null)
         {
             try
@@ -53,13 +48,7 @@ namespace Oculus.Movement.Utils
             var mainParent = selectedGameObject;
 
             // Add the retargeting and body tracking components at root first.
-            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent, disableAvatar);
-            if (lateUpdateMask != null)
-            {
-                retargetingLayer.PositionsToCorrectLateUpdateComp = new AvatarMask();
-                retargetingLayer.PositionsToCorrectLateUpdateComp.CopyOtherMaskBodyActiveValues(
-                    lateUpdateMask);
-            }
+            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent);
             if (tPoseMask != null)
             {
                 retargetingLayer.MaskToSetToTPoseComp = new AvatarMask();
@@ -80,13 +69,12 @@ namespace Oculus.Movement.Utils
             selectedGameObject.SetActive(true);
         }
 
-        private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent, bool disableAvatar)
+        private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent)
         {
             RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
             if (!retargetingLayer)
             {
                 retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
-                retargetingLayer.DisableAvatar = disableAvatar;
             }
 
             OVRBody bodyComp = mainParent.GetComponent<OVRBody>();

@@ -1202,11 +1202,16 @@ namespace Oculus.Movement
     public static class RetargetingLayerTooltips
     {
         public const string DisableAvatar =
-            "Disable avatar for accurate positions, especially fingers.";
+            "Disable avatar for accurate positions, especially fingers." +
+            "NOTE: Deprecated.";
 
         public const string PositionsToCorrectLateUpdate =
             "Positions to correct after the fact. Avatar " +
-            "masks prevent setting positions of the hands precisely.";
+            "masks prevent setting positions of the hands precisely." +
+            "NOTE: Deprecated.";
+
+        public const string CorrectPositionsLateUpdate =
+            "Allows correcting positions in LateUpdate for accuracy.";
 
         public const string ApplyAnimationConstraintsToCorrectedPositions =
             "Apply position offsets done by animation rigging constraints for corrected " +
@@ -1304,10 +1309,6 @@ namespace Oculus.Movement
 
         public const string SpawnOffset =
             "Offset per spawn.";
-
-        public const string PositionsToCorrectLateUpdateMask =
-            "Positions to correct mask, intended to correct the finger positions of " +
-            "animation rigged characters during retargeting.";
 
         public const string TPoseMask =
             "Positions to correct mask, intended to set certain joints of " +

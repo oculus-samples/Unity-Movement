@@ -81,6 +81,7 @@ namespace Oculus.Movement.AnimationRigging
         /// disabling an avatar is that animations or animation rig constraints
         /// might not run on the character. <see cref="_positionsToCorrectLateUpdate"/>
         /// can be used to keep the avatar and also correct finger positions in LateUpdate.
+        /// NOTE: Deprecated.
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.DisableAvatar)]
@@ -97,10 +98,18 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Positions to correct after the fact. Avatar
         /// masks prevent setting positions of the hands precisely.
+        /// NOTE: Deprecated.
         /// </summary>
         [SerializeField, Optional]
         [Tooltip(RetargetingLayerTooltips.PositionsToCorrectLateUpdate)]
         protected AvatarMask _positionsToCorrectLateUpdate;
+
+        /// <summary>
+        /// Allows correcting positions in LateUpdate for accuracy.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.CorrectPositionsLateUpdate)]
+        protected bool _correctPositionsLateUpdate = true;
 
         /// <summary>
         /// Don't allow changing the original field directly, as that
@@ -403,8 +412,6 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         protected override void Update()
         {
-            DisableAvatarIfNecessary();
-
             UpdateSkeleton();
             SkeletonPostProcessing?.Invoke(Bones);
             RecomputeSkeletalOffsetsIfNecessary();
@@ -433,11 +440,10 @@ namespace Oculus.Movement.AnimationRigging
 
         private void CorrectPositions()
         {
-            if (_positionsToCorrectLateUpdateInstance == null)
+            if (!_correctPositionsLateUpdate)
             {
                 return;
             }
-
             for (var i = 0; i < Bones.Count; i++)
             {
                 if (!CustomBoneIdToHumanBodyBone.TryGetValue(Bones[i].Id, out var humanBodyBone))
@@ -457,16 +463,21 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 var bodyPart = CustomMappings.HumanBoneToAvatarBodyPart[humanBodyBone];
-                if (!_positionsToCorrectLateUpdateInstance.GetHumanoidBodyPartActive(bodyPart) ||
+                var targetJoint = targetData.OriginalJoint;
+                var currentTargetJointPosition = targetJoint.position;
+                var currentOVRBonePosition = Bones[i].Transform.position;
+                var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetJointPosition).sqrMagnitude;
+
+                // if the position error is large, and the retargeting mask indicates that a fix is
+                // required, fix it
+                if (errorRelativeToBodyTracking < Mathf.Epsilon ||
                     (CustomPositionsToCorrectLateUpdateMask != null &&
-                     !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
-                   )
+                    !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart)))
                 {
                     continue;
                 }
 
                 var adjustment = FindAdjustment(humanBodyBone);
-                var targetJoint = targetData.OriginalJoint;
                 if (!ShouldUpdatePositionOfBone(humanBodyBone))
                 {
                     continue;
@@ -480,20 +491,21 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     continue;
                 }
-
                 float rtWeight = _retargetingAnimationConstraint.weight;
                 
                 if (adjustment == null)
                 {
                     targetJoint.position =
-                        Vector3.Lerp(oldPosition, Bones[i].Transform.position + positionOffset, rtWeight);
+                        Vector3.Lerp(currentTargetJointPosition,
+                            currentOVRBonePosition + positionOffset, rtWeight);
                 }
                 else
                 {
                     if (!adjustment.DisablePositionTransform)
                     {
                         targetJoint.position =
-                            Vector3.Lerp(oldPosition, Bones[i].Transform.position + positionOffset, rtWeight);
+                            Vector3.Lerp(currentTargetJointPosition,
+                                currentOVRBonePosition + positionOffset, rtWeight);
                     }
                 }
             }
@@ -539,20 +551,6 @@ namespace Oculus.Movement.AnimationRigging
             {
                 var constraint = _jointConstraints[i];
                 constraint.Update();
-            }
-        }
-
-        private void DisableAvatarIfNecessary()
-        {
-            // target meta data not created yet, can't disable avatar
-            if (TargetSkeletonData == null)
-            {
-                return;
-            }
-
-            if (_disableAvatar && AnimatorTargetSkeleton.avatar != null)
-            {
-                AnimatorTargetSkeleton.avatar = null;
             }
         }
 
