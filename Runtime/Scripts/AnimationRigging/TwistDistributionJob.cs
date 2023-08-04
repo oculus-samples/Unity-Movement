@@ -194,8 +194,12 @@ namespace Oculus.Movement.AnimationRigging
             for (int i = 0; i < twistNodes.Count; i++)
             {
                 var segmentUp = data.SegmentUp.TransformVector(job.TwistUpDirections[i]);
+                var lookDirectionDot = Vector3.Dot(job.SegmentDirections[0], segmentUp);
+                // Don't apply twists if the look directions are zero or the look directions are parallel.
                 if (job.SegmentDirections[0].sqrMagnitude <= Mathf.Epsilon ||
-                    segmentUp.sqrMagnitude <= Mathf.Epsilon)
+                    segmentUp.sqrMagnitude <= Mathf.Epsilon ||
+                    lookDirectionDot >= 1 - Mathf.Epsilon ||
+                    lookDirectionDot <= -1 + Mathf.Epsilon)
                 {
                     continue;
                 }
