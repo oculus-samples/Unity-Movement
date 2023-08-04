@@ -27,11 +27,8 @@ namespace Oculus.Movement.Utils
         /// no undo actions since those are not allowed at runtime.
         /// </summary>
         /// <param name="selectedGameObject">GameObject to add animation rigging + retargeting too.</param>
-        /// <param name="tPoseMask">T-pose mask, intended for
-        /// <see cref="RetargetingLayer"/> component created.</param>
         public static void SetupCharacterForAnimationRiggingRetargeting(
-            GameObject selectedGameObject,
-            AvatarMask tPoseMask = null)
+            GameObject selectedGameObject)
         {
             try
             {
@@ -49,11 +46,6 @@ namespace Oculus.Movement.Utils
 
             // Add the retargeting and body tracking components at root first.
             RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent);
-            if (tPoseMask != null)
-            {
-                retargetingLayer.MaskToSetToTPoseComp = new AvatarMask();
-                retargetingLayer.MaskToSetToTPoseComp.CopyOtherMaskBodyActiveValues(tPoseMask);
-            }
 
             GameObject rigObject;
             RigBuilder rigBuilder;

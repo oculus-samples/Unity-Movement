@@ -74,56 +74,11 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Disable the target's avatar after building its meta data. There is an
-        /// issue in Unity where the positions of all of the retargeted's
-        /// bones are *not* set if an avatar is assigned during runtime, even if
-        /// the avatar's "Translation DoF" checkbox is checked (specifically the fingers). The drawback of
-        /// disabling an avatar is that animations or animation rig constraints
-        /// might not run on the character. <see cref="_positionsToCorrectLateUpdate"/>
-        /// can be used to keep the avatar and also correct finger positions in LateUpdate.
-        /// NOTE: Deprecated.
-        /// </summary>
-        [SerializeField]
-        [Tooltip(RetargetingLayerTooltips.DisableAvatar)]
-        protected bool _disableAvatar = false;
-        /// <summary>
-        /// Accessors for disable avatar toggle.
-        /// </summary>
-        public bool DisableAvatar
-        {
-            get { return _disableAvatar; }
-            set { _disableAvatar = value; }
-        }
-
-        /// <summary>
-        /// Positions to correct after the fact. Avatar
-        /// masks prevent setting positions of the hands precisely.
-        /// NOTE: Deprecated.
-        /// </summary>
-        [SerializeField, Optional]
-        [Tooltip(RetargetingLayerTooltips.PositionsToCorrectLateUpdate)]
-        protected AvatarMask _positionsToCorrectLateUpdate;
-
-        /// <summary>
         /// Allows correcting positions in LateUpdate for accuracy.
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.CorrectPositionsLateUpdate)]
         protected bool _correctPositionsLateUpdate = true;
-
-        /// <summary>
-        /// Don't allow changing the original field directly, as that
-        /// has a side-effect of modifying the original mask object.
-        /// </summary>
-        private AvatarMask _positionsToCorrectLateUpdateInstance;
-        /// <summary>
-        /// Positions to correct accessors.
-        /// </summary>
-        public AvatarMask PositionsToCorrectLateUpdateComp
-        {
-            get { return _positionsToCorrectLateUpdateInstance; }
-            set { _positionsToCorrectLateUpdateInstance = value; }
-        }
 
         /// <summary>
         /// Apply position offsets done by animation rigging constraints for corrected
@@ -138,29 +93,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             get { return _applyAnimationConstraintsToCorrectedPositions; }
             set { _applyAnimationConstraintsToCorrectedPositions = value; }
-        }
-
-        /// <summary>
-        /// Since some bones are not affected by retargeting,
-        /// some joints should be reset to t-pose.
-        /// NOTE: Deprecated.
-        /// </summary>
-        [SerializeField, Optional]
-        [Tooltip(RetargetingLayerTooltips.MaskToSetToTPose)]
-        protected AvatarMask _maskToSetToTPose;
-
-        /// <summary>
-        /// Don't allow changing the original field directly, as that
-        /// has a side-effect of modifying the original mask object.
-        /// </summary>
-        private AvatarMask _maskToSetToTPoseInstance;
-        /// <summary>
-        /// Mask to set to TPose accessors.
-        /// </summary>
-        public AvatarMask MaskToSetToTPoseComp
-        {
-            get { return _maskToSetToTPoseInstance; }
-            set { _maskToSetToTPoseInstance = value; }
         }
 
         /// <summary>
@@ -215,7 +147,6 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <summary>
         /// Allows one to specify which positions to correct during late update.
-        /// This is ANDed with <see cref="_positionsToCorrectLateUpdateInstance"/>
         /// </summary>
         public AvatarMask CustomPositionsToCorrectLateUpdateMask { get; set; }
 
@@ -247,69 +178,9 @@ namespace Oculus.Movement.AnimationRigging
         protected override void Awake()
         {
             base.Awake();
-            if (_positionsToCorrectLateUpdateInstance == null)
-            {
-                CreatePositionsToCorrectLateUpdateMaskInstance();
-            }
-            if (_maskToSetToTPoseInstance == null)
-            {
-                CreateTPoseMaskInstance();
-            }
 
             Assert.IsNotNull(_retargetingAnimationConstraint,
                 "Please assign the retargeting constraint to RetargetingLayer.");
-        }
-
-        /// <summary>
-        /// Allows creating instance of position correction mask used in this class at any time.
-        /// Effectively resets animation masks being used to what the corresponding
-        /// field <see cref="_positionsToCorrectLateUpdate"/> specify. This is primarily used by
-        /// <see cref="RetargetingLayerEditor"/>.
-        /// </summary>
-        public void CreatePositionsToCorrectLateUpdateMaskInstance()
-        {
-            if (_positionsToCorrectLateUpdate != null)
-            {
-                _positionsToCorrectLateUpdateInstance = new AvatarMask();
-                _positionsToCorrectLateUpdateInstance.CopyOtherMaskBodyActiveValues(
-                    _positionsToCorrectLateUpdate);
-            }
-            else
-            {
-                _positionsToCorrectLateUpdateInstance = null;
-            }
-        }
-
-        /// <summary>
-        /// Allows creating instance of T-Pose mask used in this class at any time.
-        /// Effectively resets animation masks being used to what the corresponding
-        /// field <see cref="_maskToSetToTPose"/> specify. This is primarily used by
-        /// <see cref="RetargetingLayerEditor"/>.
-        /// </summary>
-        public void CreateTPoseMaskInstance()
-        {
-            if (_maskToSetToTPose != null)
-            {
-                _maskToSetToTPoseInstance = new AvatarMask();
-                _maskToSetToTPoseInstance.CopyOtherMaskBodyActiveValues(_maskToSetToTPose);
-            }
-            else
-            {
-                _maskToSetToTPoseInstance = null;
-            }
-        }
-
-        /// <summary>
-        /// Allows creating instances of masks used in this class at any time.
-        /// Effectively resets animation masks being used to what the corresponding
-        /// fields <see cref="_positionsToCorrectLateUpdate"/> and
-        /// <see cref="_maskToSetToTPose"/> specify. This is primarily used by
-        /// <see cref="RetargetingLayerEditor"/>.
-        /// </summary>
-        public void CreateMaskInstances()
-        {
-            CreatePositionsToCorrectLateUpdateMaskInstance();
-            CreateTPoseMaskInstance();
         }
 
         /// <summary>
@@ -468,8 +339,7 @@ namespace Oculus.Movement.AnimationRigging
                 var currentOVRBonePosition = Bones[i].Transform.position;
                 var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetJointPosition).sqrMagnitude;
 
-                // if the position error is large, and the retargeting mask indicates that a fix is
-                // required, fix it
+                // if the position error is large and mask permits, fix the joint
                 if (errorRelativeToBodyTracking < Mathf.Epsilon ||
                     (CustomPositionsToCorrectLateUpdateMask != null &&
                     !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart)))

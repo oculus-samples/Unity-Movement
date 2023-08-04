@@ -1201,15 +1201,6 @@ namespace Oculus.Movement
 
     public static class RetargetingLayerTooltips
     {
-        public const string DisableAvatar =
-            "Disable avatar for accurate positions, especially fingers." +
-            "NOTE: Deprecated.";
-
-        public const string PositionsToCorrectLateUpdate =
-            "Positions to correct after the fact. Avatar " +
-            "masks prevent setting positions of the hands precisely." +
-            "NOTE: Deprecated.";
-
         public const string CorrectPositionsLateUpdate =
             "Allows correcting positions in LateUpdate for accuracy.";
 
@@ -1222,11 +1213,6 @@ namespace Oculus.Movement
             "Bones to exclude when correcting positions. " +
             "This can be necessary if you use a constraint that affects a specific bone, " +
             "and the correction mask might include it.";
-
-        public const string MaskToSetToTPose =
-            "Since some bones are not affected by retargeting, " +
-            "some joints should be reset to t-pose." +
-            "NOTE: Deprecated.";
 
         public const string EnableTrackingByProxy =
             "Create proxy transforms that track the skeletal bones. If the " +
