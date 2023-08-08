@@ -335,38 +335,44 @@ namespace Oculus.Movement.AnimationRigging
 
                 var bodyPart = CustomMappings.HumanBoneToAvatarBodyPart[humanBodyBone];
                 var targetJoint = targetData.OriginalJoint;
-                var currentTargetJointPosition = targetJoint.position;
-                var currentOVRBonePosition = Bones[i].Transform.position;
-                var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetJointPosition).sqrMagnitude;
 
-                // if the position error is large and mask permits, fix the joint
-                if (errorRelativeToBodyTracking < Mathf.Epsilon ||
-                    (CustomPositionsToCorrectLateUpdateMask != null &&
+                // Make sure body part passes mask, and bone's position should be updated.
+                if ( (CustomPositionsToCorrectLateUpdateMask != null &&
                     !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart)))
                 {
                     continue;
                 }
-
                 var adjustment = FindAdjustment(humanBodyBone);
                 if (!ShouldUpdatePositionOfBone(humanBodyBone))
                 {
                     continue;
                 }
 
-                var positionOffset = _applyAnimationConstraintsToCorrectedPositions ?
-                    JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
-                var oldPosition = targetJoint.position;
+                var currentTargetPosition = targetJoint.position;
                 // Make sure the joint position is valid before fixing it.
-                if (!RiggingUtilities.IsFiniteVector3(oldPosition))
+                if (!RiggingUtilities.IsFiniteVector3(currentTargetPosition))
                 {
                     continue;
                 }
+
+                var positionOffset = _applyAnimationConstraintsToCorrectedPositions ?
+                    JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
+                var currentOVRBonePosition = Bones[i].Transform.position;
+                var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetPosition).sqrMagnitude;
+
+                // skip positional fix if the error relative to body tracking is low
+                // and the position offset is small
+                if (errorRelativeToBodyTracking < Mathf.Epsilon &&
+                    positionOffset.sqrMagnitude < Mathf.Epsilon)
+                {
+                    continue;
+                }
+
                 float rtWeight = _retargetingAnimationConstraint.weight;
-                
                 if (adjustment == null)
                 {
                     targetJoint.position =
-                        Vector3.Lerp(currentTargetJointPosition,
+                        Vector3.Lerp(currentTargetPosition,
                             currentOVRBonePosition + positionOffset, rtWeight);
                 }
                 else
@@ -374,7 +380,7 @@ namespace Oculus.Movement.AnimationRigging
                     if (!adjustment.DisablePositionTransform)
                     {
                         targetJoint.position =
-                            Vector3.Lerp(currentTargetJointPosition,
+                            Vector3.Lerp(currentTargetPosition,
                                 currentOVRBonePosition + positionOffset, rtWeight);
                     }
                 }
