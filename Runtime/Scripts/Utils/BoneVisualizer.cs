@@ -39,6 +39,7 @@ namespace Oculus.Movement.Utils
     /// with a common type.
     /// </summary>
     public abstract class BoneVisualizer : MonoBehaviour, IListGenerating
+        , IOVRSkeletonProcessor
     {
         /// <summary>
         /// Visualization guide type. Indicates if user
@@ -124,6 +125,12 @@ namespace Oculus.Movement.Utils
             => _boneIdToAxisObject;
 
         /// <inheritdoc/>
+        public bool EnableSkeletonProcessing { get => enabled; set => enabled = value; }
+
+        /// <inheritdoc/>
+        public virtual string SkeletonProcessorLabel => name;
+
+        /// <inheritdoc/>
         public abstract void GenerateList();
 
         /// <inheritdoc/>
@@ -133,6 +140,12 @@ namespace Oculus.Movement.Utils
         /// Applies bone positions & rotations to axes & lines visuals
         /// </summary>
         public abstract void Visualize();
+
+        /// <inheritdoc/>
+        public virtual void ProcessSkeleton(OVRSkeleton skeleton)
+        {
+            Visualize();
+        }
     }
 
     /// <summary>

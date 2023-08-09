@@ -14,17 +14,15 @@ namespace Oculus.Movement.AnimationRigging
     /// functions that work with animation rigging.
     /// </summary>
     [DefaultExecutionOrder(220)]
-    public partial class RetargetingLayer : OVRUnityHumanoidSkeletonRetargeter
+    public partial class RetargetingLayer : OVRUnityHumanoidSkeletonRetargeter,
+        IOVRSkeletonProcessorAggregator
     {
         /// <summary>
-        /// Callback type, auditable and assignable in the Unity Editor.
-        /// Also assignable in code using
-        /// <see cref="UnityEditor.Events.UnityEventTools.AddPersistentListener"/>
+        /// Callback that can adjust a given skeleton. Is the functional backend that implements
+        /// <see cref="IOVRSkeletonProcessorAggregator"/>
         /// </summary>
-        [System.Serializable]
-        public class SkeletonPostProcessingEvent : UnityEngine.Events.UnityEvent<IList<OVRBone>>
-        {
-        }
+        /// <param name="skeleton"></param>
+        public delegate void OVRSkeletonProcessor(OVRSkeleton skeleton);
 
         /// <summary>
         /// Joint position adjustment to be applied to corrected positions.
@@ -117,8 +115,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Triggers methods that can alter bone translations and rotations, before rendering and physics
         /// </summary>
         [SerializeField, Optional]
-        protected SkeletonPostProcessingEvent SkeletonPostProcessing;
-        public SkeletonPostProcessingEvent SkeletonPostProcessingEv
+        protected OVRSkeletonProcessor SkeletonPostProcessing;
+        public OVRSkeletonProcessor SkeletonPostProcessingEv
         {
             get { return SkeletonPostProcessing; }
             set { SkeletonPostProcessing = value; }
@@ -285,7 +283,7 @@ namespace Oculus.Movement.AnimationRigging
         protected override void Update()
         {
             UpdateSkeleton();
-            SkeletonPostProcessing?.Invoke(Bones);
+            SkeletonPostProcessing?.Invoke(this);
             RecomputeSkeletalOffsetsIfNecessary();
 
             if (_enableTrackingByProxy)
@@ -577,6 +575,18 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             return (targetData, humanBodyBone);
+        }
+
+        /// <inheritdoc/>
+        public void AddProcessor(IOVRSkeletonProcessor processor)
+        {
+            SkeletonPostProcessing += processor.ProcessSkeleton;
+        }
+
+        /// <inheritdoc/>
+        public void RemoveProcessor(IOVRSkeletonProcessor processor)
+        {
+            SkeletonPostProcessing -= processor.ProcessSkeleton;
         }
     }
 }

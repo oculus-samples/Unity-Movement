@@ -1031,21 +1031,6 @@ MonoBehaviour:
   _correctPositionsLateUpdate: 1
   _applyAnimationConstraintsToCorrectedPositions: 1
   _enableTrackingByProxy: 0
-  SkeletonPostProcessing:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6483914532100646655}
-        m_TargetAssemblyTypeName: Oculus.Movement.Effects.CopyRetargetedBones, Meta.Movement
-        m_MethodName: UpdateTargetsWithBoneData
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   _retargetingAnimationConstraint: {fileID: 318886850}
 --- !u!114 &208026093
 MonoBehaviour:
@@ -1071,6 +1056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00344307bbe4d949bfcf8eddb0caf22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _autoAddTo: {fileID: 208026092}
   _retargetedBoneTargets:
   - HumanBodyBone: 17
     Target: {fileID: 583436289584067096}
