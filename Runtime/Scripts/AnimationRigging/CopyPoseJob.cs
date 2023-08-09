@@ -74,6 +74,7 @@ namespace Oculus.Movement.AnimationRigging
                 NativeArrayOptions.UninitializedMemory);
             for (int i = 0; i < data.AnimatorBones.Length; i++)
             {
+                job.Positions[i] = Vector3.zero;
                 if (data.AnimatorBones[i] != null)
                 {
                     job.Bones[i] = ReadOnlyTransformHandle.Bind(animator, data.AnimatorBones[i]);
