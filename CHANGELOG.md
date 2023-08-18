@@ -1,3 +1,40 @@
+# [2.4.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.3.0...v2.4.0) (2023-08-18)
+
+
+### Bug Fixes
+
+* **Runtime:** Add more checks to prevent invalid look rotation operations for twist distribution ([2da6751](https://github.com/oculus-samples/Unity-Movement/commit/2da67517ecc0fbd9d0fce09563bcdcc5e84b76a4))
+* **Runtime:** Adjust conditionals related to late update ([39b3998](https://github.com/oculus-samples/Unity-Movement/commit/39b3998d7f6b3af505aa188a93ae11026fe508f2))
+* **Runtime:** Allow multiple tuples with same starting bone for OVRSkeleton visualizer ([ccc60b0](https://github.com/oculus-samples/Unity-Movement/commit/ccc60b0ac06a4b234637adf12749411866eae501))
+* **Runtime:** Check IsFinite on input position when fixing bones in LateUpdate ([4ddeade](https://github.com/oculus-samples/Unity-Movement/commit/4ddeade2cfc0dec3cd893e25d6df355c7cecfa5c))
+* **Runtime:** Deformation constraint sets up data at edit time ([74dc7a6](https://github.com/oculus-samples/Unity-Movement/commit/74dc7a68273eb3b7935fc1e796ba1944f8dfa4bc))
+* **Runtime:** Fix constraints using the same job binder data when multiple constraints are present ([d9d9519](https://github.com/oculus-samples/Unity-Movement/commit/d9d9519a2c3628755cf34932c87511893b410c13))
+* **Runtime:** Fix OVR bone pairs issue, cast to BodyTrackingBoneId when creating visual objects ([5b44a85](https://github.com/oculus-samples/Unity-Movement/commit/5b44a85678fcf42404a0e6f926efb74895a695d3))
+* **Runtime:** Initialize vectors in CopyPoseJob ([1de0d7e](https://github.com/oculus-samples/Unity-Movement/commit/1de0d7e5cb1106a09445b1847e55a50a1e787253)), closes [#3](https://github.com/oculus-samples/Unity-Movement/issues/3)
+* **Runtime:** Make hands more accurate with constraints ([a03b423](https://github.com/oculus-samples/Unity-Movement/commit/a03b4237790e1a47e6b30810edb29a31a67465f3))
+* **Runtime:** Prevent duplicates of tuples in visual skeleton, allow tapering ([5508364](https://github.com/oculus-samples/Unity-Movement/commit/5508364f0e3d57378ce24ecd7fd8b4caa0707933))
+* **Runtime:** Remove LateUpdate correction mask ([b189f20](https://github.com/oculus-samples/Unity-Movement/commit/b189f201af695d7d2d179ada9fa2757ae8b8ad78))
+* **Runtime:** Retargeting layer respects weight of constraint ([c71aa09](https://github.com/oculus-samples/Unity-Movement/commit/c71aa09e8e0ccb6fece51792ddb515b6e05caa96))
+* **Runtime:** Straighten legs with constraints ([364d235](https://github.com/oculus-samples/Unity-Movement/commit/364d235ed5a14b36659fc8c4a73c23feb2bcaf9d))
+* **Runtime:** Treat masks as optional in AddComponentsRuntime ([5d7e2bc](https://github.com/oculus-samples/Unity-Movement/commit/5d7e2bc8a959af415593fe6a04d7169fe347f2c9))
+* **Runtime:** Twist distro set up during edit time ([8e97568](https://github.com/oculus-samples/Unity-Movement/commit/8e975689b37abd5b91a04cbcf82320db67f6d578))
+* **Runtime:** Update twist distribution to check against the look rotation being zero ([330620f](https://github.com/oculus-samples/Unity-Movement/commit/330620f6b072852cf6eeba39748b6335fc25a427))
+* **Samples:** Fix legs of spawnable green robot ([163cf9a](https://github.com/oculus-samples/Unity-Movement/commit/163cf9aa8ffdf45a141b1b0fba4bfb0087670d7b))
+
+
+### Features
+
+* **Runtime:** Add bone axis renderer, make color shaders support stereo ([1f4065f](https://github.com/oculus-samples/Unity-Movement/commit/1f4065fec6adc34bac33d34a501eebcee60decdc))
+* **Runtime:** Add checks for upper chest and shoulders ([07cac4c](https://github.com/oculus-samples/Unity-Movement/commit/07cac4cbdaa3022dc2aecc297781fa74023d4ab2))
+* **Runtime:** Add IsFiniteVector3 check to RiggingUtilities ([d17a86f](https://github.com/oculus-samples/Unity-Movement/commit/d17a86fc3edebcb7e3f6f282eb8a6538e9568207))
+* **Runtime:** Allow duplicate tuples to be rendered for animator bones ([0cb2314](https://github.com/oculus-samples/Unity-Movement/commit/0cb2314c21ad429be197f7d42eced3fe94d311c9))
+* **Runtime:** Create animator bone visual ([625c102](https://github.com/oculus-samples/Unity-Movement/commit/625c102de2e5a4e18659481e4bd1237d502e5d12))
+* **Runtime:** Custom bone visualizer ([c7ddb2a](https://github.com/oculus-samples/Unity-Movement/commit/c7ddb2a15994a091c2a74585f5bb762d23763337))
+* **Runtime:** OVRSkeleton visualizer ([22da8aa](https://github.com/oculus-samples/Unity-Movement/commit/22da8aa154f954c17e36decf90f462539fc05eb8))
+* **Runtime:** Run visualizers in LateUpdate ([b19c5ea](https://github.com/oculus-samples/Unity-Movement/commit/b19c5ea17552325763291db85505bcae19dbba2d))
+* **Runtime:** Update unity functions in AnimatorBoneVisualizer to be inheritable ([3547708](https://github.com/oculus-samples/Unity-Movement/commit/3547708e6f44364e692f9bf021d449246ab09102))
+* **Runtime:** Validate humanoid bones for retargeting ([c8d1eeb](https://github.com/oculus-samples/Unity-Movement/commit/c8d1eeb21581c5dac0e9c469beb5f6b9d98ba766))
+
 # [2.3.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.2.0...v2.3.0) (2023-07-07)
 
 
