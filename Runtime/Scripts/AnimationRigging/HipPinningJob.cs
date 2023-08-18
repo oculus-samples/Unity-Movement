@@ -92,12 +92,6 @@ namespace Oculus.Movement.AnimationRigging
     public class HipPinningJobBinder<T> : AnimationJobBinder<HipPinningJob, T>
         where T : struct, IAnimationJobData, IHipPinningData
     {
-        private Transform _hipsParent;
-        private IHipPinningData _data;
-        private Quaternion _initialLocalRotation;
-        private bool _shouldUpdate;
-        private bool _firstFrame = true;
-
         /// <inheritdoc />
         public override HipPinningJob Create(Animator animator, ref T data, Component component)
         {
@@ -125,10 +119,8 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             var hipsBone = data.Bones[(int)OVRSkeleton.BoneId.Body_Hips];
-            _hipsParent = hipsBone.parent;
-            _initialLocalRotation = data.InitialHipLocalRotation;
-            _data = data;
-            _data.AssignClosestHipPinningTarget(hipsBone.position);
+            data.AssignClosestHipPinningTarget(hipsBone.position);
+            data.IsFirstFrame = true;
             return job;
         }
 
@@ -137,7 +129,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (data.ConstraintSkeleton.IsDataValid)
             {
-                _shouldUpdate = true;
+                data.ShouldUpdate = true;
             }
 
             Transform hips = data.Bones[(int)OVRSkeleton.BoneId.Body_Hips];
@@ -150,15 +142,15 @@ namespace Oculus.Movement.AnimationRigging
             if (data.CurrentHipPinningTarget != null)
             {
                 Vector3 closestHipTargetPos = data.CurrentHipPinningTarget.HipTargetTransform.position;
-                job.TargetHipPos[0] = _hipsParent.InverseTransformPoint(closestHipTargetPos);
+                job.TargetHipPos[0] = data.Root.InverseTransformPoint(closestHipTargetPos);
                 Quaternion targetRotation = hips.localRotation *
-                                            Quaternion.Inverse(_initialLocalRotation) *
+                                            Quaternion.Inverse(data.InitialHipLocalRotation) *
                                             data.CurrentHipPinningTarget.HipTargetInitialRotationOffset;
 
                 // Don't set the rotation of the chair on the first frame, so that the feet are angled correctly.
-                if (_firstFrame)
+                if (data.IsFirstFrame)
                 {
-                    _firstFrame = false;
+                    data.IsFirstFrame = false;
                 }
                 else
                 {
@@ -169,14 +161,14 @@ namespace Oculus.Movement.AnimationRigging
             }
             else
             {
-                _shouldUpdate = false;
+                data.ShouldUpdate = false;
             }
-            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
+            job.DeltaTime[0] = data.ShouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
             if (!data.ConstraintSkeleton.IsDataValid)
             {
-                _shouldUpdate = false;
+                data.ShouldUpdate = false;
             }
         }
 

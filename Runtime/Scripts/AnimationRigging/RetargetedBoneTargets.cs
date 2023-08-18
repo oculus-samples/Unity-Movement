@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Update target transforms with retargeted bone data.
     /// </summary>
-    public class RetargetedBoneTargets : MonoBehaviour
+    public class RetargetedBoneTargets : MonoBehaviour, IOVRSkeletonProcessor
     {
         /// <summary>
         /// A retargeted bone target.
@@ -35,12 +36,39 @@ namespace Oculus.Movement.AnimationRigging
             public Transform Target;
         }
 
+        /// <inheritdoc/>
+        public bool EnableSkeletonProcessing
+        {
+            get => enabled;
+            set => enabled = value;
+        }
+
+        /// <inheritdoc/>
+        public string SkeletonProcessorLabel => "Retarget Hands";
+
+        /// <summary>
+        /// The <see cref="IOVRSkeletonProcessorAggregator"/> to give self to
+        /// </summary>
+        [SerializeField]
+        [ContextMenuItem(nameof(FindLocalProcessorAggregator),nameof(FindLocalProcessorAggregator))]
+        [Interface(typeof(IOVRSkeletonProcessorAggregator))]
+        protected UnityEngine.Object _autoAddTo;
+
         /// <summary>
         /// The array of retargeted bone targets.
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetedBoneTargetsTooltips.RetargetedBoneTargets)]
         protected RetargetedBoneTarget[] _retargetedBoneTargets;
+
+        private void FindLocalProcessorAggregator()
+        {
+            _autoAddTo = GetComponentInParent<IOVRSkeletonProcessorAggregator>()
+                as UnityEngine.Object;
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
+        }
 
         /// <summary>
         /// Correlate HumanBodyBones to OVRSkeleton.BoneId.
@@ -57,12 +85,26 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Will add self to <see cref="IOVRSkeletonProcessorAggregator"/> <see cref="_autoAddTo"/>
+        /// </summary>
+        private void Start()
+        {
+            if (_autoAddTo != null)
+            {
+                IOVRSkeletonProcessorAggregator aggregator = _autoAddTo
+                    as IOVRSkeletonProcessorAggregator;
+                aggregator.AddProcessor(this);
+            }
+        }
+
+        /// <summary>
         /// Update the bone targets with the retargeted bone transform data.
         /// This should be used with <see cref="RetargetingLayer.SkeletonPostProcessing" />.
         /// </summary>
         /// <param name="bones"></param>
-        public virtual void UpdateTargetsWithBoneData(IList<OVRBone> bones)
+        public void ProcessSkeleton(OVRSkeleton skeleton)
         {
+            IList<OVRBone> bones = skeleton.Bones;
             for (var i = 0; i < bones.Count; i++)
             {
                 foreach (var retargetedBoneTarget in _retargetedBoneTargets)

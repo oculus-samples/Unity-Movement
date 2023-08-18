@@ -27,16 +27,8 @@ namespace Oculus.Movement.Utils
         /// no undo actions since those are not allowed at runtime.
         /// </summary>
         /// <param name="selectedGameObject">GameObject to add animation rigging + retargeting too.</param>
-        /// <param name="disableAvatar">Disable avatar upon initialization.</param>
-        /// <param name="lateUpdateMask">Late update mask, intended for
-        /// <see cref="RetargetingLayer"/> component created.</param>
-        /// <param name="tPoseMask">T-pose mask, intended for
-        /// <see cref="RetargetingLayer"/> component created.</param>
         public static void SetupCharacterForAnimationRiggingRetargeting(
-            GameObject selectedGameObject,
-            bool disableAvatar,
-            AvatarMask lateUpdateMask = null,
-            AvatarMask tPoseMask = null)
+            GameObject selectedGameObject)
         {
             try
             {
@@ -53,12 +45,7 @@ namespace Oculus.Movement.Utils
             var mainParent = selectedGameObject;
 
             // Add the retargeting and body tracking components at root first.
-            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent, disableAvatar);
-            retargetingLayer.PositionsToCorrectLateUpdateComp = new AvatarMask();
-            retargetingLayer.PositionsToCorrectLateUpdateComp.CopyOtherMaskBodyActiveValues(
-                lateUpdateMask);
-            retargetingLayer.MaskToSetToTPoseComp = new AvatarMask();
-            retargetingLayer.MaskToSetToTPoseComp.CopyOtherMaskBodyActiveValues(tPoseMask);
+            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
@@ -66,6 +53,7 @@ namespace Oculus.Movement.Utils
 
             RetargetingAnimationConstraint retargetConstraint =
                 AddRetargetingConstraint(rigObject, retargetingLayer);
+            retargetingLayer.RetargetingConstraint = retargetConstraint;
 
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(mainParent, retargetingLayer, rigBuilder,
@@ -73,13 +61,12 @@ namespace Oculus.Movement.Utils
             selectedGameObject.SetActive(true);
         }
 
-        private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent, bool disableAvatar)
+        private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent)
         {
             RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
             if (!retargetingLayer)
             {
                 retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
-                retargetingLayer.DisableAvatar = disableAvatar;
             }
 
             OVRBody bodyComp = mainParent.GetComponent<OVRBody>();
@@ -136,6 +123,7 @@ namespace Oculus.Movement.Utils
                 retargetingAnimConstraintObj.SetActive(true);
 
                 retargetConstraint.transform.SetParent(rigObject.transform, true);
+                retargetConstraint.transform.SetAsLastSibling();
                 retargetConstraint.transform.localPosition = Vector3.zero;
                 retargetConstraint.transform.localRotation = Quaternion.identity;
                 retargetConstraint.transform.localScale = Vector3.one;

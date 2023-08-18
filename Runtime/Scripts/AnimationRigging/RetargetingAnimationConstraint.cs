@@ -229,6 +229,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             BuildArraysForJob(dummySourceObject, dummyTargetObject);
             UpdateDataArraysWithAdjustments();
+            UpdateRetargetingLateUpdateMasks();
             _hasInitialized = true;
         }
 

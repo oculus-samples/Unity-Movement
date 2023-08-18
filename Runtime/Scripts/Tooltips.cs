@@ -948,6 +948,30 @@ namespace Oculus.Movement
 
         public const string ArmMoveSpeed =
             "The move towards speed for the arms.";
+
+        public const string HipsToHeadBones =
+            "Array of transform bones from hips to head.";
+
+        public const string LeftArmData =
+            "Left arm data.";
+
+        public const string LeftArmDataInitialized =
+            "Whether the left arm data is initialized or not.";
+
+        public const string RightArmData =
+            "Right arm data.";
+
+        public const string RightArmDataInitialized =
+            "Whether the right arm data is initialized or not.";
+
+        public const string BonePairData =
+            "All bone pair data.";
+
+        public const string StartingScale =
+            "Starting scale of character.";
+
+        public const string HipsToHeadDistance =
+            "Distances between head and hips.";
     }
 
     public static class HipPinningDataTooltips
@@ -1177,12 +1201,12 @@ namespace Oculus.Movement
 
     public static class RetargetingLayerTooltips
     {
-        public const string DisableAvatar =
-            "Disable avatar for accurate positions, especially fingers.";
+        public const string CorrectPositionsLateUpdate =
+            "Allows correcting positions in LateUpdate for accuracy.";
 
-        public const string PositionsToCorrectLateUpdate =
-            "Positions to correct after the fact. Avatar " +
-            "masks prevent setting positions of the hands precisely.";
+        public const string HandCorrectionWeightLateUpdate =
+            "Allow correcting rotations in LateUpdate. This can produce more " +
+            "accurate hands, for instance.";
 
         public const string ApplyAnimationConstraintsToCorrectedPositions =
             "Apply position offsets done by animation rigging constraints for corrected " +
@@ -1194,14 +1218,13 @@ namespace Oculus.Movement
             "This can be necessary if you use a constraint that affects a specific bone, " +
             "and the correction mask might include it.";
 
-        public const string MaskToSetToTPose =
-            "Since some bones are not affected by retargeting, " +
-            "some joints should be reset to t-pose.";
-
         public const string EnableTrackingByProxy =
             "Create proxy transforms that track the skeletal bones. If the " +
             "skeletal bone transforms change, that won't necessitate creating new " +
             "proxy transforms in most cases.";
+
+        public const string RetargetingAnimationContraint =
+            "Related retargeting constraint.";
     }
 
     public static class LateMirroredObjectTooltips
@@ -1278,12 +1301,57 @@ namespace Oculus.Movement
         public const string SpawnOffset =
             "Offset per spawn.";
 
-        public const string PositionsToCorrectLateUpdateMask =
-            "Positions to correct mask, intended to correct the finger positions of " +
-            "animation rigged characters during retargeting.";
-
         public const string TPoseMask =
             "Positions to correct mask, intended to set certain joints of " +
             "animation rigged characters to T-Pose during retargeting.";
+    }
+
+    public static class AnimatorBoneVisualizerTooltips
+    {
+        public const string AnimatorComp =
+            "Animator component to visualize bones for.";
+    }
+
+    public static class OVRSkeletonBoneVisualizerTooltips
+    {
+        public const string OVRSkeletonComp =
+            "OVRSkeleton component to visualize bones for.";
+
+        public const string VisualizeBindPose =
+            "Whether to visualize bind pose or not.";
+    }
+
+    public static class BoneVisualizerTooltips
+    {
+
+        public const string WhenToRender =
+            "When to render this skeleton during the Unity gameloop.";
+
+        public const string VisualizationGuideType =
+            "The type of guide used to visualize bones.";
+
+        public const string MaskToVisualize =
+            "Mask to use for visualization.";
+
+        public const string BoneVisualData =
+            "Bone collection to use for visualization.";
+
+        public const string LineRendererPrefab =
+            "Line renderer to use for visualization.";
+
+        public const string AxisRendererPrefab =
+            "Axis renderer to use for visualization.";
+
+        public const string VisualType =
+            "Indicates what kind of visual is desired.";
+    }
+
+    public static class BoneVisualizerLineColorTooltips
+    {
+        public const string BoneVisualizer =
+            nameof(Utils.BoneVisualizer) + " to change the color of";
+
+        public const string LineColor =
+            "The color to change the " + nameof(Utils.BoneVisualizer) + " to";
     }
 }

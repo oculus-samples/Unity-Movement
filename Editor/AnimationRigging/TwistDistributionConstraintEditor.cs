@@ -38,12 +38,14 @@ namespace Oculus.Movement.AnimationRigging
                     Undo.RecordObject(constraint, "Find Animator");
                     var animator = constraint.GetComponentInParent<Animator>();
                     constraint.data.AssignAnimator(animator);
+                    EditorUtility.SetDirty(target);
                 }
                 if (GUILayout.Button("Find OVR Skeleton"))
                 {
                     Undo.RecordObject(constraint, "Find OVR Skeleton");
                     var skeleton = constraint.GetComponentInParent<OVRCustomSkeleton>();
                     constraint.data.AssignOVRSkeleton(skeleton);
+                    EditorUtility.SetDirty(target);
                 }
                 shouldShowButton = true;
             }
@@ -54,6 +56,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     Undo.RecordObject(constraint, "Find Twist Nodes");
                     FindTwistNodes(constraint);
+                    EditorUtility.SetDirty(target);
                 }
                 if (twistDistributionData.SegmentUp == null &&
                     twistDistributionData.SegmentEnd == null &&
@@ -61,6 +64,18 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     Undo.RecordObject(constraint, "Find Segment Joints");
                     FindSegments(constraint);
+                    EditorUtility.SetDirty(target);
+                }
+                shouldShowButton = true;
+            }
+
+            if (twistDistributionData.TwistNodes.Count > 0)
+            {
+                if (GUILayout.Button("Compute Twist Node Data"))
+                {
+                    Undo.RecordObject(constraint, "Compute Twist Node Data");
+                    constraint.data.ComputeTwistNodeData();
+                    EditorUtility.SetDirty(target);
                 }
                 shouldShowButton = true;
             }

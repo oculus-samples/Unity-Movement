@@ -170,6 +170,17 @@ namespace Oculus.Movement.Effects.Deprecated
 
             for (int i = 0; i < _twistJoints.Length; i++)
             {
+                var lookDirectionDot = Vector3.Dot(_currentLookAtDir,
+                    _currentEndUpTransform.TransformVector(_twistJoints[i].SegmentEndUpAxis));
+                // Don't apply twists if the look directions are zero or the look directions are parallel.
+                if (_currentLookAtDir.sqrMagnitude <= Mathf.Epsilon ||
+                    _currentEndUpTransform.TransformVector(_twistJoints[i].SegmentEndUpAxis).sqrMagnitude <= Mathf.Epsilon ||
+                    lookDirectionDot >= 1 - Mathf.Epsilon ||
+                    lookDirectionDot <= -1 + Mathf.Epsilon)
+                {
+                    continue;
+                }
+
                 // Reset joint.
                 _twistJoints[i].Joint.localRotation = _twistJoints[i].RestQuaternion;
 

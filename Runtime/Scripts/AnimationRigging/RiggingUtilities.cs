@@ -31,12 +31,20 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="skeleton"><see cref="OVRSkeleton"/> to query.</param>
         /// <param name="boneId"><see cref="OVRSkeleton.BoneId"/> of transform to find.</param>
-        /// <returns></returns>
+        /// <param name="isBindPose">If bone is obtained via bind pose.</param>
+        /// <returns>Bone transform.</returns>
         public static Transform FindBoneTransformFromSkeleton(
             OVRSkeleton skeleton,
-            OVRSkeleton.BoneId boneId)
+            OVRSkeleton.BoneId boneId,
+            bool isBindPose = false)
         {
-            var bones = skeleton.Bones;
+            if (!skeleton.IsInitialized ||
+                !skeleton.IsDataValid)
+            {
+                return null;
+            }
+
+            var bones = isBindPose ? skeleton.BindPoses : skeleton.Bones;
             for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
             {
                 if (bones[boneIndex].Id == boneId)
@@ -63,6 +71,17 @@ namespace Oculus.Movement.AnimationRigging
                 return null;
             }
             return animator.GetBoneTransform(CustomMappings.BoneIdToHumanBodyBone[boneId]);
+        }
+
+        /// <summary>
+        /// Returns true if this vector3 is finite and not NaN.
+        /// </summary>
+        /// <param name="v">The Vector3 to be checked.</param>
+        /// <returns>True if valid.</returns>
+        public static bool IsFiniteVector3(Vector3 v)
+        {
+            return float.IsFinite(v.x) && float.IsFinite(v.y) && float.IsFinite(v.z) &&
+                   !float.IsNaN(v.x) && !float.IsNaN(v.y) && !float.IsNaN(v.z);
         }
     }
 

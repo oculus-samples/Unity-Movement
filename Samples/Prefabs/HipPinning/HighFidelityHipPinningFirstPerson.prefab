@@ -637,6 +637,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 0
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: -0.8500198, y: 0.020306736, z: -0.5263601}
+    - {x: -0.8500198, y: 0.020306736, z: -0.5263601}
+    - {x: -0.8500198, y: 0.020306736, z: -0.5263601}
+    _twistNodeSpacings:
+    - 0
+    - 0.34631848
+    - 0.6926367
 --- !u!1 &4994664485943194642
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,6 +702,105 @@ MonoBehaviour:
     _armWeight: 0
     _handWeight: 0
     _armMoveSpeed: 0
+    _hipsToHeadBones:
+    - {fileID: 8911903714498386270}
+    - {fileID: 6349585496898920960}
+    - {fileID: 47671476499168914}
+    - {fileID: 5411799685071577940}
+    - {fileID: 5571723699023252082}
+    - {fileID: 6885306115466274032}
+    - {fileID: 7188521250940347498}
+    _leftArmData:
+      ShoulderBone: {fileID: 2223570764790469765}
+      UpperArmBone: {fileID: 24274709243371028}
+      LowerArmBone: {fileID: 2827531660133311963}
+      HandBone: {fileID: 231661889192982023}
+      ArmWeight: 0
+      HandWeight: 0
+      MoveSpeed: 0
+    _rightArmData:
+      ShoulderBone: {fileID: 1744467641500109490}
+      UpperArmBone: {fileID: 7124955169347283970}
+      LowerArmBone: {fileID: 8362510363615060496}
+      HandBone: {fileID: 5535935693886961202}
+      ArmWeight: 0
+      HandWeight: 0
+      MoveSpeed: 0
+    _bonePairData:
+    - StartBone: {fileID: 8911903714498386270}
+      EndBone: {fileID: 6349585496898920960}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.038306892
+      IsMoveTowards: 0
+    - StartBone: {fileID: 6349585496898920960}
+      EndBone: {fileID: 47671476499168914}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.11096214
+      IsMoveTowards: 0
+    - StartBone: {fileID: 47671476499168914}
+      EndBone: {fileID: 5411799685071577940}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.11240488
+      IsMoveTowards: 0
+    - StartBone: {fileID: 5411799685071577940}
+      EndBone: {fileID: 5571723699023252082}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.1846194
+      IsMoveTowards: 0
+    - StartBone: {fileID: 5571723699023252082}
+      EndBone: {fileID: 6885306115466274032}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.13176535
+      IsMoveTowards: 0
+    - StartBone: {fileID: 6885306115466274032}
+      EndBone: {fileID: 7188521250940347498}
+      SnapThreshold: 0
+      MoveTowardsSpeed: 0
+      Distance: 0.07068894
+      IsMoveTowards: 0
+    - StartBone: {fileID: 5571723699023252082}
+      EndBone: {fileID: 2223570764790469765}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.119189434
+      IsMoveTowards: 0
+    - StartBone: {fileID: 5571723699023252082}
+      EndBone: {fileID: 1744467641500109490}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.119189434
+      IsMoveTowards: 0
+    - StartBone: {fileID: 2223570764790469765}
+      EndBone: {fileID: 24274709243371028}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.17650495
+      IsMoveTowards: 0
+    - StartBone: {fileID: 1744467641500109490}
+      EndBone: {fileID: 7124955169347283970}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.17650484
+      IsMoveTowards: 0
+    - StartBone: {fileID: 24274709243371028}
+      EndBone: {fileID: 2827531660133311963}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.25680098
+      IsMoveTowards: 0
+    - StartBone: {fileID: 7124955169347283970}
+      EndBone: {fileID: 8362510363615060496}
+      SnapThreshold: 0.1
+      MoveTowardsSpeed: 0
+      Distance: 0.25679642
+      IsMoveTowards: 0
+    _startingScale: {x: 1, y: 1, z: 1}
+    _hipsToHeadDistance: 0.6140263
 --- !u!1 &5157524381134081549
 GameObject:
   m_ObjectHideFlags: 0
@@ -1016,6 +1123,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 1
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: -0.8500448, y: 0.020295262, z: -0.52631927}
+    - {x: -0.8500448, y: 0.020295262, z: -0.52631927}
+    - {x: -0.8500448, y: 0.020295262, z: -0.52631927}
+    _twistNodeSpacings:
+    - 0
+    - 0.34631228
+    - 0.6926246
 --- !u!1 &6629226668042296422
 GameObject:
   m_ObjectHideFlags: 0
@@ -1097,6 +1212,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 1
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: 0.00000004065537, y: -1.0000001, z: 0.00000011920929}
+    - {x: 0.00000004065537, y: -1.0000001, z: 0.00000011920929}
+    - {x: 0.00000004065537, y: -1.0000001, z: 0.00000011920929}
+    _twistNodeSpacings:
+    - 0.3902205
+    - 0.7023965
+    - 0.9999959
 --- !u!1 &7127696881513123657
 GameObject:
   m_ObjectHideFlags: 0
@@ -1178,6 +1301,14 @@ MonoBehaviour:
     _twistUpAxis: 2
     _invertForwardAxis: 0
     _invertUpAxis: 1
+    _twistNodeUps:
+    - {x: 0.00000003299839, y: -1.0000007, z: 0.00000011920929}
+    - {x: 0.00000003299839, y: -1.0000007, z: 0.00000011920929}
+    - {x: 0.00000003299839, y: -1.0000007, z: 0.00000011920929}
+    _twistNodeSpacings:
+    - 0.3902133
+    - 0.7023841
+    - 0.999989
 --- !u!1 &7591702345266992917
 GameObject:
   m_ObjectHideFlags: 0
@@ -1345,6 +1476,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8516791775919695146, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
   m_PrefabInstance: {fileID: 8531934559616596798}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &47671476499168914 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8561019307427218860, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &231661889192982023 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8453399462411537721, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
@@ -1497,9 +1633,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4370680940190284369, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
   m_PrefabInstance: {fileID: 8531934559616596798}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &5411799685071577940 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4430722223406340202, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5535935693886961202 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4230038290932878604, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5571723699023252082 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4266378242308141388, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
   m_PrefabInstance: {fileID: 8531934559616596798}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &6171397758821561763 stripped
@@ -1512,9 +1658,24 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2563083832853654056, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
   m_PrefabInstance: {fileID: 8531934559616596798}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &6349585496898920960 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3348926708340398398, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6885306115466274032 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3020226679401504718, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7124955169347283970 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1479267263978952508, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
+  m_PrefabInstance: {fileID: 8531934559616596798}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7188521250940347498 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1559728415474851668, guid: d93e9f2485cf85b4aad13c207e1b410f, type: 3}
   m_PrefabInstance: {fileID: 8531934559616596798}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8065065785454080346 stripped

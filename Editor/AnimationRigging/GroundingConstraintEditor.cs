@@ -43,7 +43,6 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
 
-
             if (GUILayout.Button("Compute Offsets"))
             {
                 Undo.RecordObject(constraint, "Compute Offsets");

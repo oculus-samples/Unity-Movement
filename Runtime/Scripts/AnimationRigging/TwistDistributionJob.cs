@@ -138,14 +138,11 @@ namespace Oculus.Movement.AnimationRigging
     public class TwistDistributionJobBinder<T> : AnimationJobBinder<TwistDistributionJob, T>
         where T : struct, IAnimationJobData, ITwistDistributionData
     {
-        private bool _shouldUpdate;
-
         /// <inheritdoc cref="IAnimationJobBinder.Create"/>
         public override TwistDistributionJob Create(Animator animator, ref T data, Component component)
         {
             var job = new TwistDistributionJob();
 
-            data.Setup();
             var twistNodes = data.TwistNodes;
             WeightedTransformArrayBinder.BindReadWriteTransforms(animator, component, twistNodes, out job.TwistTransforms);
             WeightedTransformArrayBinder.BindWeights(animator, component, twistNodes, data.TwistNodesProperty, out job.TwistWeights);
@@ -190,13 +187,22 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (data.IsBoneTransformsDataValid())
             {
-                _shouldUpdate = true;
+                data.ShouldUpdate = true;
             }
 
             WeightedTransformArray twistNodes = data.TwistNodes;
             for (int i = 0; i < twistNodes.Count; i++)
             {
                 var segmentUp = data.SegmentUp.TransformVector(job.TwistUpDirections[i]);
+                var lookDirectionDot = Vector3.Dot(job.SegmentDirections[0], segmentUp);
+                // Don't apply twists if the look directions are zero or the look directions are parallel.
+                if (job.SegmentDirections[0].sqrMagnitude <= Mathf.Epsilon ||
+                    segmentUp.sqrMagnitude <= Mathf.Epsilon ||
+                    lookDirectionDot >= 1 - Mathf.Epsilon ||
+                    lookDirectionDot <= -1 + Mathf.Epsilon)
+                {
+                    continue;
+                }
                 job.SegmentUpAxis[i] = segmentUp;
             }
 
@@ -209,12 +215,12 @@ namespace Oculus.Movement.AnimationRigging
             var segmentDirection = (segmentEndPos - segmentStartPos) * 2f;
             job.SegmentDirections[0] = segmentDirection;
 
-            job.DeltaTime[0] = _shouldUpdate ? Time.unscaledDeltaTime : 0.0f;
+            job.DeltaTime[0] = data.ShouldUpdate ? Time.unscaledDeltaTime : 0.0f;
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())
             {
-                _shouldUpdate = false;
+                data.ShouldUpdate = false;
             }
         }
 

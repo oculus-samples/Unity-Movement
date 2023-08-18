@@ -5,6 +5,7 @@ using Oculus.Movement.AnimationRigging.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Assertions;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -13,17 +14,15 @@ namespace Oculus.Movement.AnimationRigging
     /// functions that work with animation rigging.
     /// </summary>
     [DefaultExecutionOrder(220)]
-    public partial class RetargetingLayer : OVRUnityHumanoidSkeletonRetargeter
+    public partial class RetargetingLayer : OVRUnityHumanoidSkeletonRetargeter,
+        IOVRSkeletonProcessorAggregator
     {
         /// <summary>
-        /// Callback type, auditable and assignable in the Unity Editor.
-        /// Also assignable in code using
-        /// <see cref="UnityEditor.Events.UnityEventTools.AddPersistentListener"/>
+        /// Callback that can adjust a given skeleton. Is the functional backend that implements
+        /// <see cref="IOVRSkeletonProcessorAggregator"/>
         /// </summary>
-        [System.Serializable]
-        public class SkeletonPostProcessingEvent : UnityEngine.Events.UnityEvent<IList<OVRBone>>
-        {
-        }
+        /// <param name="skeleton"></param>
+        public delegate void OVRSkeletonProcessor(OVRSkeleton skeleton);
 
         /// <summary>
         /// Joint position adjustment to be applied to corrected positions.
@@ -54,89 +53,14 @@ namespace Oculus.Movement.AnimationRigging
             {
                 var targetPositionOffset = FinalPosition - OriginalPosition;
                 // The recorded positions will not be finite when we regenerate data for the rig.
-                if (!float.IsFinite(FinalPosition.x) ||
-                    !float.IsFinite(FinalPosition.y) ||
-                    !float.IsFinite(FinalPosition.z) ||
-                    !float.IsFinite(OriginalPosition.x) ||
-                    !float.IsFinite(OriginalPosition.y) ||
-                    !float.IsFinite(OriginalPosition.z))
+                if (!RiggingUtilities.IsFiniteVector3(FinalPosition) ||
+                    !RiggingUtilities.IsFiniteVector3(OriginalPosition))
                 {
                     return Vector3.zero;
                 }
                 return targetPositionOffset;
             }
         }
-
-        private static readonly Dictionary<HumanBodyBones, AvatarMaskBodyPart>
-            _humanBoneToAvatarBodyPart = new Dictionary<HumanBodyBones, AvatarMaskBodyPart>()
-            {
-                { HumanBodyBones.Neck, AvatarMaskBodyPart.Head },
-
-                { HumanBodyBones.Head, AvatarMaskBodyPart.Head },
-                { HumanBodyBones.LeftEye, AvatarMaskBodyPart.Head },
-                { HumanBodyBones.RightEye, AvatarMaskBodyPart.Head },
-                { HumanBodyBones.Jaw, AvatarMaskBodyPart.Head },
-
-                { HumanBodyBones.Hips, AvatarMaskBodyPart.Body },
-
-                { HumanBodyBones.Spine, AvatarMaskBodyPart.Body },
-                { HumanBodyBones.Chest, AvatarMaskBodyPart.Body },
-                { HumanBodyBones.UpperChest, AvatarMaskBodyPart.Body },
-
-                { HumanBodyBones.RightShoulder, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightUpperArm, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLowerArm, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightHand, AvatarMaskBodyPart.RightArm },
-
-                { HumanBodyBones.LeftShoulder, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftUpperArm, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLowerArm, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftHand, AvatarMaskBodyPart.LeftArm },
-
-                { HumanBodyBones.LeftUpperLeg, AvatarMaskBodyPart.LeftLeg },
-                { HumanBodyBones.LeftLowerLeg, AvatarMaskBodyPart.LeftLeg },
-
-                { HumanBodyBones.LeftFoot, AvatarMaskBodyPart.LeftLeg },
-                { HumanBodyBones.LeftToes, AvatarMaskBodyPart.LeftLeg },
-
-                { HumanBodyBones.RightUpperLeg, AvatarMaskBodyPart.RightLeg },
-                { HumanBodyBones.RightLowerLeg, AvatarMaskBodyPart.RightLeg },
-
-                { HumanBodyBones.RightFoot, AvatarMaskBodyPart.RightLeg },
-                { HumanBodyBones.RightToes, AvatarMaskBodyPart.RightLeg },
-
-                { HumanBodyBones.LeftThumbProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftThumbIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftThumbDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftIndexProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftIndexIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftIndexDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftMiddleProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftMiddleIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftMiddleDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftRingProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftRingIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftRingDistal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLittleProximal, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLittleIntermediate, AvatarMaskBodyPart.LeftArm },
-                { HumanBodyBones.LeftLittleDistal, AvatarMaskBodyPart.LeftArm },
-
-                { HumanBodyBones.RightThumbProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightThumbIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightThumbDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightIndexProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightIndexIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightIndexDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightMiddleProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightMiddleIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightMiddleDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightRingProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightRingIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightRingDistal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLittleProximal, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLittleIntermediate, AvatarMaskBodyPart.RightArm },
-                { HumanBodyBones.RightLittleDistal, AvatarMaskBodyPart.RightArm }
-            };
 
         /// <summary>
         /// The array of joint position adjustments.
@@ -148,47 +72,19 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Disable the target's avatar after building its meta data. There is an
-        /// issue in Unity where the positions of all of the retargeted's
-        /// bones are *not* set if an avatar is assigned during runtime, even if
-        /// the avatar's "Translation DoF" checkbox is checked (specifically the fingers). The drawback of
-        /// disabling an avatar is that animations or animation rig constraints
-        /// might not run on the character. <see cref="_positionsToCorrectLateUpdate"/>
-        /// can be used to keep the avatar and also correct finger positions in LateUpdate.
+        /// Allows correcting positions in LateUpdate for accuracy.
         /// </summary>
         [SerializeField]
-        [Tooltip(RetargetingLayerTooltips.DisableAvatar)]
-        protected bool _disableAvatar = false;
-        /// <summary>
-        /// Accessors for disable avatar toggle.
-        /// </summary>
-        public bool DisableAvatar
-        {
-            get { return _disableAvatar; }
-            set { _disableAvatar = value; }
-        }
+        [Tooltip(RetargetingLayerTooltips.CorrectPositionsLateUpdate)]
+        protected bool _correctPositionsLateUpdate = true;
 
         /// <summary>
-        /// Positions to correct after the fact. Avatar
-        /// masks prevent setting positions of the hands precisely.
+        /// Allow correcting rotations in LateUpdate. This can produce more
+        /// accurate hands, for instance.
         /// </summary>
-        [SerializeField, Optional]
-        [Tooltip(RetargetingLayerTooltips.PositionsToCorrectLateUpdate)]
-        protected AvatarMask _positionsToCorrectLateUpdate;
-
-        /// <summary>
-        /// Don't allow changing the original field directly, as that
-        /// has a side-effect of modifying the original mask object.
-        /// </summary>
-        private AvatarMask _positionsToCorrectLateUpdateInstance;
-        /// <summary>
-        /// Positions to correct accessors.
-        /// </summary>
-        public AvatarMask PositionsToCorrectLateUpdateComp
-        {
-            get { return _positionsToCorrectLateUpdateInstance; }
-            set { _positionsToCorrectLateUpdateInstance = value; }
-        }
+        [Tooltip(RetargetingLayerTooltips.HandCorrectionWeightLateUpdate)]
+        [SerializeField, Range(0.0f, 1.0f)]
+        protected float _handCorrectionWeightLateUpdate = 1.0f;
 
         /// <summary>
         /// Apply position offsets done by animation rigging constraints for corrected
@@ -203,28 +99,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             get { return _applyAnimationConstraintsToCorrectedPositions; }
             set { _applyAnimationConstraintsToCorrectedPositions = value; }
-        }
-
-        /// <summary>
-        /// Since some bones are not affected by retargeting,
-        /// some joints should be reset to t-pose.
-        /// </summary>
-        [SerializeField, Optional]
-        [Tooltip(RetargetingLayerTooltips.MaskToSetToTPose)]
-        protected AvatarMask _maskToSetToTPose;
-
-        /// <summary>
-        /// Don't allow changing the original field directly, as that
-        /// has a side-effect of modifying the original mask object.
-        /// </summary>
-        private AvatarMask _maskToSetToTPoseInstance;
-        /// <summary>
-        /// Mask to set to TPose accessors.
-        /// </summary>
-        public AvatarMask MaskToSetToTPoseComp
-        {
-            get { return _maskToSetToTPoseInstance; }
-            set { _maskToSetToTPoseInstance = value; }
         }
 
         /// <summary>
@@ -249,11 +123,23 @@ namespace Oculus.Movement.AnimationRigging
         /// Triggers methods that can alter bone translations and rotations, before rendering and physics
         /// </summary>
         [SerializeField, Optional]
-        protected SkeletonPostProcessingEvent SkeletonPostProcessing;
-        public SkeletonPostProcessingEvent SkeletonPostProcessingEv
+        protected OVRSkeletonProcessor SkeletonPostProcessing;
+        public OVRSkeletonProcessor SkeletonPostProcessingEv
         {
             get { return SkeletonPostProcessing; }
             set { SkeletonPostProcessing = value; }
+        }
+
+        /// <summary>
+        /// Related retargeting constraint.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.RetargetingAnimationContraint)]
+        protected RetargetingAnimationConstraint _retargetingAnimationConstraint;
+        public RetargetingAnimationConstraint RetargetingConstraint
+        {
+            get { return _retargetingAnimationConstraint; }
+            set { _retargetingAnimationConstraint = value; }
         }
 
         private Pose[] _defaultPoses;
@@ -267,7 +153,6 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <summary>
         /// Allows one to specify which positions to correct during late update.
-        /// This is ANDed with <see cref="_positionsToCorrectLateUpdateInstance"/>
         /// </summary>
         public AvatarMask CustomPositionsToCorrectLateUpdateMask { get; set; }
 
@@ -299,66 +184,9 @@ namespace Oculus.Movement.AnimationRigging
         protected override void Awake()
         {
             base.Awake();
-            if (_positionsToCorrectLateUpdateInstance == null)
-            {
-                CreatePositionsToCorrectLateUpdateMaskInstance();
-            }
-            if (_maskToSetToTPoseInstance == null)
-            {
-                CreateTPoseMaskInstance();
-            }
-        }
 
-        /// <summary>
-        /// Allows creating instance of position correction mask used in this class at any time.
-        /// Effectively resets animation masks being used to what the corresponding
-        /// field <see cref="_positionsToCorrectLateUpdate"/> specify. This is primarily used by
-        /// <see cref="RetargetingLayerEditor"/>.
-        /// </summary>
-        public void CreatePositionsToCorrectLateUpdateMaskInstance()
-        {
-            if (_positionsToCorrectLateUpdate != null)
-            {
-                _positionsToCorrectLateUpdateInstance = new AvatarMask();
-                _positionsToCorrectLateUpdateInstance.CopyOtherMaskBodyActiveValues(
-                    _positionsToCorrectLateUpdate);
-            }
-            else
-            {
-                _positionsToCorrectLateUpdateInstance = null;
-            }
-        }
-
-        /// <summary>
-        /// Allows creating instance of T-Pose mask used in this class at any time.
-        /// Effectively resets animation masks being used to what the corresponding
-        /// field <see cref="_maskToSetToTPose"/> specify. This is primarily used by
-        /// <see cref="RetargetingLayerEditor"/>.
-        /// </summary>
-        public void CreateTPoseMaskInstance()
-        {
-            if (_maskToSetToTPose != null)
-            {
-                _maskToSetToTPoseInstance = new AvatarMask();
-                _maskToSetToTPoseInstance.CopyOtherMaskBodyActiveValues(_maskToSetToTPose);
-            }
-            else
-            {
-                _maskToSetToTPoseInstance = null;
-            }
-        }
-
-        /// <summary>
-        /// Allows creating instances of masks used in this class at any time.
-        /// Effectively resets animation masks being used to what the corresponding
-        /// fields <see cref="_positionsToCorrectLateUpdate"/> and
-        /// <see cref="_maskToSetToTPose"/> specify. This is primarily used by
-        /// <see cref="RetargetingLayerEditor"/>.
-        /// </summary>
-        public void CreateMaskInstances()
-        {
-            CreatePositionsToCorrectLateUpdateMaskInstance();
-            CreateTPoseMaskInstance();
+            Assert.IsNotNull(_retargetingAnimationConstraint,
+                "Please assign the retargeting constraint to RetargetingLayer.");
         }
 
         /// <summary>
@@ -372,6 +200,8 @@ namespace Oculus.Movement.AnimationRigging
             ConstructDefaultPoseInformation();
             ConstructBoneAdjustmentInformation();
             CacheJointConstraints();
+
+            ValidateHumanoid();
         }
 
         private void ConstructDefaultPoseInformation()
@@ -414,6 +244,40 @@ namespace Oculus.Movement.AnimationRigging
             _jointConstraints = jointConstraints.ToArray();
         }
 
+        private void ValidateHumanoid()
+        {
+            bool validHumanoid = true;
+            foreach (var bodyBone in CustomBoneIdToHumanBodyBone.Values)
+            {
+                if (!AnimatorTargetSkeleton.GetBoneTransform(bodyBone))
+                {
+                    Debug.LogError($"Did not find {bodyBone} in {AnimatorTargetSkeleton}.");
+                    validHumanoid = false;
+                }
+            }
+
+            if (!validHumanoid)
+            {
+                return;
+            }
+
+            // specific checks follow.
+            var upperChest = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.UpperChest);
+            var leftShoulder = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.LeftShoulder);
+            var rightShoulder = AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.RightShoulder);
+
+            if (leftShoulder.parent != upperChest)
+            {
+                Debug.LogWarning($"In the ideal case, the parent of left shoulder ({leftShoulder}) should be the" +
+                    $" upper chest ({upperChest}).");
+            }
+            if (rightShoulder.parent != upperChest)
+            {
+                Debug.LogWarning($"In the ideal case, the parent of right shoulder ({rightShoulder}) should be the" +
+                    $" upper chest ({upperChest}).");
+            }
+        }
+
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
             if (Application.isEditor)
@@ -426,10 +290,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         protected override void Update()
         {
-            DisableAvatarIfNecessary();
-
             UpdateSkeleton();
-            SkeletonPostProcessing?.Invoke(Bones);
+            SkeletonPostProcessing?.Invoke(this);
             RecomputeSkeletalOffsetsIfNecessary();
 
             if (_enableTrackingByProxy)
@@ -448,19 +310,19 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-            CorrectPositions();
-            FixJointsToTPose();
+            CorrectBones();
             // apply constraints on character after fixing positions.
             RunConstraints();
         }
 
-        private void CorrectPositions()
+        private void CorrectBones()
         {
-            if (_positionsToCorrectLateUpdateInstance == null)
+            bool handCorrectionTurnedOn = (_handCorrectionWeightLateUpdate > Mathf.Epsilon);
+            if (!_correctPositionsLateUpdate &&
+                !handCorrectionTurnedOn)
             {
                 return;
             }
-
             for (var i = 0; i < Bones.Count; i++)
             {
                 if (!CustomBoneIdToHumanBodyBone.TryGetValue(Bones[i].Id, out var humanBodyBone))
@@ -479,65 +341,102 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
-                var bodyPart = _humanBoneToAvatarBodyPart[humanBodyBone];
-                if (!_positionsToCorrectLateUpdateInstance.GetHumanoidBodyPartActive(bodyPart) ||
-                    (CustomPositionsToCorrectLateUpdateMask != null &&
-                     !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
-                   )
+                var bodyPart = CustomMappings.HumanBoneToAvatarBodyPart[humanBodyBone];
+                var targetJoint = targetData.OriginalJoint;
+
+                // Make sure body part passes mask, and bone's position should be updated.
+                if (CustomPositionsToCorrectLateUpdateMask != null &&
+                    !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
+                {
+                    continue;
+                }
+                var adjustment = FindAdjustment(humanBodyBone);
+                if (!ShouldUpdatePositionOfBone(humanBodyBone))
                 {
                     continue;
                 }
 
-                var adjustment = FindAdjustment(humanBodyBone);
-                var targetJoint = targetData.OriginalJoint;
-                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
-                var shouldUpdatePosition = IsBodySectionInArray(
-                    bodySectionOfJoint, BodySectionToPosition);
-
-                if (!shouldUpdatePosition)
+                var currentTargetPosition = targetJoint.position;
+                // Make sure the joint position is valid before fixing it.
+                if (!RiggingUtilities.IsFiniteVector3(currentTargetPosition))
                 {
                     continue;
                 }
 
                 var positionOffset = _applyAnimationConstraintsToCorrectedPositions ?
                     JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
+                var currentOVRBonePosition = Bones[i].Transform.position;
+                var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetPosition).sqrMagnitude;
 
+                // If correcting positions only, skip positional fix if the error relative
+                // to body tracking is low, and the position offset due to IK is small.
+                if ((_correctPositionsLateUpdate && !handCorrectionTurnedOn) &&
+                    errorRelativeToBodyTracking < Mathf.Epsilon &&
+                    positionOffset.sqrMagnitude < Mathf.Epsilon)
+                {
+                    continue;
+                }
+
+                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+                bool isHandJoint =
+                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.LeftHand ||
+                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.RightHand;
+                // exclude any position offsets from IK if correcting hand position to
+                // body tracking values
+                if (isHandJoint)
+                {
+                    positionOffset = Vector3.Lerp(positionOffset, Vector3.zero,
+                        _handCorrectionWeightLateUpdate);
+                }
+
+                float rtWeight = _retargetingAnimationConstraint.weight;
                 if (adjustment == null)
                 {
-                    targetJoint.position = Bones[i].Transform.position + positionOffset;
+                    if (handCorrectionTurnedOn && isHandJoint)
+                    {
+                        targetJoint.rotation =
+                            Quaternion.Slerp(targetJoint.rotation,
+                                Bones[i].Transform.rotation *
+                                targetData.CorrectionQuaternion.Value,
+                                _handCorrectionWeightLateUpdate);
+                    }
+                    if (_correctPositionsLateUpdate)
+                    {
+                        targetJoint.position =
+                            Vector3.Lerp(currentTargetPosition,
+                                currentOVRBonePosition + positionOffset, rtWeight);
+                    }
                 }
                 else
                 {
-                    if (!adjustment.DisablePositionTransform)
+                    if (handCorrectionTurnedOn && isHandJoint)
                     {
-                        targetJoint.position = Bones[i].Transform.position + positionOffset;
+                        if (!adjustment.DisableRotationTransform)
+                        {
+                            targetJoint.rotation =
+                                Quaternion.Slerp(targetJoint.rotation,
+                                    Bones[i].Transform.rotation *
+                                    targetData.CorrectionQuaternion.Value,
+                                    _handCorrectionWeightLateUpdate);
+                        }
+
+                        targetJoint.rotation *= adjustment.RotationChange;
+                    }
+                    if (!adjustment.DisablePositionTransform &&
+                        _correctPositionsLateUpdate)
+                    {
+                        targetJoint.position =
+                            Vector3.Lerp(currentTargetPosition,
+                                currentOVRBonePosition + positionOffset, rtWeight);
                     }
                 }
             }
         }
 
-        private void FixJointsToTPose()
+        protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
         {
-            if (_maskToSetToTPoseInstance == null)
-            {
-                return;
-            }
-
-            for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
-            {
-                var boneTransform = AnimatorTargetSkeleton.GetBoneTransform(i);
-                if (boneTransform == null)
-                {
-                    continue;
-                }
-                if (!_maskToSetToTPoseInstance.GetHumanoidBodyPartActive(_humanBoneToAvatarBodyPart[i]))
-                {
-                    continue;
-                }
-                var defaultPose = _defaultPoses[(int)i];
-                boneTransform.SetLocalPositionAndRotation(defaultPose.position,
-                  defaultPose.rotation);
-            }
+            var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+            return IsBodySectionInArray(bodySectionOfJoint, BodySectionToPosition);
         }
 
         private void RunConstraints()
@@ -550,20 +449,6 @@ namespace Oculus.Movement.AnimationRigging
             {
                 var constraint = _jointConstraints[i];
                 constraint.Update();
-            }
-        }
-
-        private void DisableAvatarIfNecessary()
-        {
-            // target meta data not created yet, can't disable avatar
-            if (TargetSkeletonData == null)
-            {
-                return;
-            }
-
-            if (_disableAvatar && AnimatorTargetSkeleton.avatar != null)
-            {
-                AnimatorTargetSkeleton.avatar = null;
             }
         }
 
@@ -651,11 +536,8 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 // run this code each frame to pick up adjustments made to the editor
-                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[targetHumanBodyBone];
-
                 var adjustment = FindAdjustment(targetHumanBodyBone);
-                bool bodySectionInPositionArray = IsBodySectionInArray(
-                    bodySectionOfJoint, BodySectionToPosition);
+                bool bodySectionInPositionArray = ShouldUpdatePositionOfBone(targetHumanBodyBone);
 
                 // Skip if the job arrays are less in number compared to bones.
                 // This can happen if the skeleton regenerates its bones during update,
@@ -673,7 +555,7 @@ namespace Oculus.Movement.AnimationRigging
                 if (avatarMask != null)
                 {
                     jointFailsMask = !avatarMask.GetHumanoidBodyPartActive(
-                        _humanBoneToAvatarBodyPart[targetHumanBodyBone]);
+                        CustomMappings.HumanBoneToAvatarBodyPart[targetHumanBodyBone]);
                 }
 
                 if (adjustment == null)
@@ -741,6 +623,18 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             return (targetData, humanBodyBone);
+        }
+
+        /// <inheritdoc/>
+        public void AddProcessor(IOVRSkeletonProcessor processor)
+        {
+            SkeletonPostProcessing += processor.ProcessSkeleton;
+        }
+
+        /// <inheritdoc/>
+        public void RemoveProcessor(IOVRSkeletonProcessor processor)
+        {
+            SkeletonPostProcessing -= processor.ProcessSkeleton;
         }
     }
 }

@@ -34,22 +34,6 @@ namespace Oculus.Movement.UI
         [Tooltip(RetargetingMenuTooltips.SpawnOffset)]
         protected Vector3 _spawnOffset = new Vector3(-1.0f, 0.0f, 0.0f);
 
-        /// <summary>
-        /// Positions to correct mask, intended to correct the finger positions of
-        /// animation rigged characters during retargeting.
-        /// </summary>
-        [SerializeField, Optional]
-        [Tooltip(RetargetingMenuTooltips.PositionsToCorrectLateUpdateMask)]
-        protected AvatarMask _positionsToCorrectLateUpdateMask;
-
-        /// <summary>
-        /// Positions to correct mask, intended to set certain joints of
-        /// animation rigged characters to T-Pose during retargeting.
-        /// </summary>
-        [SerializeField, Optional]
-        [Tooltip(RetargetingMenuTooltips.TPoseMask)]
-        protected AvatarMask _tPoseMask;
-
         private const int _characterSpawnLimit = 20;
         private Vector3 _currentSpawnOffset;
         private List<GameObject> _charactersSpawned = new List<GameObject>();
@@ -89,8 +73,7 @@ namespace Oculus.Movement.UI
                 return;
             }
             GameObject newCharacter = Instantiate(_characterToSpawn);
-            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, false,
-                _positionsToCorrectLateUpdateMask, _tPoseMask);
+            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter);
 
             AdjustSpawnedCharacterTransform(newCharacter);
             _currentSpawnOffset += _spawnOffset;
