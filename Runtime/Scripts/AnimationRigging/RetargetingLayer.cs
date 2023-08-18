@@ -79,6 +79,14 @@ namespace Oculus.Movement.AnimationRigging
         protected bool _correctPositionsLateUpdate = true;
 
         /// <summary>
+        /// Allow correcting rotations in LateUpdate. This can produce more
+        /// accurate hands, for instance.
+        /// </summary>
+        [Tooltip(RetargetingLayerTooltips.HandCorrectionWeightLateUpdate)]
+        [SerializeField, Range(0.0f, 1.0f)]
+        protected float _handCorrectionWeightLateUpdate = 1.0f;
+
+        /// <summary>
         /// Apply position offsets done by animation rigging constraints for corrected
         /// positions. Due to the limited motion of humanoid avatars, this should be set if any
         /// animation rigging constraints are applied after the retargeting job runs.
@@ -302,14 +310,16 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-            CorrectPositions();
+            CorrectBones();
             // apply constraints on character after fixing positions.
             RunConstraints();
         }
 
-        private void CorrectPositions()
+        private void CorrectBones()
         {
-            if (!_correctPositionsLateUpdate)
+            bool handCorrectionTurnedOn = (_handCorrectionWeightLateUpdate > Mathf.Epsilon);
+            if (!_correctPositionsLateUpdate &&
+                !handCorrectionTurnedOn)
             {
                 return;
             }
@@ -335,8 +345,8 @@ namespace Oculus.Movement.AnimationRigging
                 var targetJoint = targetData.OriginalJoint;
 
                 // Make sure body part passes mask, and bone's position should be updated.
-                if ( (CustomPositionsToCorrectLateUpdateMask != null &&
-                    !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart)))
+                if (CustomPositionsToCorrectLateUpdateMask != null &&
+                    !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
                 {
                     continue;
                 }
@@ -358,24 +368,62 @@ namespace Oculus.Movement.AnimationRigging
                 var currentOVRBonePosition = Bones[i].Transform.position;
                 var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetPosition).sqrMagnitude;
 
-                // skip positional fix if the error relative to body tracking is low
-                // and the position offset is small
-                if (errorRelativeToBodyTracking < Mathf.Epsilon &&
+                // If correcting positions only, skip positional fix if the error relative
+                // to body tracking is low, and the position offset due to IK is small.
+                if ((_correctPositionsLateUpdate && !handCorrectionTurnedOn) &&
+                    errorRelativeToBodyTracking < Mathf.Epsilon &&
                     positionOffset.sqrMagnitude < Mathf.Epsilon)
                 {
                     continue;
                 }
 
+                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+                bool isHandJoint =
+                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.LeftHand ||
+                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.RightHand;
+                // exclude any position offsets from IK if correcting hand position to
+                // body tracking values
+                if (isHandJoint)
+                {
+                    positionOffset = Vector3.Lerp(positionOffset, Vector3.zero,
+                        _handCorrectionWeightLateUpdate);
+                }
+
                 float rtWeight = _retargetingAnimationConstraint.weight;
                 if (adjustment == null)
                 {
-                    targetJoint.position =
-                        Vector3.Lerp(currentTargetPosition,
-                            currentOVRBonePosition + positionOffset, rtWeight);
+                    if (handCorrectionTurnedOn && isHandJoint)
+                    {
+                        targetJoint.rotation =
+                            Quaternion.Slerp(targetJoint.rotation,
+                                Bones[i].Transform.rotation *
+                                targetData.CorrectionQuaternion.Value,
+                                _handCorrectionWeightLateUpdate);
+                    }
+                    if (_correctPositionsLateUpdate)
+                    {
+                        targetJoint.position =
+                            Vector3.Lerp(currentTargetPosition,
+                                currentOVRBonePosition + positionOffset, rtWeight);
+                    }
                 }
                 else
                 {
-                    if (!adjustment.DisablePositionTransform)
+                    if (handCorrectionTurnedOn && isHandJoint)
+                    {
+                        if (!adjustment.DisableRotationTransform)
+                        {
+                            targetJoint.rotation =
+                                Quaternion.Slerp(targetJoint.rotation,
+                                    Bones[i].Transform.rotation *
+                                    targetData.CorrectionQuaternion.Value,
+                                    _handCorrectionWeightLateUpdate);
+                        }
+
+                        targetJoint.rotation *= adjustment.RotationChange;
+                    }
+                    if (!adjustment.DisablePositionTransform &&
+                        _correctPositionsLateUpdate)
                     {
                         targetJoint.position =
                             Vector3.Lerp(currentTargetPosition,

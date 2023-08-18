@@ -1204,6 +1204,10 @@ namespace Oculus.Movement
         public const string CorrectPositionsLateUpdate =
             "Allows correcting positions in LateUpdate for accuracy.";
 
+        public const string HandCorrectionWeightLateUpdate =
+            "Allow correcting rotations in LateUpdate. This can produce more " +
+            "accurate hands, for instance.";
+
         public const string ApplyAnimationConstraintsToCorrectedPositions =
             "Apply position offsets done by animation rigging constraints for corrected " +
             "positions. Due to the limited motion of humanoid avatars, this should be set if any " +
