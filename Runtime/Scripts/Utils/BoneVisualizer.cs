@@ -95,6 +95,13 @@ namespace Oculus.Movement.Utils
         protected const string _CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN = "-CustomLineVisual.";
         protected const string _AXIS_VISUAL_NAME_SUFFIX_TOKEN = "-AxisVisual.";
 
+        /// <summary>
+        /// When to render this skeleton during the Unity gameloop.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(BoneVisualizerTooltips.WhenToRender)]
+        protected WhenToRender _whenToRender = WhenToRender.LateUpdate;
+
         protected Dictionary<object, LineRenderer> _boneTupleToLineRenderer
             = new Dictionary<object, LineRenderer>();
         protected Dictionary<int, Transform> _boneIdToAxisObject
@@ -140,10 +147,19 @@ namespace Oculus.Movement.Utils
         /// Applies bone positions & rotations to axes & lines visuals
         /// </summary>
         public abstract void Visualize();
+        /// <summary>
+        /// Can be used by UI to change the source of the skeleton visual data
+        /// </summary>
+        /// <param name="body"></param>
+        public abstract void SetBody(GameObject body);
 
         /// <inheritdoc/>
         public virtual void ProcessSkeleton(OVRSkeleton skeleton)
         {
+            if (_whenToRender == WhenToRender.Automatic)
+            {
+                _whenToRender = WhenToRender.VisualizeCalledExplicitly;
+            }
             Visualize();
         }
     }
@@ -378,13 +394,6 @@ namespace Oculus.Movement.Utils
         }
 
         /// <summary>
-        /// When to render this skeleton during the Unity gameloop.
-        /// </summary>
-        [SerializeField]
-        [Tooltip(BoneVisualizerTooltips.WhenToRender)]
-        protected WhenToRender _whenToRender = WhenToRender.LateUpdate;
-
-        /// <summary>
         /// The type of guide used to visualize bones.
         /// </summary>
         [SerializeField]
@@ -481,7 +490,15 @@ namespace Oculus.Movement.Utils
             ResetBoneVisuals();
         }
 
-        private void ResetBoneVisuals()
+        protected virtual void OnDisable()
+        {
+            ResetBoneVisuals();
+        }
+
+        /// <summary>
+        /// Clears existing bones. Prompts generation in <see cref="Update"/>.
+        /// </summary>
+        protected void ResetBoneVisuals()
         {
             _customBoneVisualData.Initialize(GetBoneCount());
             ClearBoneTupleVisualObjects();
@@ -489,7 +506,7 @@ namespace Oculus.Movement.Utils
         }
 
         /// <inheritdoc/>
-        private void Start()
+        protected virtual void Start()
         {
             if (_customBoneVisualData.BoneTuples == null ||
             _customBoneVisualData.BoneTuples.Count == 0)

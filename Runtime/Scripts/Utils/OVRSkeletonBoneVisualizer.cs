@@ -31,6 +31,11 @@ namespace Oculus.Movement.Utils
         protected override void Awake()
         {
             base.Awake();
+        }
+
+        protected override void Start()
+        {
+            base.Start();
             Assert.IsNotNull(_ovrSkeletonComp);
         }
 
@@ -78,6 +83,13 @@ namespace Oculus.Movement.Utils
         protected override AvatarMaskBodyPart GetAvatarBodyPart(int currentBone)
         {
             return CustomMappings.OVRSkeletonBoneIdToAvatarBodyPart[(OVRSkeleton.BoneId)currentBone];
+        }
+
+        /// <inheritdoc />
+        public override void SetBody(GameObject body)
+        {
+            _ovrSkeletonComp = body.GetComponent<OVRSkeleton>();
+            ResetBoneVisuals();
         }
     }
 }

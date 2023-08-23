@@ -23,6 +23,12 @@ namespace Oculus.Movement.Utils
         protected override void Awake()
         {
             base.Awake();
+        }
+
+        /// <inheritdoc/>
+        protected override void Start()
+        {
+            base.Start();
             Assert.IsNotNull(_animatorComp);
         }
 
@@ -50,6 +56,11 @@ namespace Oculus.Movement.Utils
             out Transform firstJoint, out Transform secondJoint)
         {
             firstJoint = _animatorComp.GetBoneTransform(tupleItem.FirstBone);
+            if (firstJoint == null)
+            {
+                firstJoint = secondJoint = null;
+                return false;
+            }
             secondJoint = (tupleItem.SecondBone == HumanBodyBones.LastBone)
                 ? firstJoint.GetChild(0)
                 : _animatorComp.GetBoneTransform(tupleItem.SecondBone);
@@ -60,6 +71,13 @@ namespace Oculus.Movement.Utils
         protected override AvatarMaskBodyPart GetAvatarBodyPart(int currentBone)
         {
             return CustomMappings.HumanBoneToAvatarBodyPart[(HumanBodyBones)currentBone];
+        }
+
+        /// <inheritdoc />
+        public override void SetBody(GameObject body)
+        {
+            _animatorComp = body.GetComponent<Animator>();
+            ResetBoneVisuals();
         }
     }
 }
