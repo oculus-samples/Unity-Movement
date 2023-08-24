@@ -1029,6 +1029,7 @@ MonoBehaviour:
   _enablePhysicsCapsules: 0
   _applyBoneTranslations: 1
   _correctPositionsLateUpdate: 1
+  _handCorrectionWeightLateUpdate: 1
   _applyAnimationConstraintsToCorrectedPositions: 1
   _enableTrackingByProxy: 0
   _retargetingAnimationConstraint: {fileID: 318886850}
@@ -1044,6 +1045,96 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 274835e4e2feae04b87f0d000555f8a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1449580700582008528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6442339640571472327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8679dc9cec9324429dd9c3909e6cac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _constraints:
+  - {fileID: 3379190405876128890}
+  _retargetingLayer: {fileID: 208026092}
+  _boneIdToTest: 19
+  _headTransform: {fileID: 813562241272511791}
+  _autoAddTo: {fileID: 208026092}
+  _distanceToEnforceConstraints: 0.2
+  _minDistanceToStartBlend: 0.5
+  _blendCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _maxWeight: 1
+--- !u!114 &6038665039104002591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6442339640571472327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8679dc9cec9324429dd9c3909e6cac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _constraints:
+  - {fileID: 2594113019570505025}
+  _retargetingLayer: {fileID: 208026092}
+  _boneIdToTest: 45
+  _headTransform: {fileID: 813562241272511791}
+  _autoAddTo: {fileID: 208026092}
+  _distanceToEnforceConstraints: 0.5
+  _minDistanceToStartBlend: 0.7
+  _blendCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _maxWeight: 1
 --- !u!114 &6483914532100646655
 MonoBehaviour:
   m_ObjectHideFlags: 0

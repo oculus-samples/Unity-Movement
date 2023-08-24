@@ -1,5 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
+using Oculus.Movement.AnimationRigging;
+using UnityEngine.Animations.Rigging;
+using UnityEngine;
+
 namespace Oculus.Movement
 {
     public static class DriveSkeletalLateUpdateLogicTooltips
@@ -1353,5 +1358,36 @@ namespace Oculus.Movement
 
         public const string LineColor =
             "The color to change the " + nameof(Utils.BoneVisualizer) + " to";
+    }
+
+    public static class BlendHandConstraintsTooltips
+    {
+        public const string Constraints =
+            "Constraints to control the weight of.";
+
+        public const string RetargetingLayer =
+            "The character's retargeting layer.";
+
+        public const string BoneIdToTest =
+            "Bone ID, usually the wrist. Can be modified depending " +
+            "on the skeleton used.";
+
+        public const string HeadTransform =
+            "Head transform to do distance checks against.";
+
+        public const string AutoAddTo =
+            "MonoBehaviour to add to.";
+
+        public const string ConstraintsMinDistance =
+            "Distance where constraints are set to 1.0.";
+
+        public const string ConstraintsMaxDistance =
+            "Distance where constraints are set to 0.0.";
+
+        public const string BlendMultiplier =
+            "Multiplier that influences weight interpolation based on distance.";
+
+        public const string MaxWeight =
+            "Max constraint weight.";
     }
 }

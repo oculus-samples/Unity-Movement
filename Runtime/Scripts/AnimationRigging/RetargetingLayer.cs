@@ -85,6 +85,11 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(RetargetingLayerTooltips.HandCorrectionWeightLateUpdate)]
         [SerializeField, Range(0.0f, 1.0f)]
         protected float _handCorrectionWeightLateUpdate = 1.0f;
+        public float HandCorrectionWeightLateUpdate
+        {
+            get => _handCorrectionWeightLateUpdate;
+            set => _handCorrectionWeightLateUpdate = value;
+        }
 
         /// <summary>
         /// Apply position offsets done by animation rigging constraints for corrected
