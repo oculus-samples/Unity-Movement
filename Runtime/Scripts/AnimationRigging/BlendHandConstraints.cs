@@ -220,7 +220,19 @@ namespace Oculus.Movement.AnimationRigging
             {
                 constraint.weight = Mathf.Min(constraintWeight, _maxWeight);
             }
-            _retargetingLayer.HandCorrectionWeightLateUpdate = constraintWeight;
+            if (IsLeftSideOfBody())
+            {
+                _retargetingLayer.LeftHandCorrectionWeightLateUpdate = constraintWeight;
+            }
+            else
+            {
+                _retargetingLayer.RightHandCorrectionWeightLateUpdate = constraintWeight;
+            }
+        }
+
+        private bool IsLeftSideOfBody()
+        {
+            return _boneIdToTest < CustomMappings.BodyTrackingBoneId.Body_RightHandPalm;
         }
 
         private bool BonesAreValid(OVRSkeleton skeleton)

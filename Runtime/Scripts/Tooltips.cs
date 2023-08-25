@@ -1209,7 +1209,11 @@ namespace Oculus.Movement
         public const string CorrectPositionsLateUpdate =
             "Allows correcting positions in LateUpdate for accuracy.";
 
-        public const string HandCorrectionWeightLateUpdate =
+        public const string LeftHandCorrectionWeightLateUpdate =
+            "Allow correcting rotations in LateUpdate. This can produce more " +
+            "accurate hands, for instance.";
+
+        public const string RightHandCorrectionWeightLateUpdate =
             "Allow correcting rotations in LateUpdate. This can produce more " +
             "accurate hands, for instance.";
 

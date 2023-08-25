@@ -82,13 +82,26 @@ namespace Oculus.Movement.AnimationRigging
         /// Allow correcting rotations in LateUpdate. This can produce more
         /// accurate hands, for instance.
         /// </summary>
-        [Tooltip(RetargetingLayerTooltips.HandCorrectionWeightLateUpdate)]
+        [Tooltip(RetargetingLayerTooltips.LeftHandCorrectionWeightLateUpdate)]
         [SerializeField, Range(0.0f, 1.0f)]
-        protected float _handCorrectionWeightLateUpdate = 1.0f;
-        public float HandCorrectionWeightLateUpdate
+        protected float _leftHandCorrectionWeightLateUpdate = 1.0f;
+        public float LeftHandCorrectionWeightLateUpdate
         {
-            get => _handCorrectionWeightLateUpdate;
-            set => _handCorrectionWeightLateUpdate = value;
+            get => _leftHandCorrectionWeightLateUpdate;
+            set => _leftHandCorrectionWeightLateUpdate = value;
+        }
+
+        /// <summary>
+        /// Allow correcting rotations in LateUpdate. This can produce more
+        /// accurate hands, for instance.
+        /// </summary>
+        [Tooltip(RetargetingLayerTooltips.RightHandCorrectionWeightLateUpdate)]
+        [SerializeField, Range(0.0f, 1.0f)]
+        protected float _rightHandCorrectionWeightLateUpdate = 1.0f;
+        public float RightHandCorrectionWeightLateUpdate
+        {
+            get => _rightHandCorrectionWeightLateUpdate;
+            set => _rightHandCorrectionWeightLateUpdate = value;
         }
 
         /// <summary>
@@ -322,7 +335,8 @@ namespace Oculus.Movement.AnimationRigging
 
         private void CorrectBones()
         {
-            bool handCorrectionTurnedOn = (_handCorrectionWeightLateUpdate > Mathf.Epsilon);
+            bool handCorrectionTurnedOn = (_leftHandCorrectionWeightLateUpdate > Mathf.Epsilon) ||
+                (_rightHandCorrectionWeightLateUpdate > Mathf.Epsilon);
             if (!_correctPositionsLateUpdate &&
                 !handCorrectionTurnedOn)
             {
@@ -386,12 +400,15 @@ namespace Oculus.Movement.AnimationRigging
                 bool isHandJoint =
                     bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.LeftHand ||
                     bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.RightHand;
+                float handWeight = bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.LeftHand ?
+                    _leftHandCorrectionWeightLateUpdate :
+                    _rightHandCorrectionWeightLateUpdate;
                 // exclude any position offsets from IK if correcting hand position to
                 // body tracking values
                 if (isHandJoint)
                 {
                     positionOffset = Vector3.Lerp(positionOffset, Vector3.zero,
-                        _handCorrectionWeightLateUpdate);
+                        handWeight);
                 }
 
                 float rtWeight = _retargetingAnimationConstraint.weight;
@@ -403,7 +420,7 @@ namespace Oculus.Movement.AnimationRigging
                             Quaternion.Slerp(targetJoint.rotation,
                                 Bones[i].Transform.rotation *
                                 targetData.CorrectionQuaternion.Value,
-                                _handCorrectionWeightLateUpdate);
+                                handWeight);
                     }
                     if (_correctPositionsLateUpdate)
                     {
@@ -422,7 +439,7 @@ namespace Oculus.Movement.AnimationRigging
                                 Quaternion.Slerp(targetJoint.rotation,
                                     Bones[i].Transform.rotation *
                                     targetData.CorrectionQuaternion.Value,
-                                    _handCorrectionWeightLateUpdate);
+                                    handWeight);
                         }
 
                         targetJoint.rotation *= adjustment.RotationChange;
