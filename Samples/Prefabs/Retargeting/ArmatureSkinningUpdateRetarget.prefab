@@ -788,6 +788,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2015256377725734567, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 85eae303c9a1e5a4e84fbb0db6233a81, type: 2}
+    - target: {fileID: 2015256377725734567, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
@@ -1029,7 +1033,8 @@ MonoBehaviour:
   _enablePhysicsCapsules: 0
   _applyBoneTranslations: 1
   _correctPositionsLateUpdate: 1
-  _handCorrectionWeightLateUpdate: 1
+  _leftHandCorrectionWeightLateUpdate: 1
+  _rightHandCorrectionWeightLateUpdate: 1
   _applyAnimationConstraintsToCorrectedPositions: 1
   _enableTrackingByProxy: 0
   _retargetingAnimationConstraint: {fileID: 318886850}
@@ -1063,8 +1068,8 @@ MonoBehaviour:
   _boneIdToTest: 19
   _headTransform: {fileID: 813562241272511791}
   _autoAddTo: {fileID: 208026092}
-  _distanceToEnforceConstraints: 0.2
-  _minDistanceToStartBlend: 0.5
+  _constraintsMinDistance: 0.2
+  _constraintsMaxDistance: 0.5
   _blendCurve:
     serializedVersion: 2
     m_Curve:
@@ -1108,8 +1113,8 @@ MonoBehaviour:
   _boneIdToTest: 45
   _headTransform: {fileID: 813562241272511791}
   _autoAddTo: {fileID: 208026092}
-  _distanceToEnforceConstraints: 0.5
-  _minDistanceToStartBlend: 0.7
+  _constraintsMinDistance: 0.2
+  _constraintsMaxDistance: 0.5
   _blendCurve:
     serializedVersion: 2
     m_Curve:

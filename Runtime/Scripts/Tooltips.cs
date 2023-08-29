@@ -1394,4 +1394,22 @@ namespace Oculus.Movement
         public const string MaxWeight =
             "Max constraint weight.";
     }
+
+    public static class CustomAnimToggleTooltips
+    {
+        public const string AnimClip =
+            "Animation clip to play.";
+        public const string CustomMask =
+            "Mask to apply.";
+        public const string RetargetingConstraints =
+            "Retargeting constraints to fix based on animation state.";
+        public const string Animators =
+            "Animators to control.";
+        public const string CustomAnimEnabled =
+            "True if animation is enabled, false is not.";
+        public const string WorldText =
+            "Text to update to based on animation state.";
+        public const string AnimParamName =
+            "Animator parameter name.";
+    }
 }
