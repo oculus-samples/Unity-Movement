@@ -63,6 +63,25 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Allows one to adjust the per-joint rotation offsets computed between
+        /// source (OVRBody) and target characters. To avoid gimbal lock,
+        /// a series of rotations are permitted.
+        /// </summary>
+        [System.Serializable]
+        public class JointRotationTweaks
+        {
+            /// <summary>
+            /// Joint to affect.
+            /// </summary>
+            public HumanBodyBones Joint;
+
+            /// <summary>
+            /// A series of rotation tweaks.
+            /// </summary>
+            public Quaternion[] RotationTweaks;
+        }
+
+        /// <summary>
         /// The array of joint position adjustments.
         /// </summary>
         public JointPositionAdjustment[] JointPositionAdjustments
@@ -160,6 +179,25 @@ namespace Oculus.Movement.AnimationRigging
             set { _retargetingAnimationConstraint = value; }
         }
 
+        /// <summary>
+        /// Joint rotation tweaks array.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.JointRotationTweaks)]
+        protected JointRotationTweaks[] _jointRotationTweaks;
+        public JointRotationTweaks[] JointRotationTweaksArray
+        {
+            get => _jointRotationTweaks;
+            set => _jointRotationTweaks = value;
+        }
+        /// <summary>
+        /// Pre-compute these values each time the editor changes for the purposes
+        /// of efficiency.
+        /// </summary>
+        private Dictionary<HumanBodyBones, Quaternion> _humanBoneToAccumulatedRotationTweaks =
+            new Dictionary<HumanBodyBones, Quaternion>();
+        private List<HumanBodyBones> _bonesToRemove = new List<HumanBodyBones> ();
+
         private Pose[] _defaultPoses;
         private IJointConstraint[] _jointConstraints;
         private ProxyTransformLogic _proxyTransformLogic = new ProxyTransformLogic();
@@ -220,6 +258,8 @@ namespace Oculus.Movement.AnimationRigging
             CacheJointConstraints();
 
             ValidateHumanoid();
+
+            PrecomputeJointRotationTweaks();
         }
 
         private void ConstructDefaultPoseInformation()
@@ -303,6 +343,78 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             _isFocusedWhileInBuild = hasFocus;
+        }
+
+        protected virtual void OnValidate()
+        {
+            PrecomputeJointRotationTweaks();
+        }
+
+        /// <summary>
+        /// When the object's properties are modified, accumulate joint rotations
+        /// and cache those values. This saves on computation when the tweaks field is used.
+        /// </summary>
+        protected void PrecomputeJointRotationTweaks()
+        {
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlaying)
+            {
+                return;
+            }
+#endif
+
+            foreach (var rotationTweak in _jointRotationTweaks)
+            {
+                var allRotations = rotationTweak.RotationTweaks;
+                var joint = rotationTweak.Joint;
+
+                Quaternion accumulatedRotation = Quaternion.identity;
+                foreach (var rotationValue in allRotations)
+                {
+                    // Make sure the quaternion is valid. Quaternions are initialized to all
+                    // zeroes by default, which makes them invalid.
+                    if (rotationValue.w < Mathf.Epsilon && rotationValue.x < Mathf.Epsilon &&
+                        rotationValue.y < Mathf.Epsilon && rotationValue.z < Mathf.Epsilon)
+                    {
+                        continue;
+                    }
+
+                    accumulatedRotation *= rotationValue;
+                }
+
+                if (!_humanBoneToAccumulatedRotationTweaks.ContainsKey(joint))
+                {
+                    _humanBoneToAccumulatedRotationTweaks.Add(joint, accumulatedRotation);
+                }
+                else
+                {
+                    _humanBoneToAccumulatedRotationTweaks[joint] = accumulatedRotation;
+                }
+            }
+
+            _bonesToRemove.Clear();
+            // If the user removed bones from the UI, remove those from the dictionary.
+            foreach (var bone in _humanBoneToAccumulatedRotationTweaks.Keys)
+            {
+                bool boneFound = false;
+                foreach (var rotationTweak in _jointRotationTweaks)
+                {
+                    if (rotationTweak.Joint == bone)
+                    {
+                        boneFound = true;
+                        break;
+                    }
+                }
+
+                if (!boneFound)
+                {
+                    _bonesToRemove.Add(bone);
+                }
+            }
+            foreach(var boneToRemove in _bonesToRemove)
+            {
+                _humanBoneToAccumulatedRotationTweaks.Remove(boneToRemove);
+            }
         }
 
         /// <inheritdoc />
@@ -419,7 +531,7 @@ namespace Oculus.Movement.AnimationRigging
                         targetJoint.rotation =
                             Quaternion.Slerp(targetJoint.rotation,
                                 Bones[i].Transform.rotation *
-                                targetData.CorrectionQuaternion.Value,
+                                targetData.CorrectionQuaternion.Value * GetRotationTweak(humanBodyBone),
                                 handWeight);
                     }
                     if (_correctPositionsLateUpdate)
@@ -438,7 +550,7 @@ namespace Oculus.Movement.AnimationRigging
                             targetJoint.rotation =
                                 Quaternion.Slerp(targetJoint.rotation,
                                     Bones[i].Transform.rotation *
-                                    targetData.CorrectionQuaternion.Value,
+                                    targetData.CorrectionQuaternion.Value * GetRotationTweak(humanBodyBone),
                                     handWeight);
                         }
 
@@ -453,6 +565,18 @@ namespace Oculus.Movement.AnimationRigging
                     }
                 }
             }
+        }
+
+        protected Quaternion GetRotationTweak(HumanBodyBones humanBody)
+        {
+            Quaternion rotation;
+
+            if (!_humanBoneToAccumulatedRotationTweaks.TryGetValue(humanBody, out rotation))
+            {
+                rotation = Quaternion.identity;
+            }
+
+            return rotation;
         }
 
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
@@ -516,7 +640,8 @@ namespace Oculus.Movement.AnimationRigging
                 targetTransforms.Add(targetBoneData.OriginalJoint);
                 shouldUpdatePositions.Add(false);
                 shouldUpdateRotations.Add(false);
-                rotationOffsets.Add(targetBoneData.CorrectionQuaternion.Value);
+                rotationOffsets.Add(targetBoneData.CorrectionQuaternion.Value *
+                    GetRotationTweak(targetHumanBodyBone));
                 rotationAdjustments.Add(Quaternion.identity);
             }
         }
@@ -582,14 +707,16 @@ namespace Oculus.Movement.AnimationRigging
 
                 if (adjustment == null)
                 {
-                    SetUpDefaultAdjustment(rotationOffsets, shouldUpdatePositions,
+                    SetUpDefaultAdjustment(targetHumanBodyBone,
+                        rotationOffsets, shouldUpdatePositions,
                         shouldUpdateRotations, rotationAdjustments, arrayId,
                         targetBoneData, bodySectionInPositionArray,
                         jointFailsMask);
                 }
                 else
                 {
-                    SetUpCustomAdjustment(rotationOffsets, shouldUpdatePositions,
+                    SetUpCustomAdjustment(targetHumanBodyBone,
+                        rotationOffsets, shouldUpdatePositions,
                         shouldUpdateRotations,
                         rotationAdjustments, adjustment, arrayId,
                         targetBoneData, bodySectionInPositionArray,
@@ -600,26 +727,28 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private void SetUpDefaultAdjustment(Quaternion[] rotationOffsets,
+        private void SetUpDefaultAdjustment(HumanBodyBones humanBodyBone, Quaternion[] rotationOffsets,
             bool[] shouldUpdatePositions, bool[] shouldUpdateRotations,
             Quaternion[] rotationAdjustments, int arrayId,
             OVRSkeletonMetadata.BoneData targetBoneData,
             bool bodySectionInPositionArray, bool jointFailsMask)
         {
-            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value;
+            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value *
+                GetRotationTweak(humanBodyBone);
             shouldUpdatePositions[arrayId] = !jointFailsMask && bodySectionInPositionArray;
             shouldUpdateRotations[arrayId] = !jointFailsMask;
             rotationAdjustments[arrayId] = Quaternion.identity;
         }
 
-        private void SetUpCustomAdjustment(Quaternion[] rotationOffsets,
+        private void SetUpCustomAdjustment(HumanBodyBones humanBodyBone, Quaternion[] rotationOffsets,
             bool[] shouldUpdatePositions, bool[] shouldUpdateRotations,
             Quaternion[] rotationAdjustments,
             JointAdjustment adjustment, int arrayId,
             OVRSkeletonMetadata.BoneData targetBoneData,
             bool bodySectionInPositionArray, bool jointFailsMask)
         {
-            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value;
+            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value *
+                GetRotationTweak(humanBodyBone);
             shouldUpdatePositions[arrayId] =
                 !adjustment.DisablePositionTransform &&
                 bodySectionInPositionArray &&

@@ -885,7 +885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121803696401781268, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_Name
-      value: ArmatureSkinningUpdateRetarget
+      value: ArmatureSkinningUpdateRetargetUser
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
@@ -1038,6 +1038,15 @@ MonoBehaviour:
   _applyAnimationConstraintsToCorrectedPositions: 1
   _enableTrackingByProxy: 0
   _retargetingAnimationConstraint: {fileID: 318886850}
+  _jointRotationTweaks:
+  - Joint: 17
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
+  - Joint: 18
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
 --- !u!114 &208026093
 MonoBehaviour:
   m_ObjectHideFlags: 0

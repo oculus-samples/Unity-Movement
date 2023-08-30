@@ -1234,6 +1234,9 @@ namespace Oculus.Movement
 
         public const string RetargetingAnimationContraint =
             "Related retargeting constraint.";
+
+        public const string JointRotationTweaks =
+            "Joint rotation tweaks array.";
     }
 
     public static class LateMirroredObjectTooltips
