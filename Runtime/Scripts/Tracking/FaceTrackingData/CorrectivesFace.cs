@@ -58,6 +58,15 @@ namespace Oculus.Movement.Tracking
         }
 
         /// <summary>
+        /// Allows modifying retargeting type field.
+        /// </summary>
+        public RetargetingType RetargetingTypeField
+        {
+            get => RetargetingValue;
+            set => RetargetingValue = value;
+        }
+
+        /// <summary>
         /// Cached mesh blendshape values.
         /// </summary>
         protected float[] _cachedBlendshapeValues;

@@ -32,6 +32,8 @@ namespace Oculus.Movement.Utils
             "Face Tracking/";
         private const string _CORRECTIVES_FACE_MENU =
             "Correctives Face";
+        private const string _ARKIT_FACE_MENU =
+            "ARKit Face";
 
         [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU)]
         private static void SetupCharacterForAnimationRiggingRetargeting()
@@ -165,6 +167,24 @@ namespace Oculus.Movement.Utils
             }
 
             SetUpCharacterForCorrectivesFace(activeGameObject);
+        }
+
+        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU)]
+        private static void SetupCharacterForARKitFace()
+        {
+            var activeGameObject = Selection.activeGameObject;
+
+            try
+            {
+                ValidateGameObjectForFaceMapping(activeGameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
+                return;
+            }
+
+            SetUpCharacterForARKitFace(activeGameObject);
         }
 
         private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent)
@@ -455,6 +475,40 @@ namespace Oculus.Movement.Utils
             EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
 
             Undo.SetCurrentGroupName($"Setup Character for Correctives Tracking");
+        }
+
+        private static void SetUpCharacterForARKitFace(GameObject gameObject)
+        {
+            Undo.IncrementCurrentGroup();
+
+            var faceExpressions = gameObject.GetComponentInParent<OVRFaceExpressions>();
+            if (!faceExpressions)
+            {
+                faceExpressions = gameObject.AddComponent<OVRFaceExpressions>();
+                Undo.RegisterCreatedObjectUndo(faceExpressions, "Create OVRFaceExpressions component");
+            }
+
+            var face = gameObject.GetComponent<ARKitFace>();
+            if (!face)
+            {
+                face = gameObject.AddComponent<ARKitFace>();
+                face.FaceExpressions = faceExpressions;
+                Undo.RegisterCreatedObjectUndo(face, "Create ARKit component");
+            }
+            face.RetargetingTypeField = OVRCustomFace.RetargetingType.Custom;
+
+            if (face.BlendshapeModifier == null)
+            {
+                face.BlendshapeModifier = gameObject.GetComponentInParent<BlendshapeModifier>();
+                Undo.RecordObject(face, "Assign to BlendshapeModifier field");
+            }
+
+            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map ARKit blendshapes");
+            face.AutoMapBlendshapes();
+            EditorUtility.SetDirty(face);
+            EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
+
+            Undo.SetCurrentGroupName($"Setup Character for ARKit Tracking");
         }
     }
 }
