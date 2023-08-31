@@ -121,7 +121,7 @@ namespace Oculus.Movement.UI.Deprecated
         /// <summary>
         /// Toggles correctives on and off.
         /// </summary>
-        public void ToggleCorrectives()
+        public void ToggleCorrectives(PointerEvent pointerEvent)
         {
             _faceTrackingSystem.CorrectivesEnabled =
                 !_faceTrackingSystem.CorrectivesEnabled;
@@ -139,7 +139,7 @@ namespace Oculus.Movement.UI.Deprecated
         /// <summary>
         /// Toggles normal recalculation on and off.
         /// </summary>
-        public void ToggleNormalRecalc()
+        public void ToggleNormalRecalc(PointerEvent pointerEvent)
         {
             _recalculateNormals.RunRecalculation =
                 !_recalculateNormals.RunRecalculation;
