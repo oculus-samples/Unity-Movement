@@ -499,8 +499,9 @@ namespace Oculus.Movement.AnimationRigging
                 var currentOVRBonePosition = Bones[i].Transform.position;
                 var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetPosition).sqrMagnitude;
 
-                // If correcting positions only, skip positional fix if the error relative
-                // to body tracking is low, and the position offset due to IK is small.
+                // If generally correcting positions only and applying hand correction,
+                // skip positional fix a) if the error relative to body tracking is low,
+                // b) and the position influence due to IK fixes is small.
                 if ((_correctPositionsLateUpdate && !handCorrectionTurnedOn) &&
                     errorRelativeToBodyTracking < Mathf.Epsilon &&
                     positionOffset.sqrMagnitude < Mathf.Epsilon)
@@ -509,14 +510,20 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
-                bool isHandJoint =
+                bool isLeftHandFingersOrWrist =
                     bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.LeftHand ||
-                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.RightHand;
-                float handWeight = bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.LeftHand ?
+                    humanBodyBone == HumanBodyBones.LeftHand;
+                bool isRightHandFingersOrWrist =
+                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.RightHand ||
+                    humanBodyBone == HumanBodyBones.RightHand;
+                bool isHandJoint = isLeftHandFingersOrWrist || isRightHandFingersOrWrist;
+
+                // Pick the correct hand correction weight based on handedness.
+                float handWeight = isLeftHandFingersOrWrist ?
                     _leftHandCorrectionWeightLateUpdate :
                     _rightHandCorrectionWeightLateUpdate;
-                // exclude any position offsets from IK if correcting hand position to
-                // body tracking values
+                // Exclude any position offsets from IK if correcting hand joints to
+                // what body tracking indicates they are.
                 if (isHandJoint)
                 {
                     positionOffset = Vector3.Lerp(positionOffset, Vector3.zero,
