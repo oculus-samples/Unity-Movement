@@ -34,6 +34,8 @@ namespace Oculus.Movement.Utils
             "Correctives Face";
         private const string _ARKIT_FACE_MENU =
             "ARKit Face";
+        private const string _NO_DUPLICATES_SUFFIX =
+            " (duplicate mapping off)";
 
         [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU)]
         private static void SetupCharacterForAnimationRiggingRetargeting()
@@ -169,6 +171,25 @@ namespace Oculus.Movement.Utils
             SetUpCharacterForCorrectivesFace(activeGameObject);
         }
 
+        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _CORRECTIVES_FACE_MENU +
+            _NO_DUPLICATES_SUFFIX)]
+        private static void SetupCharacterForCorrectivesFaceNoDuplicates()
+        {
+            var activeGameObject = Selection.activeGameObject;
+
+            try
+            {
+                ValidateGameObjectForFaceMapping(activeGameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
+                return;
+            }
+
+            SetUpCharacterForCorrectivesFace(activeGameObject, false);
+        }
+
         [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU)]
         private static void SetupCharacterForARKitFace()
         {
@@ -185,6 +206,25 @@ namespace Oculus.Movement.Utils
             }
 
             SetUpCharacterForARKitFace(activeGameObject);
+        }
+
+        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU
+            + _NO_DUPLICATES_SUFFIX)]
+        private static void SetupCharacterForARKitFaceNoDuplicates()
+        {
+            var activeGameObject = Selection.activeGameObject;
+
+            try
+            {
+                ValidateGameObjectForFaceMapping(activeGameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
+                return;
+            }
+
+            SetUpCharacterForARKitFace(activeGameObject, false);
         }
 
         private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent)
@@ -444,7 +484,8 @@ namespace Oculus.Movement.Utils
             }
         }
 
-        private static void SetUpCharacterForCorrectivesFace(GameObject gameObject)
+        private static void SetUpCharacterForCorrectivesFace(GameObject gameObject,
+            bool allowDuplicates = true)
         {
             Undo.IncrementCurrentGroup();
 
@@ -470,6 +511,7 @@ namespace Oculus.Movement.Utils
             }
 
             Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correctives blendshapes");
+            face.AllowDuplicateMappingField = allowDuplicates;
             face.AutoMapBlendshapes();
             EditorUtility.SetDirty(face);
             EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
@@ -477,7 +519,8 @@ namespace Oculus.Movement.Utils
             Undo.SetCurrentGroupName($"Setup Character for Correctives Tracking");
         }
 
-        private static void SetUpCharacterForARKitFace(GameObject gameObject)
+        private static void SetUpCharacterForARKitFace(GameObject gameObject,
+            bool allowDuplicates = true)
         {
             Undo.IncrementCurrentGroup();
 
@@ -504,6 +547,7 @@ namespace Oculus.Movement.Utils
             }
 
             Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map ARKit blendshapes");
+            face.AllowDuplicateMappingField = allowDuplicates;
             face.AutoMapBlendshapes();
             EditorUtility.SetDirty(face);
             EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
