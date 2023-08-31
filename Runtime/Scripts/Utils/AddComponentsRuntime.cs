@@ -4,6 +4,7 @@ using Oculus.Movement.AnimationRigging;
 using System;
 using UnityEngine.Animations.Rigging;
 using UnityEngine;
+using Oculus.Movement.Tracking;
 
 namespace Oculus.Movement.Utils
 {
@@ -23,6 +24,80 @@ namespace Oculus.Movement.Utils
         }
 
         /// <summary>
+        /// Allows adding correctives face tracking to a character at runtime.
+        /// </summary>
+        /// <param name="selectedGameObject">GameObject to add correctives face tracking to.</param>
+        /// <param name="allowDuplicates">Whether or not to allow duplicate mapping.</param>
+        public static void SetupCharacterForCorrectivesFace(
+            GameObject selectedGameObject,
+            bool allowDuplicates)
+        {
+            try
+            {
+                ValidateGameObjectForFaceMapping(selectedGameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+                Debug.LogError($"Face Tracking setup error: {e.Message}.");
+                return;
+            }
+
+            var faceExpressions = selectedGameObject.GetComponentInParent<OVRFaceExpressions>();
+            if (!faceExpressions)
+            {
+                faceExpressions = selectedGameObject.AddComponent<OVRFaceExpressions>();
+            }
+
+            var face = selectedGameObject.GetComponent<CorrectivesFace>();
+            if (!face)
+            {
+                face = selectedGameObject.AddComponent<CorrectivesFace>();
+                face.FaceExpressions = faceExpressions;
+            }
+
+            face.RetargetingTypeField = OVRCustomFace.RetargetingType.OculusFace;
+            face.AllowDuplicateMappingField = allowDuplicates;
+            face.AutoMapBlendshapes();
+        }
+
+        /// <summary>
+        /// Allows adding correctives face tracking to a character at runtime.
+        /// </summary>
+        /// <param name="selectedGameObject">GameObject to add correctives face tracking to.</param>
+        /// <param name="allowDuplicates">Whether or not to allow duplicate mapping.</param>
+        public static void SetupCharacterForARKitFace(
+            GameObject selectedGameObject,
+            bool allowDuplicates)
+        {
+            try
+            {
+                ValidateGameObjectForFaceMapping(selectedGameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+                Debug.LogError($"Face Tracking setup error: {e.Message}.");
+                return;
+            }
+
+            var faceExpressions = selectedGameObject.GetComponentInParent<OVRFaceExpressions>();
+            if (!faceExpressions)
+            {
+                faceExpressions = selectedGameObject.AddComponent<OVRFaceExpressions>();
+            }
+
+            var face = selectedGameObject.GetComponent<ARKitFace>();
+            if (!face)
+            {
+                face = selectedGameObject.AddComponent<ARKitFace>();
+                face.FaceExpressions = faceExpressions;
+            }
+
+            face.RetargetingTypeField = OVRCustomFace.RetargetingType.Custom;
+            face.AllowDuplicateMappingField = allowDuplicates;
+            face.AutoMapBlendshapes();
+        }
+
+        /// <summary>
         /// Adds Animation rigging + retargeting at runtime. Similar to the HelperMenus version except
         /// no undo actions since those are not allowed at runtime.
         /// </summary>
@@ -32,7 +107,7 @@ namespace Oculus.Movement.Utils
         {
             try
             {
-                ValidGameObjectForAnimationRigging(selectedGameObject);
+                ValidateGameObjectForAnimationRigging(selectedGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -159,7 +234,7 @@ namespace Oculus.Movement.Utils
             rigSetup.RetargetingLayerComp = retargetingLayer;
         }
 
-        private static void ValidGameObjectForAnimationRigging(GameObject go)
+        private static void ValidateGameObjectForAnimationRigging(GameObject go)
         {
             var animatorComp = go.GetComponent<Animator>();
             if (animatorComp == null || animatorComp.avatar == null
@@ -168,6 +243,17 @@ namespace Oculus.Movement.Utils
                 throw new InvalidOperationException(
                     $"Animation Rigging requires an {nameof(Animator)} " +
                     $"component with a Humanoid avatar.");
+            }
+        }
+
+        public static void ValidateGameObjectForFaceMapping(GameObject go)
+        {
+            var renderer = go.GetComponent<SkinnedMeshRenderer>();
+            if (renderer == null || renderer.sharedMesh == null || renderer.sharedMesh.blendShapeCount == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Adding a Face Tracking component requires a {nameof(SkinnedMeshRenderer)} " +
+                    $"that contains blendshapes.");
             }
         }
     }

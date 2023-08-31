@@ -67,6 +67,15 @@ namespace Oculus.Movement.Tracking
         }
 
         /// <summary>
+        /// Allows modifying duplicates field.
+        /// </summary>
+        public bool AllowDuplicateMappingField
+        {
+            get => AllowDuplicateMapping;
+            set => AllowDuplicateMapping = value;
+        }
+
+        /// <summary>
         /// Cached mesh blendshape values.
         /// </summary>
         protected float[] _cachedBlendshapeValues;
