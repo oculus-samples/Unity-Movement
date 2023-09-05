@@ -1,3 +1,44 @@
+# [3.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.4.0...v3.0.0) (2023-09-05)
+
+
+### Bug Fixes
+
+* **Runtime:** Allow multiple rotation adjustments for retargeting ([40bfb0e](https://github.com/oculus-samples/Unity-Movement/commit/40bfb0ec1ceb2cd8ec271680389ed7c3530cf990))
+* **Runtime:** Hand constraint affects retargeting layer's weight per hand ([bd05634](https://github.com/oculus-samples/Unity-Movement/commit/bd05634e786e5a6f729149a0c28ba26973e30b85))
+* **Runtime:** Hand correction wrist inclusion fix ([33ca1cd](https://github.com/oculus-samples/Unity-Movement/commit/33ca1cd750b2ef6727754a6b1e616714777ec78c))
+
+
+### Features
+
+* **Editor:** Add ARKit one-click menu ([084757e](https://github.com/oculus-samples/Unity-Movement/commit/084757e5e4a90044a48f462d19bee2833aa996dc))
+* **Editor:** Add constraints to retargeting helper menu ([fe410bf](https://github.com/oculus-samples/Unity-Movement/commit/fe410bf60461944074ed317e0673c69caad4ced2))
+* **Editor:** Allow changing duplicate mapping bool from 1-click FT menus ([b634ae6](https://github.com/oculus-samples/Unity-Movement/commit/b634ae63c9d3c2c211a876a771f929dae23f6176))
+* **Runtime:** Add functions to add face tracking at runtime ([c9561f5](https://github.com/oculus-samples/Unity-Movement/commit/c9561f5eb39b0e9b2da686d7385470f304d61c17))
+* **Runtime:** Update version in README to v56 SDK ([ae6861f](https://github.com/oculus-samples/Unity-Movement/commit/ae6861f708e71a8be5efdd3db97f38cd1cf570d3))
+* **Runtime:** Upgrade to v56.0 SDK ([67670ff](https://github.com/oculus-samples/Unity-Movement/commit/67670ffa19b7dde7fe3bb8bba154fd5f4fdf2553))
+* **samples:** Adds menu to toggle animation on retargeted character ([fd8e15b](https://github.com/oculus-samples/Unity-Movement/commit/fd8e15bb6b16a1ed7f4b64e9a1368ef425833ba8))
+
+
+### BREAKING CHANGES
+
+* **Runtime:** Updates to support v56.0 SDK, depends on script changes in that version.
+
+Since `PointableUnityEventWrapper` `UnityEvent`s uses `PointerEvent` as the generic variable now, functions used for `PointerEvent`s had to be updated.
+
+See the following changes:
+1. `ToggleObjects.cs`
+2. `DriveThirdPartySkeleton.cs`
+3. `HipPinningCalibration.cs`
+4. `ToggleMenu.cs`
+5. `BlendshapesMenuToggle.cs`
+6. `ButtonToggleIcon.cs`
+
+Reviewed By: andkim-meta
+
+Differential Revision: D48727866
+
+fbshipit-source-id: 6cc0d502cb3b594a607b781fbe8626bc170e3c62
+
 # [2.4.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.3.0...v2.4.0) (2023-08-18)
 
 
