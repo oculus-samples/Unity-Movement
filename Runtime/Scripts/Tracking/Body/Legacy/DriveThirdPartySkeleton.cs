@@ -11,6 +11,7 @@ using TMPro;
 using static Oculus.Movement.Tracking.Deprecated.HumanBodyBonesMappings;
 using static Oculus.Movement.Tracking.Deprecated.HumanBodyBonesMappings.BodyTrackingBoneId;
 using static Oculus.Movement.Tracking.Deprecated.SkeletonMetadata;
+using Oculus.Interaction;
 
 namespace Oculus.Movement.Tracking.Deprecated
 {
@@ -413,7 +414,7 @@ namespace Oculus.Movement.Tracking.Deprecated
         /// <summary>
         /// Toggles the ability to see skeletal debugging.
         /// </summary>
-        public void ToggleSkeletalDebugViews()
+        public void ToggleSkeletalDebugViews(PointerEvent pointerEvent)
         {
             _showSkeletalDebugViews = !_showSkeletalDebugViews;
         }
@@ -421,7 +422,7 @@ namespace Oculus.Movement.Tracking.Deprecated
         /// <summary>
         /// Toggles the ability to see debug axes.
         /// </summary>
-        public void ToggleDebugAxes()
+        public void ToggleDebugAxes(PointerEvent pointerEvent)
         {
             _showDebugAxes = !_showDebugAxes;
         }

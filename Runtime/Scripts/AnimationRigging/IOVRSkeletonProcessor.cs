@@ -8,7 +8,7 @@ namespace Oculus.Movement.AnimationRigging
     public interface IOVRSkeletonProcessor
     {
         /// <summary>
-        /// Processes an <see cref="OVRSkeleton"/>s for some purpose (eg:
+        /// Processes an <see cref="OVRSkeleton"/> for some purpose (eg:
         /// forcing a hand pose, moving body parts without the user)
         /// </summary>
         /// <param name="bones"></param>

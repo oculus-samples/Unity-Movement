@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -59,7 +60,7 @@ namespace Oculus.Movement.UI
         /// <summary>
         /// Toggles the select icon state.
         /// </summary>
-        public void ToggleSelectIcon()
+        public void ToggleSelectIcon(PointerEvent pointerEvent)
         {
             _selectState = !_selectState;
             _toggleMaterial.SetColor(_colorId, _selectState ?

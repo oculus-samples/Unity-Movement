@@ -3,7 +3,7 @@ Unity-Movement is a package that uses OpenXR’s tracking layer APIs to expose M
 
 ### Requirements
 - Unity 2021.3.21f1 (2021 LTS) or newer installed
-- v53.0 or newer of the Oculus Integration SDK with OVRPlugin set to use OpenXR as backend. Make sure to include the VR and Interaction folders when importing into your project.
+- v56.0 or newer of the Oculus Integration SDK with OVRPlugin set to use OpenXR as backend. Make sure to include the VR and Interaction folders when importing into your project.
 - A project set up with these [configuration settings](https://developer.oculus.com/documentation/unity/unity-conf-settings/)
 
 ### Licenses

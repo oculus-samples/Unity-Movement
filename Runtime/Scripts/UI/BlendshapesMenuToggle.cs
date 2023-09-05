@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -27,7 +28,7 @@ namespace Oculus.Movement.UI
         /// <summary>
         /// Toggles blendshapes menus on and off. Called via UI in scene.
         /// </summary>
-        public void ToggleBlendshapesMenuEnableState()
+        public void ToggleBlendshapesMenuEnableState(PointerEvent pointerEvent)
         {
             foreach (var blendShapesMenu in _blendShapesMenus)
             {

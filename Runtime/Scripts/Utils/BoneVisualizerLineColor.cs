@@ -40,9 +40,12 @@ namespace Oculus.Movement.Utils
             set
             {
                 _lineColor = value;
-                foreach(var kvp in _boneVisualizer.BoneVisualRenderers)
+                if (_boneVisualizer != null)
                 {
-                    SetLineColorToCachedMaterial(kvp.Value);
+                    foreach (var kvp in _boneVisualizer.BoneVisualRenderers)
+                    {
+                        SetLineColorToCachedMaterial(kvp.Value);
+                    }
                 }
             }
         }

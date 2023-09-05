@@ -1,5 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
+using Oculus.Movement.AnimationRigging;
+using UnityEngine.Animations.Rigging;
+using UnityEngine;
+
 namespace Oculus.Movement
 {
     public static class DriveSkeletalLateUpdateLogicTooltips
@@ -1204,7 +1209,11 @@ namespace Oculus.Movement
         public const string CorrectPositionsLateUpdate =
             "Allows correcting positions in LateUpdate for accuracy.";
 
-        public const string HandCorrectionWeightLateUpdate =
+        public const string LeftHandCorrectionWeightLateUpdate =
+            "Allow correcting rotations in LateUpdate. This can produce more " +
+            "accurate hands, for instance.";
+
+        public const string RightHandCorrectionWeightLateUpdate =
             "Allow correcting rotations in LateUpdate. This can produce more " +
             "accurate hands, for instance.";
 
@@ -1225,6 +1234,9 @@ namespace Oculus.Movement
 
         public const string RetargetingAnimationContraint =
             "Related retargeting constraint.";
+
+        public const string JointRotationTweaks =
+            "Joint rotation tweaks array.";
     }
 
     public static class LateMirroredObjectTooltips
@@ -1353,5 +1365,54 @@ namespace Oculus.Movement
 
         public const string LineColor =
             "The color to change the " + nameof(Utils.BoneVisualizer) + " to";
+    }
+
+    public static class BlendHandConstraintsTooltips
+    {
+        public const string Constraints =
+            "Constraints to control the weight of.";
+
+        public const string RetargetingLayer =
+            "The character's retargeting layer.";
+
+        public const string BoneIdToTest =
+            "Bone ID, usually the wrist. Can be modified depending " +
+            "on the skeleton used.";
+
+        public const string HeadTransform =
+            "Head transform to do distance checks against.";
+
+        public const string AutoAddTo =
+            "MonoBehaviour to add to.";
+
+        public const string ConstraintsMinDistance =
+            "Distance where constraints are set to 1.0.";
+
+        public const string ConstraintsMaxDistance =
+            "Distance where constraints are set to 0.0.";
+
+        public const string BlendMultiplier =
+            "Multiplier that influences weight interpolation based on distance.";
+
+        public const string MaxWeight =
+            "Max constraint weight.";
+    }
+
+    public static class CustomAnimToggleTooltips
+    {
+        public const string AnimClip =
+            "Animation clip to play.";
+        public const string CustomMask =
+            "Mask to apply.";
+        public const string RetargetingConstraints =
+            "Retargeting constraints to fix based on animation state.";
+        public const string Animators =
+            "Animators to control.";
+        public const string CustomAnimEnabled =
+            "True if animation is enabled, false is not.";
+        public const string WorldText =
+            "Text to update to based on animation state.";
+        public const string AnimParamName =
+            "Animator parameter name.";
     }
 }

@@ -53,6 +53,11 @@ namespace Oculus.Movement.AnimationRigging
         [ContextMenuItem(nameof(FindLocalProcessorAggregator),nameof(FindLocalProcessorAggregator))]
         [Interface(typeof(IOVRSkeletonProcessorAggregator))]
         protected UnityEngine.Object _autoAddTo;
+        public Object AutoAddTo
+        {
+            get => _autoAddTo;
+            set => _autoAddTo = value;
+        }
 
         /// <summary>
         /// The array of retargeted bone targets.
@@ -60,6 +65,11 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetedBoneTargetsTooltips.RetargetedBoneTargets)]
         protected RetargetedBoneTarget[] _retargetedBoneTargets;
+        public RetargetedBoneTarget[] RetargetedBoneTargetsArray
+        {
+            get => _retargetedBoneTargets;
+            set => _retargetedBoneTargets = value;
+        }
 
         private void FindLocalProcessorAggregator()
         {

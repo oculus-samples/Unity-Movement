@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
 using Oculus.Movement.Effects.Deprecated;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -119,7 +120,7 @@ namespace Oculus.Movement.UI.Deprecated
         /// <summary>
         /// Calibrate the hip pinning target transform with the current tracked hip position
         /// </summary>
-        public void Calibrate()
+        public void Calibrate(PointerEvent pointerEvent)
         {
             Vector3 hipTranslation = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips].localPosition;
             var mainChairTransform = _mainChairProp.transform;

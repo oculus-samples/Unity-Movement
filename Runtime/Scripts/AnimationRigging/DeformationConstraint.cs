@@ -302,6 +302,11 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.SpineTranslationCorrectionType)]
         private SpineTranslationCorrectionType _spineTranslationCorrectionType;
+        public SpineTranslationCorrectionType SpineTranslationCorrectionTypeField
+        {
+            get => _spineTranslationCorrectionType;
+            set => _spineTranslationCorrectionType = value;
+        }
 
         /// <inheritdoc cref="IDeformationData.CorrectSpineOnce"/>
         [NotKeyable, SerializeField]
@@ -314,6 +319,11 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.ApplyToArms)]
         private bool _applyToArms;
+        public bool ApplyToArms
+        {
+            get => _applyToArms;
+            set => _applyToArms = value;
+        }
 
         /// <summary>
         /// Apply deformation on hands.
@@ -321,6 +331,11 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.ApplyToHands)]
         private bool _applyToHands;
+        public bool ApplyToHands
+        {
+            get => _applyToHands;
+            set => _applyToHands = value;
+        }
 
         /// <summary>
         /// If true, the arms will move towards the deformation target position.
@@ -345,6 +360,11 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(DeformationDataTooltips.ArmWeight)]
         [ConditionalHide("_applyToArms", true)]
         private float _armWeight;
+        public float ArmWeight
+        {
+            get => _armWeight;
+            set => _armWeight = value;
+        }
 
         /// <summary>
         /// The weight for the deformation on hands.
@@ -353,6 +373,11 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(DeformationDataTooltips.HandWeight)]
         [ConditionalHide("_applyToHands", true)]
         private int _handWeight;
+        public int HandWeight
+        {
+            get => _handWeight;
+            set => _handWeight = value;
+        }
 
         /// <summary>
         /// The move towards speed for the arms.

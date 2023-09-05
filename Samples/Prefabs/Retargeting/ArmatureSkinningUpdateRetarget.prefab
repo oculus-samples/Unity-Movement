@@ -788,6 +788,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2015256377725734567, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 85eae303c9a1e5a4e84fbb0db6233a81, type: 2}
+    - target: {fileID: 2015256377725734567, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
@@ -881,7 +885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121803696401781268, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_Name
-      value: ArmatureSkinningUpdateRetarget
+      value: ArmatureSkinningUpdateRetargetUser
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
@@ -1029,9 +1033,20 @@ MonoBehaviour:
   _enablePhysicsCapsules: 0
   _applyBoneTranslations: 1
   _correctPositionsLateUpdate: 1
+  _leftHandCorrectionWeightLateUpdate: 1
+  _rightHandCorrectionWeightLateUpdate: 1
   _applyAnimationConstraintsToCorrectedPositions: 1
   _enableTrackingByProxy: 0
   _retargetingAnimationConstraint: {fileID: 318886850}
+  _jointRotationTweaks:
+  - Joint: 17
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
+  - Joint: 18
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
 --- !u!114 &208026093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1044,6 +1059,96 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 274835e4e2feae04b87f0d000555f8a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1449580700582008528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6442339640571472327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8679dc9cec9324429dd9c3909e6cac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _constraints:
+  - {fileID: 3379190405876128890}
+  _retargetingLayer: {fileID: 208026092}
+  _boneIdToTest: 19
+  _headTransform: {fileID: 813562241272511791}
+  _autoAddTo: {fileID: 208026092}
+  _constraintsMinDistance: 0.2
+  _constraintsMaxDistance: 0.5
+  _blendCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _maxWeight: 1
+--- !u!114 &6038665039104002591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6442339640571472327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8679dc9cec9324429dd9c3909e6cac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _constraints:
+  - {fileID: 2594113019570505025}
+  _retargetingLayer: {fileID: 208026092}
+  _boneIdToTest: 45
+  _headTransform: {fileID: 813562241272511791}
+  _autoAddTo: {fileID: 208026092}
+  _constraintsMinDistance: 0.2
+  _constraintsMaxDistance: 0.5
+  _blendCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _maxWeight: 1
 --- !u!114 &6483914532100646655
 MonoBehaviour:
   m_ObjectHideFlags: 0
