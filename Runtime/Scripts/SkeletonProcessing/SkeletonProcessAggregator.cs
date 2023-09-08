@@ -59,7 +59,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     _lastKownProcessor = Processor;
                     _iProcessor = null;
-                    if (Processor != null)
+                    if (Processor != null && IProcessor != null)
                     {
                         _lastKnownEnabled = IProcessor.EnableSkeletonProcessing;
                         label = IProcessor.SkeletonProcessorLabel;
