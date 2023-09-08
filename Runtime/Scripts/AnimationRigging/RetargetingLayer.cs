@@ -362,6 +362,10 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 #endif
+            if (_jointRotationTweaks == null || _jointRotationTweaks.Length == 0)
+            {
+                return;
+            }
 
             foreach (var rotationTweak in _jointRotationTweaks)
             {
