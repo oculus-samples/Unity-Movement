@@ -32,6 +32,8 @@ If the new scene or an existing scene doesn’t have a GameObject with the OVRCa
 
 Layer index 10, layer index 11, and the HiddenMesh layer must be present in the project for RecalculateNormals to work correctly.
 
+Some Project Settings can be validated via **Movement->Check Project Settings**. For a more thorough check, please use **Oculus->Tools->Project Setup Tool**.
+
 ## Rendering Quality
 Navigate to your Project Settings (Edit->Project Settings...) and click on
 the "Quality" section. If your project uses URP,
