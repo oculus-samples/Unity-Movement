@@ -317,7 +317,8 @@ namespace Oculus.Movement.AnimationRigging
             {
                 if (!AnimatorTargetSkeleton.GetBoneTransform(bodyBone))
                 {
-                    Debug.LogError($"Did not find {bodyBone} in {AnimatorTargetSkeleton}.");
+                    Debug.LogWarning($"Did not find {bodyBone} in {AnimatorTargetSkeleton}, this might affect" +
+                        $" the retargeted result.");
                     validHumanoid = false;
                 }
             }
