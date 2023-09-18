@@ -183,6 +183,15 @@ namespace Oculus.Movement.AnimationRigging
             {
                 UpdateSkeletalConstraintInterfaceReferences();
             }
+
+            if (_retargetingLayer != null)
+            {
+                if (_retargetingLayer.EnableTrackingByProxy != CheckSkeletalUpdatesByProxy)
+                {
+                    Debug.LogError($"The proxy tracking setting should be the same in " +
+                        $"retargeting layer and animation rig set up for the object {this.name}.");
+                }
+            }
         }
 
         private void UpdateSkeletalConstraintInterfaceReferences()
