@@ -1,3 +1,20 @@
+# [3.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v3.0.0...v3.1.0) (2023-09-20)
+
+
+### Bug Fixes
+
+* **Runtime:** _jointRotationTweaks null check ([649d1db](https://github.com/oculus-samples/Unity-Movement/commit/649d1dbe6487477a6aea84f10c7c477291ecb9e9))
+* **Runtime:** AnimationRigSetup checks proxy setting relative to RetargingLayer ([361fe8c](https://github.com/oculus-samples/Unity-Movement/commit/361fe8c420592c25cdaf2813ef812b73dd6780db))
+* **Runtime:** Catch exceptions in RetargetingLayer, avoid null ref in copy pose ([0a9f6ad](https://github.com/oculus-samples/Unity-Movement/commit/0a9f6ad1b4824a14eefbd61810f9a96d1279e7ce))
+* **Runtime:** Change humanoid checks to warnings ([4db5b73](https://github.com/oculus-samples/Unity-Movement/commit/4db5b737da7220ce9aa4e094fdfeecc148b5c013))
+* **Runtime:** IProcessor null check ([6638763](https://github.com/oculus-samples/Unity-Movement/commit/6638763f0e4e546fdcb3419ad1a6661a0aac3731))
+
+
+### Features
+
+* **Editor:** Project settings validation window ([20d7a57](https://github.com/oculus-samples/Unity-Movement/commit/20d7a57cc34b1591259afa427f0ac5366a7b201a))
+* **Runtime:** Turn on dynamic adjustments to true by default ([29d0ecc](https://github.com/oculus-samples/Unity-Movement/commit/29d0ecce57a562622a23debe0a16480372c11e5e))
+
 # [3.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v2.4.0...v3.0.0) (2023-09-05)
 
 
