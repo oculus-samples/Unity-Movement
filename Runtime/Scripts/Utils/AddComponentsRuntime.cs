@@ -195,6 +195,7 @@ namespace Oculus.Movement.Utils
                 retargetConstraint =
                     retargetingAnimConstraintObj.AddComponent<RetargetingAnimationConstraint>();
                 retargetConstraint.RetargetingLayerComp = retargetingLayer;
+                retargetConstraint.data.AllowDynamicAdjustmentsRuntime = true;
                 retargetingAnimConstraintObj.SetActive(true);
 
                 retargetConstraint.transform.SetParent(rigObject.transform, true);

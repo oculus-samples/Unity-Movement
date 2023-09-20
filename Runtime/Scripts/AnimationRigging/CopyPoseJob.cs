@@ -92,6 +92,10 @@ namespace Oculus.Movement.AnimationRigging
         public override void Update(CopyPoseJob job, ref T data)
         {
             base.Update(job, ref data);
+            if (data.RetargetingLayerComp.JointPositionAdjustments == null)
+            {
+                return;
+            }
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
             {
                 var bodyAdjustment = data.RetargetingLayerComp.JointPositionAdjustments[(int)i];

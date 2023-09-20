@@ -2,6 +2,7 @@
 
 using Oculus.Interaction;
 using Oculus.Movement.AnimationRigging.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -251,7 +252,14 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         protected override void Start()
         {
-            base.Start();
+            try
+            {
+                base.Start();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+            }
 
             ConstructDefaultPoseInformation();
             ConstructBoneAdjustmentInformation();
@@ -309,7 +317,8 @@ namespace Oculus.Movement.AnimationRigging
             {
                 if (!AnimatorTargetSkeleton.GetBoneTransform(bodyBone))
                 {
-                    Debug.LogError($"Did not find {bodyBone} in {AnimatorTargetSkeleton}.");
+                    Debug.LogWarning($"Did not find {bodyBone} in {AnimatorTargetSkeleton}, this might affect" +
+                        $" the retargeted result.");
                     validHumanoid = false;
                 }
             }
@@ -362,6 +371,10 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 #endif
+            if (_jointRotationTweaks == null || _jointRotationTweaks.Length == 0)
+            {
+                return;
+            }
 
             foreach (var rotationTweak in _jointRotationTweaks)
             {
@@ -454,8 +467,16 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
+            if (CustomBoneIdToHumanBodyBone == null || Bones == null)
+            {
+                return;
+            }
             for (var i = 0; i < Bones.Count; i++)
             {
+                if (Bones[i] == null)
+                {
+                    continue;
+                }
                 if (!CustomBoneIdToHumanBodyBone.TryGetValue(Bones[i].Id, out var humanBodyBone))
                 {
                     continue;
@@ -621,6 +642,10 @@ namespace Oculus.Movement.AnimationRigging
         {
             var skeletalBones = Bones;
             int numBones = skeletalBones.Count;
+            if (TargetSkeletonData == null)
+            {
+                return;
+            }
             var targetBoneDataMap = TargetSkeletonData.BodyToBoneData;
             for (int i = 0; i < numBones; i++)
             {

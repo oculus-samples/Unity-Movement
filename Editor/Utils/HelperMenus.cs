@@ -290,6 +290,7 @@ namespace Oculus.Movement.Utils
                 retargetConstraint =
                     retargetingAnimConstraintObj.AddComponent<RetargetingAnimationConstraint>();
                 retargetConstraint.RetargetingLayerComp = retargetingLayer;
+                retargetConstraint.data.AllowDynamicAdjustmentsRuntime = true;
                 Undo.RegisterCreatedObjectUndo(retargetingAnimConstraintObj, "Create Retargeting Constraint");
 
                 Undo.SetTransformParent(retargetingAnimConstraintObj.transform, rigObject.transform, "Add Retarget Constraint to Rig");

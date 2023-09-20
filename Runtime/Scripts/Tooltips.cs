@@ -1415,4 +1415,41 @@ namespace Oculus.Movement
         public const string AnimParamName =
             "Animator parameter name.";
     }
+
+    public static class SkeletonHandAdjustmentTooltips
+    {
+        public const string Hand =
+            "ISDK Hand source. Can be Synthetic hand. First hand in list that is active and enabled is used.";
+
+        public const string CameraRig =
+            "Should be the OVRCameraRig, which ISDK hands will offset to follow";
+
+        public const string HandsAreOffset =
+            "If the camera rig moves but the body is stationary, this should be true.\n" +
+            "If the camera rig and body move together, this can stay false.";
+    }
+
+    public static class ActivateToggleTooltips
+    {
+        public const string Index =
+            "Which state is set from state list";
+
+        public const string WrapIndex =
+            "Whether or not Next/Prev will wrap back around after the limit";
+
+        public const string States =
+            "The list of triggerable states";
+
+        public const string OnSetNameChange =
+            "When the Index changes, these callbacks will be called with the name of the triggered state";
+
+        public const string Set_Name =
+            "Name of this state";
+
+        public const string Set_Ignored =
+            "If true, this state will be ignored by Prev() and Next() methods";
+
+        public const string Set_ObjectsToActivate =
+            "Objects that will activate and deactivate with this state";
+    }
 }
