@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/oculus-samples/Unity-Movement/compare/v3.1.0...v3.1.1) (2023-09-21)
+
+
+### Bug Fixes
+
+* **Runtime:** Add ActivateToggle copyright notice ([0f799b6](https://github.com/oculus-samples/Unity-Movement/commit/0f799b64ca7de70549114b2659f4a2b995cbe85b))
+
 # [3.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v3.0.0...v3.1.0) (2023-09-20)
 
 
