@@ -1452,4 +1452,174 @@ namespace Oculus.Movement
         public const string Set_ObjectsToActivate =
             "Objects that will activate and deactivate with this state";
     }
+
+    public static class TransformsFollowTooltips
+    {
+        public const string FollowingTransforms =
+            "Other Transforms that will follow this Transform";
+    }
+
+    public static class AnimationConstraintMaskerTooltips
+    {
+        public const string Mask =
+            "Section of body where body tracking continues animating while activity triggers";
+
+        public const string ActivityExitTime =
+            "Seconds of inactivity till entire animator follows body tracking again";
+
+        public const string Animator =
+            "The body being animated";
+
+        public const string ConstraintsToDeactivate =
+            "Partial names of constraints to deactivate when animation masking is active. For"
+            + "example, {\"_Leg\"} will disable all rig constraints with \"_Leg\" in the name.";
+    }
+
+    public static class AnimatorHooksTooltips
+    {
+        public const string AutoAssignAnimatorsFromChildren =
+            "If true, Animators field will be dynamically set";
+
+        public const string Animators =
+            "Animators who should receive signals to animate";
+    }
+
+    public static class JumpingRigidbodyTooltips
+    {
+        public const string Rigidbody =
+            "Should reference the main Rigidbody of the character controller";
+
+        public const string TargetJumpHeight =
+            "How many units high the character controller should jump";
+
+        public const string CanOnlyJumpOnGround =
+            "Prevents jump impulse if the character controller is not grounded";
+
+        public const string JumpEvents =
+            "Callbacks to trigger at certain stages of jumping";
+    }
+
+    public static class MovementSDKLocomotionTooltips
+    {
+        public const string Rigidbody =
+            "Should reference the main Rigidbody of the character controller";
+
+        public const string Collider =
+            "The Collider that counts as this character's feet";
+
+        public const string EnableMovement =
+            "Joystick will move forward and backward, as well as strafe left and right at Speed";
+
+        public const string EnableRotation =
+            "Joystick will turn according to RotationAngle";
+
+        public const string ScaleInputByActualVelocity =
+            "If Input given to input events reflects obstacles hampering velocity";
+
+        public const string RotationAngle =
+            "Default snap turn amount.";
+
+        public const string Speed =
+            "How quickly the controller will move with fully extended joystick";
+
+        public const string CameraRig =
+            "The Camera Rig";
+
+        public const string JoystickEvents =
+            "Callbacks to trigger on certain joystic input events";
+    }
+
+    public static class ReappearAfterFallTooltips
+    {
+        public const string Rigidbody =
+            "Should reference the main Rigidbody of the character controller";
+
+        public const string MinimumY =
+            "When _rigidbody.transform.position.y is lower than this value, restart it";
+
+    }
+
+    public static class SphereColliderFollowerTooltips
+    {
+        public const string Collider =
+            "Which sphere is being followed by this graphic?";
+    }
+
+    public static class SphereColliderStaysBelowHipsTooltips
+    {
+        public const string Collider =
+            "The sphere collider at the foot of the body tracked user";
+
+        public const string CharacterRoot =
+            "Root of the character object, which has specially named body tracked bones as children somewhere in it's hierarchy";
+
+        public const string TrackingHipsNames =
+            "Partial names (in the hierarchy) of Transforms that track the hips";
+
+        public const string TrackingToesNames =
+            "Partial names (in the hierarchy) of Transforms that track the toes or bottom of feet";
+
+        public const string ColliderFollowsToes =
+            "If true, the sphere collider will be influenced by the y-position of toes";
+    }
+
+    public static class ActivatableStateSetTooltips
+    {
+        public const string Set =
+            "Set of activatable states";
+
+        public const string Index =
+            "Index of current activatable state";
+
+        public const string MinimumActivationDuration =
+            "Minimum number of seconds a state can count as active. Exit time.";
+
+        public const string OnTimerChange =
+            "Callback to notify as the activation timeout timer advances";
+    }
+
+    public static class OVRInputBindingTooltips
+    {
+        public const string ButtonBindings =
+            "Button state listeners";
+
+        public const string JoystickBindings =
+            "Joysticks state listeners";
+
+        public const string OnUpdate =
+            "Check input bindings on Update";
+
+        public const string OnFixedUpdate =
+            "Check input bindings on FixedUpdate";
+    }
+
+    public static class UnityInputBindingTooltips
+    {
+        public const string ButtonJump =
+            "Triggered by Input.GetButton(\"Jump\")";
+
+        public const string AxisHorizontalVertical =
+            "Triggered by Input.GetAxis() \"Hoizontal\" and \"Vertical\"";
+
+        public const string KeyBindings =
+            "Key bindings listening to Input.GetKey(KeyCode)";
+    }
+
+    public static class ReorderInHierarchyTooltips
+    {
+        public const string HowToReorder =
+            "How to reorder this transform in the hierarchy";
+
+        public const string Target =
+            "Which object to reorder in relation to";
+    }
+
+    public static class OVRBodyTrackingStateListenerTooltips
+    {
+        public const string StateListeners =
+            "Body tracking state listeners";
+
+        public const string MaxWaitTimeForBodyTracking =
+            "How many seconds before body tracking times out and is considered disconnected";
+    }
 }
