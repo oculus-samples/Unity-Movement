@@ -78,6 +78,19 @@ namespace Oculus.Movement.Locomotion
         [ContextMenuItem(nameof(RefreshAnimators),nameof(RefreshAnimators))]
         private Animator[] _animators;
 
+        [SerializeField]
+        private float _maxInputAcceleration = 0.1f;
+
+        /// <summary>
+        /// The raw input value, which is filtered by acceleration to smooth animations
+        /// </summary>
+        private Vector2 _targetDirection;
+
+        /// <summary>
+        /// The cached direction value (result of smoothed _targetDirection) sent to the animators
+        /// </summary>
+        private Vector2 _animatorDirection;
+
         /// <summary>
         /// A valid animator to querey for variable values
         /// </summary>
@@ -130,11 +143,8 @@ namespace Oculus.Movement.Locomotion
         /// </summary>
         public float Horizontal
         {
-            get => GetFloat(Variables.Horizontal);
-            set
-            {
-                SetFloat(Variables.Horizontal, value);
-            }
+            get => _targetDirection.x;
+            set => _targetDirection.x = value;
         }
 
         /// <summary>
@@ -142,11 +152,8 @@ namespace Oculus.Movement.Locomotion
         /// </summary>
         public float Vertical
         {
-            get => GetFloat(Variables.Vertical);
-            set
-            {
-                SetFloat(Variables.Vertical, value);
-            }
+            get => _targetDirection.y;
+            set => _targetDirection.y = value;
         }
 
         /// <summary>
@@ -154,17 +161,14 @@ namespace Oculus.Movement.Locomotion
         /// </summary>
         public Vector2 InputHorizontalVertical
         {
-            get => new Vector2(GetFloat(Variables.Horizontal), GetFloat(Variables.Vertical));
+            get => _targetDirection;
             set
             {
-                if (ValidAnimator == null)
+                _targetDirection = value;
+                float magnitude = _targetDirection.magnitude;
+                if (magnitude > 1)
                 {
-                    return;
-                }
-                if (GetBool(Variables.Grounded))
-                {
-                    SetFloat(Variables.Horizontal, value.x);
-                    SetFloat(Variables.Vertical, value.y);
+                    _targetDirection /= magnitude;
                 }
             }
         }
@@ -291,6 +295,53 @@ namespace Oculus.Movement.Locomotion
         private void Start()
         {
             RefreshAnimators();
+        }
+
+        private void FixedUpdate()
+        {
+            if (_targetDirection != _animatorDirection)
+            {
+                MoveAnimatorDirectionTowardTarget();
+            }
+        }
+
+        private void MoveAnimatorDirectionTowardTarget()
+        {
+            Vector2 delta = _targetDirection - _animatorDirection;
+            float dist = delta.magnitude;
+            float desiredAccelerationThisFrame = dist / Time.deltaTime;
+            Vector2 previousAnimatorDireciton = _animatorDirection;
+            if (_maxInputAcceleration == 0 || desiredAccelerationThisFrame < _maxInputAcceleration)
+            {
+                _animatorDirection = _targetDirection;
+            }
+            else
+            {
+                Vector2 dir = delta / dist;
+                _animatorDirection += dir * _maxInputAcceleration;
+                float actualMagnitude = _animatorDirection.magnitude;
+                if (actualMagnitude > 1)
+                {
+                    _animatorDirection /= actualMagnitude;
+                }
+                // prevent overshooting to zero
+                if (_targetDirection.x == 0 && ((_animatorDirection.x > 0) != (previousAnimatorDireciton.x > 0)))
+                {
+                    _animatorDirection.x = 0;
+                }
+                if (_targetDirection.y == 0 && ((_animatorDirection.y > 0) != (previousAnimatorDireciton.y > 0)))
+                {
+                    _animatorDirection.y = 0;
+                }
+            }
+            if (_animatorDirection.x != previousAnimatorDireciton.x)
+            {
+                SetFloat(Variables.Horizontal, _animatorDirection.x);
+            }
+            if (_animatorDirection.y != previousAnimatorDireciton.y)
+            {
+                SetFloat(Variables.Vertical, _animatorDirection.y);
+            }
         }
 
         /// <summary>

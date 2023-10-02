@@ -7,7 +7,7 @@ namespace Oculus.Movement.Utils
 {
     /// <summary>
     /// Listens to Unity <see cref="KeyCode"/> press and release, as well as
-    /// <see cref="Input.GetAxis(string)"/> "Hoizontal" and "Vertical"
+    /// <see cref="Input.GetAxisRaw(string)"/> "Hoizontal" and "Vertical"
     /// </summary>
     public class UnityInputBinding : MonoBehaviour
     {
@@ -18,7 +18,7 @@ namespace Oculus.Movement.Utils
         public class UnityEvent_bool : UnityEvent<bool> { }
 
         /// <summary>
-        /// Triggered by <see cref="Input.GetAxis(string)"/> "Hoizontal" and "Vertical"
+        /// Triggered by <see cref="Input.GetAxisRaw(string)"/> "Hoizontal" and "Vertical"
         /// </summary>
         [System.Serializable]
         public class UnityEvent_Vector2 : UnityEvent<Vector2> { }
@@ -60,7 +60,7 @@ namespace Oculus.Movement.Utils
         private UnityEvent_bool _buttonJump;
 
         /// <summary>
-        /// Triggered by <see cref="Input.GetAxis(string)"/> "Hoizontal" and "Vertical"
+        /// Triggered by <see cref="Input.GetAxisRaw(string)"/> "Hoizontal" and "Vertical"
         /// </summary>
         [Tooltip(UnityInputBindingTooltips.AxisHorizontalVertical)]
         [SerializeField]
@@ -71,21 +71,48 @@ namespace Oculus.Movement.Utils
         /// </summary>
         [Tooltip(UnityInputBindingTooltips.KeyBindings)]
         [SerializeField]
-        public KeyBinding[] _keyBindings;
+        private KeyBinding[] _keyBindings;
+
+        /// <summary>
+        /// Check input bindings on <see cref="Update"/>
+        /// </summary>
+        [Tooltip(OVRInputBindingTooltips.OnUpdate)]
+        [SerializeField]
+        private bool _onUpdate;
+
+        /// <summary>
+        /// Check input bindings on <see cref="FixedUpdate"/>
+        /// </summary>
+        [Tooltip(OVRInputBindingTooltips.OnFixedUpdate)]
+        [SerializeField]
+        private bool _onFixedUpdate = true;
 
         private bool _jumpLastCheck;
         private Vector2 _axisLastCheck;
 
         private void Update()
         {
-            MoveControls();
-            JumpControls();
-            UpdateBindings();
+            if (_onUpdate)
+            {
+                MoveControls();
+                JumpControls();
+                UpdateBindings();
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if (_onFixedUpdate)
+            {
+                MoveControls();
+                JumpControls();
+                UpdateBindings();
+            }
         }
 
         private void MoveControls()
         {
-            Vector2 axisInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            Vector2 axisInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             bool inputIsMeaningful = axisInput != Vector2.zero;
             bool inputIsDiffrentFromLastFrame = axisInput != _axisLastCheck;
             if (inputIsMeaningful || inputIsDiffrentFromLastFrame)
