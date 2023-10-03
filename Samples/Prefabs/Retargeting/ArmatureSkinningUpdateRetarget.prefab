@@ -885,7 +885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121803696401781268, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_Name
-      value: ArmatureSkinningUpdateRetargetUser
+      value: ArmatureSkinningUpdateRetarget
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
@@ -996,7 +996,7 @@ MonoBehaviour:
   - {fileID: 3676716232870504498}
   _rebindAnimator: 1
   _reEnableRig: 1
-  _rigToggleOnFocus: 1
+  _rigToggleOnFocus: 0
   _retargetingLayer: {fileID: 208026092}
   _checkSkeletalUpdatesByProxy: 0
 --- !u!114 &208026091

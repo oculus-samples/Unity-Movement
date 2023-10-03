@@ -865,7 +865,7 @@ MonoBehaviour:
   - {fileID: 4460941168362880823}
   _rebindAnimator: 0
   _reEnableRig: 0
-  _rigToggleOnFocus: 1
+  _rigToggleOnFocus: 0
   _retargetingLayer: {fileID: 0}
   _checkSkeletalUpdatesByProxy: 0
 --- !u!114 &4416254126646396801

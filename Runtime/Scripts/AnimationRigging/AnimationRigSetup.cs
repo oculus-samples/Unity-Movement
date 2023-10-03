@@ -96,7 +96,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField]
         [Tooltip(AnimationRigSetupTooltips.RigToggleOnFocus)]
-        protected bool _rigToggleOnFocus = true;
+        protected bool _rigToggleOnFocus = false;
 
         /// <inheritdoc cref="_rigToggleOnFocus"/>
         public bool RigToggleOnFocus
