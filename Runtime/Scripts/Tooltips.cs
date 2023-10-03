@@ -1634,4 +1634,13 @@ namespace Oculus.Movement
         public const string MaxWaitTimeForBodyTracking =
             "How many seconds before body tracking times out and is considered disconnected";
     }
+
+    public static class ToggleConstraintsSkeletonStateTooltips
+    {
+        public const string Constraints =
+            "Constraints to control the weight of.";
+
+        public const string Skeleton =
+            "The skeleton object that needs to be tracked.";
+    }
 }

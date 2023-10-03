@@ -825,6 +825,22 @@ MonoBehaviour:
   _rigToggleOnFocus: 1
   _retargetingLayer: {fileID: 0}
   _checkSkeletalUpdatesByProxy: 0
+--- !u!114 &5895253470718524380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607326578965322257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a87c462fa9931da4b872f37c96a3102a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _constraints:
+  - {fileID: 1123534316221971162}
+  - {fileID: 4031897247645224307}
+  _skeleton: {fileID: 3946535142790877676}
 --- !u!4 &1122422457210726926 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4131856439344247223, guid: acf265753b6022246b6834742c70714f, type: 3}
