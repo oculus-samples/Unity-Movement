@@ -80,6 +80,7 @@ namespace Oculus.Movement.Locomotion
         /// <summary>
         /// Default turn speed, when rotating smoothly
         /// </summary>
+        [Tooltip(MovementSDKLocomotionTooltips.RotationPerSecond)]
         [SerializeField]
         private float _rotationPerSecond = 360f / 2;
 

@@ -1497,6 +1497,9 @@ namespace Oculus.Movement
 
         public const string JumpEvents =
             "Callbacks to trigger at certain stages of jumping";
+
+        public const string FloorLayerMask =
+            "These collision layers will be checked for collision as valid ground to jump from";
     }
 
     public static class MovementSDKLocomotionTooltips
@@ -1518,6 +1521,9 @@ namespace Oculus.Movement
 
         public const string RotationAngle =
             "Default snap turn amount.";
+
+        public const string RotationPerSecond =
+            "Default turn speed, when rotating smoothly";
 
         public const string Speed =
             "How quickly the controller will move with fully extended joystick";
@@ -1561,6 +1567,12 @@ namespace Oculus.Movement
 
         public const string ColliderFollowsToes =
             "If true, the sphere collider will be influenced by the y-position of toes";
+
+        public const string FloorLayerMask =
+            "Collision layers to avoid merging foot collision area into (due to animation or body tracking)";
+
+        public const string ExpectedBodyCapsule =
+            "Capsule volume where the body is expected, should be a trigger";
     }
 
     public static class ActivatableStateSetTooltips

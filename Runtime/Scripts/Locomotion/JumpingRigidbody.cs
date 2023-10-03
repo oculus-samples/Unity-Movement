@@ -42,16 +42,25 @@ namespace Oculus.Movement.Locomotion
         private float _targetJumpHeight = 1;
 
         /// <summary>
-        /// how wide the character controller's standing base is
-        /// </summary>
-        private float _footRadius = .125f;
-
-        /// <summary>
         /// Prevents jump impulse if the character controller is not grounded
         /// </summary>
         [Tooltip(JumpingRigidbodyTooltips.CanOnlyJumpOnGround)]
         [SerializeField]
         private bool _canOnlyJumpOnGround = true;
+
+        /// <summary>
+        /// These collision layers will be checked for collision as valid ground to jump from
+        /// </summary>
+        [Tooltip(JumpingRigidbodyTooltips.FloorLayerMask)]
+        [SerializeField]
+        private LayerMask _floorLayerMask = 1;
+
+        /// <summary>
+        /// Callbacks to trigger at certain stages of jumping
+        /// </summary>
+        [Tooltip(JumpingRigidbodyTooltips.JumpEvents)]
+        [SerializeField]
+        private JumpEvents _jumpEvents = new JumpEvents();
 
         /// <summary>
         /// True while controller is moving up during jump
@@ -79,17 +88,9 @@ namespace Oculus.Movement.Locomotion
         private bool _receivedScriptedJumpButtonPressThisFrame;
 
         /// <summary>
-        /// These collision layers will be checked for collision as valid ground to jump from
+        /// how wide the character controller's standing base is
         /// </summary>
-        [SerializeField]
-        private LayerMask _floorLayerMask = 1;
-
-        /// <summary>
-        /// Callbacks to trigger at certain stages of jumping
-        /// </summary>
-        [Tooltip(JumpingRigidbodyTooltips.JumpEvents)]
-        [SerializeField]
-        private JumpEvents _jumpEvents = new JumpEvents();
+        private float _footRadius = .125f;
 
         /// <summary>
         /// Distance expected of ray to determine grounding

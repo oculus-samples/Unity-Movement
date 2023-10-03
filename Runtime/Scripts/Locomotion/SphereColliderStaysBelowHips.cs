@@ -20,6 +20,7 @@ namespace Oculus.Movement.Locomotion
         /// <summary>
         /// Capsule volume where the body is expected, should be a trigger
         /// </summary>
+        [Tooltip(SphereColliderStaysBelowHipsTooltips.ExpectedBodyCapsule)]
         [SerializeField]
         protected CapsuleCollider _expectedBodyCapsule;
 
@@ -31,8 +32,9 @@ namespace Oculus.Movement.Locomotion
         protected Transform _characterRoot;
 
         /// <summary>
-        /// Collision layers to avoid merging coot collision area into (due to animation or body tracking)
+        /// Collision layers to avoid merging foot collision area into (due to animation or body tracking)
         /// </summary>
+        [Tooltip(SphereColliderStaysBelowHipsTooltips.FloorLayerMask)]
         [SerializeField]
         protected LayerMask _floorLayerMask = 1;
 
