@@ -242,6 +242,9 @@ namespace Oculus.Movement.AnimationRigging
             if (index >= 0)
             {
                 _skeletonProcessors.RemoveAt(index);
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
             }
         }
 
