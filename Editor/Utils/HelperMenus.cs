@@ -37,41 +37,6 @@ namespace Oculus.Movement.Utils
         private const string _NO_DUPLICATES_SUFFIX =
             " (duplicate mapping off)";
 
-        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU)]
-        private static void SetupCharacterForAnimationRiggingRetargeting()
-        {
-            var activeGameObject = Selection.activeGameObject;
-
-            try
-            {
-                ValidGameObjectForAnimationRigging(activeGameObject);
-            }
-            catch (InvalidOperationException e)
-            {
-                EditorUtility.DisplayDialog("Retargeting setup error.", e.Message, "Ok");
-                return;
-            }
-
-            Undo.IncrementCurrentGroup();
-
-            // Add the retargeting and body tracking components at root first.
-            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(activeGameObject);
-
-            GameObject rigObject;
-            RigBuilder rigBuilder;
-            (rigBuilder, rigObject) = AddBasicAnimationRiggingComponents(activeGameObject);
-
-            RetargetingAnimationConstraint retargetConstraint =
-                AddRetargetingConstraint(rigObject, retargetingLayer);
-            retargetingLayer.RetargetingConstraint = retargetConstraint;
-
-            // Add final components to tie everything together.
-            AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
-                new RetargetingAnimationConstraint[] { retargetConstraint }, retargetingLayer);
-
-            Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
-        }
-
         [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_MENU + _CONSTRAINTS_SUFFIX)]
         private static void SetupCharacterForAnimationRiggingRetargetingConstraints()
         {
