@@ -17,7 +17,11 @@ namespace Oculus.Movement.AnimationRigging
     public class BlendHandConstraints : MonoBehaviour, IOVRSkeletonProcessor
     {
         /// <inheritdoc />
-        public bool EnableSkeletonProcessing { get; set; }
+        public bool EnableSkeletonProcessing
+        {
+            get => enabled;
+            set => enabled = value;
+        }
         /// <inheritdoc />
         public string SkeletonProcessorLabel => "Blend Hands";
 
@@ -68,7 +72,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// MonoBehaviour to add to.
         /// </summary>
-        [SerializeField]
+        [Optional, SerializeField]
         [Interface(typeof(IOVRSkeletonProcessorAggregator))]
         [Tooltip(BlendHandConstraintsTooltips.AutoAddTo)]
         protected MonoBehaviour _autoAddTo;
@@ -165,7 +169,6 @@ namespace Oculus.Movement.AnimationRigging
 
             Assert.IsNotNull(_retargetingLayer);
             Assert.IsNotNull(_headTransform);
-            Assert.IsNotNull(_autoAddTo);
             Assert.IsNotNull(_blendCurve);
 
             Assert.IsTrue(_constraintsMinDistance < _constraintsMaxDistance);
