@@ -321,14 +321,17 @@ namespace Oculus.Movement.Utils
                 deformationConstraintObject.transform.localScale = Vector3.one;
 
                 deformationConstraint.data.SpineTranslationCorrectionTypeField
-                    = DeformationData.SpineTranslationCorrectionType.SkipHips;
-                deformationConstraint.data.ApplyToArms = true;
-                deformationConstraint.data.ApplyToHands = true;
-                deformationConstraint.data.ArmWeight = 1.0f;
-                deformationConstraint.data.HandWeight = 1;
+                    = DeformationData.SpineTranslationCorrectionType.AccurateHead;
+                deformationConstraint.data.SpineAlignmentWeight = 1.0f;
+                deformationConstraint.data.LeftShoulderWeight = 0.75f;
+                deformationConstraint.data.RightShoulderWeight = 0.75f;
+                deformationConstraint.data.LeftArmWeight = 1.0f;
+                deformationConstraint.data.RightArmWeight = 1.0f;
+                deformationConstraint.data.LeftHandWeight = 1.0f;
+                deformationConstraint.data.RightHandWeight = 1.0f;
 
                 deformationConstraint.data.AssignAnimator(animator);
-                deformationConstraint.data.SetUpHipsAndHeadBones();
+                deformationConstraint.data.SetUpHipsToHeadBones();
                 deformationConstraint.data.SetUpLeftArmData();
                 deformationConstraint.data.SetUpRightArmData();
                 deformationConstraint.data.SetUpBonePairs();

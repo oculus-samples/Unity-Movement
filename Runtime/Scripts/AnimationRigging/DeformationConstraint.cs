@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
+using Oculus.Movement.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,24 +29,19 @@ namespace Oculus.Movement.AnimationRigging
         public Transform EndBone;
 
         /// <summary>
-        /// The distance between the target and current position before the end bone snaps to the target position.
-        /// </summary>
-        public float SnapThreshold;
-
-        /// <summary>
-        /// The speed of the bone move towards if enabled.
-        /// </summary>
-        public float MoveTowardsSpeed;
-
-        /// <summary>
         /// The distance between the start and end bones.
         /// </summary>
         public float Distance;
 
         /// <summary>
-        /// If true, the end bone will move towards the deformation target position.
+        /// The proportion of this bone relative to the height.
         /// </summary>
-        public bool IsMoveTowards;
+        public float HeightProportion;
+
+        /// <summary>
+        /// The proportion of this bone relative to its limb.
+        /// </summary>
+        public float LimbProportion;
     }
 
     /// <summary>
@@ -75,34 +71,18 @@ namespace Oculus.Movement.AnimationRigging
         public Transform HandBone;
 
         /// <summary>
-        /// The weight for the deformation on arms.
+        /// The local position of the shoulder.
         /// </summary>
-        public float ArmWeight;
-
-        /// <summary>
-        /// The weight for the deformation on hands.
-        /// </summary>
-        public float HandWeight;
-
-        /// <summary>
-        /// The move towards speed for the arms.
-        /// </summary>
-        public float MoveSpeed;
+        public Vector3 ShoulderLocalPos;
 
         /// <summary>
         /// Indicates if initialized or not.
         /// </summary>
         /// <returns></returns>
-        public bool IsInitialized
-        {
-            get
-            {
-                return ShoulderBone != null &&
-                    UpperArmBone != null &&
-                    LowerArmBone != null &&
-                    HandBone != null;
-            }
-        }
+        public bool IsInitialized =>
+            UpperArmBone != null &&
+            LowerArmBone != null &&
+            HandBone != null;
 
         /// <summary>
         /// Resets all tracked transforms to null.
@@ -142,7 +122,12 @@ namespace Oculus.Movement.AnimationRigging
         public Transform[] HipsToHeadBones { get; }
 
         /// <summary>
-        /// The position info for the bone pairs used for deformation.
+        /// The array of transform targets from the hips to the head bones.
+        /// </summary>
+        public Transform[] HipsToHeadBoneTargets { get; }
+
+        /// <summary>
+        /// The position info for the bone pairs used for Deformation.
         /// </summary>
         public BonePairData[] BonePairs { get; }
 
@@ -152,14 +137,14 @@ namespace Oculus.Movement.AnimationRigging
         public ArmPosData LeftArm { get; }
 
         /// <summary>
-        /// Indicates if left arm data was initialized or not.
-        /// </summary>
-        public bool LeftArmDataInitialized { get; }
-
-        /// <summary>
         /// The position info for the right arm.
         /// </summary>
         public ArmPosData RightArm { get; }
+
+        /// <summary>
+        /// Indicates if left arm data was initialized or not.
+        /// </summary>
+        public bool LeftArmDataInitialized { get; }
 
         /// <summary>
         /// Indicates if left arm data was initialized or not.
@@ -169,7 +154,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The type of spine translation correction that should be applied.
         /// </summary>
-        public DeformationData.SpineTranslationCorrectionType SpineCorrectionType { get; }
+        public int SpineCorrectionType { get; }
 
         /// <summary>
         /// The starting scale of the character, taken from the animator transform.
@@ -177,19 +162,59 @@ namespace Oculus.Movement.AnimationRigging
         public Vector3 StartingScale { get; }
 
         /// <summary>
+        /// The spine correction type int property.
+        /// </summary>
+        public string SpineCorrectionTypeIntProperty { get; }
+
+        /// <summary>
+        /// The spine alignment weight float property.
+        /// </summary>
+        public string SpineAlignmentWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The left shoulder weight float property.
+        /// </summary>
+        public string LeftShoulderWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The right shoulder weight float property.
+        /// </summary>
+        public string RightShoulderWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The left arm weight float property.
+        /// </summary>
+        public string LeftArmWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The right arm weight float property.
+        /// </summary>
+        public string RightArmWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The left hand weight float property.
+        /// </summary>
+        public string LeftHandWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The right hand weight float property.
+        /// </summary>
+        public string RightHandWeightFloatProperty { get; }
+
+        /// <summary>
         /// The distance between the hips and head bones.
         /// </summary>
         public float HipsToHeadDistance { get; }
 
         /// <summary>
-        /// Allows the spine correction to run only once, assuming the skeleton's positions don't get updated multiple times.
+        /// Sets up hips to head bones.
         /// </summary>
-        public bool CorrectSpineOnce { get; }
+        public void SetUpHipsToHeadBones();
 
         /// <summary>
-        /// Sets up hips and head bones.
+        /// Sets up hips to head bone targets.
         /// </summary>
-        public void SetUpHipsAndHeadBones();
+        public void SetUpHipsToHeadBoneTargets(Transform setupParent);
 
         /// <summary>
         /// Sets up left arm data.
@@ -226,9 +251,8 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Deformation data used by the deformation job.
     /// Implements the deformation data interface.
-    /// TODO: allow for case where rig can be enabled, this means sync transform arrays must not be null by default
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct DeformationData : IAnimationJobData, IDeformationData
     {
         /// <summary>
@@ -237,13 +261,13 @@ namespace Oculus.Movement.AnimationRigging
         public enum SpineTranslationCorrectionType
         {
             /// <summary>No spine translation correction applied.</summary>
-            None,
-            /// <summary>Skip the head bone for applying spine translation correction.</summary>
-            SkipHead,
-            /// <summary>Skip the hips bone for applying spine translation correction.</summary>
-            SkipHips,
-            /// <summary>Skip both the head bone and hips bone for applying spine translation correction.</summary>
-            SkipHipsAndHead
+            None = 0,
+            /// <summary>Accurately place the head bone when applying spine translation correction.</summary>
+            AccurateHead = 1,
+            /// <summary>Accurately place the hips bone when applying spine translation correction.</summary>
+            AccurateHips = 2,
+            /// <summary>Accurately place the hips and head bone when applying spine translation correction.</summary>
+            AccurateHipsAndHead = 3,
         }
 
         /// <inheritdoc />
@@ -260,10 +284,14 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc />
-        SpineTranslationCorrectionType IDeformationData.SpineCorrectionType => _spineTranslationCorrectionType;
+        int IDeformationData.SpineCorrectionType => _spineTranslationCorrectionType;
 
         /// <inheritdoc />
         Transform[] IDeformationData.HipsToHeadBones => _hipsToHeadBones;
+
+        /// <inheritdoc />
+        Transform[] IDeformationData.HipsToHeadBoneTargets => _hipsToHeadBoneTargets;
+
         /// <inheritdoc />
         BonePairData[] IDeformationData.BonePairs => _bonePairData;
 
@@ -271,10 +299,10 @@ namespace Oculus.Movement.AnimationRigging
         ArmPosData IDeformationData.LeftArm => _leftArmData;
 
         /// <inheritdoc />
-        bool IDeformationData.LeftArmDataInitialized => _leftArmData.IsInitialized;
+        ArmPosData IDeformationData.RightArm => _rightArmData;
 
         /// <inheritdoc />
-        ArmPosData IDeformationData.RightArm => _rightArmData;
+        bool IDeformationData.LeftArmDataInitialized => _leftArmData.IsInitialized;
 
         /// <inheritdoc />
         bool IDeformationData.RightArmDataInitialized => _rightArmData.IsInitialized;
@@ -283,109 +311,143 @@ namespace Oculus.Movement.AnimationRigging
         Vector3 IDeformationData.StartingScale => _startingScale;
 
         /// <inheritdoc />
-        float IDeformationData.HipsToHeadDistance => _hipsToHeadDistance;
+        string IDeformationData.SpineCorrectionTypeIntProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_spineTranslationCorrectionType));
 
         /// <inheritdoc />
-        bool IDeformationData.CorrectSpineOnce => _correctSpineOnce;
+        string IDeformationData.SpineAlignmentWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_spineAlignmentWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.LeftShoulderWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_leftShoulderWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.RightShoulderWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightShoulderWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.LeftArmWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_leftArmWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.RightArmWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightArmWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.LeftHandWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_leftHandWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.RightHandWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightHandWeight));
+
+        /// <inheritdoc />
+        float IDeformationData.HipsToHeadDistance => _hipsToHeadDistance;
 
         /// <inheritdoc cref="IDeformationData.ConstraintCustomSkeleton"/>
-        [NotKeyable, SerializeField]
+        [NotKeyable, SerializeField, ConditionalHide("_animator", null)]
         [Tooltip(DeformationDataTooltips.CustomSkeleton)]
         private OVRCustomSkeleton _customSkeleton;
 
         /// <inheritdoc cref="IDeformationData.ConstraintAnimator"/>
-        [NotKeyable, SerializeField]
+        [NotKeyable, SerializeField, ConditionalHide("_customSkeleton", null)]
         [Tooltip(DeformationDataTooltips.Animator)]
         private Animator _animator;
 
         /// <inheritdoc cref="IDeformationData.SpineCorrectionType"/>
-        [NotKeyable, SerializeField]
+        [SyncSceneToStream, SerializeField, IntAsEnum(typeof(SpineTranslationCorrectionType))]
         [Tooltip(DeformationDataTooltips.SpineTranslationCorrectionType)]
-        private SpineTranslationCorrectionType _spineTranslationCorrectionType;
+        private int _spineTranslationCorrectionType;
         public SpineTranslationCorrectionType SpineTranslationCorrectionTypeField
         {
-            get => _spineTranslationCorrectionType;
-            set => _spineTranslationCorrectionType = value;
+            get => (SpineTranslationCorrectionType)_spineTranslationCorrectionType;
+            set => _spineTranslationCorrectionType = (int)value;
         }
 
-        /// <inheritdoc cref="IDeformationData.CorrectSpineOnce"/>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.CorrectSpineOnce)]
-        private bool _correctSpineOnce;
-
         /// <summary>
-        /// Apply deformation on arms.
+        /// The weight for the spine alignment.
         /// </summary>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.ApplyToArms)]
-        private bool _applyToArms;
-        public bool ApplyToArms
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.SpineAlignmentWeight)]
+        private float _spineAlignmentWeight;
+        public float SpineAlignmentWeight
         {
-            get => _applyToArms;
-            set => _applyToArms = value;
+            get => _spineAlignmentWeight;
+            set => _spineAlignmentWeight = value;
         }
 
         /// <summary>
-        /// Apply deformation on hands.
+        /// The weight for the left shoulder deformation.
         /// </summary>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.ApplyToHands)]
-        private bool _applyToHands;
-        public bool ApplyToHands
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.LeftShoulderWeight)]
+        private float _leftShoulderWeight;
+        public float LeftShoulderWeight
         {
-            get => _applyToHands;
-            set => _applyToHands = value;
+            get => _leftShoulderWeight;
+            set => _leftShoulderWeight = value;
         }
 
         /// <summary>
-        /// If true, the arms will move towards the deformation target position.
+        /// The weight for the right shoulder deformation.
         /// </summary>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.MoveTowardsArms)]
-        [ConditionalHide("_useMoveTowardsArms", true)]
-        private bool _useMoveTowardsArms;
-
-        /// <summary>
-        /// The distance between the target and current position before the bone snaps to the target position.
-        /// </summary>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.SnapThreshold)]
-        [ConditionalHide("_useMoveTowardsArms", true)]
-        private float _snapThreshold;
-
-        /// <summary>
-        /// The weight for the deformation on arms.
-        /// </summary>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.ArmWeight)]
-        [ConditionalHide("_applyToArms", true)]
-        private float _armWeight;
-        public float ArmWeight
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.RightShoulderWeight)]
+        private float _rightShoulderWeight;
+        public float RightShoulderWeight
         {
-            get => _armWeight;
-            set => _armWeight = value;
+            get => _rightShoulderWeight;
+            set => _rightShoulderWeight = value;
         }
 
         /// <summary>
-        /// The weight for the deformation on hands.
+        /// The weight for the deformation on the left arm.
         /// </summary>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.HandWeight)]
-        [ConditionalHide("_applyToHands", true)]
-        private int _handWeight;
-        public int HandWeight
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.LeftArmWeight)]
+        private float _leftArmWeight;
+        public float LeftArmWeight
         {
-            get => _handWeight;
-            set => _handWeight = value;
+            get => _leftArmWeight;
+            set => _leftArmWeight = value;
         }
 
         /// <summary>
-        /// The move towards speed for the arms.
+        /// The weight for the deformation on the right arm.
         /// </summary>
-        [NotKeyable, SerializeField]
-        [Tooltip(DeformationDataTooltips.ArmMoveSpeed)]
-        [ConditionalHide("_useMoveTowardsArms", true)]
-        private float _armMoveSpeed;
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.RightArmWeight)]
+        private float _rightArmWeight;
+        public float RightArmWeight
+        {
+            get => _rightArmWeight;
+            set => _rightArmWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for the deformation on the left hand.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.LeftHandWeight)]
+        private float _leftHandWeight;
+        public float LeftHandWeight
+        {
+            get => _leftHandWeight;
+            set => _leftHandWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for the deformation on the right hand.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.RightHandWeight)]
+        private float _rightHandWeight;
+        public float RightHandWeight
+        {
+            get => _rightHandWeight;
+            set => _rightHandWeight = value;
+        }
 
         /// <summary>
         /// Array of transform bones from hips to head.
@@ -393,6 +455,13 @@ namespace Oculus.Movement.AnimationRigging
         [SyncSceneToStream, SerializeField]
         [Tooltip(DeformationDataTooltips.HipsToHeadBones)]
         private Transform[] _hipsToHeadBones;
+
+        /// <summary>
+        /// Array of transform bone targets from hips to head.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.HipsToHeadBoneTargets)]
+        private Transform[] _hipsToHeadBoneTargets;
 
         /// <summary>
         /// Left arm data.
@@ -456,25 +525,11 @@ namespace Oculus.Movement.AnimationRigging
                 (_animator != null);
         }
 
-        private Transform FindBoneTransform(OVRSkeleton.BoneId boneId)
-        {
-            if (_customSkeleton != null)
-            {
-                return RiggingUtilities.FindBoneTransformFromCustomSkeleton(_customSkeleton, boneId);
-            }
-
-            if (_animator != null)
-            {
-                return RiggingUtilities.FindBoneTransformAnimator(_animator, boneId);
-            }
-
-            return null;
-        }
-
         /// <inheritdoc />
-        public void SetUpHipsAndHeadBones()
+        public void SetUpHipsToHeadBones()
         {
-            var hipToHeadBones = new List<Transform>();
+            var hipsToHeadBones = new List<Transform>();
+            _hipsToHeadDistance = 0.0f;
             for (int boneId = (int)OVRSkeleton.BoneId.Body_Hips; boneId <= (int)OVRSkeleton.BoneId.Body_Head;
                  boneId++)
             {
@@ -483,41 +538,71 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     continue;
                 }
-                hipToHeadBones.Add(foundBoneTransform.transform);
+                hipsToHeadBones.Add(foundBoneTransform.transform);
+                if (hipsToHeadBones.Count > 1)
+                {
+                    _hipsToHeadDistance +=
+                        Vector3.Distance(hipsToHeadBones[^1].position, hipsToHeadBones[^2].position);
+                }
             }
+            _hipsToHeadBones = hipsToHeadBones.ToArray();
+        }
 
-            _hipsToHeadDistance =
-                Vector3.Distance(hipToHeadBones[0].position, hipToHeadBones[^1].position);
-            _hipsToHeadBones = hipToHeadBones.ToArray();
+        /// <inheritdoc />
+        public void SetUpHipsToHeadBoneTargets(Transform setupParent)
+        {
+            var hipsTarget = setupParent.FindChildRecursive("Hips");
+            var spineLowerTarget = setupParent.FindChildRecursive("SpineLower");
+            var spineUpperTarget = setupParent.FindChildRecursive("SpineUpper");
+            var chestTarget = setupParent.FindChildRecursive("Chest");
+            var neckTarget = setupParent.FindChildRecursive("Neck");
+            var headTarget = setupParent.FindChildRecursive("Head");
+
+            var hipsToHeadBoneTargets = new List<Transform>
+            {
+                hipsTarget, spineLowerTarget
+            };
+
+            // Add optional bones, based on the length of the original array.
+            if (_hipsToHeadBones.Length > 4)
+            {
+                hipsToHeadBoneTargets.Add(spineUpperTarget);
+            }
+            if (_hipsToHeadBones.Length > 5)
+            {
+                hipsToHeadBoneTargets.Add(chestTarget);
+            }
+            hipsToHeadBoneTargets.Add(neckTarget);
+            hipsToHeadBoneTargets.Add(headTarget);
+
+            _hipsToHeadBoneTargets = hipsToHeadBoneTargets.ToArray();
         }
 
         /// <inheritdoc />
         public void SetUpLeftArmData()
         {
+            var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder);
             _leftArmData = new ArmPosData()
             {
-                ArmWeight = _applyToArms ? _armWeight : 0,
-                HandWeight = _applyToHands ? _handWeight : 0,
-                MoveSpeed = _armMoveSpeed,
-                ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder),
+                ShoulderBone = shoulder,
                 UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper),
                 LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower),
-                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftHandWrist)
+                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftHandWrist),
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero
             };
         }
 
         /// <inheritdoc />
         public void SetUpRightArmData()
         {
+            var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder);
             _rightArmData = new ArmPosData()
             {
-                ArmWeight = _applyToArms ? _armWeight : 0,
-                HandWeight = _applyToHands ? _handWeight : 0,
-                MoveSpeed = _armMoveSpeed,
-                ShoulderBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder),
+                ShoulderBone = shoulder,
                 UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper),
                 LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower),
-                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightHandWrist)
+                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightHandWrist),
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero
             };
         }
 
@@ -533,142 +618,125 @@ namespace Oculus.Movement.AnimationRigging
             if (!_leftArmData.IsInitialized)
             {
                 Debug.LogError("Please set up left arm data before trying to " +
-                    "set up bone pairs");
+                               "set up bone pairs");
                 return;
             }
             if (!_rightArmData.IsInitialized)
             {
                 Debug.LogError("Please set up right arm data before trying to " +
-                    "set up bone pairs");
+                               "set up bone pairs");
                 return;
             }
-            // Setup bone pairs
+
+            // Setup bone pairs for hips to head bones.
             var bonePairs = new List<BonePairData>();
             for (int i = 0; i < _hipsToHeadBones.Length - 1; i++)
             {
                 var bonePair = new BonePairData
                 {
                     StartBone = _hipsToHeadBones[i],
-                    EndBone = _hipsToHeadBones[i + 1],
-                    SnapThreshold = 0,
-                    MoveTowardsSpeed = 0,
-                    Distance = Vector3.Distance(
-                        _hipsToHeadBones[i + 1].position,
-                        _hipsToHeadBones[i].position),
-                    IsMoveTowards = false
+                    EndBone = _hipsToHeadBones[i + 1]
                 };
                 bonePairs.Add(bonePair);
             }
 
+            // Check for optional bones and update accordingly.
             var chestBone = FindBoneTransform(OVRSkeleton.BoneId.Body_Chest);
-            var chestBonePos = chestBone.position;
-            var leftShoulderBonePos = _leftArmData.ShoulderBone.position;
-            var rightShoulderBonePos = _rightArmData.ShoulderBone.position;
-            var leftUpperArmBonePos = _leftArmData.UpperArmBone.position;
-            var rightUpperArmBonePos = _rightArmData.UpperArmBone.position;
-            var leftLowerArmBonePos = _leftArmData.LowerArmBone.position;
-            var rightLowerArmBonePos = _rightArmData.LowerArmBone.position;
-
-            if (_applyToArms)
+            var spineUpperBone = FindBoneTransform(OVRSkeleton.BoneId.Body_SpineUpper);
+            var spineLowerBone = FindBoneTransform(OVRSkeleton.BoneId.Body_SpineLower);
+            var highestSpineBone = chestBone;
+            if (chestBone == null)
             {
-                // Chest to shoulder bones.
-                bonePairs.Add(new BonePairData
-                {
-                    StartBone = chestBone,
-                    EndBone = _leftArmData.ShoulderBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _leftArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        leftShoulderBonePos,
-                        chestBonePos),
-                    IsMoveTowards = false
-                });
-                bonePairs.Add(new BonePairData
-                {
-                    StartBone = chestBone,
-                    EndBone = _rightArmData.ShoulderBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _rightArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        rightShoulderBonePos,
-                        chestBonePos),
-                    IsMoveTowards = false
-                });
+                Debug.LogWarning($"Did not find the {HumanBodyBones.UpperChest} bone in {_animator}. The deformation job result will be affected.");
+                highestSpineBone = spineUpperBone;
+            }
+            if (spineUpperBone == null)
+            {
+                Debug.LogWarning($"Did not find the {HumanBodyBones.Chest} bone in {_animator}. The deformation job result will be affected.");
+                highestSpineBone = spineLowerBone;
+            }
+            var leftShoulderBone = _leftArmData.ShoulderBone;
+            var rightShoulderBone = _rightArmData.ShoulderBone;
 
-                // Shoulder to upper arm bones.
+            // Chest to shoulder bones.
+            if (leftShoulderBone != null)
+            {
                 bonePairs.Add(new BonePairData
                 {
-                    StartBone = _leftArmData.ShoulderBone,
-                    EndBone = _leftArmData.UpperArmBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _leftArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        leftUpperArmBonePos,
-                        leftShoulderBonePos),
-                    IsMoveTowards = _useMoveTowardsArms
-                });
-                bonePairs.Add(new BonePairData
-                {
-                    StartBone = _rightArmData.ShoulderBone,
-                    EndBone = _rightArmData.UpperArmBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _rightArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        rightUpperArmBonePos,
-                        rightShoulderBonePos),
-                    IsMoveTowards = _useMoveTowardsArms
-                });
-
-                // Upper arm to lower arm bones.
-                bonePairs.Add(new BonePairData
-                {
-                    StartBone = _leftArmData.UpperArmBone,
-                    EndBone = _leftArmData.LowerArmBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _leftArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        leftLowerArmBonePos,
-                        leftUpperArmBonePos),
-                    IsMoveTowards = _useMoveTowardsArms
-                });
-                bonePairs.Add(new BonePairData
-                {
-                    StartBone = _rightArmData.UpperArmBone,
-                    EndBone = _rightArmData.LowerArmBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _rightArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        rightLowerArmBonePos,
-                        rightUpperArmBonePos),
-                    IsMoveTowards = _useMoveTowardsArms
+                    StartBone = highestSpineBone, EndBone = leftShoulderBone,
                 });
             }
-
-            if (_applyToHands)
+            else
             {
-                // Lower arm to hand bones.
+                Debug.LogWarning($"Did not find the {HumanBodyBones.LeftShoulder} bone in {_animator}. The deformation job result will be affected.");
+            }
+
+            if (rightShoulderBone != null)
+            {
                 bonePairs.Add(new BonePairData
                 {
-                    StartBone = _leftArmData.LowerArmBone,
-                    EndBone = _leftArmData.HandBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _leftArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        _leftArmData.HandBone.position,
-                        leftLowerArmBonePos),
-                    IsMoveTowards = _useMoveTowardsArms
+                    StartBone = highestSpineBone, EndBone = rightShoulderBone,
                 });
-                bonePairs.Add(new BonePairData
+            }
+            else
+            {
+                Debug.LogWarning($"Did not find the {HumanBodyBones.RightShoulder} bone in {_animator}. The deformation job result will be affected.");
+            }
+
+            // Shoulder to upper arm bones.
+            bonePairs.Add(new BonePairData
+            {
+                StartBone = leftShoulderBone != null ? leftShoulderBone : highestSpineBone,
+                EndBone = _leftArmData.UpperArmBone
+            });
+            bonePairs.Add(new BonePairData
+            {
+                StartBone = rightShoulderBone != null ? rightShoulderBone : highestSpineBone,
+                EndBone = _rightArmData.UpperArmBone
+            });
+
+            // Upper arm to lower arm bones.
+            bonePairs.Add(new BonePairData
+            {
+                StartBone = _leftArmData.UpperArmBone, EndBone = _leftArmData.LowerArmBone
+            });
+            bonePairs.Add(new BonePairData
+            {
+                StartBone = _rightArmData.UpperArmBone, EndBone = _rightArmData.LowerArmBone
+            });
+
+            // Lower arm to hand bones.
+            bonePairs.Add(new BonePairData
+            {
+                StartBone = _leftArmData.LowerArmBone, EndBone = _leftArmData.HandBone
+            });
+            bonePairs.Add(new BonePairData
+            {
+                StartBone = _rightArmData.LowerArmBone, EndBone = _rightArmData.HandBone
+            });
+
+            // Calculate original bone pair lengths.
+            for (int i = 0; i < bonePairs.Count; i++)
+            {
+                var bonePair = bonePairs[i];
+                if (bonePair.StartBone != null && bonePair.EndBone != null)
                 {
-                    StartBone = _rightArmData.LowerArmBone,
-                    EndBone = _rightArmData.HandBone,
-                    SnapThreshold = _snapThreshold,
-                    MoveTowardsSpeed = _rightArmData.MoveSpeed,
-                    Distance = Vector3.Distance(
-                        _rightArmData.HandBone.position,
-                        rightLowerArmBonePos),
-                    IsMoveTowards = _useMoveTowardsArms
-                });
+                    bonePair.Distance = Vector3.Distance(bonePair.EndBone.position, bonePair.StartBone.position);
+                }
+                else
+                {
+                    Debug.LogWarning($"Missing bones in bone pair! Start Bone: {bonePair.StartBone}, End Bone: {bonePair.EndBone}");
+                }
+                bonePairs[i] = bonePair;
+            }
+
+            // Calculate proportions for spine.
+            for (int i = 0; i < _hipsToHeadBones.Length - 1; i++)
+            {
+                var bonePair = bonePairs[i];
+                bonePair.HeightProportion = bonePair.Distance / _hipsToHeadDistance;
+                bonePair.LimbProportion = bonePair.Distance / _hipsToHeadDistance;
+                bonePairs[i] = bonePair;
             }
 
             _bonePairData = bonePairs.ToArray();
@@ -695,10 +763,31 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void ClearTransformData()
         {
+            _bonePairData = null;
             _hipsToHeadBones = null;
+            _hipsToHeadBoneTargets = null;
             _leftArmData.ClearTransformData();
             _rightArmData.ClearTransformData();
-            _bonePairData = null;
+        }
+
+        /// <summary>
+        /// Find the transform for a specific boneId.
+        /// </summary>
+        /// <param name="boneId">The boneId to be found.</param>
+        /// <returns>The bone transform.</returns>
+        private Transform FindBoneTransform(OVRSkeleton.BoneId boneId)
+        {
+            if (_customSkeleton != null)
+            {
+                return RiggingUtilities.FindBoneTransformFromCustomSkeleton(_customSkeleton, boneId);
+            }
+
+            if (_animator != null)
+            {
+                return RiggingUtilities.FindBoneTransformAnimator(_animator, boneId);
+            }
+
+            return null;
         }
 
         bool IAnimationJobData.IsValid()
@@ -715,20 +804,16 @@ namespace Oculus.Movement.AnimationRigging
                 return false;
             }
 
-            if (_hipsToHeadBones == null || _hipsToHeadBones.Length == 0)
+            if (_hipsToHeadBones == null || _hipsToHeadBones.Length == 0 || _hipsToHeadBoneTargets.Length == 0)
             {
                 Debug.LogError("Hips to head bones not set up.");
                 return false;
             }
 
-            if (_applyToArms)
+            if (!_leftArmData.IsInitialized || !_rightArmData.IsInitialized)
             {
-                if (_leftArmData.ShoulderBone == null || _leftArmData.UpperArmBone == null || _leftArmData.LowerArmBone == null ||
-                    _rightArmData.ShoulderBone == null || _rightArmData.UpperArmBone == null || _rightArmData.LowerArmBone == null)
-                {
-                    Debug.LogError("Arm data not set up.");
-                    return false;
-                }
+                Debug.LogError("Arm data not set up.");
+                return false;
             }
 
             return true;
@@ -737,16 +822,25 @@ namespace Oculus.Movement.AnimationRigging
         void IAnimationJobData.SetDefaultValues()
         {
             _animator = null;
-            _spineTranslationCorrectionType = SpineTranslationCorrectionType.None;
-            _applyToArms = false;
-            _useMoveTowardsArms = false;
-            _correctSpineOnce = false;
-            _snapThreshold = 0.1f;
-            _startingScale = Vector3.one;
+            _customSkeleton = null;
+            _spineTranslationCorrectionType = (int)SpineTranslationCorrectionType.None;
+
+            _spineAlignmentWeight = 0.0f;
+            _leftShoulderWeight = 0.0f;
+            _rightShoulderWeight = 0.0f;
+            _leftArmWeight = 0.0f;
+            _rightArmWeight = 0.0f;
+            _leftHandWeight = 0.0f;
+            _rightHandWeight = 0.0f;
+
+            _hipsToHeadBones = null;
+            _hipsToHeadBoneTargets = null;
             _leftArmData = new ArmPosData();
             _rightArmData = new ArmPosData();
             _bonePairData = null;
-            _hipsToHeadBones = null;
+
+            _startingScale = Vector3.one;
+            _hipsToHeadDistance = 0.0f;
         }
     }
 
@@ -760,10 +854,6 @@ namespace Oculus.Movement.AnimationRigging
         DeformationJobBinder<DeformationData>>,
         IOVRSkeletonConstraint
     {
-        private void Start()
-        {
-        }
-
         /// <inheritdoc />
         public void RegenerateData()
         {

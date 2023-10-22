@@ -917,10 +917,6 @@ namespace Oculus.Movement
 
     public static class DeformationDataTooltips
     {
-        public const string Skeleton =
-            "[Deprecated] The OVR Skeleton component. " +
-            "NOTE: not recommended as this was experimental.";
-
         public const string CustomSkeleton =
             "The OVRCustomSkeleton component for the character.";
 
@@ -930,44 +926,38 @@ namespace Oculus.Movement
         public const string SpineTranslationCorrectionType =
             "The type of spine translation correction that should be applied.";
 
-        public const string ApplyToArms =
-            "Apply deformation on arms.";
+        public const string SpineAlignmentWeight =
+            "The weight for the spine alignment.";
 
-        public const string ApplyToHands =
-            "Apply deformation on hands.";
+        public const string LeftShoulderWeight =
+            "The weight for the deformation on the left shoulder.";
 
-        public const string CorrectSpineOnce =
-            "Allows the spine correction to run only once, assuming the skeleton's positions don't get updated multiple times.";
+        public const string RightShoulderWeight =
+            "The weight for the deformation on the right shoulder.";
 
-        public const string MoveTowardsArms =
-            "If true, the arms will move towards the deformation target position.";
+        public const string LeftArmWeight =
+            "The weight for the deformation on the left arm.";
 
-        public const string SnapThreshold =
-            "The distance between the target and current position before the bone snaps to the target position.";
+        public const string RightArmWeight =
+            "The weight for the deformation on the right arm.";
 
-        public const string ArmWeight =
-            "The weight for the deformation on arms.";
-
-        public const string HandWeight =
+        public const string LeftHandWeight =
             "The weight for the deformation on hands.";
 
-        public const string ArmMoveSpeed =
-            "The move towards speed for the arms.";
+        public const string RightHandWeight =
+            "The weight for the deformation on hands.";
 
         public const string HipsToHeadBones =
             "Array of transform bones from hips to head.";
 
+        public const string HipsToHeadBoneTargets =
+            "Array of transform bone targets from hips to head.";
+
         public const string LeftArmData =
             "Left arm data.";
 
-        public const string LeftArmDataInitialized =
-            "Whether the left arm data is initialized or not.";
-
         public const string RightArmData =
             "Right arm data.";
-
-        public const string RightArmDataInitialized =
-            "Whether the right arm data is initialized or not.";
 
         public const string BonePairData =
             "All bone pair data.";
