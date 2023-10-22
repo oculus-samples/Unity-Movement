@@ -4,6 +4,7 @@ using Oculus.Movement.AnimationRigging;
 using Oculus.Movement.Tracking;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -69,39 +70,65 @@ namespace Oculus.Movement.Utils
 
             Animator animatorComp = activeGameObject.GetComponent<Animator>();
 
+            // Body deformation.
+            RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
             DeformationConstraint deformationConstraint =
-                AddDeformationConstraint(rigObject, animatorComp);
+                AddDeformationConstraint(rigObject, animatorComp, spineBoneTargets);
             constraintMonos.Add(deformationConstraint);
 
-            Transform leftHandTarget = AddHandTarget(rigObject, "LeftHandTarget");
+            Transform leftElbowTarget = AddHandTarget(rigObject, "LeftElbowTarget", animatorComp.GetBoneTransform(HumanBodyBones.LeftLowerArm));
+            Transform leftHandTarget = AddHandTarget(rigObject, "LeftHandTarget", animatorComp.GetBoneTransform(HumanBodyBones.LeftHand));
             TwoBoneIKConstraint leftTwoBoneIKConstraint =
                 AddTwoBoneIKConstraint(rigObject, "LeftArmIK",
                     animatorComp.GetBoneTransform(HumanBodyBones.LeftUpperArm),
                     animatorComp.GetBoneTransform(HumanBodyBones.LeftLowerArm),
                     animatorComp.GetBoneTransform(HumanBodyBones.LeftHand),
-                    leftHandTarget);
+                    leftHandTarget, leftElbowTarget);
+            Undo.SetTransformParent(leftHandTarget, leftTwoBoneIKConstraint.transform,
+                "Parent Left Hand to Two-Bone IK");
+            Undo.SetTransformParent(leftElbowTarget, leftTwoBoneIKConstraint.transform,
+                "Parent Left Elbow to Two-Bone IK");
 
-            Transform rightHandTarget = AddHandTarget(rigObject, "RightHandTarget");
+            Transform rightElbowTarget = AddHandTarget(rigObject, "RightElbowTarget", animatorComp.GetBoneTransform(HumanBodyBones.RightLowerArm));
+            Transform rightHandTarget = AddHandTarget(rigObject, "RightHandTarget", animatorComp.GetBoneTransform(HumanBodyBones.RightHand));
             TwoBoneIKConstraint rightTwoBoneIKConstraint =
                 AddTwoBoneIKConstraint(rigObject, "RightArmIK",
                     animatorComp.GetBoneTransform(HumanBodyBones.RightUpperArm),
                     animatorComp.GetBoneTransform(HumanBodyBones.RightLowerArm),
                     animatorComp.GetBoneTransform(HumanBodyBones.RightHand),
-                    rightHandTarget);
+                    rightHandTarget, rightElbowTarget);
+            Undo.SetTransformParent(rightHandTarget, rightTwoBoneIKConstraint.transform,
+                "Parent Right Hand to Two-Bone IK");
+            Undo.SetTransformParent(rightElbowTarget, rightTwoBoneIKConstraint.transform,
+                "Parent Right Elbow to Two-Bone IK");
 
-            RetargetedBoneTarget leftHandRTTarget = new RetargetedBoneTarget();
-            leftHandRTTarget.BoneId = OVRSkeleton.BoneId.Body_LeftHandWrist;
-            leftHandRTTarget.Target = leftHandTarget;
-            leftHandRTTarget.HumanBodyBone = HumanBodyBones.LeftHand;
-            RetargetedBoneTarget rightHandRTTarget = new RetargetedBoneTarget();
-            rightHandRTTarget.BoneId = OVRSkeleton.BoneId.Body_RightHandWrist;
-            rightHandRTTarget.Target = rightHandTarget;
-            rightHandRTTarget.HumanBodyBone = HumanBodyBones.RightHand;
-            AddRetargetedBoneTargetComponent(activeGameObject,
-                new RetargetedBoneTarget[]
-                {
-                    leftHandRTTarget, rightHandRTTarget
-                });
+            RetargetedBoneTarget leftHandRTTarget = new RetargetedBoneTarget
+            {
+                BoneId = OVRSkeleton.BoneId.Body_LeftHandWrist, Target = leftHandTarget,
+                HumanBodyBone = HumanBodyBones.LeftHand
+            };
+            RetargetedBoneTarget leftElbowRTTarget = new RetargetedBoneTarget
+            {
+                BoneId = OVRSkeleton.BoneId.Body_LeftArmLower, Target = leftElbowTarget,
+                HumanBodyBone = HumanBodyBones.LeftLowerArm
+            };
+            RetargetedBoneTarget rightHandRTTarget = new RetargetedBoneTarget
+            {
+                BoneId = OVRSkeleton.BoneId.Body_RightHandWrist, Target = rightHandTarget,
+                HumanBodyBone = HumanBodyBones.RightHand
+            };
+            RetargetedBoneTarget rightElbowRTTarget = new RetargetedBoneTarget
+            {
+                BoneId = OVRSkeleton.BoneId.Body_RightArmLower, Target = rightElbowTarget,
+                HumanBodyBone = HumanBodyBones.RightLowerArm
+            };
+
+            var retargetedBoneTargets = new List<RetargetedBoneTarget>
+            {
+                leftHandRTTarget, rightHandRTTarget, leftElbowRTTarget, rightElbowRTTarget
+            };
+            retargetedBoneTargets.AddRange(spineBoneTargets);
+            AddRetargetedBoneTargetComponent(activeGameObject, retargetedBoneTargets.ToArray());
 
             AddHandBlendConstraint(activeGameObject, new MonoBehaviour[] { leftTwoBoneIKConstraint },
                 retargetingLayer, CustomMappings.BodyTrackingBoneId.Body_LeftHandWrist,
@@ -201,6 +228,25 @@ namespace Oculus.Movement.Utils
                 Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
             }
 
+            var bodySectionToPosition =
+                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
+                    "_bodySectionToPosition", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (bodySectionToPosition != null)
+            {
+                bodySectionToPosition.SetValue(retargetingLayer, new[]
+                {
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.LeftArm,
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.RightArm,
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.LeftHand,
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.RightHand,
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.Hips,
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.Back,
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.Neck,
+                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.Head
+                });
+            }
+            EditorUtility.SetDirty(retargetingLayer);
+
             OVRBody bodyComp = mainParent.GetComponent<OVRBody>();
             if (!bodyComp)
             {
@@ -247,7 +293,7 @@ namespace Oculus.Movement.Utils
             GameObject rigObject, RetargetingLayer retargetingLayer)
         {
             RetargetingAnimationConstraint retargetConstraint =
-                rigObject.GetComponentInChildren<RetargetingAnimationConstraint>();
+                rigObject.GetComponentInChildren<RetargetingAnimationConstraint>(true);
             if (retargetConstraint == null)
             {
                 GameObject retargetingAnimConstraintObj =
@@ -263,10 +309,10 @@ namespace Oculus.Movement.Utils
                 retargetConstraint.transform.localPosition = Vector3.zero;
                 retargetConstraint.transform.localRotation = Quaternion.identity;
                 retargetConstraint.transform.localScale = Vector3.one;
-
-                // keep retargeter disabled until it initializes properly
-                retargetConstraint.gameObject.SetActive(false);
             }
+
+            // Keep retargeter disabled until it initializes properly.
+            retargetConstraint.gameObject.SetActive(false);
             return retargetConstraint;
         }
 
@@ -298,8 +344,79 @@ namespace Oculus.Movement.Utils
             Undo.RegisterCreatedObjectUndo(rigSetup, "Create Anim Rig Setup");
         }
 
+        private static RetargetedBoneTarget[] AddSpineBoneTargets(GameObject rigObject,
+            Animator animator)
+        {
+            var boneTargets = new List<RetargetedBoneTarget>();
+            Transform hipsTarget = AddSpineTarget(rigObject, "HipsTarget",
+                animator.GetBoneTransform(HumanBodyBones.Hips));
+            Transform spineLowerTarget = AddSpineTarget(rigObject, "SpineLowerTarget",
+                animator.GetBoneTransform(HumanBodyBones.Spine));
+            Transform spineUpperTarget = AddSpineTarget(rigObject, "SpineUpperTarget",
+                animator.GetBoneTransform(HumanBodyBones.Chest));
+            Transform chestTarget = AddSpineTarget(rigObject, "ChestTarget",
+                animator.GetBoneTransform(HumanBodyBones.UpperChest));
+            Transform neckTarget = AddSpineTarget(rigObject, "NeckTarget",
+                animator.GetBoneTransform(HumanBodyBones.Neck));
+            Transform headTarget = AddSpineTarget(rigObject, "HeadTarget",
+                animator.GetBoneTransform(HumanBodyBones.Head));
+
+            Tuple<OVRSkeleton.BoneId, Transform>[] bonesToRetarget =
+            {
+                new(OVRSkeleton.BoneId.Body_Hips, hipsTarget),
+                new(OVRSkeleton.BoneId.Body_SpineLower, spineLowerTarget),
+                new(OVRSkeleton.BoneId.Body_SpineUpper, spineUpperTarget),
+                new(OVRSkeleton.BoneId.Body_Chest, chestTarget),
+                new(OVRSkeleton.BoneId.Body_Neck, neckTarget),
+                new(OVRSkeleton.BoneId.Body_Head, headTarget),
+            };
+
+            foreach (var boneToRetarget in bonesToRetarget)
+            {
+                RetargetedBoneTarget boneRTTarget = new RetargetedBoneTarget();
+                boneRTTarget.BoneId = boneToRetarget.Item1;
+                boneRTTarget.Target = boneToRetarget.Item2;
+                boneRTTarget.HumanBodyBone = CustomMappings.BoneIdToHumanBodyBone[boneRTTarget.BoneId];
+                boneTargets.Add(boneRTTarget);
+            }
+            return boneTargets.ToArray();
+        }
+
+        private static Transform AddSpineTarget(GameObject mainParent,
+            string nameOfTarget, Transform targetTransform = null)
+        {
+            Transform spineTarget =
+                mainParent.transform.FindChildRecursive(nameOfTarget);
+            if (spineTarget == null)
+            {
+                GameObject spineTargetObject =
+                    new GameObject(nameOfTarget);
+                Undo.RegisterCreatedObjectUndo(spineTargetObject,
+                    $"Create Spine Target {nameOfTarget}");
+                Undo.SetTransformParent(spineTargetObject.transform, mainParent.transform,
+                    $"Add Spine Target {nameOfTarget} To Main Parent");
+                Undo.RegisterCompleteObjectUndo(spineTargetObject,
+                    $"Spine Target {nameOfTarget} Transform Init");
+                spineTarget = spineTargetObject.transform;
+            }
+
+            if (targetTransform != null)
+            {
+                spineTarget.position = targetTransform.position;
+                spineTarget.rotation = targetTransform.rotation;
+                spineTarget.localScale = targetTransform.localScale;
+            }
+            else
+            {
+                spineTarget.localPosition = Vector3.zero;
+                spineTarget.localRotation = Quaternion.identity;
+                spineTarget.localScale = Vector3.one;
+            }
+            return spineTarget;
+        }
+
         private static DeformationConstraint AddDeformationConstraint(
-            GameObject rigObject, Animator animator)
+            GameObject rigObject, Animator animator, RetargetedBoneTarget[] spineBoneTargets)
         {
             DeformationConstraint deformationConstraint =
                 rigObject.GetComponentInChildren<DeformationConstraint>();
@@ -311,7 +428,6 @@ namespace Oculus.Movement.Utils
                     deformationConstraintObject.AddComponent<DeformationConstraint>();
 
                 Undo.RegisterCreatedObjectUndo(deformationConstraintObject, "Create Deformation");
-
                 Undo.SetTransformParent(deformationConstraintObject.transform, rigObject.transform,
                     $"Add Deformation Constraint to Rig");
                 Undo.RegisterCompleteObjectUndo(deformationConstraintObject,
@@ -319,65 +435,93 @@ namespace Oculus.Movement.Utils
                 deformationConstraintObject.transform.localPosition = Vector3.zero;
                 deformationConstraintObject.transform.localRotation = Quaternion.identity;
                 deformationConstraintObject.transform.localScale = Vector3.one;
-
-                deformationConstraint.data.SpineTranslationCorrectionTypeField
-                    = DeformationData.SpineTranslationCorrectionType.AccurateHead;
-                deformationConstraint.data.SpineAlignmentWeight = 1.0f;
-                deformationConstraint.data.LeftShoulderWeight = 0.75f;
-                deformationConstraint.data.RightShoulderWeight = 0.75f;
-                deformationConstraint.data.LeftArmWeight = 1.0f;
-                deformationConstraint.data.RightArmWeight = 1.0f;
-                deformationConstraint.data.LeftHandWeight = 1.0f;
-                deformationConstraint.data.RightHandWeight = 1.0f;
-
-                deformationConstraint.data.AssignAnimator(animator);
-                deformationConstraint.data.SetUpHipsToHeadBones();
-                deformationConstraint.data.SetUpLeftArmData();
-                deformationConstraint.data.SetUpRightArmData();
-                deformationConstraint.data.SetUpBonePairs();
-                deformationConstraint.data.InitializeStartingScale();
             }
+
+            foreach (var spineBoneTarget in spineBoneTargets)
+            {
+                Undo.SetTransformParent(spineBoneTarget.Target, deformationConstraint.transform,
+                    $"Parent Spine Bone Target {spineBoneTarget.Target.name} to Deformation.");
+                Undo.RegisterCompleteObjectUndo(spineBoneTarget.Target,
+                    $"Spine Bone Target {spineBoneTarget.Target.name} Init");
+            }
+
+            deformationConstraint.data.SpineTranslationCorrectionTypeField
+                = DeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead;
+            deformationConstraint.data.SpineAlignmentWeight = 1.0f;
+            deformationConstraint.data.LeftShoulderWeight = 0.75f;
+            deformationConstraint.data.RightShoulderWeight = 0.75f;
+            deformationConstraint.data.LeftArmWeight = 1.0f;
+            deformationConstraint.data.RightArmWeight = 1.0f;
+            deformationConstraint.data.LeftHandWeight = 1.0f;
+            deformationConstraint.data.RightHandWeight = 1.0f;
+
+            deformationConstraint.data.AssignAnimator(animator);
+            deformationConstraint.data.SetUpLeftArmData();
+            deformationConstraint.data.SetUpRightArmData();
+            deformationConstraint.data.SetUpHipsToHeadBones();
+            deformationConstraint.data.SetUpHipsToHeadBoneTargets(deformationConstraint.transform);
+            deformationConstraint.data.SetUpBonePairs();
+            deformationConstraint.data.InitializeStartingScale();
+
+            PrefabUtility.RecordPrefabInstancePropertyModifications(deformationConstraint);
             return deformationConstraint;
         }
 
-        private static Transform AddHandTarget(GameObject mainParent, string nameOfTarget)
+        private static Transform AddHandTarget(GameObject mainParent,
+            string nameOfTarget, Transform targetTransform = null)
         {
             Transform handTarget =
-                mainParent.transform.Find(nameOfTarget);
+                mainParent.transform.FindChildRecursive(nameOfTarget);
             if (handTarget == null)
             {
                 GameObject handTargetObject =
                     new GameObject(nameOfTarget);
-                Undo.RegisterCreatedObjectUndo(handTargetObject, "Create Hand Target " + nameOfTarget);
-
+                Undo.RegisterCreatedObjectUndo(handTargetObject,
+                    $"Create Hand Target {nameOfTarget}");
                 Undo.SetTransformParent(handTargetObject.transform, mainParent.transform,
                     $"Add Hand Target {nameOfTarget} To Main Parent");
                 Undo.RegisterCompleteObjectUndo(handTargetObject,
                     $"Hand Target {nameOfTarget} Transform Init");
                 handTarget = handTargetObject.transform;
-                handTarget.transform.localPosition = Vector3.zero;
-                handTarget.transform.localRotation = Quaternion.identity;
-                handTarget.transform.localScale = Vector3.one;
             }
+            if (targetTransform != null)
+            {
+                handTarget.position = targetTransform.position;
+                handTarget.rotation = targetTransform.rotation;
+                handTarget.localScale = targetTransform.localScale;
+            }
+            else
+            {
+                handTarget.localPosition = Vector3.zero;
+                handTarget.localRotation = Quaternion.identity;
+                handTarget.localScale = Vector3.one;
+            }
+
+            PrefabUtility.RecordPrefabInstancePropertyModifications(handTarget);
             return handTarget;
         }
 
         private static RetargetedBoneTargets AddRetargetedBoneTargetComponent(GameObject mainParent,
             RetargetedBoneTarget[] boneTargetsArray)
         {
-            RetargetedBoneTargets retargetedBoneTargets =
-                mainParent.AddComponent<RetargetedBoneTargets>();
-            Undo.RegisterCreatedObjectUndo(retargetedBoneTargets, "Add RT bone targets");
+            RetargetedBoneTargets retargetedBoneTargets = mainParent.GetComponent<RetargetedBoneTargets>();
+            if (retargetedBoneTargets == null)
+            {
+                retargetedBoneTargets =
+                    mainParent.AddComponent<RetargetedBoneTargets>();
+                Undo.RegisterCreatedObjectUndo(retargetedBoneTargets, "Add RT bone targets");
+            }
 
-            retargetedBoneTargets.AutoAddTo = mainParent.GetComponent<MonoBehaviour>();
+            retargetedBoneTargets.AutoAddTo = mainParent.GetComponent<RetargetingLayer>();
             retargetedBoneTargets.RetargetedBoneTargetsArray = boneTargetsArray;
 
+            PrefabUtility.RecordPrefabInstancePropertyModifications(retargetedBoneTargets);
             return retargetedBoneTargets;
         }
 
         private static TwoBoneIKConstraint AddTwoBoneIKConstraint(
             GameObject rigObject, string name, Transform root,
-            Transform mid, Transform tip, Transform target)
+            Transform mid, Transform tip, Transform target, Transform hint)
         {
             TwoBoneIKConstraint twoBoneIKConstraint = null;
             Transform twoBoneIKConstraintObjTransform = rigObject.transform.Find(name);
@@ -387,17 +531,8 @@ namespace Oculus.Movement.Utils
                     new GameObject(name);
                 twoBoneIKConstraint =
                     twoBoneIKConstraintObj.AddComponent<TwoBoneIKConstraint>();
-                twoBoneIKConstraint.data.root = root;
-                twoBoneIKConstraint.data.mid = mid;
-                twoBoneIKConstraint.data.tip = tip;
-                twoBoneIKConstraint.data.target = target;
-                twoBoneIKConstraint.data.maintainTargetPositionOffset = false;
-                twoBoneIKConstraint.data.maintainTargetRotationOffset = false;
-                twoBoneIKConstraint.data.targetRotationWeight = 0.0f;
-                twoBoneIKConstraint.data.targetPositionWeight = 1.0f;
-                twoBoneIKConstraint.data.hintWeight = 1.0f;
-                Undo.RegisterCreatedObjectUndo(twoBoneIKConstraintObj, "Create Two Bone IK " + name);
-
+                Undo.RegisterCreatedObjectUndo(twoBoneIKConstraintObj,
+                    $"Create Two Bone IK {name}");
                 Undo.SetTransformParent(twoBoneIKConstraintObj.transform, rigObject.transform,
                     $"Add TwoBone IK {name} Constraint to Rig");
                 Undo.RegisterCompleteObjectUndo(twoBoneIKConstraintObj,
@@ -406,6 +541,22 @@ namespace Oculus.Movement.Utils
                 twoBoneIKConstraintObj.transform.localRotation = Quaternion.identity;
                 twoBoneIKConstraintObj.transform.localScale = Vector3.one;
             }
+            else
+            {
+                twoBoneIKConstraint = twoBoneIKConstraintObjTransform.GetComponent<TwoBoneIKConstraint>();
+            }
+
+            twoBoneIKConstraint.data.root = root;
+            twoBoneIKConstraint.data.mid = mid;
+            twoBoneIKConstraint.data.tip = tip;
+            twoBoneIKConstraint.data.hint = hint;
+            twoBoneIKConstraint.data.target = target;
+            twoBoneIKConstraint.data.maintainTargetPositionOffset = false;
+            twoBoneIKConstraint.data.maintainTargetRotationOffset = false;
+            twoBoneIKConstraint.data.targetRotationWeight = 0.0f;
+            twoBoneIKConstraint.data.targetPositionWeight = 1.0f;
+            twoBoneIKConstraint.data.hintWeight = 1.0f;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(twoBoneIKConstraint);
             return twoBoneIKConstraint;
         }
 
@@ -413,6 +564,21 @@ namespace Oculus.Movement.Utils
             GameObject mainParent, MonoBehaviour[] constraints, RetargetingLayer retargetingLayer,
             CustomMappings.BodyTrackingBoneId boneIdToTest, Transform headTransform)
         {
+            var blendHandConstraints = mainParent.GetComponentsInChildren<BlendHandConstraints>();
+            foreach (var blendHandConstraint in blendHandConstraints)
+            {
+                if (blendHandConstraint.BoneIdToTest == boneIdToTest)
+                {
+                    blendHandConstraint.RetargetingLayerComp = retargetingLayer;
+                    blendHandConstraint.BoneIdToTest = boneIdToTest;
+                    blendHandConstraint.HeadTransform = headTransform;
+                    blendHandConstraint.AutoAddTo = mainParent.GetComponent<RetargetingLayer>();
+                    blendHandConstraint.BlendCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(blendHandConstraint);
+                    return blendHandConstraint;
+                }
+            }
+
             BlendHandConstraints blendConstraint =
                 mainParent.AddComponent<BlendHandConstraints>();
             Undo.RegisterCreatedObjectUndo(blendConstraint, "Add blend constraint");

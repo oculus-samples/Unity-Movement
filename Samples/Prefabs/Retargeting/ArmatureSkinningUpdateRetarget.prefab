@@ -275,6 +275,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
+    _customSkeleton: {fileID: 0}
+    _animator: {fileID: 4325497552437736820}
+    _spineTranslationCorrectionType: 3
     _spineAlignmentWeight: 1
     _leftShoulderWeight: 0.75
     _rightShoulderWeight: 0.75
@@ -282,9 +285,6 @@ MonoBehaviour:
     _rightArmWeight: 1
     _leftHandWeight: 1
     _rightHandWeight: 1
-    _spineTranslationCorrectionType: 3
-    _customSkeleton: {fileID: 0}
-    _animator: {fileID: 4325497552437736820}
     _hipsToHeadBones:
     - {fileID: 24668466978050337}
     - {fileID: 4136407814712997250}
@@ -1340,6 +1340,14 @@ MonoBehaviour:
   _updateRootScale: 0
   _enablePhysicsCapsules: 0
   _applyBoneTranslations: 1
+  _adjustments:
+  - Joint: 0
+    RotationChange: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    BoneIdOverrideValue: 71
+  _bodySectionsToAlign: 0400000006000000050000000700000008000000090000000a0000000b000000
+  _bodySectionToPosition: 0400000006000000050000000700000008000000090000000a0000000b000000
   _correctPositionsLateUpdate: 1
   _leftHandCorrectionWeightLateUpdate: 1
   _rightHandCorrectionWeightLateUpdate: 1
