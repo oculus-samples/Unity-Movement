@@ -1207,6 +1207,10 @@ namespace Oculus.Movement
             "Allow correcting rotations in LateUpdate. This can produce more " +
             "accurate hands, for instance.";
 
+        public const string ShoulderCorrectionWeightLateUpdate =
+            "Allow correcting shoulder transforms in LateUpdate. This can produce more " +
+            "accurate shoulders, for instance.";
+
         public const string ApplyAnimationConstraintsToCorrectedPositions =
             "Apply position offsets done by animation rigging constraints for corrected " +
             "positions. Due to the limited motion of humanoid avatars, this should be set if any " +
@@ -1286,6 +1290,9 @@ namespace Oculus.Movement
 
             public const string Target =
                 "The target transform to update with the retargeted bone data.";
+
+            public const string PositionOffset =
+                "The position offset from the target transform.";
         }
 
         public const string RetargetedBoneTargets =

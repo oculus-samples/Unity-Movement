@@ -1956,10 +1956,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ArmatureSkinningUpdateRetargetSkeletonProcessor
       objectReference: {fileID: 0}
-    - target: {fileID: 5579424741214871896, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
-      propertyPath: _rigToggleOnFocus
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8760844189829344787, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_RootOrder
       value: 0

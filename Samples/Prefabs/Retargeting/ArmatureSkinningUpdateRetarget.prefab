@@ -1351,6 +1351,7 @@ MonoBehaviour:
   _correctPositionsLateUpdate: 1
   _leftHandCorrectionWeightLateUpdate: 1
   _rightHandCorrectionWeightLateUpdate: 1
+  _shoulderCorrectionWeightLateUpdate: 0
   _applyAnimationConstraintsToCorrectedPositions: 1
   _enableTrackingByProxy: 0
   _retargetingAnimationConstraint: {fileID: 318886850}

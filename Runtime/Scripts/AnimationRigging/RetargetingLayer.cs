@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
 
 namespace Oculus.Movement.AnimationRigging
@@ -122,6 +123,19 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _rightHandCorrectionWeightLateUpdate;
             set => _rightHandCorrectionWeightLateUpdate = value;
+        }
+
+        /// <summary>
+        /// Allow correcting shoulder transforms in LateUpdate. This can produce more
+        /// accurate shoulders, for instance.
+        /// </summary>
+        [Tooltip(RetargetingLayerTooltips.ShoulderCorrectionWeightLateUpdate)]
+        [SerializeField, Range(0.0f, 1.0f)]
+        protected float _shoulderCorrectionWeightLateUpdate = 1.0f;
+        public float ShoulderCorrectionWeightLateUpdate
+        {
+            get => _shoulderCorrectionWeightLateUpdate;
+            set => _shoulderCorrectionWeightLateUpdate = value;
         }
 
         /// <summary>
@@ -454,7 +468,7 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             CorrectBones();
-            // apply constraints on character after fixing positions.
+            // Apply constraints on character after fixing positions.
             RunConstraints();
         }
 
@@ -538,6 +552,8 @@ namespace Oculus.Movement.AnimationRigging
                     bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.RightHand ||
                     humanBodyBone == HumanBodyBones.RightHand;
                 bool isHandJoint = isLeftHandFingersOrWrist || isRightHandFingersOrWrist;
+                bool isShoulderJoint = humanBodyBone == HumanBodyBones.LeftShoulder ||
+                                      humanBodyBone == HumanBodyBones.RightShoulder;
 
                 // Pick the correct hand correction weight based on handedness.
                 float handWeight = isLeftHandFingersOrWrist ?
@@ -552,6 +568,14 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 float rtWeight = _retargetingAnimationConstraint.weight;
+                if (isShoulderJoint)
+                {
+                    CorrectShoulders(targetJoint,
+                        Bones[i].Transform.rotation,
+                        targetData.CorrectionQuaternion.Value,
+                        GetRotationTweak(humanBodyBone),
+                        adjustment);
+                }
                 if (adjustment == null)
                 {
                     if (handCorrectionTurnedOn && isHandJoint)
@@ -592,6 +616,38 @@ namespace Oculus.Movement.AnimationRigging
                                 currentOVRBonePosition + positionOffset, rtWeight);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Correct the shoulders rotation to not be restricted by muscle space.
+        /// </summary>
+        protected virtual void CorrectShoulders(Transform targetJoint,
+            Quaternion boneRotation,
+            Quaternion correctionQuaternion,
+            Quaternion rotationTweak,
+            JointAdjustment adjustment)
+        {
+            // Restore the child transform when correcting shoulders.
+            var childJoint = targetJoint.GetChild(0);
+            var childAffineTransform = new AffineTransform
+            {
+                rotation = childJoint != null ? childJoint.rotation : Quaternion.identity,
+                translation = childJoint != null ? childJoint.position : Vector3.zero
+            };
+            var targetWeight = adjustment != null && adjustment.DisableRotationTransform ?
+                0.0f : _shoulderCorrectionWeightLateUpdate;
+            var rotationChange = adjustment != null ? adjustment.RotationChange : Quaternion.identity;
+            targetJoint.rotation =
+                Quaternion.Slerp(targetJoint.rotation,
+                    boneRotation *
+                    correctionQuaternion * rotationTweak,
+                    targetWeight) *
+                    rotationChange;
+            if (childJoint != null)
+            {
+                childJoint.SetPositionAndRotation(childAffineTransform.translation,
+                    childAffineTransform.rotation);
             }
         }
 

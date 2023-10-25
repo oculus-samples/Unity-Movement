@@ -6903,14 +6903,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 208026090, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
-      propertyPath: _rigToggleOnFocus
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 208026092, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
-      propertyPath: _enableTrackingByProxy
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3817605947884828321, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
       propertyPath: m_RootOrder
       value: 12
@@ -6955,10 +6947,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4325497552437736820, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 85eae303c9a1e5a4e84fbb0db6233a81, type: 2}
     - target: {fileID: 6442339640571472327, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
       propertyPath: m_Name
       value: ArmatureSkinningUpdateRetargetUser
