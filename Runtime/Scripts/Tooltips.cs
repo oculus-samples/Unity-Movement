@@ -1211,23 +1211,31 @@ namespace Oculus.Movement
             "Allow correcting shoulder transforms in LateUpdate. This can produce more " +
             "accurate shoulders, for instance.";
 
+        public const string HandIKType =
+            "The type of IK that should be applied to modify the arm bones toward the " +
+            "correct hand target.";
+
+        public const string IKTolerance =
+            "The maximum distance between the resulting position and target position that is allowed.";
+
+        public const string IKIterations =
+            "The maximum number of iterations allowed for the IK algorithm..";
+
         public const string ApplyAnimationConstraintsToCorrectedPositions =
             "Apply position offsets done by animation rigging constraints for corrected " +
             "positions. Due to the limited motion of humanoid avatars, this should be set if any " +
             "animation rigging constraints are applied after the retargeting job runs.";
-
-        public const string BonesToExcludeDuringCorrection =
-            "Bones to exclude when correcting positions. " +
-            "This can be necessary if you use a constraint that affects a specific bone, " +
-            "and the correction mask might include it.";
 
         public const string EnableTrackingByProxy =
             "Create proxy transforms that track the skeletal bones. If the " +
             "skeletal bone transforms change, that won't necessitate creating new " +
             "proxy transforms in most cases.";
 
-        public const string RetargetingAnimationContraint =
+        public const string RetargetingAnimationConstraint =
             "Related retargeting constraint.";
+
+        public const string RetargetingProcessors =
+            "List of retargeting processors, which run in late update after retargeting and animation rigging.";
 
         public const string JointRotationTweaks =
             "Joint rotation tweaks array.";

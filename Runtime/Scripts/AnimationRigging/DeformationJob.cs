@@ -180,6 +180,16 @@ namespace Oculus.Movement.AnimationRigging
         public Vector3 RightShoulderOriginalLocalPos;
 
         /// <summary>
+        /// The lower arm to hand axis for the left arm.
+        /// </summary>
+        public Vector3 LeftLowerArmToHandAxis;
+
+        /// <summary>
+        /// The lower arm to hand axis for the right arm.
+        /// </summary>
+        public Vector3 RightLowerArmToHandAxis;
+
+        /// <summary>
         /// The hips index in the bone pair data.
         /// </summary>
         public int HipsIndex;
@@ -528,17 +538,26 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Interpolates the hand positions from the pre-deformation positions to the positions after skeletal
-        /// proportions are enforced.
+        /// Interpolates the hand positions from the pre-deformation positions to positions relative to
+        /// its elbows after skeletal proportions are enforced.
         /// </summary>
         /// <param name="stream">The animation stream.</param>
         /// <param name="weight">The weight of this operation.</param>
         private void InterpolateHands(AnimationStream stream, float weight)
         {
-            var leftHandPos = LeftHandBone.GetPosition(stream);
-            var rightHandPos = RightHandBone.GetPosition(stream);
             var leftHandOffsetWeight = weight * LeftHandOffsetWeight.Get(stream);
             var rightHandOffsetWeight = weight * RightHandOffsetWeight.Get(stream);
+
+            var leftHandPos = LeftHandBone.GetPosition(stream);
+            var leftElbowPos = LeftLowerArmBone.GetPosition(stream);
+            var leftElbowDir = LeftLowerArmBone.GetRotation(stream) * LeftLowerArmToHandAxis;
+            leftHandPos = leftElbowPos + leftElbowDir * Vector3.Distance(leftHandPos, leftElbowPos);
+
+            var rightHandPos = RightHandBone.GetPosition(stream);
+            var rightElbowPos = RightLowerArmBone.GetPosition(stream);
+            var rightElbowDir = RightLowerArmBone.GetRotation(stream) * RightLowerArmToHandAxis;
+            rightHandPos = rightElbowPos + rightElbowDir * Vector3.Distance(rightHandPos, rightElbowPos);
+
             LeftHandBone.SetPosition(stream,
                 Vector3.Lerp(_preDeformationLeftHandPos, leftHandPos, leftHandOffsetWeight));
             RightHandBone.SetPosition(stream,
@@ -647,6 +666,8 @@ namespace Oculus.Movement.AnimationRigging
 
             job.LeftShoulderOriginalLocalPos = data.LeftArm.ShoulderLocalPos;
             job.RightShoulderOriginalLocalPos = data.RightArm.ShoulderLocalPos;
+            job.LeftLowerArmToHandAxis = data.LeftArm.LowerArmToHandAxis;
+            job.RightLowerArmToHandAxis = data.RightArm.LowerArmToHandAxis;
             job.HipsIndex = (int)HumanBodyBones.Hips;
             job.SpineIndex = job.HipsIndex + 1;
             job.HeadIndex = data.HipsToHeadBones.Length - 1;

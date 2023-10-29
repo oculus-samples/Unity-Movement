@@ -109,9 +109,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <summary>
         /// Update the bone targets with the retargeted bone transform data.
-        /// This should be used with <see cref="RetargetingLayer.SkeletonPostProcessing" />.
+        /// This should be used with <see cref="RetargetingLayer.SkeletonPostProcessingEv" />.
         /// </summary>
-        /// <param name="bones"></param>
+        /// <param name="skeleton"></param>
         public void ProcessSkeleton(OVRSkeleton skeleton)
         {
             IList<OVRBone> bones = skeleton.Bones;

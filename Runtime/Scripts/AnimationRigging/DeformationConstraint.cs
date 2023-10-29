@@ -76,13 +76,19 @@ namespace Oculus.Movement.AnimationRigging
         public Vector3 ShoulderLocalPos;
 
         /// <summary>
+        /// The axis of the lower arm to the hand.
+        /// </summary>
+        public Vector3 LowerArmToHandAxis;
+
+        /// <summary>
         /// Indicates if initialized or not.
         /// </summary>
         /// <returns></returns>
         public bool IsInitialized =>
             UpperArmBone != null &&
             LowerArmBone != null &&
-            HandBone != null;
+            HandBone != null &&
+            LowerArmToHandAxis != Vector3.zero;
 
         /// <summary>
         /// Resets all tracked transforms to null.
@@ -582,13 +588,18 @@ namespace Oculus.Movement.AnimationRigging
         public void SetUpLeftArmData()
         {
             var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder);
+            var upperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper);
+            var lowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower);
+            var handBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftHandWrist);
             _leftArmData = new ArmPosData()
             {
                 ShoulderBone = shoulder,
-                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper),
-                LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower),
-                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftHandWrist),
-                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero
+                UpperArmBone = upperArmBone,
+                LowerArmBone = lowerArmBone,
+                HandBone = handBone,
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero,
+                LowerArmToHandAxis =
+                    lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
         }
 
@@ -596,13 +607,18 @@ namespace Oculus.Movement.AnimationRigging
         public void SetUpRightArmData()
         {
             var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder);
+            var upperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper);
+            var lowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower);
+            var handBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightHandWrist);
             _rightArmData = new ArmPosData()
             {
                 ShoulderBone = shoulder,
-                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper),
-                LowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower),
-                HandBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightHandWrist),
-                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero
+                UpperArmBone = upperArmBone,
+                LowerArmBone = lowerArmBone,
+                HandBone = handBone,
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero,
+                LowerArmToHandAxis =
+                    lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
         }
 

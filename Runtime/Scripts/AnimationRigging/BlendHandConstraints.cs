@@ -31,12 +31,20 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Interface(typeof(IRigConstraint))]
         [Tooltip(BlendHandConstraintsTooltips.Constraints)]
         private MonoBehaviour[] _constraints;
+        /// <inheritdoc cref="_constraints"/>
+        public MonoBehaviour[] Constraints
+        {
+            get => _constraints;
+            set => _constraints = value;
+        }
 
         /// <summary>
         /// The character's retargeting layer.
         /// </summary>
         [SerializeField]
+        [Tooltip(BlendHandConstraintsTooltips.RetargetingLayer)]
         private RetargetingLayer _retargetingLayer;
+        /// <inheritdoc cref="_retargetingLayer"/>
         public RetargetingLayer RetargetingLayerComp
         {
             get => _retargetingLayer;
@@ -132,7 +140,8 @@ namespace Oculus.Movement.AnimationRigging
 
         private IRigConstraint[] _iRigConstraints;
         private Transform _cachedTransform;
-        private float _cachedConstraintWeight = 0.0f;
+        private float _cachedConstraintWeight;
+        private RetargetingProcessorCorrectBones _retargetingProcessorCorrectBones;
 
         /// <summary>
         /// Adds constraint. Valid for use via editor scripts only.
@@ -164,8 +173,10 @@ namespace Oculus.Movement.AnimationRigging
 
         private void Awake()
         {
-            Assert.IsTrue(_constraints != null && _constraints.Length > 0);
-            UpdateSkeletalConstraintInterfaceReferences();
+            if (_constraints.Length > 0)
+            {
+                UpdateSkeletalConstraintInterfaceReferences();
+            }
 
             Assert.IsNotNull(_retargetingLayer);
             Assert.IsNotNull(_headTransform);
@@ -193,6 +204,16 @@ namespace Oculus.Movement.AnimationRigging
             {
                 aggregator.AddProcessor(this);
             }
+
+            foreach (var retargetingProcessor in _retargetingLayer.RetargetingProcessors)
+            {
+                var correctBonesProcessor = retargetingProcessor as RetargetingProcessorCorrectBones;
+                if (correctBonesProcessor != null)
+                {
+                    _retargetingProcessorCorrectBones = correctBonesProcessor;
+                    break;
+                }
+            }
         }
 
         /// <summary>
@@ -219,17 +240,21 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             float constraintWeight = ComputeCurrentConstraintWeight(skeleton);
-            foreach (var constraint in _iRigConstraints)
+            if (_iRigConstraints != null)
             {
-                constraint.weight = Mathf.Min(constraintWeight, _maxWeight);
+                foreach (var constraint in _iRigConstraints)
+                {
+                    constraint.weight = Mathf.Min(constraintWeight, _maxWeight);
+                }
             }
+
             if (IsLeftSideOfBody())
             {
-                _retargetingLayer.LeftHandCorrectionWeightLateUpdate = constraintWeight;
+                _retargetingProcessorCorrectBones.LeftHandCorrectionWeightLateUpdate = constraintWeight;
             }
             else
             {
-                _retargetingLayer.RightHandCorrectionWeightLateUpdate = constraintWeight;
+                _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = constraintWeight;
             }
         }
 

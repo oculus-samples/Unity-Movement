@@ -70,71 +70,27 @@ namespace Oculus.Movement.Utils
 
             Animator animatorComp = activeGameObject.GetComponent<Animator>();
 
+            // Destroy old components
+            DestroyBoneTarget(rigObject, "LeftHandTarget");
+            DestroyBoneTarget(rigObject, "RightHandTarget");
+            DestroyBoneTarget(rigObject, "LeftElbowTarget");
+            DestroyBoneTarget(rigObject, "RightElbowTarget");
+            DestroyTwoBoneIKConstraint(rigObject, "LeftArmIK");
+            DestroyTwoBoneIKConstraint(rigObject, "RightArmIK");
+
             // Body deformation.
             RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
             DeformationConstraint deformationConstraint =
                 AddDeformationConstraint(rigObject, animatorComp, spineBoneTargets);
             constraintMonos.Add(deformationConstraint);
 
-            Transform leftElbowTarget = AddHandTarget(rigObject, "LeftElbowTarget", animatorComp.GetBoneTransform(HumanBodyBones.LeftLowerArm));
-            Transform leftHandTarget = AddHandTarget(rigObject, "LeftHandTarget", animatorComp.GetBoneTransform(HumanBodyBones.LeftHand));
-            TwoBoneIKConstraint leftTwoBoneIKConstraint =
-                AddTwoBoneIKConstraint(rigObject, "LeftArmIK",
-                    animatorComp.GetBoneTransform(HumanBodyBones.LeftUpperArm),
-                    animatorComp.GetBoneTransform(HumanBodyBones.LeftLowerArm),
-                    animatorComp.GetBoneTransform(HumanBodyBones.LeftHand),
-                    leftHandTarget, leftElbowTarget);
-            Undo.SetTransformParent(leftHandTarget, leftTwoBoneIKConstraint.transform,
-                "Parent Left Hand to Two-Bone IK");
-            Undo.SetTransformParent(leftElbowTarget, leftTwoBoneIKConstraint.transform,
-                "Parent Left Elbow to Two-Bone IK");
+            AddRetargetedBoneTargetComponent(activeGameObject, spineBoneTargets);
 
-            Transform rightElbowTarget = AddHandTarget(rigObject, "RightElbowTarget", animatorComp.GetBoneTransform(HumanBodyBones.RightLowerArm));
-            Transform rightHandTarget = AddHandTarget(rigObject, "RightHandTarget", animatorComp.GetBoneTransform(HumanBodyBones.RightHand));
-            TwoBoneIKConstraint rightTwoBoneIKConstraint =
-                AddTwoBoneIKConstraint(rigObject, "RightArmIK",
-                    animatorComp.GetBoneTransform(HumanBodyBones.RightUpperArm),
-                    animatorComp.GetBoneTransform(HumanBodyBones.RightLowerArm),
-                    animatorComp.GetBoneTransform(HumanBodyBones.RightHand),
-                    rightHandTarget, rightElbowTarget);
-            Undo.SetTransformParent(rightHandTarget, rightTwoBoneIKConstraint.transform,
-                "Parent Right Hand to Two-Bone IK");
-            Undo.SetTransformParent(rightElbowTarget, rightTwoBoneIKConstraint.transform,
-                "Parent Right Elbow to Two-Bone IK");
-
-            RetargetedBoneTarget leftHandRTTarget = new RetargetedBoneTarget
-            {
-                BoneId = OVRSkeleton.BoneId.Body_LeftHandWrist, Target = leftHandTarget,
-                HumanBodyBone = HumanBodyBones.LeftHand
-            };
-            RetargetedBoneTarget leftElbowRTTarget = new RetargetedBoneTarget
-            {
-                BoneId = OVRSkeleton.BoneId.Body_LeftArmLower, Target = leftElbowTarget,
-                HumanBodyBone = HumanBodyBones.LeftLowerArm
-            };
-            RetargetedBoneTarget rightHandRTTarget = new RetargetedBoneTarget
-            {
-                BoneId = OVRSkeleton.BoneId.Body_RightHandWrist, Target = rightHandTarget,
-                HumanBodyBone = HumanBodyBones.RightHand
-            };
-            RetargetedBoneTarget rightElbowRTTarget = new RetargetedBoneTarget
-            {
-                BoneId = OVRSkeleton.BoneId.Body_RightArmLower, Target = rightElbowTarget,
-                HumanBodyBone = HumanBodyBones.RightLowerArm
-            };
-
-            var retargetedBoneTargets = new List<RetargetedBoneTarget>
-            {
-                leftHandRTTarget, rightHandRTTarget, leftElbowRTTarget, rightElbowRTTarget
-            };
-            retargetedBoneTargets.AddRange(spineBoneTargets);
-            AddRetargetedBoneTargetComponent(activeGameObject, retargetedBoneTargets.ToArray());
-
-            AddHandBlendConstraint(activeGameObject, new MonoBehaviour[] { leftTwoBoneIKConstraint },
+            AddHandBlendConstraint(activeGameObject, null,
                 retargetingLayer, CustomMappings.BodyTrackingBoneId.Body_LeftHandWrist,
                 animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
-            AddHandBlendConstraint(activeGameObject, new MonoBehaviour[] { rightTwoBoneIKConstraint },
+            AddHandBlendConstraint(activeGameObject, null,
                 retargetingLayer, CustomMappings.BodyTrackingBoneId.Body_RightHandWrist,
                 animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
@@ -467,38 +423,16 @@ namespace Oculus.Movement.Utils
             return deformationConstraint;
         }
 
-        private static Transform AddHandTarget(GameObject mainParent,
-            string nameOfTarget, Transform targetTransform = null)
+        private static bool DestroyBoneTarget(GameObject mainParent, string nameOfTarget)
         {
             Transform handTarget =
                 mainParent.transform.FindChildRecursive(nameOfTarget);
-            if (handTarget == null)
+            if (handTarget != null)
             {
-                GameObject handTargetObject =
-                    new GameObject(nameOfTarget);
-                Undo.RegisterCreatedObjectUndo(handTargetObject,
-                    $"Create Hand Target {nameOfTarget}");
-                Undo.SetTransformParent(handTargetObject.transform, mainParent.transform,
-                    $"Add Hand Target {nameOfTarget} To Main Parent");
-                Undo.RegisterCompleteObjectUndo(handTargetObject,
-                    $"Hand Target {nameOfTarget} Transform Init");
-                handTarget = handTargetObject.transform;
+                Undo.DestroyObjectImmediate(handTarget);
+                return true;
             }
-            if (targetTransform != null)
-            {
-                handTarget.position = targetTransform.position;
-                handTarget.rotation = targetTransform.rotation;
-                handTarget.localScale = targetTransform.localScale;
-            }
-            else
-            {
-                handTarget.localPosition = Vector3.zero;
-                handTarget.localRotation = Quaternion.identity;
-                handTarget.localScale = Vector3.one;
-            }
-
-            PrefabUtility.RecordPrefabInstancePropertyModifications(handTarget);
-            return handTarget;
+            return false;
         }
 
         private static RetargetedBoneTargets AddRetargetedBoneTargetComponent(GameObject mainParent,
@@ -519,45 +453,15 @@ namespace Oculus.Movement.Utils
             return retargetedBoneTargets;
         }
 
-        private static TwoBoneIKConstraint AddTwoBoneIKConstraint(
-            GameObject rigObject, string name, Transform root,
-            Transform mid, Transform tip, Transform target, Transform hint)
+        private static bool DestroyTwoBoneIKConstraint(GameObject rigObject, string name)
         {
-            TwoBoneIKConstraint twoBoneIKConstraint = null;
             Transform twoBoneIKConstraintObjTransform = rigObject.transform.Find(name);
-            if (twoBoneIKConstraintObjTransform == null)
+            if (twoBoneIKConstraintObjTransform != null)
             {
-                GameObject twoBoneIKConstraintObj =
-                    new GameObject(name);
-                twoBoneIKConstraint =
-                    twoBoneIKConstraintObj.AddComponent<TwoBoneIKConstraint>();
-                Undo.RegisterCreatedObjectUndo(twoBoneIKConstraintObj,
-                    $"Create Two Bone IK {name}");
-                Undo.SetTransformParent(twoBoneIKConstraintObj.transform, rigObject.transform,
-                    $"Add TwoBone IK {name} Constraint to Rig");
-                Undo.RegisterCompleteObjectUndo(twoBoneIKConstraintObj,
-                    $"TwoBone IK Constraint {name} Transform Init");
-                twoBoneIKConstraintObj.transform.localPosition = Vector3.zero;
-                twoBoneIKConstraintObj.transform.localRotation = Quaternion.identity;
-                twoBoneIKConstraintObj.transform.localScale = Vector3.one;
+                Undo.DestroyObjectImmediate(twoBoneIKConstraintObjTransform);
+                return true;
             }
-            else
-            {
-                twoBoneIKConstraint = twoBoneIKConstraintObjTransform.GetComponent<TwoBoneIKConstraint>();
-            }
-
-            twoBoneIKConstraint.data.root = root;
-            twoBoneIKConstraint.data.mid = mid;
-            twoBoneIKConstraint.data.tip = tip;
-            twoBoneIKConstraint.data.hint = hint;
-            twoBoneIKConstraint.data.target = target;
-            twoBoneIKConstraint.data.maintainTargetPositionOffset = false;
-            twoBoneIKConstraint.data.maintainTargetRotationOffset = false;
-            twoBoneIKConstraint.data.targetRotationWeight = 0.0f;
-            twoBoneIKConstraint.data.targetPositionWeight = 1.0f;
-            twoBoneIKConstraint.data.hintWeight = 1.0f;
-            PrefabUtility.RecordPrefabInstancePropertyModifications(twoBoneIKConstraint);
-            return twoBoneIKConstraint;
+            return false;
         }
 
         private static BlendHandConstraints AddHandBlendConstraint(
@@ -569,6 +473,7 @@ namespace Oculus.Movement.Utils
             {
                 if (blendHandConstraint.BoneIdToTest == boneIdToTest)
                 {
+                    blendHandConstraint.Constraints = null;
                     blendHandConstraint.RetargetingLayerComp = retargetingLayer;
                     blendHandConstraint.BoneIdToTest = boneIdToTest;
                     blendHandConstraint.HeadTransform = headTransform;
@@ -583,10 +488,7 @@ namespace Oculus.Movement.Utils
                 mainParent.AddComponent<BlendHandConstraints>();
             Undo.RegisterCreatedObjectUndo(blendConstraint, "Add blend constraint");
 
-            foreach (MonoBehaviour constraint in constraints)
-            {
-                blendConstraint.AddSkeletalConstraint(constraint);
-            }
+            blendConstraint.Constraints = null;
             blendConstraint.RetargetingLayerComp = retargetingLayer;
             blendConstraint.BoneIdToTest = boneIdToTest;
             blendConstraint.HeadTransform = headTransform;
