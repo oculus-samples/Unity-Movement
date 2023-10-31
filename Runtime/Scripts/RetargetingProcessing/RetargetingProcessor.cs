@@ -15,6 +15,15 @@ namespace Oculus.Movement.AnimationRigging
         [Range(0.0f, 1.0f)]
         public float Weight = 1.0f;
 
+        /// <summary>
+        /// Deep copy data from another processor to this processor.
+        /// </summary>
+        /// <param name="source">The source processor to copy from.</param>
+        public virtual void CopyData(RetargetingProcessor source)
+        {
+            Weight = source.Weight;
+        }
+
         /// <inheritdoc />
         public virtual void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)
         {

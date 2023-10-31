@@ -21,6 +21,10 @@ namespace Oculus.Movement.AnimationRigging
     [CustomPropertyDrawer(typeof(RetargetingProcessor), true)]
     public class RetargetingProcessorScriptableObjectDrawer : PropertyDrawer
     {
+        private const int buttonWidth = 66;
+        private static readonly List<string> ignoreClassFullNames = new List<string> { "TMPro.TMP_FontAsset" };
+
+        /// <inheritdoc />
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             float totalHeight = EditorGUIUtility.singleLineHeight;
@@ -39,7 +43,10 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     do
                     {
-                        if (prop.name == "m_Script") continue;
+                        if (prop.name == "m_Script")
+                        {
+                            continue;
+                        }
                         var subProp = serializedObject.FindProperty(prop.name);
                         float height = EditorGUI.GetPropertyHeight(subProp, null, true) +
                                        EditorGUIUtility.standardVerticalSpacing;
@@ -55,10 +62,7 @@ namespace Oculus.Movement.AnimationRigging
             return totalHeight;
         }
 
-        const int buttonWidth = 66;
-
-        static readonly List<string> ignoreClassFullNames = new List<string> { "TMPro.TMP_FontAsset" };
-
+        /// <inheritdoc />
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
@@ -98,23 +102,62 @@ namespace Oculus.Movement.AnimationRigging
 
             var indentedPosition = EditorGUI.IndentedRect(position);
             var indentOffset = indentedPosition.x - position.x;
+            var saveToAssets = false;
+            var propertyWidth = buttonWidth;
             propertyRect = new Rect(position.x + (EditorGUIUtility.labelWidth - indentOffset), position.y,
                 position.width - (EditorGUIUtility.labelWidth - indentOffset), EditorGUIUtility.singleLineHeight);
 
-            if (propertySO != null || property.objectReferenceValue == null)
+            if (property.propertyType == SerializedPropertyType.ObjectReference &&
+                property.objectReferenceValue != null)
             {
-                propertyRect.width -= buttonWidth;
+                var data = (ScriptableObject)property.objectReferenceValue;
+                if (!AssetDatabase.Contains(data))
+                {
+                    saveToAssets = true;
+                    propertyWidth = Mathf.RoundToInt(buttonWidth * 1.5f);
+                }
+            }
+
+            if (propertySO != null || property.objectReferenceValue == null || saveToAssets)
+            {
+                propertyRect.width -= propertyWidth;
             }
 
             EditorGUI.ObjectField(propertyRect, property, type, GUIContent.none);
-            if (GUI.changed) property.serializedObject.ApplyModifiedProperties();
+            if (GUI.changed)
+            {
+                property.serializedObject.ApplyModifiedProperties();
+            }
 
-            var buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth,
+            var buttonRect = new Rect(position.x + position.width - propertyWidth, position.y, propertyWidth,
                 EditorGUIUtility.singleLineHeight);
 
             if (property.propertyType == SerializedPropertyType.ObjectReference && property.objectReferenceValue != null)
             {
                 var data = (ScriptableObject)property.objectReferenceValue;
+
+                if (saveToAssets)
+                {
+                    if (GUI.Button(buttonRect, "Save to Assets"))
+                    {
+                        string selectedAssetPath = "Assets";
+                        if (property.serializedObject.targetObject is MonoBehaviour)
+                        {
+                            MonoScript ms = MonoScript.FromMonoBehaviour((MonoBehaviour)property.serializedObject.targetObject);
+                            selectedAssetPath = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(ms));
+                        }
+
+                        var replacementObject = ReplaceAssetWithSavePrompt(data.GetType(), selectedAssetPath, data as RetargetingProcessor);
+                        if (replacementObject != null)
+                        {
+                            Undo.DestroyObjectImmediate(data);
+                            property.objectReferenceValue = replacementObject;
+                        }
+                        property.serializedObject.ApplyModifiedProperties();
+                        GUIUtility.ExitGUI();
+                        return;
+                    }
+                }
 
                 if (property.isExpanded)
                 {
@@ -137,7 +180,10 @@ namespace Oculus.Movement.AnimationRigging
                         do
                         {
                             // Don't bother drawing the class file
-                            if (prop.name == "m_Script") continue;
+                            if (prop.name == "m_Script")
+                            {
+                                continue;
+                            }
                             float height = EditorGUI.GetPropertyHeight(prop, new GUIContent(prop.displayName), true);
                             EditorGUI.PropertyField(new Rect(position.x, y, position.width - buttonWidth, height), prop,
                                 true);
@@ -146,7 +192,9 @@ namespace Oculus.Movement.AnimationRigging
                     }
 
                     if (GUI.changed)
+                    {
                         serializedObject.ApplyModifiedProperties();
+                    }
                     serializedObject.Dispose();
                     EditorGUI.indentLevel--;
                 }
@@ -163,6 +211,9 @@ namespace Oculus.Movement.AnimationRigging
                     }
 
                     property.objectReferenceValue = CreateAssetWithSavePrompt(type, selectedAssetPath);
+                    property.serializedObject.ApplyModifiedProperties();
+                    GUIUtility.ExitGUI();
+                    return;
                 }
             }
 
@@ -170,12 +221,12 @@ namespace Oculus.Movement.AnimationRigging
             EditorGUI.EndProperty();
         }
 
-        public static T _GUILayout<T>(string label, T objectReferenceValue, ref bool isExpanded) where T : ScriptableObject
+        private static T _GUILayout<T>(string label, T objectReferenceValue, ref bool isExpanded) where T : ScriptableObject
         {
             return _GUILayout<T>(new GUIContent(label), objectReferenceValue, ref isExpanded);
         }
 
-        public static T _GUILayout<T>(GUIContent label, T objectReferenceValue, ref bool isExpanded)
+        private static T _GUILayout<T>(GUIContent label, T objectReferenceValue, ref bool isExpanded)
             where T : ScriptableObject
         {
             Rect position = EditorGUILayout.BeginVertical();
@@ -239,7 +290,7 @@ namespace Oculus.Movement.AnimationRigging
             return objectReferenceValue;
         }
 
-        static void DrawScriptableObjectChildFields<T>(T objectReferenceValue) where T : ScriptableObject
+        private static void DrawScriptableObjectChildFields<T>(T objectReferenceValue) where T : ScriptableObject
         {
             // Draw a background that shows us clearly which fields are part of the ScriptableObject
             EditorGUI.indentLevel++;
@@ -259,13 +310,15 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             if (GUI.changed)
+            {
                 serializedObject.ApplyModifiedProperties();
+            }
             serializedObject.Dispose();
             EditorGUILayout.EndVertical();
             EditorGUI.indentLevel--;
         }
 
-        public static T DrawScriptableObjectField<T>(GUIContent label, T objectReferenceValue, ref bool isExpanded)
+        private static T DrawScriptableObjectField<T>(GUIContent label, T objectReferenceValue, ref bool isExpanded)
             where T : ScriptableObject
         {
             Rect position = EditorGUILayout.BeginVertical();
@@ -329,11 +382,14 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         // Creates a new ScriptableObject via the default Save File panel
-        static ScriptableObject CreateAssetWithSavePrompt(Type type, string path)
+        private static ScriptableObject CreateAssetWithSavePrompt(Type type, string path)
         {
             path = EditorUtility.SaveFilePanelInProject("Save ScriptableObject", type.Name + ".asset", "asset",
                 "Enter a file name for the ScriptableObject.", path);
-            if (path == "") return null;
+            if (path == "")
+            {
+                return null;
+            }
             ScriptableObject asset = ScriptableObject.CreateInstance(type);
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
@@ -343,16 +399,43 @@ namespace Oculus.Movement.AnimationRigging
             return asset;
         }
 
-        Type GetFieldType()
+        private static ScriptableObject ReplaceAssetWithSavePrompt(Type type, string path, RetargetingProcessor processor)
+        {
+            path = EditorUtility.SaveFilePanelInProject("Save ScriptableObject", processor.name + ".asset", "asset",
+                "Enter a file name for the ScriptableObject.", path);
+            if (path == "")
+            {
+                return null;
+            }
+            ScriptableObject asset = ScriptableObject.CreateInstance(type);
+            var newProcessor = asset as RetargetingProcessor;
+            if (newProcessor != null)
+            {
+                newProcessor.CopyData(processor);
+            }
+            AssetDatabase.CreateAsset(asset, path);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            EditorGUIUtility.PingObject(asset);
+            return asset;
+        }
+
+        private Type GetFieldType()
         {
             Type type = fieldInfo.FieldType;
-            if (type.IsArray) type = type.GetElementType();
+            if (type.IsArray)
+            {
+                type = type.GetElementType();
+            }
             else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            {
                 type = type.GetGenericArguments()[0];
+            }
             return type;
         }
 
-        static bool AreAnySubPropertiesVisible(SerializedProperty property)
+        private static bool AreAnySubPropertiesVisible(SerializedProperty property)
         {
             var data = (ScriptableObject)property.objectReferenceValue;
             SerializedObject serializedObject = new SerializedObject(data);

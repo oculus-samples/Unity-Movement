@@ -167,7 +167,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.RetargetingProcessors)]
-        protected List<RetargetingProcessor> _retargetingProcessors;
+        protected List<RetargetingProcessor> _retargetingProcessors = new();
         /// <inheritdoc cref="_retargetingProcessors"/>
         public List<RetargetingProcessor> RetargetingProcessors
         {
@@ -659,6 +659,15 @@ namespace Oculus.Movement.AnimationRigging
         public void RemoveProcessor(IOVRSkeletonProcessor processor)
         {
             _skeletonPostProcessing -= processor.ProcessSkeleton;
+        }
+
+        /// <summary>
+        /// Add the specified retargeting processor.
+        /// </summary>
+        /// <param name="processor">The processor to be added.</param>
+        public void AddRetargetingProcessor(RetargetingProcessor processor)
+        {
+            _retargetingProcessors.Add(processor);
         }
 
         /// <summary>

@@ -68,6 +68,22 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc />
+        public override void CopyData(RetargetingProcessor source)
+        {
+            base.CopyData(source);
+            var sourceCorrectBones = source as RetargetingProcessorCorrectBones;
+            if (sourceCorrectBones == null)
+            {
+                Debug.LogError($"Failed to copy properties from {source.name} processor to {name} processor");
+                return;
+            }
+            _correctPositionsLateUpdate = sourceCorrectBones.CorrectPositionsLateUpdate;
+            _shoulderCorrectionWeightLateUpdate = sourceCorrectBones.ShoulderCorrectionWeightLateUpdate;
+            _leftHandCorrectionWeightLateUpdate = sourceCorrectBones.LeftHandCorrectionWeightLateUpdate;
+            _rightHandCorrectionWeightLateUpdate = sourceCorrectBones.RightHandCorrectionWeightLateUpdate;
+        }
+
+        /// <inheritdoc />
         public override void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
         {
             if (Weight <= 0.0f)
@@ -76,8 +92,8 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             bool handCorrectionTurnedOn =
-                _leftHandCorrectionWeightLateUpdate > Mathf.Epsilon ||
-                _rightHandCorrectionWeightLateUpdate > Mathf.Epsilon;
+                LeftHandCorrectionWeightLateUpdate > Mathf.Epsilon ||
+                RightHandCorrectionWeightLateUpdate > Mathf.Epsilon;
 
             if (ovrBones == null)
             {

@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
 using Oculus.Movement.Tracking;
 using System;
@@ -97,6 +98,11 @@ namespace Oculus.Movement.Utils
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
                 constraintMonos.ToArray(), retargetingLayer);
+
+            // Add retargeting processors to the retargeting layer.
+            AddCorrectBonesRetargetingProcessor(retargetingLayer);
+            AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
+            AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
 
             Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
         }
@@ -298,6 +304,55 @@ namespace Oculus.Movement.Utils
             rigSetup.ReEnableRig = true;
             rigSetup.RetargetingLayerComp = retargetingLayer;
             Undo.RegisterCreatedObjectUndo(rigSetup, "Create Anim Rig Setup");
+        }
+
+        private static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer)
+        {
+            bool needCorrectBones = true;
+            foreach (var processor in retargetingLayer.RetargetingProcessors)
+            {
+                if (processor as RetargetingProcessorCorrectBones != null)
+                {
+                    needCorrectBones = false;
+                }
+            }
+
+            if (needCorrectBones)
+            {
+                var retargetingProcessorCorrectBones = ScriptableObject.CreateInstance<RetargetingProcessorCorrectBones>();
+                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectBones, "Create correct bones retargeting processor.");
+                Undo.RecordObject (retargetingLayer, "Add retargeting processor to retargeting layer.");
+                retargetingProcessorCorrectBones.name = "CorrectBones";
+                retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectBones);
+            }
+        }
+
+        private static void AddCorrectHandRetargetingProcessor(RetargetingLayer retargetingLayer, Handedness handedness)
+        {
+            bool needCorrectHand = true;
+            foreach (var processor in retargetingLayer.RetargetingProcessors)
+            {
+                var correctHand = processor as RetargetingProcessorCorrectHand;
+                if (correctHand != null)
+                {
+                    if (correctHand.Handedness == handedness)
+                    {
+                        needCorrectHand = false;
+                    }
+                }
+            }
+
+            if (needCorrectHand)
+            {
+                var retargetingProcessorCorrectHand = ScriptableObject.CreateInstance<RetargetingProcessorCorrectHand>();
+                var handednessString = handedness == Handedness.Left ? "Left" : "Right";
+                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand ({handednessString}) retargeting processor.");
+                Undo.RecordObject (retargetingLayer, "Add retargeting processor to retargeting layer.");
+                retargetingProcessorCorrectHand.Handedness = handedness;
+                retargetingProcessorCorrectHand.HandIKType = RetargetingProcessorCorrectHand.IKType.CCDIK;
+                retargetingProcessorCorrectHand.name = $"Correct{handednessString}Hand";
+                retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectHand);
+            }
         }
 
         private static RetargetedBoneTarget[] AddSpineBoneTargets(GameObject rigObject,

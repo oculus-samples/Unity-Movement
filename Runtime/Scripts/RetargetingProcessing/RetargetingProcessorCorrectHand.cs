@@ -79,6 +79,22 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3 _originalHandPosition;
 
         /// <inheritdoc />
+        public override void CopyData(RetargetingProcessor source)
+        {
+            base.CopyData(source);
+            var sourceCorrectHand = source as RetargetingProcessorCorrectHand;
+            if (sourceCorrectHand == null)
+            {
+                Debug.LogError($"Failed to copy properties from {source.name} processor to {name} processor");
+                return;
+            }
+            _handedness = sourceCorrectHand.Handedness;
+            _handIKType = sourceCorrectHand.HandIKType;
+            _ikTolerance = sourceCorrectHand.IKTolerance;
+            _ikIterations = sourceCorrectHand.IKIterations;
+        }
+
+        /// <inheritdoc />
         public override void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)
         {
             // Skip the finger bones.
@@ -95,9 +111,9 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
-                if ((_handedness == Handedness.Left &&
-                    CustomMappings.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.LeftArm) ||
-                    (_handedness == Handedness.Right &&
+                if ((Handedness == Handedness.Left &&
+                     CustomMappings.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.LeftArm) ||
+                    (Handedness == Handedness.Right &&
                      CustomMappings.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.RightArm))
                 {
                     armBones.Add(boneTransform);
@@ -115,15 +131,15 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
         {
-            if ((_handedness == Handedness.Left &&
-                ovrBones.Count < (int)OVRSkeleton.BoneId.Body_LeftHandWrist) ||
-                (_handedness == Handedness.Right &&
-                ovrBones.Count < (int)OVRSkeleton.BoneId.Body_RightHandWrist))
+            if ((Handedness == Handedness.Left &&
+                 ovrBones.Count < (int)OVRSkeleton.BoneId.Body_LeftHandWrist) ||
+                (Handedness == Handedness.Right &&
+                 ovrBones.Count < (int)OVRSkeleton.BoneId.Body_RightHandWrist))
             {
                 return;
             }
 
-            var targetHand = ovrBones[_handedness == Handedness.Left ?
+            var targetHand = ovrBones[Handedness == Handedness.Left ?
                 (int)OVRSkeleton.BoneId.Body_LeftHandWrist :
                 (int)OVRSkeleton.BoneId.Body_RightHandWrist]?.Transform;
             if (targetHand == null)
@@ -137,9 +153,9 @@ namespace Oculus.Movement.AnimationRigging
             Vector3 targetPosition = Vector3.Lerp(handBone.position, targetHand.position, Weight);
             if (Weight > 0.0f)
             {
-                if (_handIKType == IKType.CCDIK)
+                if (HandIKType == IKType.CCDIK)
                 {
-                    AnimationUtilities.SolveCCDIK(_armBones, targetPosition, _ikTolerance, _ikIterations);
+                    AnimationUtilities.SolveCCDIK(_armBones, targetPosition, IKTolerance, IKIterations);
                 }
             }
             handBone.position = targetPosition;
