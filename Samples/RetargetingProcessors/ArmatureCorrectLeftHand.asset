@@ -17,3 +17,4 @@ MonoBehaviour:
   _handIKType: 1
   _ikTolerance: 0.000001
   _ikIterations: 10
+  _ikMaxStretch: 0.01

@@ -1215,6 +1215,9 @@ namespace Oculus.Movement
             "The type of IK that should be applied to modify the arm bones toward the " +
             "correct hand target.";
 
+        public const string MaxStretch =
+            "The maximum stretch for the hand to reach the target position that is allowed.";
+
         public const string IKTolerance =
             "The maximum distance between the resulting position and target position that is allowed.";
 

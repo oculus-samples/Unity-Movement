@@ -513,20 +513,6 @@ namespace Oculus.Movement.AnimationRigging
             var leftArmOffsetWeight = weight * LeftArmOffsetWeight.Get(stream);
             var rightArmOffsetWeight = weight * RightArmOffsetWeight.Get(stream);
 
-            if (LeftShoulderBone.IsValid(stream))
-            {
-                var leftShoulderPos = LeftShoulderBone.GetPosition(stream);
-                LeftShoulderBone.SetPosition(stream,
-                    Vector3.Lerp(_preDeformationLeftShoulderPos, leftShoulderPos, leftArmOffsetWeight));
-            }
-
-            if (RightShoulderBone.IsValid(stream))
-            {
-                var rightShoulderPos = RightShoulderBone.GetPosition(stream);
-                RightShoulderBone.SetPosition(stream,
-                    Vector3.Lerp(_preDeformationRightShoulderPos, rightShoulderPos, rightArmOffsetWeight));
-            }
-
             LeftUpperArmBone.SetPosition(stream,
                 Vector3.Lerp(_preDeformationLeftUpperArmPos, leftUpperArmPos, leftArmOffsetWeight));
             RightUpperArmBone.SetPosition(stream,

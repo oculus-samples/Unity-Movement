@@ -50,6 +50,19 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// The maximum stretch for the hand to reach the target position that is allowed.
+        /// </summary>
+        [Tooltip(RetargetingLayerTooltips.MaxStretch)]
+        [SerializeField]
+        private float _maxStretch = 0.01f;
+        /// <inheritdoc cref="_maxStretch" />
+        public float MaxStretch
+        {
+            get => _maxStretch;
+            set => _maxStretch = value;
+        }
+
+        /// <summary>
         /// The maximum distance between the resulting position and target position that is allowed.
         /// </summary>
         [Tooltip(RetargetingLayerTooltips.IKTolerance)]
@@ -158,7 +171,7 @@ namespace Oculus.Movement.AnimationRigging
                     AnimationUtilities.SolveCCDIK(_armBones, targetPosition, IKTolerance, IKIterations);
                 }
             }
-            handBone.position = targetPosition;
+            handBone.position = Vector3.MoveTowards(handBone.position, targetPosition, MaxStretch);
             handBone.rotation = handRotation;
         }
     }
