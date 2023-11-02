@@ -987,6 +987,36 @@ namespace Oculus.Movement
             "The range from the hip pinning target before hip pinning is disabled.";
     }
 
+    public static class CaptureAnimationDataTooltips
+    {
+        public const string ConstraintAnimator =
+            "The animator used by the constraint.";
+
+        public const string TargetAnimatorLayer =
+            "The target animator layer to capture animations on.";
+
+        public const string ReferencePoseTime =
+            "The normalized time from which the reference pose should be captured from.";
+
+        public const string ReferencePose =
+            "The bone data for the reference pose.";
+
+        public const string CurrentPose =
+            "The bone data for the current pose.";
+    }
+
+    public static class PlaybackAnimationDataTooltips
+    {
+        public const string AnimationPlaybackType =
+            "The animation playback type.";
+
+        public const string SourceConstraint =
+            "The capture animation constraint to source animation data from.";
+
+        public const string AvatarMask =
+            "The avatar mask for masking the animation.";
+    }
+
     public static class AnimationRigSetupTooltips
     {
         public const string Skeleton =
