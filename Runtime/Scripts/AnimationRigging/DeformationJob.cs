@@ -405,22 +405,14 @@ namespace Oculus.Movement.AnimationRigging
         {
             var headOffset = _targetHeadPos - HeadBone.GetPosition(stream);
 
-            // Separate head offset application to upper and lower body.
-            var upperBodyProportion = 0.0f;
-            for (int i = HipsIndex; i <= HeadIndex; i++)
-            {
-                upperBodyProportion += BoneAnimData[i].HeightProportion;
-            }
-            var lowerBodyProportion = 1 - upperBodyProportion;
-
             // Upper body.
-            UpperBodyOffsets[HipsIndex] = headOffset * (lowerBodyProportion + BoneAnimData[HipsIndex].HeightProportion);
+            UpperBodyOffsets[HipsIndex] = headOffset;
             UpperBodyTargetPositions[HipsIndex] = HipsBone.GetPosition(stream) +
                                                   Vector3.Lerp(Vector3.zero, UpperBodyOffsets[HipsIndex], weight);
             for (int i = SpineIndex; i <= HeadIndex; i++)
             {
                 var bone = HipsToHeadBones[i];
-                UpperBodyOffsets[i] = UpperBodyOffsets[i - 1] + headOffset * BoneAnimData[i].LimbProportion;
+                UpperBodyOffsets[i] = headOffset;
                 UpperBodyTargetPositions[i] = bone.GetPosition(stream) +
                                               Vector3.Lerp(Vector3.zero, UpperBodyOffsets[i], weight);
             }
