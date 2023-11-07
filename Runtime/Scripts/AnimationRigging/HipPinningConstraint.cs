@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
@@ -18,6 +19,11 @@ namespace Oculus.Movement.AnimationRigging
         public OVRCustomSkeleton ConstraintSkeleton { get; }
 
         /// <summary>
+        /// Animator component.
+        /// </summary>
+        public Animator AnimatorComponent { get; }
+
+        /// <summary>
         /// If true, update this job.
         /// </summary>
         public bool ShouldUpdate { get; set; }
@@ -33,9 +39,14 @@ namespace Oculus.Movement.AnimationRigging
         public HipPinningConstraintTarget CurrentHipPinningTarget { get; }
 
         /// <summary>
+        /// Has run calibration or not.
+        /// </summary>
+        public bool HasCalibrated { get; }
+
+        /// <summary>
         /// The bones that compose the skeleton.
         /// </summary>
-        public Transform[] Bones  { get; }
+        public Transform[] Bones { get; }
 
         /// <summary>
         /// The root bone of this transform.
@@ -68,6 +79,11 @@ namespace Oculus.Movement.AnimationRigging
         public bool IsFirstFrame { get; set; }
 
         /// <summary>
+        /// Indicates if the constraint has been set up or not.
+        /// </summary>
+        public bool ObtainedProperReferences { get; }
+
+        /// <summary>
         /// Event when the user enters a hip pinning area.
         /// </summary>
         public event Action<HipPinningConstraintTarget> OnEnterHipPinningArea;
@@ -92,6 +108,24 @@ namespace Oculus.Movement.AnimationRigging
         /// Called when the user leaves a hip pinning area.
         /// </summary>
         public void ExitHipPinningArea(HipPinningConstraintTarget target);
+
+        /// <summary>
+        /// Returns hip transform.
+        /// </summary>
+        /// <returns>Transform of the hip.</returns>
+        public Transform GetHipTransform();
+
+        /// <summary>
+        /// Indicates if bone transforms are valid or not.
+        /// </summary>
+        /// <returns>True if so, false if not.</returns>
+        public bool IsBoneTransformsDataValid();
+
+        /// <summary>
+        /// Retrieves index of bone above hips.
+        /// </summary>
+        /// <returns>Index of bone above hips.</returns>
+        public int GetIndexOfFirstBoneAboveHips();
     }
 
     /// <summary>
@@ -104,6 +138,9 @@ namespace Oculus.Movement.AnimationRigging
         // Interface implementation
         /// <inheritdoc />
         OVRCustomSkeleton IHipPinningData.ConstraintSkeleton => _skeleton;
+
+        /// <inheritdoc />
+        Animator IHipPinningData.AnimatorComponent => _animator;
 
         /// <inheritdoc />
         bool IHipPinningData.ShouldUpdate
@@ -128,6 +165,9 @@ namespace Oculus.Movement.AnimationRigging
         Vector3 IHipPinningData.CalibratedHipPos => _calibratedHipTranslation;
 
         /// <inheritdoc />
+        bool IHipPinningData.HasCalibrated => _hasCalibrated;
+
+        /// <inheritdoc />
         Quaternion IHipPinningData.InitialHipLocalRotation => _initialHipLocalRotation;
 
         /// <inheritdoc />
@@ -143,6 +183,9 @@ namespace Oculus.Movement.AnimationRigging
             set => _isFirstFrame = value;
         }
 
+        /// <inheritdoc />
+        public bool ObtainedProperReferences => _obtainedProperReferences;
+
         /// <inheritdoc cref="IHipPinningData.EnterHipPinningArea"/>
         public event Action<HipPinningConstraintTarget> OnEnterHipPinningArea;
 
@@ -153,6 +196,11 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(HipPinningDataTooltips.Skeleton)]
         [NotKeyable, SerializeField]
         private OVRCustomSkeleton _skeleton;
+
+        /// <inheritdoc cref="IHipPinningData.AnimatorComponent"/>
+        [Tooltip(HipPinningDataTooltips.Animator)]
+        [NotKeyable, SerializeField]
+        private Animator _animator;
 
         /// <inheritdoc cref="IHipPinningData.HipPinningTargets"/>
         [Tooltip(HipPinningDataTooltips.HipPinningTargets)]
@@ -176,42 +224,59 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField]
         private float _hipPinningLeaveRange;
 
-        [SyncSceneToStream]
-        private Transform[] _bones;
-        private Vector3 _calibratedHipTranslation;
-        private Quaternion _initialHipLocalRotation;
-        private HipPinningConstraintTarget _currentHipPinningTarget;
+        /// <summary>
+        /// Root transform of skeleton.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, HideInInspector]
         private Transform _root;
+
+        /// <summary>
+        /// Array of skeletal bones.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, HideInInspector]
+        private Transform[] _bones;
+
+        /// <summary>
+        /// Indicates if all references have been obtained or not.
+        /// </summary>
+        [NotKeyable, SerializeField, HideInInspector]
+        private bool _obtainedProperReferences;
+
+        private Quaternion _initialHipLocalRotation;
+
+        private Vector3 _calibratedHipTranslation;
+        private bool _hasCalibrated;
+        private HipPinningConstraintTarget _currentHipPinningTarget;
         private bool _shouldUpdate;
         private bool _isFirstFrame;
 
-        private bool _obtainedProperReferences;
+        private bool _hasSetUp;
 
         /// <summary>
-        /// Setup the hip pinning constraint.
+        /// Run set-up if necessary. This is necessary for
+        /// OVRCustomSkeleton-based characters, since the bones are
+        /// re-parented at runtime and they need to be re-queried.
         /// </summary>
-        /// <returns>Returns true if has setup runs or has already run.</returns>
-        public bool Setup()
+        public void SetUp()
         {
-            if (_obtainedProperReferences)
+            if (_hasSetUp)
             {
-                return true;
+                return;
             }
-
-            if (!_skeleton.IsInitialized || !_skeleton.IsDataValid)
+            if (_skeleton == null && _animator != null)
             {
-                return false;
+                _hasSetUp = true;
+                return;
             }
+            _hasSetUp = true;
 
+            _initialHipLocalRotation = GetHipTransform().localRotation;
             _bones = new Transform[_skeleton.CustomBones.Count];
             for (int i = 0; i < _bones.Length; i++)
             {
                 _bones[i] = _skeleton.CustomBones[i];
             }
-            _initialHipLocalRotation = _bones[(int)OVRSkeleton.BoneId.Body_Hips].transform.localRotation;
             _root = _bones[(int)OVRSkeleton.BoneId.Body_Hips].parent;
-            _obtainedProperReferences = true;
-            return true;
         }
 
         /// <summary>
@@ -221,6 +286,82 @@ namespace Oculus.Movement.AnimationRigging
         public void AssignOVRSkeleton(OVRCustomSkeleton skeleton)
         {
             _skeleton = skeleton;
+        }
+
+        /// <summary>
+        /// Assign the animator component.
+        /// </summary>
+        /// <param name="animator">The animator component to assign.</param>
+        public void AssignAnimator(Animator animator)
+        {
+            _animator = animator;
+        }
+
+        /// <summary>
+        /// Sets up bone references to the character.
+        /// </summary>
+        public void SetUpBoneReferences()
+        {
+            if (_skeleton != null)
+            {
+                SetUpBonesOVR();
+            }
+            else if (_animator != null)
+            {
+                SetUpBonesAnimator();
+            }
+            _obtainedProperReferences = true;
+        }
+
+        private void SetUpBonesOVR()
+        {
+            _bones = new Transform[_skeleton.CustomBones.Count];
+            for (int i = 0; i < _bones.Length; i++)
+            {
+                _bones[i] = _skeleton.CustomBones[i];
+            }
+            _root = _bones[(int)OVRSkeleton.BoneId.Body_Hips].parent;
+            _initialHipLocalRotation = GetHipTransform().localRotation;
+        }
+
+        private void SetUpBonesAnimator()
+        {
+            var hipTransform = _animator.GetBoneTransform(HumanBodyBones.Hips);
+            if (hipTransform == null)
+            {
+                throw new Exception("Your character's Humanoid mapping is missing a hip transform.");
+            }
+            List<Transform> allBones = GetValidAnimatorBones();
+            _bones = allBones.ToArray();
+            _root = hipTransform.parent;
+            _initialHipLocalRotation = GetHipTransform().localRotation;
+        }
+
+        private List<Transform> GetValidAnimatorBones()
+        {
+            List<Transform> allBones = new List<Transform>();
+            for (var currBone = HumanBodyBones.Hips; currBone < HumanBodyBones.LastBone; currBone++)
+            {
+                var boneTransform = _animator.GetBoneTransform(currBone);
+                if (boneTransform != null)
+                {
+                    allBones.Add(boneTransform);
+                }
+            }
+            return allBones;
+        }
+
+        /// <summary>
+        /// Resets all references.
+        /// </summary>
+        public void ClearSetupReferences()
+        {
+            _skeleton = null;
+            _animator = null;
+            _bones = null;
+            _initialHipLocalRotation = Quaternion.identity;
+            _root = null;
+            _obtainedProperReferences = false;
         }
 
         /// <summary>
@@ -249,7 +390,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="position">The position of the character's hips.</param>
         public void CalibrateInitialHipHeight(Vector3 position)
         {
-            _calibratedHipTranslation = _bones[(int)OVRSkeleton.BoneId.Body_Hips].position;
+            _calibratedHipTranslation = GetHipTransform().position;
+            _hasCalibrated = true;
             if (_enableHipPinningHeightAdjustment)
             {
                 _currentHipPinningTarget.UpdateHeight(position.y - _currentHipPinningTarget.HipTargetTransform.position.y);
@@ -274,6 +416,39 @@ namespace Oculus.Movement.AnimationRigging
             OnExitHipPinningArea?.Invoke(target);
         }
 
+        /// <inheritdoc />
+        public bool IsBoneTransformsDataValid()
+        {
+            return (_skeleton != null && _skeleton.IsDataValid) ||
+                (_animator != null);
+        }
+
+        /// <inheritdoc />
+        public Transform GetHipTransform()
+        {
+            if (_skeleton != null)
+            {
+                return _bones[(int)OVRSkeleton.BoneId.Body_Hips];
+            }
+            else
+            {
+                return _bones[(int)HumanBodyBones.Hips];
+            }
+        }
+
+        /// <inheritdoc />
+        public int GetIndexOfFirstBoneAboveHips()
+        {
+            if (_skeleton != null)
+            {
+                return (int)OVRSkeleton.BoneId.Body_SpineLower;
+            }
+            else
+            {
+                return (int)(HumanBodyBones.Hips + 1);
+            }
+        }
+
         bool IAnimationJobData.IsValid()
         {
             if (_skeleton == null)
@@ -292,8 +467,16 @@ namespace Oculus.Movement.AnimationRigging
         void IAnimationJobData.SetDefaultValues()
         {
             _skeleton = null;
+            _animator = null;
             _hipPinningTargets = null;
+            _enableHipPinningHeightAdjustment = false;
+            _enableHipPinningLeave = false;
+            _hipPinningLeaveRange = 0.0f;
+            _root = null;
+            _bones = null;
             _obtainedProperReferences = false;
+            _hasSetUp = false;
+            _hasCalibrated = false;
         }
     }
 
@@ -307,31 +490,10 @@ namespace Oculus.Movement.AnimationRigging
         HipPinningJobBinder<HipPinningData>>,
         IOVRSkeletonConstraint
     {
-        private void Start()
-        {
-            if (data.Setup())
-            {
-                gameObject.SetActive(true);
-            }
-        }
-
         /// <inheritdoc />
         public void RegenerateData()
         {
-            if (data.Setup())
-            {
-                gameObject.SetActive(true);
-            }
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            if (gameObject.activeInHierarchy && !Application.isPlaying)
-            {
-                Debug.LogWarning($"{name} should be disabled initially; it enables itself when ready. Otherwise you" +
-                    $" might get an errors regarding invalid sync variables at runtime.");
-            }
+            data.SetUp();
         }
     }
 }

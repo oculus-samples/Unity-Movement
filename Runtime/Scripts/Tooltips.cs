@@ -974,6 +974,9 @@ namespace Oculus.Movement
         public const string Skeleton =
             "The OVR Skeleton component.";
 
+        public const string Animator =
+            "Animator component.";
+
         public const string HipPinningTargets =
             "The list of hip pinning targets in the scene.";
 

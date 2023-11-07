@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -34,9 +35,9 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<float> DeltaTime;
 
         /// <summary>
-        /// If true, update the bone positions as there is a valid OVR Skeleton.
+        /// If true, update the bone positions as there is a valid skeleton.
         /// </summary>
-        public bool ValidOvrSkeleton;
+        public bool ValidSkeletalData;
 
         /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
@@ -54,8 +55,8 @@ namespace Oculus.Movement.AnimationRigging
                 var trackedHipPos = Hips.GetLocalPosition(stream);
                 var hipPosDelta = TargetHipPos[0] - trackedHipPos;
 
-                // Only change bone positions if we have a valid OVR Skeleton Hierarchy.
-                if (ValidOvrSkeleton)
+                // Only change bone positions if we have a valid skeleton hierarchy.
+                if (ValidSkeletalData)
                 {
                     foreach (var bone in Bones)
                     {
@@ -97,28 +98,31 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new HipPinningJob();
 
-            var spineLowerIndex = (int)OVRSkeleton.BoneId.Body_SpineLower;
-            int bonesCount = data.ConstraintSkeleton.CustomBones.Count;
-
-            job.Hips = ReadWriteTransformHandle.Bind(animator, data.Bones[(int)OVRSkeleton.BoneId.Body_Hips]);
-            job.Bones = new NativeArray<ReadWriteTransformHandle>(bonesCount - spineLowerIndex, Allocator.Persistent);
+            int firstBoneIndexAboveHips = data.GetIndexOfFirstBoneAboveHips();
+            job.Hips = ReadWriteTransformHandle.Bind(animator, data.GetHipTransform());
+            int numBonesTotal = data.Bones.Length;
+            int numBonesAboveHips = numBonesTotal - firstBoneIndexAboveHips;
+            job.Bones = new NativeArray<ReadWriteTransformHandle>(
+                numBonesAboveHips,
+                Allocator.Persistent);
             job.TargetHipPos = new NativeArray<Vector3>(1, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
             job.DeltaTime = new NativeArray<float>(1, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
-            job.ValidOvrSkeleton = data.ConstraintSkeleton.IsInitialized;
+            job.ValidSkeletalData = data.IsBoneTransformsDataValid();
 
-            int boneIndex = 0;
-            for (int i = spineLowerIndex; i < bonesCount; i++)
+            int reducedBoneIndex = 0;
+            for (int i = firstBoneIndexAboveHips; i < numBonesTotal; i++)
             {
-                if (data.Bones[i] != null)
+                if (data.Bones[i] == null)
                 {
-                    job.Bones[boneIndex] = ReadWriteTransformHandle.Bind(animator, data.Bones[i]);
-                    boneIndex++;
+                    continue;
                 }
+                job.Bones[reducedBoneIndex++] =
+                    ReadWriteTransformHandle.Bind(animator, data.Bones[i]);
             }
 
-            var hipsBone = data.Bones[(int)OVRSkeleton.BoneId.Body_Hips];
+            var hipsBone = data.GetHipTransform();
             data.AssignClosestHipPinningTarget(hipsBone.position);
             data.IsFirstFrame = true;
             return job;
@@ -132,7 +136,7 @@ namespace Oculus.Movement.AnimationRigging
                 data.ShouldUpdate = true;
             }
 
-            Transform hips = data.Bones[(int)OVRSkeleton.BoneId.Body_Hips];
+            Transform hips = data.GetHipTransform();
             Vector3 trackedHipPos = hips.position;
             if (data.HipPinningLeave)
             {
@@ -183,7 +187,8 @@ namespace Oculus.Movement.AnimationRigging
         private void CheckIfHipPinningIsValid(IHipPinningData data, Vector3 trackedHipPos)
         {
             float dist = Vector3.Distance(data.CalibratedHipPos, trackedHipPos);
-            if (dist > data.HipPinningLeaveRange && data.CurrentHipPinningTarget != null)
+            if (dist > data.HipPinningLeaveRange && data.CurrentHipPinningTarget != null &&
+                data.HasCalibrated)
             {
                 data.ExitHipPinningArea(data.CurrentHipPinningTarget);
             }

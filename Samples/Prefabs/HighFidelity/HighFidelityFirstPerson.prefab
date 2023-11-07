@@ -608,6 +608,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
+    _customSkeleton: {fileID: 1024561555539579727}
+    _animator: {fileID: 0}
+    _spineTranslationCorrectionType: 1
     _spineAlignmentWeight: 0
     _leftShoulderWeight: 0
     _rightShoulderWeight: 0
@@ -615,9 +618,6 @@ MonoBehaviour:
     _rightArmWeight: 0
     _leftHandWeight: 0
     _rightHandWeight: 0
-    _spineTranslationCorrectionType: 1
-    _customSkeleton: {fileID: 1024561555539579727}
-    _animator: {fileID: 0}
     _hipsToHeadBones:
     - {fileID: 4614795461479404054}
     - {fileID: 7185562945170467144}
@@ -640,12 +640,14 @@ MonoBehaviour:
       LowerArmBone: {fileID: 2061263398344273555}
       HandBone: {fileID: 4076173765156699471}
       ShoulderLocalPos: {x: -0.066512585, y: 0.09479429, z: 0.0282178}
+      LowerArmToHandAxis: {x: -1, y: -0.000000050878956, z: -0.000000043610534}
     _rightArmData:
       ShoulderBone: {fileID: 2563644540292334074}
       UpperArmBone: {fileID: 6432989413210236746}
       LowerArmBone: {fileID: 5740937155685247320}
       HandBone: {fileID: 8608038177421147514}
       ShoulderLocalPos: {x: -0.066512585, y: 0.09479429, z: -0.0282178}
+      LowerArmToHandAxis: {x: 1, y: -0.0000008067804, z: 0.000000101756086}
     _bonePairData:
     - StartBone: {fileID: 4614795461479404054}
       EndBone: {fileID: 7185562945170467144}
