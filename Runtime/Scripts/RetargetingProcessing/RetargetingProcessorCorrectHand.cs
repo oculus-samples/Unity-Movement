@@ -52,14 +52,27 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The maximum stretch for the hand to reach the target position that is allowed.
         /// </summary>
-        [Tooltip(RetargetingLayerTooltips.MaxStretch)]
+        [Tooltip(RetargetingLayerTooltips.MaxHandStretch)]
         [SerializeField]
-        private float _maxStretch = 0.01f;
-        /// <inheritdoc cref="_maxStretch" />
-        public float MaxStretch
+        private float _maxHandStretch = 0.01f;
+        /// <inheritdoc cref="_maxHandStretch" />
+        public float MaxHandStretch
         {
-            get => _maxStretch;
-            set => _maxStretch = value;
+            get => _maxHandStretch;
+            set => _maxHandStretch = value;
+        }
+
+        /// <summary>
+        /// The maximum stretch for the shoulder to help the hand reach the target position that is allowed.
+        /// </summary>
+        [Tooltip(RetargetingLayerTooltips.MaxHandStretch)]
+        [SerializeField]
+        private float _maxShoulderStretch = 0.1f;
+        /// <inheritdoc cref="_maxShoulderStretch" />
+        public float MaxShoulderStretch
+        {
+            get => _maxShoulderStretch;
+            set => _maxShoulderStretch = value;
         }
 
         /// <summary>
@@ -164,15 +177,24 @@ namespace Oculus.Movement.AnimationRigging
             handBone.position = _originalHandPosition;
             var handRotation = handBone.rotation;
             Vector3 targetPosition = Vector3.Lerp(handBone.position, targetHand.position, Weight);
+            bool solvedIK = false;
             if (Weight > 0.0f)
             {
                 if (HandIKType == IKType.CCDIK)
                 {
-                    AnimationUtilities.SolveCCDIK(_armBones, targetPosition, IKTolerance, IKIterations);
+                    solvedIK = AnimationUtilities.SolveCCDIK(_armBones, targetPosition, IKTolerance, IKIterations);
                 }
             }
-            handBone.position = Vector3.MoveTowards(handBone.position, targetPosition, MaxStretch);
+            handBone.position = Vector3.MoveTowards(handBone.position, targetPosition, MaxHandStretch);
             handBone.rotation = handRotation;
+
+            if (!solvedIK && MaxShoulderStretch > 0.0f)
+            {
+                var shoulderStretchDirection = targetPosition - handBone.position;
+                var shoulderStretchMagnitude = Mathf.Clamp(shoulderStretchDirection.magnitude, 0, MaxShoulderStretch);
+                var shoulderStretchVector = shoulderStretchDirection.normalized * shoulderStretchMagnitude;
+                _armBones[^1].position += shoulderStretchVector;
+            }
         }
     }
 }
