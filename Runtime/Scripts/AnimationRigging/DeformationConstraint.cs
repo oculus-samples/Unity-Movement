@@ -175,7 +175,17 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The spine alignment weight float property.
         /// </summary>
-        public string SpineAlignmentWeightFloatProperty { get; }
+        public string SpineLowerAlignmentWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The spine upper alignment weight float property.
+        /// </summary>
+        public string SpineUpperAlignmentWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The chest alignment weight float property.
+        /// </summary>
+        public string ChestAlignmentWeightFloatProperty { get; }
 
         /// <summary>
         /// The left shoulder weight float property.
@@ -321,8 +331,16 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_spineTranslationCorrectionType));
 
         /// <inheritdoc />
-        string IDeformationData.SpineAlignmentWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_spineAlignmentWeight));
+        string IDeformationData.SpineLowerAlignmentWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_spineLowerAlignmentWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.SpineUpperAlignmentWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_spineUpperAlignmentWeight));
+
+        /// <inheritdoc />
+        string IDeformationData.ChestAlignmentWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_chestAlignmentWeight));
 
         /// <inheritdoc />
         string IDeformationData.LeftShoulderWeightFloatProperty =>
@@ -372,15 +390,39 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for the spine alignment.
+        /// The weight for the spine lower alignment.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
         [Tooltip(DeformationDataTooltips.SpineAlignmentWeight)]
-        private float _spineAlignmentWeight;
-        public float SpineAlignmentWeight
+        private float _spineLowerAlignmentWeight;
+        public float SpineLowerAlignmentWeight
         {
-            get => _spineAlignmentWeight;
-            set => _spineAlignmentWeight = value;
+            get => _spineLowerAlignmentWeight;
+            set => _spineLowerAlignmentWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for the spine upper alignment.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.SpineAlignmentWeight)]
+        private float _spineUpperAlignmentWeight;
+        public float SpineUpperAlignmentWeight
+        {
+            get => _spineUpperAlignmentWeight;
+            set => _spineUpperAlignmentWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for the chest alignment.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.SpineAlignmentWeight)]
+        private float _chestAlignmentWeight;
+        public float ChestAlignmentWeight
+        {
+            get => _chestAlignmentWeight;
+            set => _chestAlignmentWeight = value;
         }
 
         /// <summary>
@@ -841,7 +883,9 @@ namespace Oculus.Movement.AnimationRigging
             _customSkeleton = null;
             _spineTranslationCorrectionType = (int)SpineTranslationCorrectionType.None;
 
-            _spineAlignmentWeight = 0.0f;
+            _spineLowerAlignmentWeight = 0.0f;
+            _spineUpperAlignmentWeight = 0.0f;
+            _chestAlignmentWeight = 0.0f;
             _leftShoulderWeight = 0.0f;
             _rightShoulderWeight = 0.0f;
             _leftArmWeight = 0.0f;

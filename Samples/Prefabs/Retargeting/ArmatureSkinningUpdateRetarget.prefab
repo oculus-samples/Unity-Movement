@@ -187,7 +187,9 @@ MonoBehaviour:
     _customSkeleton: {fileID: 0}
     _animator: {fileID: 4325497552437736820}
     _spineTranslationCorrectionType: 3
-    _spineAlignmentWeight: 1
+    _spineLowerAlignmentWeight: 1
+    _spineUpperAlignmentWeight: 0.5
+    _chestAlignmentWeight: 0.25
     _leftShoulderWeight: 0.75
     _rightShoulderWeight: 0.75
     _leftArmWeight: 1
@@ -981,7 +983,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9121803696401781268, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_Name
-      value: ArmatureSkinningUpdateRetargetUser
+      value: ArmatureSkinningUpdateRetarget
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}

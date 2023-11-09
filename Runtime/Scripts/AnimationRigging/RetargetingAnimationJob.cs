@@ -57,7 +57,10 @@ namespace Oculus.Movement.AnimationRigging
             }
             else
             {
-                AnimationRuntimeUtils.PassThrough(stream, TargetTransforms[0]);
+                if (TargetTransforms.Length > 0)
+                {
+                    AnimationRuntimeUtils.PassThrough(stream, TargetTransforms[0]);
+                }
             }
         }
 

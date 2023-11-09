@@ -458,7 +458,9 @@ namespace Oculus.Movement.Utils
 
             deformationConstraint.data.SpineTranslationCorrectionTypeField
                 = DeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead;
-            deformationConstraint.data.SpineAlignmentWeight = 1.0f;
+            deformationConstraint.data.SpineLowerAlignmentWeight = 1.0f;
+            deformationConstraint.data.SpineUpperAlignmentWeight = 0.5f;
+            deformationConstraint.data.ChestAlignmentWeight = 0.0f;
             deformationConstraint.data.LeftShoulderWeight = 0.75f;
             deformationConstraint.data.RightShoulderWeight = 0.75f;
             deformationConstraint.data.LeftArmWeight = 1.0f;
