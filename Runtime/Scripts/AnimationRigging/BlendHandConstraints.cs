@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
+using Oculus.Interaction.Input;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
@@ -142,6 +143,7 @@ namespace Oculus.Movement.AnimationRigging
         private Transform _cachedTransform;
         private float _cachedConstraintWeight;
         private RetargetingProcessorCorrectBones _retargetingProcessorCorrectBones;
+        private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
 
         /// <summary>
         /// Adds constraint. Valid for use via editor scripts only.
@@ -211,7 +213,19 @@ namespace Oculus.Movement.AnimationRigging
                 if (correctBonesProcessor != null)
                 {
                     _retargetingProcessorCorrectBones = correctBonesProcessor;
-                    break;
+                }
+
+                var correctHandProcessor = retargetingProcessor as RetargetingProcessorCorrectHand;
+                if (correctHandProcessor != null)
+                {
+                    if (correctHandProcessor.Handedness == Handedness.Left && IsLeftSideOfBody())
+                    {
+                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                    }
+                    else if (correctHandProcessor.Handedness == Handedness.Right && !IsLeftSideOfBody())
+                    {
+                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                    }
                 }
             }
         }
@@ -255,6 +269,10 @@ namespace Oculus.Movement.AnimationRigging
             else
             {
                 _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = constraintWeight;
+            }
+            if (_retargetingProcessorCorrectHand != null)
+            {
+                _retargetingProcessorCorrectHand.Weight = constraintWeight;
             }
         }
 
