@@ -57,17 +57,20 @@ namespace Oculus.Movement.AnimationRigging
         {
             IGroundingData groundingData = constraint.data;
             Transform hipsTransform = null;
+            bool isFullSkeleton = groundingData.ConstraintSkeleton.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
+
             if (groundingData.ConstraintSkeleton != null)
             {
                 hipsTransform = RiggingUtilities.FindBoneTransformFromCustomSkeleton(
                     groundingData.ConstraintSkeleton,
-                    OVRSkeleton.BoneId.Body_Hips);
+                    isFullSkeleton ? OVRSkeleton.BoneId.FullBody_Hips : OVRSkeleton.BoneId.Body_Hips);
             }
             else
             {
                 hipsTransform = RiggingUtilities.FindBoneTransformAnimator(
                     groundingData.ConstraintAnimator,
-                    OVRSkeleton.BoneId.Body_Hips);
+                    isFullSkeleton ? OVRSkeleton.BoneId.FullBody_Hips : OVRSkeleton.BoneId.Body_Hips,
+                    groundingData.ConstraintAnimator.GetComponent<OVRSkeleton>().GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody);
             }
             if (hipsTransform == null)
             {

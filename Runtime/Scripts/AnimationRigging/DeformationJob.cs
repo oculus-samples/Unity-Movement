@@ -259,7 +259,12 @@ namespace Oculus.Movement.AnimationRigging
 
                 _targetHipsPos = HipsToHeadBoneTargets[HipsIndex].GetPosition(stream);
                 _targetHeadPos = HipsToHeadBoneTargets[^1].GetPosition(stream);
-                AlignSpine(stream, weight);
+                if (SpineLowerAlignmentWeight.Get(stream) != 0.0f ||
+                    SpineUpperAlignmentWeight.Get(stream) != 0.0f ||
+                    ChestAlignmentWeight.Get(stream) != 0.0f)
+                {
+                    AlignSpine(stream, weight);
+                }
                 InterpolateShoulders(stream, weight);
                 UpdateBoneDirections(stream);
                 EnforceOriginalSkeletalProportions(stream, weight);

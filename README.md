@@ -2,8 +2,8 @@
 Unity-Movement is a package that uses OpenXR’s tracking layer APIs to expose Meta Quest Pro’s Body Tracking (BT), Eye Tracking (ET), and Face Tracking (FT) capabilities. With this package, developers can leverage tracking to populate VR environments with custom avatars that bring the expressiveness of users into the virtual environments that they create.
 
 ### Requirements
-- Unity 2021.3.21f1 (2021 LTS) or newer installed
-- v56.0 or newer of the Oculus Integration SDK with OVRPlugin set to use OpenXR as backend. Make sure to include the VR and Interaction folders when importing into your project.
+- Unity 2021.3.26f1 (2021 LTS) or newer installed
+- v60.0 or newer of the Meta XR SDK. You will need the Meta XR Core SDK, Meta XR Interaction SDK and Meta XR Interaction SDK OVR Samples packages found [on this page](https://assetstore.unity.com/publishers/25353).
 - A project set up with these [configuration settings](https://developer.oculus.com/documentation/unity/unity-conf-settings/)
 
 ### Licenses
@@ -29,6 +29,8 @@ If the new scene or an existing scene doesn’t have a GameObject with the OVRCa
 5. In the General tab, there are options to enable body, face, and eye tracking support. Select Supported or Required for the type of tracking support you wish to add.
 6. Under OVRManager's "Permission Requests On Startup" section, enable  Body, Face and Eye Tracking.
 7. Ensure that OVRManager's "Tracking Origin Type" is set to "Floor Level".
+8. In OVRManager's "Movement Tracking" section select "High" for "Body Tracking Fidelity."
+9. In OVRManager's "Movement Tracking" section select "Full Body" for "Body Tracking Joint Set."
 
 Layer index 10, layer index 11, and the HiddenMesh layer must be present in the project for RecalculateNormals to work correctly.
 
@@ -62,6 +64,8 @@ In order for the SceneSelectMenu buttons to work, add the scenes located in the 
 
 ## Samples
 The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/Scenes** folder to the project's Assets folder.
+
+For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
 
 For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-samples/#face-and-eye-tracking-with-aura), [Blendshape Mapping Example Sample](https://developer.oculus.com/documentation/unity/move-samples/#arkit-mapping-with-blendshape-mapping-example), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-with-hip-pinning), [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-sample), and [Retargeting Sample](https://developer.oculus.com/documentation/unity/move-samples/#retargeting-with-blue-robot).
 

@@ -3,6 +3,7 @@
 using Oculus.Movement.AnimationRigging;
 using UnityEngine;
 using UnityEngine.Assertions;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.Utils
 {
@@ -11,7 +12,7 @@ namespace Oculus.Movement.Utils
     /// </summary>
     [DefaultExecutionOrder(230)]
     public class OVRSkeletonBoneVisualizer
-        : BoneVisualizer<CustomMappings.BodyTrackingBoneId>
+        : BoneVisualizer<OVRHumanBodyBonesMappings.BodyTrackingBoneId>
     {
         /// <summary>
         /// OVRSkeleton component to visualize bones for.
@@ -48,7 +49,7 @@ namespace Oculus.Movement.Utils
         /// <inheritdoc />
         protected override BoneTuple GetBoneTuple(int currentBone)
         {
-            var boneTuple = CustomMappings.OVRSkeletonBoneIdToJointPair[(OVRSkeleton.BoneId)currentBone];
+            var boneTuple = OVRHumanBodyBonesMappings.BoneIdToJointPair[(OVRSkeleton.BoneId)currentBone];
             return new BoneTuple((int)boneTuple.Item1, (int)boneTuple.Item2);
         }
 
@@ -72,7 +73,7 @@ namespace Oculus.Movement.Utils
                 _ovrSkeletonComp,
                 (OVRSkeleton.BoneId)tupleItem.FirstBoneId,
                 _visualizeBindPose);
-            secondJoint = (tupleItem.SecondBoneId >= (int)CustomMappings.BodyTrackingBoneId.Body_End)
+            secondJoint = (tupleItem.SecondBoneId >= (int)OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_End)
                 ? firstJoint.GetChild(0)
                 : RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
                     (OVRSkeleton.BoneId)tupleItem.SecondBoneId, _visualizeBindPose);
@@ -82,7 +83,7 @@ namespace Oculus.Movement.Utils
         /// <inheritdoc />
         protected override AvatarMaskBodyPart GetAvatarBodyPart(int currentBone)
         {
-            return CustomMappings.OVRSkeletonBoneIdToAvatarBodyPart[(OVRSkeleton.BoneId)currentBone];
+            return BoneMappingsExtension.OVRSkeletonBoneIdToAvatarBodyPart[(OVRSkeleton.BoneId)currentBone];
         }
 
         /// <inheritdoc />

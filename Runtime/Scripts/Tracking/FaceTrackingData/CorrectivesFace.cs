@@ -1,7 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
-using System;
 using UnityEngine;
 
 namespace Oculus.Movement.Tracking
@@ -26,6 +25,28 @@ namespace Oculus.Movement.Tracking
         /// Allows one to freeze current values obtained from facial expressions component.
         /// </summary>
         public bool FreezeExpressionWeights { get; set; }
+
+        /// <summary>
+        /// Forces the jaw to drop to accomodate the tongue if it is being stuck out.
+        /// </summary>
+        [SerializeField]
+        [Tooltip("Whether or not to force the jaw open to accomodate an extended tongue")]
+        protected bool _forceJawDropForTongue = true;
+
+        /// <inheritdoc cref="_forceJawDropForTongue" />
+        public bool ForceJawDropForTongue
+        {
+            get { return _forceJawDropForTongue; }
+            set { _forceJawDropForTongue = value; }
+        }
+
+        [SerializeField]
+        [Tooltip("Minimum value of TongueOut to force JawDrop open")]
+        private float _tongueOutThreshold = 0.25f;
+
+        [SerializeField]
+        [Tooltip("Minimum value of JawDrop to force when the user's tongue is out")]
+        private float _minJawDrop = 0.5f;
 
         /// <summary>
         /// Optional blendshape modifier component.
@@ -248,6 +269,16 @@ namespace Oculus.Movement.Tracking
                 else if (blendShapeToFaceExpression == OVRFaceExpressions.FaceExpression.EyesClosedR)
                 {
                     currentWeight += ExpressionWeights[(int)OVRFaceExpressions.FaceExpression.EyesLookDownR];
+                }
+                else if (ForceJawDropForTongue && blendShapeToFaceExpression == OVRFaceExpressions.FaceExpression.JawDrop)
+                {
+                    // Fetch this from the underlying expressions in case the renderer being fixed
+                    // has JawDrop but not TongueOut.
+                    var tongueWeight = _faceExpressions[OVRFaceExpressions.FaceExpression.TongueOut];
+                    if (tongueWeight > _tongueOutThreshold)
+                    {
+                        currentWeight = Mathf.Max(_minJawDrop, currentWeight);
+                    }
                 }
 
                 if (_blendshapeModifier != null)

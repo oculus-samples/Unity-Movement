@@ -276,7 +276,9 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _bones[i] = _skeleton.CustomBones[i];
             }
-            _root = _bones[(int)OVRSkeleton.BoneId.Body_Hips].parent;
+            _root = _bones[(int)(IsSkeletonFullBody() ?
+                OVRSkeleton.BoneId.FullBody_Hips :
+                OVRSkeleton.BoneId.Body_Hips)].parent;
         }
 
         /// <summary>
@@ -320,7 +322,9 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _bones[i] = _skeleton.CustomBones[i];
             }
-            _root = _bones[(int)OVRSkeleton.BoneId.Body_Hips].parent;
+            _root = _bones[(int)(IsSkeletonFullBody() ?
+                OVRSkeleton.BoneId.FullBody_Hips :
+                OVRSkeleton.BoneId.Body_Hips)].parent;
             _initialHipLocalRotation = GetHipTransform().localRotation;
         }
 
@@ -423,12 +427,19 @@ namespace Oculus.Movement.AnimationRigging
                 (_animator != null);
         }
 
+        private bool IsSkeletonFullBody()
+        {
+            return _skeleton.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
+        }
+
         /// <inheritdoc />
         public Transform GetHipTransform()
         {
             if (_skeleton != null)
             {
-                return _bones[(int)OVRSkeleton.BoneId.Body_Hips];
+                return _bones[IsSkeletonFullBody() ?
+                    (int)OVRSkeleton.BoneId.FullBody_Hips :
+                    (int)OVRSkeleton.BoneId.Body_Hips];
             }
             else
             {
@@ -441,7 +452,9 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (_skeleton != null)
             {
-                return (int)OVRSkeleton.BoneId.Body_SpineLower;
+                return IsSkeletonFullBody() ?
+                    (int)OVRSkeleton.BoneId.FullBody_SpineLower :
+                    (int)OVRSkeleton.BoneId.Body_SpineLower;
             }
             else
             {
@@ -483,7 +496,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Hip Pinning constraint.
     /// </summary>
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Hip Pinning Constraint")]
     public class HipPinningConstraint : RigConstraint<
         HipPinningJob,
         HipPinningData,

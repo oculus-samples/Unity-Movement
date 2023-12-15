@@ -110,7 +110,10 @@ namespace Oculus.Movement.UI
         /// </summary>
         public void Calibrate()
         {
-            Vector3 hipTranslation = _skeleton.CustomBones[(int)OVRSkeleton.BoneId.Body_Hips].localPosition;
+            var isFullBody = _skeleton.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
+            Vector3 hipTranslation = _skeleton.CustomBones[isFullBody ?
+                (int)OVRSkeleton.BoneId.FullBody_Hips : 
+                (int)OVRSkeleton.BoneId.Body_Hips].localPosition;
             var mainChairTransform = _mainHipPinningTargetRenderer.transform;
             mainChairTransform.localPosition =
                 new Vector3(hipTranslation.x, mainChairTransform.localPosition.y, hipTranslation.z);

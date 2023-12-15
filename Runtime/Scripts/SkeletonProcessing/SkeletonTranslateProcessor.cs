@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System;
 using Oculus.Movement.Utils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -95,6 +96,11 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _transformOffsetForSkeleton = transform;
             }
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            enabled = hasFocus;
         }
 
         /// <summary>

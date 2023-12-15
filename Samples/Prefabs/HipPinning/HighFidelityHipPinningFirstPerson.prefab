@@ -782,9 +782,11 @@ MonoBehaviour:
     _customSkeleton: {fileID: 729980574542687627}
     _animator: {fileID: 0}
     _spineTranslationCorrectionType: 1
-    _spineAlignmentWeight: 0
-    _leftShoulderWeight: 0
-    _rightShoulderWeight: 0
+    _spineLowerAlignmentWeight: 0
+    _spineUpperAlignmentWeight: 0
+    _chestAlignmentWeight: 0
+    _leftShoulderWeight: 0.05
+    _rightShoulderWeight: 0.05
     _leftArmWeight: 0
     _rightArmWeight: 0
     _leftHandWeight: 0
@@ -823,33 +825,33 @@ MonoBehaviour:
     - StartBone: {fileID: 8911903714498386270}
       EndBone: {fileID: 6349585496898920960}
       Distance: 0.038306892
-      HeightProportion: 0.0623864
-      LimbProportion: 0.0623864
+      HeightProportion: 0.05904745
+      LimbProportion: 0.05904745
     - StartBone: {fileID: 6349585496898920960}
       EndBone: {fileID: 47671476499168914}
       Distance: 0.11096214
-      HeightProportion: 0.18071236
-      LimbProportion: 0.18071236
+      HeightProportion: 0.17104053
+      LimbProportion: 0.17104053
     - StartBone: {fileID: 47671476499168914}
       EndBone: {fileID: 5411799685071577940}
       Distance: 0.11240488
-      HeightProportion: 0.183062
-      LimbProportion: 0.183062
+      HeightProportion: 0.17326443
+      LimbProportion: 0.17326443
     - StartBone: {fileID: 5411799685071577940}
       EndBone: {fileID: 5571723699023252082}
       Distance: 0.1846194
-      HeightProportion: 0.30067018
-      LimbProportion: 0.30067018
+      HeightProportion: 0.28457814
+      LimbProportion: 0.28457814
     - StartBone: {fileID: 5571723699023252082}
       EndBone: {fileID: 6885306115466274032}
       Distance: 0.13176535
-      HeightProportion: 0.21459235
-      LimbProportion: 0.21459235
+      HeightProportion: 0.20310725
+      LimbProportion: 0.20310725
     - StartBone: {fileID: 6885306115466274032}
       EndBone: {fileID: 7188521250940347498}
       Distance: 0.07068894
-      HeightProportion: 0.11512364
-      LimbProportion: 0.11512364
+      HeightProportion: 0.108962156
+      LimbProportion: 0.108962156
     - StartBone: {fileID: 5571723699023252082}
       EndBone: {fileID: 2223570764790469765}
       Distance: 0.119189434
@@ -891,7 +893,7 @@ MonoBehaviour:
       HeightProportion: 0
       LimbProportion: 0
     _startingScale: {x: 1, y: 1, z: 1}
-    _hipsToHeadDistance: 0.6140263
+    _hipsToHeadDistance: 0.6487476
 --- !u!1 &5157524381134081549
 GameObject:
   m_ObjectHideFlags: 0

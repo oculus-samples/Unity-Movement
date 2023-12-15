@@ -45,6 +45,11 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<Quaternion> OverrideBoneRotations;
 
         /// <summary>
+        /// The bones that should be skipped.
+        /// </summary>
+        public NativeArray<bool> BonesToSkip;
+
+        /// <summary>
         /// Job weight.
         /// </summary>
         public FloatProperty jobWeight { get; set; }
@@ -69,6 +74,12 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     if (!Bones[i].IsValid(stream))
                     {
+                        continue;
+                    }
+
+                    if (BonesToSkip[i])
+                    {
+                        // Skip setting this bone.
                         continue;
                     }
 
@@ -135,6 +146,8 @@ namespace Oculus.Movement.AnimationRigging
                 NativeArrayOptions.UninitializedMemory);
             job.OverrideBoneRotations = new NativeArray<Quaternion>((int)HumanBodyBones.LastBone, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
+            job.BonesToSkip = new NativeArray<bool>((int)HumanBodyBones.LastBone, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
 
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
             {
@@ -146,6 +159,7 @@ namespace Oculus.Movement.AnimationRigging
                 job.BoneRotationDeltas[(int)i] = bone != null ? bone.localRotation : Quaternion.identity;
                 job.OverrideBonePositions[(int)i] = bone != null ? bone.localPosition : Vector3.zero;
                 job.OverrideBoneRotations[(int)i] = bone != null ? bone.localRotation : Quaternion.identity;
+                job.BonesToSkip[(int)i] = bone == null;
             }
 
             return job;
@@ -162,10 +176,13 @@ namespace Oculus.Movement.AnimationRigging
 
                 if (playbackType == PlaybackAnimationData.AnimationPlaybackType.None ||
                     (data.AnimationMask != null &&
-                     !data.AnimationMask.GetHumanoidBodyPartActive(CustomMappings.HumanBoneToAvatarBodyPart[i])))
+                     !data.AnimationMask.GetHumanoidBodyPartActive(BoneMappingsExtension.HumanBoneToAvatarBodyPart[i])))
                 {
                     job.BonePositionDeltas[index] = Vector3.zero;
                     job.BoneRotationDeltas[index] = Quaternion.identity;
+                    job.OverrideBonePositions[index] = Vector3.zero;
+                    job.OverrideBoneRotations[index] = Quaternion.identity;
+                    job.BonesToSkip[index] = true;
                     continue;
                 }
 
@@ -173,12 +190,14 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     job.BonePositionDeltas[index] = data.SourceConstraint.data.GetBonePositionDelta(i);
                     job.BoneRotationDeltas[index] = data.SourceConstraint.data.GetBoneRotationDelta(i);
+                    job.BonesToSkip[index] = false;
                 }
 
                 if (playbackType == PlaybackAnimationData.AnimationPlaybackType.Override)
                 {
                     job.OverrideBonePositions[index] = captureAnimationData.CurrentPose[index].LocalPosition;
                     job.OverrideBoneRotations[index] = captureAnimationData.CurrentPose[index].LocalRotation;
+                    job.BonesToSkip[index] = false;
                 }
             }
 
@@ -189,6 +208,7 @@ namespace Oculus.Movement.AnimationRigging
         public override void Destroy(PlaybackAnimationJob job)
         {
             job.Bones.Dispose();
+            job.BonesToSkip.Dispose();
             job.BonePositionDeltas.Dispose();
             job.BoneRotationDeltas.Dispose();
             job.OverrideBonePositions.Dispose();

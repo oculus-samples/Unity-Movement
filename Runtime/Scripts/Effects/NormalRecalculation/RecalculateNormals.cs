@@ -22,7 +22,7 @@ namespace Oculus.Movement.Effects
         /// The layer of the duplicate mesh with recalculate normals, should
         /// be on a visible layer.
         /// </summary>
-        public string DuplicateLayerName { get => _duplicateLayerName; set => _duplicateLayerName = value; }
+        public int DuplicateLayer { get => _duplicateLayer; set => _duplicateLayer = value; }
 
         /// <summary>
         /// Skinned mesh renderer requiring normal recalc.
@@ -61,8 +61,8 @@ namespace Oculus.Movement.Effects
         /// be on a visible layer.
         /// </summary>
         [SerializeField]
-        [Tooltip(RecalculateNormalsTooltips.DuplicateLayerName)]
-        protected string _duplicateLayerName = "Character";
+        [Tooltip(RecalculateNormalsTooltips.DuplicateLayer)]
+        protected int _duplicateLayer = 11;
 
         /// <summary>
         /// The layer of original mesh with invalid normals, should be
@@ -121,7 +121,7 @@ namespace Oculus.Movement.Effects
             Assert.IsNotNull(_skinnedMeshRenderer);
             Assert.IsTrue(_recalculateMaterialIndices.Length > 0);
             Assert.IsTrue(LayerMask.NameToLayer(_hiddenMeshLayerName) > -1);
-            Assert.IsTrue(LayerMask.NameToLayer(_duplicateLayerName) > -1);
+            Assert.IsTrue(LayerMask.LayerToName(_duplicateLayer) != null);
 
             _instantiatedMaterials = _skinnedMeshRenderer.materials;
             foreach (var recalculateMaterialIndex in _recalculateMaterialIndices)
@@ -248,18 +248,17 @@ namespace Oculus.Movement.Effects
         private void ToggleVisibility(bool showNormalRecalculation)
         {
             int hiddenMeshLayer = LayerMask.NameToLayer(_hiddenMeshLayerName);
-            int visibleMeshLayer = LayerMask.NameToLayer(_duplicateLayerName);
             if (showNormalRecalculation)
             {
                 _skinnedMeshRenderer.gameObject.layer = hiddenMeshLayer;
                 if (_recalcObject)
                 {
-                    _recalcObject.gameObject.layer = visibleMeshLayer;
+                    _recalcObject.gameObject.layer = _duplicateLayer;
                 }
             }
             else
             {
-                _skinnedMeshRenderer.gameObject.layer = visibleMeshLayer;
+                _skinnedMeshRenderer.gameObject.layer = _duplicateLayer;
                 if (_recalcObject)
                 {
                     _recalcObject.gameObject.layer = hiddenMeshLayer;
@@ -282,7 +281,7 @@ namespace Oculus.Movement.Effects
         private (MeshFilter, MeshRenderer) GetDuplicateMeshForNormalRecalculation()
         {
             _recalcObject = new GameObject(gameObject.name + "_NormalRecalc");
-            _recalcObject.layer = LayerMask.NameToLayer(_duplicateLayerName);
+            _recalcObject.layer = _duplicateLayer;
             var meshFilterRecalc = _recalcObject.AddComponent<MeshFilter>();
             var meshRendererRecalc = _recalcObject.AddComponent<MeshRenderer>();
             var recalcTransform = _recalcObject.transform;

@@ -2,6 +2,7 @@
 
 using System;
 using UnityEngine;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -61,16 +62,25 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="animator"><see cref="Animator"/> to query.</param>
         /// <param name="boneId"><see cref="OVRSkeleton.BoneId"/> of transform to find.</param>
+        /// <param name="isFullBody">If is full body bone or not.</param>
         /// <returns></returns>
         public static Transform FindBoneTransformAnimator(
             Animator animator,
-            OVRSkeleton.BoneId boneId)
+            OVRSkeleton.BoneId boneId,
+            bool isFullBody)
         {
-            if (!CustomMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
+            if ((isFullBody && !OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone.ContainsKey(boneId)) ||
+                (!isFullBody && !OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
+                )
             {
                 return null;
             }
-            return animator.GetBoneTransform(CustomMappings.BoneIdToHumanBodyBone[boneId]);
+
+            if (isFullBody)
+            {
+                return animator.GetBoneTransform(OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone[boneId]);
+            }
+            return animator.GetBoneTransform(OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone[boneId]);
         }
 
         /// <summary>

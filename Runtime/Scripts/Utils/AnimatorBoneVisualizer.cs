@@ -3,6 +3,7 @@
 using Oculus.Movement.AnimationRigging;
 using UnityEngine;
 using UnityEngine.Assertions;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.Utils
 {
@@ -41,7 +42,7 @@ namespace Oculus.Movement.Utils
         /// <inheritdoc />
         protected override BoneTuple GetBoneTuple(int currentBone)
         {
-            var boneTuple = CustomMappings.BoneToJointPair[(HumanBodyBones)currentBone];
+            var boneTuple = OVRHumanBodyBonesMappings.BoneToJointPair[(HumanBodyBones)currentBone];
             return new BoneTuple((int)boneTuple.Item1, (int)boneTuple.Item2);
         }
 
@@ -70,7 +71,7 @@ namespace Oculus.Movement.Utils
         /// <inheritdoc />
         protected override AvatarMaskBodyPart GetAvatarBodyPart(int currentBone)
         {
-            return CustomMappings.HumanBoneToAvatarBodyPart[(HumanBodyBones)currentBone];
+            return BoneMappingsExtension.HumanBoneToAvatarBodyPart[(HumanBodyBones)currentBone];
         }
 
         /// <inheritdoc />

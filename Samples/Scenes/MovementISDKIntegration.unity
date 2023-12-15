@@ -228,20 +228,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6966857970010877544, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &50906629
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8443568635789723409, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_Name
+      value: BTCalibrationButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.875
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.275
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7010574
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.09229593
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7010574
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.09229593
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443568635789723411, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c723fc2e86185ec498c4ae6e14c45cd9, type: 3}
 --- !u!4 &51472184 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7074563621144590399, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
---- !u!319 &52514089
-AvatarMask:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-  m_Elements: []
 --- !u!4 &93568388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3599611966401181169, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
@@ -1368,7 +1416,7 @@ MonoBehaviour:
     OnActivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingLines
@@ -1384,7 +1432,7 @@ MonoBehaviour:
     OnDeactivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingLines
@@ -1403,7 +1451,7 @@ MonoBehaviour:
     OnActivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingAxes
@@ -1419,7 +1467,7 @@ MonoBehaviour:
     OnDeactivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingAxes
@@ -1438,7 +1486,7 @@ MonoBehaviour:
     OnActivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingAxes
@@ -1451,7 +1499,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 1
           m_CallState: 2
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingLines
@@ -1467,7 +1515,7 @@ MonoBehaviour:
     OnDeactivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingAxes
@@ -1480,7 +1528,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 1313465879}
+        - m_Target: {fileID: 947634417}
           m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[UnityEngine.HumanBodyBones,
             UnityEngine
           m_MethodName: set_IsShowingLines
@@ -1714,6 +1762,106 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3715466454324626421, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &800006208
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1803550042}
+    m_Modifications:
+    - target: {fileID: 1236458827194487761, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: _maskToVisualize
+      value: 
+      objectReference: {fileID: 31900000, guid: 8267e3d56146c7e43bd0296dc7f86558, type: 2}
+    - target: {fileID: 1236458827194487761, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: _ovrSkeletonComp
+      value: 
+      objectReference: {fileID: 1320817568}
+    - target: {fileID: 1692031724233491721, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_Name
+      value: DebugBonesOVRSkeletonFullBody
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+--- !u!4 &800006209 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1692031724233491723, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+  m_PrefabInstance: {fileID: 800006208}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &800006210 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1692031724233491721, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+  m_PrefabInstance: {fileID: 800006208}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &800006211 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1236458827194487761, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
+  m_PrefabInstance: {fileID: 800006208}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800006210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7ef839cc9cacff4091af449079bbce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &800006212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800006210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84fe64f23f2a68b4a86633382680187d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _boneVisualizer: {fileID: 800006211}
+  _lineColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 0.5019608}
 --- !u!4 &801156447 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7706974062571457071, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
@@ -1830,6 +1978,95 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8251760988216600566, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &947634415
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1803550042}
+    m_Modifications:
+    - target: {fileID: 669339439527238448, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: _animatorComp
+      value: 
+      objectReference: {fileID: 1313172172}
+    - target: {fileID: 669339439527238449, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_Name
+      value: DebugBones
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238462, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: _lineColor.b
+      value: 0.0627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238462, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: _lineColor.g
+      value: 0.6039216
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238462, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: _lineColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+--- !u!4 &947634416 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 669339439527238463, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+  m_PrefabInstance: {fileID: 947634415}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &947634417 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 669339439527238448, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
+  m_PrefabInstance: {fileID: 947634415}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c79d7660e6ccc8a47882b41bfbda4978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1026697025 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6969163518431648179, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
@@ -1854,39 +2091,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.size
-      value: 6
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[0].label
-      value: DrawOVRSkeletonBones Initial
+      value: DebugBonesOVRSkeletonFullBody
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[1].label
-      value: LeftHandISDK
+      value: LeftHandSynthetic
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[2].label
-      value: RightHandISDK
+      value: RightHandSynthetic
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[3].label
-      value: LeftControllerHand
+      value: LeftControllerHandSynthentic
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[4].label
-      value: RightControllerHand
+      value: RightControllerHandSynthetic
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[5].label
-      value: Retarget Hands
+      value: Blend Hands Right
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[6].label
-      value: Retarget Hands
+      value: Blend Hands Left
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[7].label
-      value: DebugBonesOVRSkeleton Processed
+      value: Retargeted Bone Targets
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[0].Enabled
@@ -1910,11 +2147,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[5].Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[6].Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[7].Enabled
@@ -1923,7 +2160,7 @@ PrefabInstance:
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[0].Processor
       value: 
-      objectReference: {fileID: 1639108944}
+      objectReference: {fileID: 800006211}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[1].Processor
       value: 
@@ -1943,18 +2180,30 @@ PrefabInstance:
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[5].Processor
       value: 
-      objectReference: {fileID: 1313172174}
+      objectReference: {fileID: 1077107420}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[6].Processor
       value: 
-      objectReference: {fileID: 1313172174}
+      objectReference: {fileID: 1077107419}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[7].Processor
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1077107418}
     - target: {fileID: 1443914921768874357, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_Name
       value: ArmatureSkinningUpdateRetargetSkeletonProcessor
+      objectReference: {fileID: 0}
+    - target: {fileID: 2444161089806565791, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7486900986326145928, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7901607669017022897, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8760844189829344787, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_RootOrder
@@ -2007,6 +2256,39 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8760844189829344787, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1077107418 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2519393238448185555, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+  m_PrefabInstance: {fileID: 1077107416}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e99c227ec21d72d45b36011069f2b263, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1077107419 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2444161089806565791, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+  m_PrefabInstance: {fileID: 1077107416}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1077107420 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7486900986326145928, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+  m_PrefabInstance: {fileID: 1077107416}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1080009793 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2143258140644656283, guid: e7fbb376593cff24f9db4ecf8d465aaf, type: 3}
@@ -2216,6 +2498,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5208342001094232904, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1284353486
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.875
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.446
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7010574
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.09229593
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7010574
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.09229593
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471434, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_Name
+      value: BodyTrackingFidelityToggle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
 --- !u!114 &1289915232 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3744647067011934911, guid: ea16c3c8c1688234fa81a4f39339bf1b, type: 3}
@@ -2242,9 +2581,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8590939900806535248, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1313172171 stripped
+--- !u!95 &1313172172 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8172159923276885446, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+  m_PrefabInstance: {fileID: 1077107416}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1320817568 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5579424741214871902, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2324633634594971607, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
@@ -2253,246 +2597,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31e3b6438933e1945a67ef8d4db811bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!95 &1313172172 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 8172159923276885446, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
-  m_PrefabInstance: {fileID: 1077107416}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1313172174 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1483202515538247245, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
-  m_PrefabInstance: {fileID: 1077107416}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e00344307bbe4d949bfcf8eddb0caf22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &1313465878
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1313465880}
-  - component: {fileID: 1313465879}
-  - component: {fileID: 1313465881}
-  m_Layer: 0
-  m_Name: DrawRetargetedBones
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1313465879
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313465878}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c79d7660e6ccc8a47882b41bfbda4978, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _whenToRender: 0
-  _visualizationGuideType: 0
-  _maskToVisualize: {fileID: 31900000, guid: 8267e3d56146c7e43bd0296dc7f86558, type: 2}
-  _customBoneVisualData:
-    BoneTuples:
-    - FirstBone: 0
-      SecondBone: 7
-      Hide: 0
-    - FirstBone: 1
-      SecondBone: 3
-      Hide: 0
-    - FirstBone: 2
-      SecondBone: 4
-      Hide: 0
-    - FirstBone: 3
-      SecondBone: 5
-      Hide: 0
-    - FirstBone: 4
-      SecondBone: 6
-      Hide: 0
-    - FirstBone: 5
-      SecondBone: 19
-      Hide: 0
-    - FirstBone: 6
-      SecondBone: 20
-      Hide: 0
-    - FirstBone: 7
-      SecondBone: 8
-      Hide: 0
-    - FirstBone: 8
-      SecondBone: 54
-      Hide: 0
-    - FirstBone: 9
-      SecondBone: 10
-      Hide: 0
-    - FirstBone: 11
-      SecondBone: 13
-      Hide: 0
-    - FirstBone: 12
-      SecondBone: 14
-      Hide: 0
-    - FirstBone: 13
-      SecondBone: 15
-      Hide: 0
-    - FirstBone: 14
-      SecondBone: 16
-      Hide: 0
-    - FirstBone: 15
-      SecondBone: 17
-      Hide: 0
-    - FirstBone: 16
-      SecondBone: 18
-      Hide: 0
-    - FirstBone: 17
-      SecondBone: 30
-      Hide: 0
-    - FirstBone: 18
-      SecondBone: 45
-      Hide: 0
-    - FirstBone: 10
-      SecondBone: 21
-      Hide: 0
-    - FirstBone: 10
-      SecondBone: 22
-      Hide: 0
-    - FirstBone: 10
-      SecondBone: 23
-      Hide: 0
-    - FirstBone: 24
-      SecondBone: 25
-      Hide: 0
-    - FirstBone: 25
-      SecondBone: 26
-      Hide: 0
-    - FirstBone: 26
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 27
-      SecondBone: 28
-      Hide: 0
-    - FirstBone: 28
-      SecondBone: 29
-      Hide: 0
-    - FirstBone: 29
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 30
-      SecondBone: 31
-      Hide: 0
-    - FirstBone: 31
-      SecondBone: 32
-      Hide: 0
-    - FirstBone: 32
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 33
-      SecondBone: 34
-      Hide: 0
-    - FirstBone: 34
-      SecondBone: 35
-      Hide: 0
-    - FirstBone: 35
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 36
-      SecondBone: 37
-      Hide: 0
-    - FirstBone: 37
-      SecondBone: 38
-      Hide: 0
-    - FirstBone: 38
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 39
-      SecondBone: 40
-      Hide: 0
-    - FirstBone: 40
-      SecondBone: 41
-      Hide: 0
-    - FirstBone: 41
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 42
-      SecondBone: 43
-      Hide: 0
-    - FirstBone: 43
-      SecondBone: 44
-      Hide: 0
-    - FirstBone: 44
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 45
-      SecondBone: 46
-      Hide: 0
-    - FirstBone: 46
-      SecondBone: 47
-      Hide: 0
-    - FirstBone: 47
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 48
-      SecondBone: 49
-      Hide: 0
-    - FirstBone: 49
-      SecondBone: 50
-      Hide: 0
-    - FirstBone: 50
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 51
-      SecondBone: 52
-      Hide: 0
-    - FirstBone: 52
-      SecondBone: 53
-      Hide: 0
-    - FirstBone: 53
-      SecondBone: 55
-      Hide: 0
-    - FirstBone: 54
-      SecondBone: 9
-      Hide: 0
-  _lineRendererPrefab: {fileID: 7812178534108119229, guid: 6d28b0d0a0ff2234cbf60710c8c912dc, type: 3}
-  _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}
-  _visualType: 0
-  _animatorComp: {fileID: 1313172172}
---- !u!4 &1313465880
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313465878}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.81499124, y: 1.347516, z: 0.12875414}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1803550042}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1313465881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313465878}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84fe64f23f2a68b4a86633382680187d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _boneVisualizer: {fileID: 1313465879}
-  _lineColor: {r: 0, g: 0.6037736, b: 0.061561298, a: 1}
 --- !u!4 &1324704613 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 417454297435961822, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
@@ -2946,75 +3050,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2004115084450931551, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1639108941
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1639108943}
-  - component: {fileID: 1639108944}
-  - component: {fileID: 1639108945}
-  m_Layer: 0
-  m_Name: DrawOVRSkeletonBones Initial
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1639108943
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1639108941}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.81499124, y: 1.347516, z: 0.12875414}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1803550042}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1639108944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1639108941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab1e3682a8676d84faba89a2aee068e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _whenToRender: 0
-  _visualizationGuideType: 0
-  _maskToVisualize: {fileID: 52514089}
-  _customBoneVisualData:
-    BoneTuples: []
-  _lineRendererPrefab: {fileID: 7812178534108119229, guid: 91a281e92421c464e837420766cafd02, type: 3}
-  _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}
-  _visualType: 0
-  _ovrSkeletonComp: {fileID: 1313172171}
-  _visualizeBindPose: 0
---- !u!114 &1639108945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1639108941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84fe64f23f2a68b4a86633382680187d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _boneVisualizer: {fileID: 1639108944}
-  _lineColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 0.5019608}
 --- !u!4 &1666254363 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5709010148866722606, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
@@ -3269,8 +3304,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1313465880}
-  - {fileID: 1639108943}
+  - {fileID: 947634416}
+  - {fileID: 800006209}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5696,9 +5731,9 @@ MonoBehaviour:
     OnActivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingLines
           m_Mode: 6
           m_Arguments:
@@ -5712,9 +5747,9 @@ MonoBehaviour:
     OnDeactivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingLines
           m_Mode: 6
           m_Arguments:
@@ -5731,9 +5766,9 @@ MonoBehaviour:
     OnActivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingAxes
           m_Mode: 6
           m_Arguments:
@@ -5747,9 +5782,9 @@ MonoBehaviour:
     OnDeactivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingAxes
           m_Mode: 6
           m_Arguments:
@@ -5766,9 +5801,9 @@ MonoBehaviour:
     OnActivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingAxes
           m_Mode: 6
           m_Arguments:
@@ -5779,9 +5814,9 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 1
           m_CallState: 2
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingLines
           m_Mode: 6
           m_Arguments:
@@ -5795,9 +5830,9 @@ MonoBehaviour:
     OnDeactivate:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingAxes
           m_Mode: 6
           m_Arguments:
@@ -5808,9 +5843,9 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 1639108944}
-          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[Oculus.Movement.AnimationRigging.CustomMappings+BodyTrackingBoneId,
-            Meta.Movement
+        - m_Target: {fileID: 800006211}
+          m_TargetAssemblyTypeName: Oculus.Movement.Utils.BoneVisualizer`1[[OVRUnityHumanoidSkeletonRetargeter+OVRHumanBodyBonesMappings+BodyTrackingBoneId,
+            Oculus.VR
           m_MethodName: set_IsShowingLines
           m_Mode: 6
           m_Arguments:

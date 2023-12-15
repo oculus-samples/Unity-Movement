@@ -5,6 +5,7 @@ using Oculus.Interaction.Input;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -58,9 +59,9 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField]
         [Tooltip(BlendHandConstraintsTooltips.BoneIdToTest)]
-        private CustomMappings.BodyTrackingBoneId _boneIdToTest =
-            CustomMappings.BodyTrackingBoneId.Body_LeftHandWrist;
-        public CustomMappings.BodyTrackingBoneId BoneIdToTest
+        private OVRHumanBodyBonesMappings.BodyTrackingBoneId _boneIdToTest =
+            OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+        public OVRHumanBodyBonesMappings.BodyTrackingBoneId BoneIdToTest
         {
             get => _boneIdToTest;
             set => _boneIdToTest = value;
@@ -175,7 +176,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private void Awake()
         {
-            if (_constraints.Length > 0)
+            if (_constraints != null && _constraints.Length > 0)
             {
                 UpdateSkeletalConstraintInterfaceReferences();
             }
@@ -278,7 +279,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private bool IsLeftSideOfBody()
         {
-            return _boneIdToTest < CustomMappings.BodyTrackingBoneId.Body_RightHandPalm;
+            return _boneIdToTest < OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandPalm;
         }
 
         private bool BonesAreValid(OVRSkeleton skeleton)

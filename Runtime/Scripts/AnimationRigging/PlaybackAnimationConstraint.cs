@@ -138,7 +138,7 @@ namespace Oculus.Movement.AnimationRigging
     /// Playback animation constraint. Uses captured animation data to playback the current animator pose
     /// additively or override.
     /// </summary>
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Playback Animation Constraint")]
     public class PlaybackAnimationConstraint : RigConstraint<
             PlaybackAnimationJob,
             PlaybackAnimationData,

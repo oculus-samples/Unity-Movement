@@ -346,7 +346,7 @@ namespace Oculus.Movement.AnimationRigging
     /// begin with, so that it can compute metadata before the
     /// character can begin animating.
     /// </summary>
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Twist Distribution Constraint")]
     public class TwistDistributionConstraint : RigConstraint<
         TwistDistributionJob,
         TwistDistributionData,
