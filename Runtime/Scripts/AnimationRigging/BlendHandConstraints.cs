@@ -1,9 +1,11 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
+using Oculus.Interaction.Input;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -17,7 +19,11 @@ namespace Oculus.Movement.AnimationRigging
     public class BlendHandConstraints : MonoBehaviour, IOVRSkeletonProcessor
     {
         /// <inheritdoc />
-        public bool EnableSkeletonProcessing { get; set; }
+        public bool EnableSkeletonProcessing
+        {
+            get => enabled;
+            set => enabled = value;
+        }
         /// <inheritdoc />
         public string SkeletonProcessorLabel => "Blend Hands";
 
@@ -27,12 +33,20 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Interface(typeof(IRigConstraint))]
         [Tooltip(BlendHandConstraintsTooltips.Constraints)]
         private MonoBehaviour[] _constraints;
+        /// <inheritdoc cref="_constraints"/>
+        public MonoBehaviour[] Constraints
+        {
+            get => _constraints;
+            set => _constraints = value;
+        }
 
         /// <summary>
         /// The character's retargeting layer.
         /// </summary>
         [SerializeField]
+        [Tooltip(BlendHandConstraintsTooltips.RetargetingLayer)]
         private RetargetingLayer _retargetingLayer;
+        /// <inheritdoc cref="_retargetingLayer"/>
         public RetargetingLayer RetargetingLayerComp
         {
             get => _retargetingLayer;
@@ -45,9 +59,9 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField]
         [Tooltip(BlendHandConstraintsTooltips.BoneIdToTest)]
-        private CustomMappings.BodyTrackingBoneId _boneIdToTest =
-            CustomMappings.BodyTrackingBoneId.Body_LeftHandWrist;
-        public CustomMappings.BodyTrackingBoneId BoneIdToTest
+        private OVRHumanBodyBonesMappings.BodyTrackingBoneId _boneIdToTest =
+            OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+        public OVRHumanBodyBonesMappings.BodyTrackingBoneId BoneIdToTest
         {
             get => _boneIdToTest;
             set => _boneIdToTest = value;
@@ -68,7 +82,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// MonoBehaviour to add to.
         /// </summary>
-        [SerializeField]
+        [Optional, SerializeField]
         [Interface(typeof(IOVRSkeletonProcessorAggregator))]
         [Tooltip(BlendHandConstraintsTooltips.AutoAddTo)]
         protected MonoBehaviour _autoAddTo;
@@ -128,7 +142,9 @@ namespace Oculus.Movement.AnimationRigging
 
         private IRigConstraint[] _iRigConstraints;
         private Transform _cachedTransform;
-        private float _cachedConstraintWeight = 0.0f;
+        private float _cachedConstraintWeight;
+        private RetargetingProcessorCorrectBones _retargetingProcessorCorrectBones;
+        private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
 
         /// <summary>
         /// Adds constraint. Valid for use via editor scripts only.
@@ -160,12 +176,13 @@ namespace Oculus.Movement.AnimationRigging
 
         private void Awake()
         {
-            Assert.IsTrue(_constraints != null && _constraints.Length > 0);
-            UpdateSkeletalConstraintInterfaceReferences();
+            if (_constraints != null && _constraints.Length > 0)
+            {
+                UpdateSkeletalConstraintInterfaceReferences();
+            }
 
             Assert.IsNotNull(_retargetingLayer);
             Assert.IsNotNull(_headTransform);
-            Assert.IsNotNull(_autoAddTo);
             Assert.IsNotNull(_blendCurve);
 
             Assert.IsTrue(_constraintsMinDistance < _constraintsMaxDistance);
@@ -189,6 +206,28 @@ namespace Oculus.Movement.AnimationRigging
             if (_autoAddTo != null && _autoAddTo is IOVRSkeletonProcessorAggregator aggregator)
             {
                 aggregator.AddProcessor(this);
+            }
+
+            foreach (var retargetingProcessor in _retargetingLayer.RetargetingProcessors)
+            {
+                var correctBonesProcessor = retargetingProcessor as RetargetingProcessorCorrectBones;
+                if (correctBonesProcessor != null)
+                {
+                    _retargetingProcessorCorrectBones = correctBonesProcessor;
+                }
+
+                var correctHandProcessor = retargetingProcessor as RetargetingProcessorCorrectHand;
+                if (correctHandProcessor != null)
+                {
+                    if (correctHandProcessor.Handedness == Handedness.Left && IsLeftSideOfBody())
+                    {
+                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                    }
+                    else if (correctHandProcessor.Handedness == Handedness.Right && !IsLeftSideOfBody())
+                    {
+                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                    }
+                }
             }
         }
 
@@ -216,23 +255,31 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             float constraintWeight = ComputeCurrentConstraintWeight(skeleton);
-            foreach (var constraint in _iRigConstraints)
+            if (_iRigConstraints != null)
             {
-                constraint.weight = Mathf.Min(constraintWeight, _maxWeight);
+                foreach (var constraint in _iRigConstraints)
+                {
+                    constraint.weight = Mathf.Min(constraintWeight, _maxWeight);
+                }
             }
+
             if (IsLeftSideOfBody())
             {
-                _retargetingLayer.LeftHandCorrectionWeightLateUpdate = constraintWeight;
+                _retargetingProcessorCorrectBones.LeftHandCorrectionWeightLateUpdate = constraintWeight;
             }
             else
             {
-                _retargetingLayer.RightHandCorrectionWeightLateUpdate = constraintWeight;
+                _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = constraintWeight;
+            }
+            if (_retargetingProcessorCorrectHand != null)
+            {
+                _retargetingProcessorCorrectHand.Weight = constraintWeight;
             }
         }
 
         private bool IsLeftSideOfBody()
         {
-            return _boneIdToTest < CustomMappings.BodyTrackingBoneId.Body_RightHandPalm;
+            return _boneIdToTest < OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandPalm;
         }
 
         private bool BonesAreValid(OVRSkeleton skeleton)

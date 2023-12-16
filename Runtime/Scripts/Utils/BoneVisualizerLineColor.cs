@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Oculus.Movement.Utils
 {
@@ -67,6 +68,7 @@ namespace Oculus.Movement.Utils
                 Debug.LogWarning($"{nameof(_boneVisualizer)} not initialized, auto-populating");
                 _boneVisualizer = GetComponent<BoneVisualizer>();
             }
+            Assert.IsNotNull(_boneVisualizer);
             _boneVisualizer.OnNewLine += SetLineColor;
         }
 

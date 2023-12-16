@@ -279,9 +279,10 @@ namespace Oculus.Movement.Utils
             /// Copy constructor
             /// </summary>
             /// <param name="original"></param>
-            public CustomBoneVisualData(CustomBoneVisualData original) {
+            public CustomBoneVisualData(CustomBoneVisualData original)
+            {
                 BoneTuples = new List<BoneTuple>(original.BoneTuples.Count);
-                for(int i = 0; i < original.BoneTuples.Count; ++i)
+                for (int i = 0; i < original.BoneTuples.Count; ++i)
                 {
                     BoneTuples.Add(new BoneTuple(original.BoneTuples[i]));
                 }
@@ -415,7 +416,7 @@ namespace Oculus.Movement.Utils
         [SerializeField]
         [Tooltip(BoneVisualizerTooltips.BoneVisualData)]
         [Interaction.ConditionalHide("_visualizationGuideType", 1)]
-        [ContextMenuItem(nameof(UseStandardBones),nameof(UseStandardBones))]
+        [ContextMenuItem(nameof(UseStandardBones), nameof(UseStandardBones))]
         protected CustomBoneVisualData _customBoneVisualData;
 
         /// <summary>
@@ -669,7 +670,7 @@ namespace Oculus.Movement.Utils
 
         private void VisualizeBoneLines()
         {
-            if(!IsShowingLines)
+            if (!IsShowingLines)
             {
                 foreach (var tupleItem in _customBoneVisualData.BoneTuples)
                 {
@@ -722,7 +723,9 @@ namespace Oculus.Movement.Utils
             {
                 string edge = $"{tupleItem.FirstBone}-{tupleItem.SecondBone}";
                 int i = _customBoneVisualData.BoneTuples.IndexOf(tupleItem);
-                Debug.LogWarning($"Cannot find transform for tuple {edge}\n" +
+                Debug.LogWarning($"Cannot find transform for tuple {edge}, " +
+                    $"first joint null? {(firstJoint != null ? "no" : "yes")}, " +
+                    $"second joint null? {(secondJoint != null ? "no" : "yes")}.\n" +
                     $"<color=#888800>Hiding {this}." +
                     $"{nameof(_customBoneVisualData)}." +
                     $"{nameof(_customBoneVisualData.BoneTuples)}[{i}]:" +

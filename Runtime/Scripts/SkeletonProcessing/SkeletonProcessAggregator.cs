@@ -225,18 +225,48 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
+        /// <summary>
+        /// Adds a <see cref="IOVRSkeletonProcessor"/> to the list
+        /// </summary>
         public void AddProcessor(IOVRSkeletonProcessor processor)
         {
             _skeletonProcessors.Add(new Item(processor));
         }
 
+        /// <summary>
+        /// Removes the given <see cref="IOVRSkeletonProcessor"/> from the list
+        /// </summary>
         public void RemoveProcessor(IOVRSkeletonProcessor processor)
         {
             int index = _skeletonProcessors.FindIndex(item => item.IProcessor == processor);
             if (index >= 0)
             {
                 _skeletonProcessors.RemoveAt(index);
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
             }
+        }
+
+        /// <summary>
+        /// Removes the given <see cref="IOVRSkeletonProcessor"/> from the list, if it is valid
+        /// </summary>
+        public void RemoveProcessor(Component processorComponent)
+        {
+            IOVRSkeletonProcessor processor = processorComponent as IOVRSkeletonProcessor;
+            if (processor != null)
+            {
+                RemoveProcessor(processor);
+            }
+        }
+
+        /// <summary>
+        /// Removes the <see cref="IOVRSkeletonProcessor"/> in this Transform from the list
+        /// </summary>
+        public void RemoveProcessorsInTransform(Transform processorObject)
+        {
+            IOVRSkeletonProcessor[] processors = processorObject.GetComponents<IOVRSkeletonProcessor>();
+            Array.ForEach(processors, p => RemoveProcessor(p));
         }
     }
 }

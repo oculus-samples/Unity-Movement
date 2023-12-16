@@ -124,6 +124,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: e88c1c6d93413254ab36e53cebc1f111, type: 2}
     - target: {fileID: -2928199212358554724, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 1.06
+      objectReference: {fileID: 0}
+    - target: {fileID: -2928199212358554724, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: -0.39
+      objectReference: {fileID: 0}
+    - target: {fileID: -2928199212358554724, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: -0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: -2928199212358554724, guid: aff2ae892ac69124eb8000bd96c5a64e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 9de73d053d6bedb459b332ec735e8bbf, type: 2}
@@ -609,6 +621,20 @@ MonoBehaviour:
   - {fileID: 314159170131016539}
   - {fileID: 246903650701507460}
   - {fileID: 3017241077913359691}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   retargetingType: 0
 --- !u!114 &341051990
 MonoBehaviour:
@@ -622,6 +648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 274835e4e2feae04b87f0d000555f8a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _providedSkeletonType: 0
 --- !u!114 &341051991
 MonoBehaviour:
   m_ObjectHideFlags: 0

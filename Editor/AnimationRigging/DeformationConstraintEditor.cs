@@ -41,7 +41,17 @@ namespace Oculus.Movement.AnimationRigging
                 if (GUILayout.Button("Find Hips To Head Bones"))
                 {
                     Undo.RecordObject(constraint, "Find Hips To Head Bones");
-                    constraint.data.SetUpHipsAndHeadBones();
+                    constraint.data.SetUpHipsToHeadBones();
+                    EditorUtility.SetDirty(target);
+                }
+            }
+            if (constraintData.HipsToHeadBoneTargets == null ||
+                constraintData.HipsToHeadBoneTargets.Length == 0)
+            {
+                if (GUILayout.Button("Find Hips To Head Bone Targets"))
+                {
+                    Undo.RecordObject(constraint, "Find Hips To Head Bone Targets");
+                    constraint.data.SetUpHipsToHeadBoneTargets(constraint.transform);
                     EditorUtility.SetDirty(target);
                 }
             }

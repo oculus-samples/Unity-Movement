@@ -13,12 +13,18 @@ namespace Oculus.Movement.Tracking
     {
         private SerializedProperty _blendshapeModifier;
         private SerializedProperty _combinationShapesTextAsset;
+        private SerializedProperty _forceJawDropForTongue;
+        private SerializedProperty _tongueOutThreshold;
+        private SerializedProperty _minJawDrop;
 
         protected override void OnEnable()
         {
             base.OnEnable();
             _blendshapeModifier = serializedObject.FindProperty("_blendshapeModifier");
             _combinationShapesTextAsset = serializedObject.FindProperty("_combinationShapesTextAsset");
+            _forceJawDropForTongue = serializedObject.FindProperty("_forceJawDropForTongue");
+            _tongueOutThreshold = serializedObject.FindProperty("_tongueOutThreshold");
+            _minJawDrop = serializedObject.FindProperty("_minJawDrop");
         }
 
         /// <inheritdoc />
@@ -29,9 +35,16 @@ namespace Oculus.Movement.Tracking
             serializedObject.Update();
 
             EditorGUILayout.ObjectField(_blendshapeModifier,
-                new GUIContent("Blend shape modifiers (optional)"));
+                new GUIContent("Blendshape Modifiers (Optional)"));
             EditorGUILayout.ObjectField(_combinationShapesTextAsset,
-                new GUIContent("Combination shapes text (Optional)"));
+                new GUIContent("Combination Shapes Text (Optional)"));
+
+            EditorGUILayout.PropertyField(_forceJawDropForTongue);
+            if (_forceJawDropForTongue.boolValue)
+            {
+                EditorGUILayout.PropertyField(_tongueOutThreshold);
+                EditorGUILayout.PropertyField(_minJawDrop);
+            }
 
             serializedObject.ApplyModifiedProperties();
         }

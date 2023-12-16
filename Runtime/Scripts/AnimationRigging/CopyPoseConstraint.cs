@@ -111,7 +111,7 @@ namespace Oculus.Movement.AnimationRigging
     /// The CopyPose constraint, used to copy the current humanoid animator pose information to be used
     /// when correcting positions in RetargetingLayer.
     /// </summary>
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Copy Pose Constraint")]
     public class CopyPoseConstraint : RigConstraint<
         CopyPoseJob,
         CopyPoseData,

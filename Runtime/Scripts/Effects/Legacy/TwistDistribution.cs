@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
+using Oculus.Movement.AnimationRigging;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -140,6 +141,15 @@ namespace Oculus.Movement.Effects.Deprecated
         public void ApplyTwist()
         {
             if (!enabled)
+            {
+                return;
+            }
+
+            if (!RiggingUtilities.IsFiniteVector3(_segmentStart.position))
+            {
+                return;
+            }
+            if (!RiggingUtilities.IsFiniteVector3(_segmentEnd.position))
             {
                 return;
             }

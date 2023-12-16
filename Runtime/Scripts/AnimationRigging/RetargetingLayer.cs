@@ -28,7 +28,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Joint position adjustment to be applied to corrected positions.
         /// </summary>
-        [System.Serializable]
+        [Serializable]
         public class JointPositionAdjustment
         {
             /// <summary>
@@ -68,7 +68,7 @@ namespace Oculus.Movement.AnimationRigging
         /// source (OVRBody) and target characters. To avoid gimbal lock,
         /// a series of rotations are permitted.
         /// </summary>
-        [System.Serializable]
+        [Serializable]
         public class JointRotationTweaks
         {
             /// <summary>
@@ -83,45 +83,25 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Triggered if proxy transforms were recreated.
+        /// </summary>
+        public int ProxyChangeCount => _proxyTransformLogic.ProxyChangeCount;
+
+        /// <summary>
+        /// Allows one to specify which positions to correct during late update.
+        /// </summary>
+        public AvatarMask CustomPositionsToCorrectLateUpdateMask
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// The array of joint position adjustments.
         /// </summary>
         public JointPositionAdjustment[] JointPositionAdjustments
         {
             get;
             private set;
-        }
-
-        /// <summary>
-        /// Allows correcting positions in LateUpdate for accuracy.
-        /// </summary>
-        [SerializeField]
-        [Tooltip(RetargetingLayerTooltips.CorrectPositionsLateUpdate)]
-        protected bool _correctPositionsLateUpdate = true;
-
-        /// <summary>
-        /// Allow correcting rotations in LateUpdate. This can produce more
-        /// accurate hands, for instance.
-        /// </summary>
-        [Tooltip(RetargetingLayerTooltips.LeftHandCorrectionWeightLateUpdate)]
-        [SerializeField, Range(0.0f, 1.0f)]
-        protected float _leftHandCorrectionWeightLateUpdate = 1.0f;
-        public float LeftHandCorrectionWeightLateUpdate
-        {
-            get => _leftHandCorrectionWeightLateUpdate;
-            set => _leftHandCorrectionWeightLateUpdate = value;
-        }
-
-        /// <summary>
-        /// Allow correcting rotations in LateUpdate. This can produce more
-        /// accurate hands, for instance.
-        /// </summary>
-        [Tooltip(RetargetingLayerTooltips.RightHandCorrectionWeightLateUpdate)]
-        [SerializeField, Range(0.0f, 1.0f)]
-        protected float _rightHandCorrectionWeightLateUpdate = 1.0f;
-        public float RightHandCorrectionWeightLateUpdate
-        {
-            get => _rightHandCorrectionWeightLateUpdate;
-            set => _rightHandCorrectionWeightLateUpdate = value;
         }
 
         /// <summary>
@@ -135,8 +115,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc cref="_applyAnimationConstraintsToCorrectedPositions"/>
         public bool ApplyAnimationConstraintsToCorrectedPositions
         {
-            get { return _applyAnimationConstraintsToCorrectedPositions; }
-            set { _applyAnimationConstraintsToCorrectedPositions = value; }
+            get => _applyAnimationConstraintsToCorrectedPositions;
+            set => _applyAnimationConstraintsToCorrectedPositions = value;
         }
 
         /// <summary>
@@ -149,35 +129,50 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.EnableTrackingByProxy)]
-        protected bool _enableTrackingByProxy = false;
+        protected bool _enableTrackingByProxy = true;
         /// <inheritdoc cref="_enableTrackingByProxy"/>
         public bool EnableTrackingByProxy
         {
-            get { return _enableTrackingByProxy; }
-            set { _enableTrackingByProxy = value; }
+            get => _enableTrackingByProxy;
+            set => _enableTrackingByProxy = value;
         }
 
         /// <summary>
         /// Triggers methods that can alter bone translations and rotations, before rendering and physics
         /// </summary>
         [SerializeField, Optional]
-        protected OVRSkeletonProcessor SkeletonPostProcessing;
+        protected OVRSkeletonProcessor _skeletonPostProcessing;
+        /// <inheritdoc cref="_skeletonPostProcessing"/>
         public OVRSkeletonProcessor SkeletonPostProcessingEv
         {
-            get { return SkeletonPostProcessing; }
-            set { SkeletonPostProcessing = value; }
+            get => _skeletonPostProcessing;
+            set => _skeletonPostProcessing = value;
         }
 
         /// <summary>
         /// Related retargeting constraint.
         /// </summary>
         [SerializeField]
-        [Tooltip(RetargetingLayerTooltips.RetargetingAnimationContraint)]
+        [Tooltip(RetargetingLayerTooltips.RetargetingAnimationConstraint)]
         protected RetargetingAnimationConstraint _retargetingAnimationConstraint;
+        /// <inheritdoc cref="_retargetingAnimationConstraint"/>
         public RetargetingAnimationConstraint RetargetingConstraint
         {
-            get { return _retargetingAnimationConstraint; }
-            set { _retargetingAnimationConstraint = value; }
+            get => _retargetingAnimationConstraint;
+            set => _retargetingAnimationConstraint = value;
+        }
+
+        /// <summary>
+        /// List of retargeting processors, which run in late update after retargeting and animation rigging.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.RetargetingProcessors)]
+        protected List<RetargetingProcessor> _retargetingProcessors = new();
+        /// <inheritdoc cref="_retargetingProcessors"/>
+        public List<RetargetingProcessor> RetargetingProcessors
+        {
+            get => _retargetingProcessors;
+            set => _retargetingProcessors = value;
         }
 
         /// <summary>
@@ -186,57 +181,25 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.JointRotationTweaks)]
         protected JointRotationTweaks[] _jointRotationTweaks;
+        /// <inheritdoc cref="_jointRotationTweaks"/>
         public JointRotationTweaks[] JointRotationTweaksArray
         {
             get => _jointRotationTweaks;
             set => _jointRotationTweaks = value;
         }
+
         /// <summary>
         /// Pre-compute these values each time the editor changes for the purposes
         /// of efficiency.
         /// </summary>
         private Dictionary<HumanBodyBones, Quaternion> _humanBoneToAccumulatedRotationTweaks =
             new Dictionary<HumanBodyBones, Quaternion>();
-        private List<HumanBodyBones> _bonesToRemove = new List<HumanBodyBones> ();
+        private List<HumanBodyBones> _bonesToRemove = new List<HumanBodyBones>();
 
         private Pose[] _defaultPoses;
         private IJointConstraint[] _jointConstraints;
         private ProxyTransformLogic _proxyTransformLogic = new ProxyTransformLogic();
-
-        /// <summary>
-        /// Triggered if proxy transforms were recreated.
-        /// </summary>
-        public int ProxyChangeCount => _proxyTransformLogic.ProxyChangeCount;
-
-        /// <summary>
-        /// Allows one to specify which positions to correct during late update.
-        /// </summary>
-        public AvatarMask CustomPositionsToCorrectLateUpdateMask { get; set; }
-
         private bool _isFocusedWhileInBuild = true;
-
-        /// <summary>
-        /// Gets number of transforms being retargeted currently. This can change during
-        /// initialization.
-        /// </summary>
-        /// <returns>Number of transforms with a valid correction quaternion.</returns>
-        public int GetNumberOfTransformsRetargeted()
-        {
-            int numTransforms = 0;
-            // return default case if this is called before initialization.
-            if (TargetSkeletonData == null || TargetSkeletonData.BodyToBoneData == null)
-            {
-                return numTransforms;
-            }
-            foreach (var boneData in TargetSkeletonData.BodyToBoneData.Values)
-            {
-                if (boneData.CorrectionQuaternion != null)
-                {
-                    numTransforms++;
-                }
-            }
-            return numTransforms;
-        }
 
         protected override void Awake()
         {
@@ -244,6 +207,16 @@ namespace Oculus.Movement.AnimationRigging
 
             Assert.IsNotNull(_retargetingAnimationConstraint,
                 "Please assign the retargeting constraint to RetargetingLayer.");
+
+            for (int i = 0; i < _retargetingProcessors.Count; i++)
+            {
+                var retargetingProcessor = _retargetingProcessors[i];
+                Assert.IsNotNull(retargetingProcessor,
+                    "Please assign the retargeting processor to RetargetingLayer.");
+                var instance = Instantiate(_retargetingProcessors[i]);
+                instance.name = $"{name} {_retargetingProcessors[i].name}";
+                _retargetingProcessors[i] = instance;
+            }
         }
 
         /// <summary>
@@ -255,19 +228,23 @@ namespace Oculus.Movement.AnimationRigging
             try
             {
                 base.Start();
+                ConstructDefaultPoseInformation();
+                ConstructBoneAdjustmentInformation();
+                CacheJointConstraints();
+
+                ValidateHumanoid();
+
+                PrecomputeJointRotationTweaks();
+
+                foreach (var retargetingProcessor in _retargetingProcessors)
+                {
+                    retargetingProcessor.SetupRetargetingProcessor(this);
+                }
             }
             catch (Exception e)
             {
                 Debug.LogWarning(e);
             }
-
-            ConstructDefaultPoseInformation();
-            ConstructBoneAdjustmentInformation();
-            CacheJointConstraints();
-
-            ValidateHumanoid();
-
-            PrecomputeJointRotationTweaks();
         }
 
         private void ConstructDefaultPoseInformation()
@@ -363,7 +340,7 @@ namespace Oculus.Movement.AnimationRigging
         /// When the object's properties are modified, accumulate joint rotations
         /// and cache those values. This saves on computation when the tweaks field is used.
         /// </summary>
-        protected void PrecomputeJointRotationTweaks()
+        protected virtual void PrecomputeJointRotationTweaks()
         {
 #if UNITY_EDITOR
             if (!UnityEditor.EditorApplication.isPlaying)
@@ -424,7 +401,7 @@ namespace Oculus.Movement.AnimationRigging
                     _bonesToRemove.Add(bone);
                 }
             }
-            foreach(var boneToRemove in _bonesToRemove)
+            foreach (var boneToRemove in _bonesToRemove)
             {
                 _humanBoneToAccumulatedRotationTweaks.Remove(boneToRemove);
             }
@@ -434,7 +411,7 @@ namespace Oculus.Movement.AnimationRigging
         protected override void Update()
         {
             UpdateSkeleton();
-            SkeletonPostProcessing?.Invoke(this);
+            _skeletonPostProcessing?.Invoke(this);
             RecomputeSkeletalOffsetsIfNecessary();
 
             if (_enableTrackingByProxy)
@@ -444,8 +421,8 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Allows fixing joints to T-pose. The avatar does not allow
-        /// precise finger positions even with translate dof checked.
+        /// Allows fixing joints via the retargeting processors. The avatar does not allow
+        /// precise finger positions even with translate DoF checked.
         /// </summary>
         protected virtual void LateUpdate()
         {
@@ -453,164 +430,27 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-            CorrectBones();
-            // apply constraints on character after fixing positions.
+
+            foreach (var retargetingProcessor in _retargetingProcessors)
+            {
+                retargetingProcessor.PrepareRetargetingProcessor(this, Bones);
+            }
+
+            foreach (var retargetingProcessor in _retargetingProcessors)
+            {
+                retargetingProcessor.ProcessRetargetingLayer(this, Bones);
+            }
+
+            // Apply constraints on character after fixing positions.
             RunConstraints();
-        }
-
-        private void CorrectBones()
-        {
-            bool handCorrectionTurnedOn = (_leftHandCorrectionWeightLateUpdate > Mathf.Epsilon) ||
-                (_rightHandCorrectionWeightLateUpdate > Mathf.Epsilon);
-            if (!_correctPositionsLateUpdate &&
-                !handCorrectionTurnedOn)
-            {
-                return;
-            }
-            if (CustomBoneIdToHumanBodyBone == null || Bones == null)
-            {
-                return;
-            }
-            for (var i = 0; i < Bones.Count; i++)
-            {
-                if (Bones[i] == null)
-                {
-                    continue;
-                }
-                if (!CustomBoneIdToHumanBodyBone.TryGetValue(Bones[i].Id, out var humanBodyBone))
-                {
-                    continue;
-                }
-
-                if (!TargetSkeletonData.BodyToBoneData.TryGetValue(humanBodyBone, out var targetData))
-                {
-                    continue;
-                }
-
-                // Skip if we cannot map the joint at all.
-                if (!targetData.CorrectionQuaternion.HasValue)
-                {
-                    continue;
-                }
-
-                var bodyPart = CustomMappings.HumanBoneToAvatarBodyPart[humanBodyBone];
-                var targetJoint = targetData.OriginalJoint;
-
-                // Make sure body part passes mask, and bone's position should be updated.
-                if (CustomPositionsToCorrectLateUpdateMask != null &&
-                    !CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
-                {
-                    continue;
-                }
-                var adjustment = FindAdjustment(humanBodyBone);
-                if (!ShouldUpdatePositionOfBone(humanBodyBone))
-                {
-                    continue;
-                }
-
-                var currentTargetPosition = targetJoint.position;
-                // Make sure the joint position is valid before fixing it.
-                if (!RiggingUtilities.IsFiniteVector3(currentTargetPosition))
-                {
-                    continue;
-                }
-
-                var positionOffset = _applyAnimationConstraintsToCorrectedPositions ?
-                    JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
-                var currentOVRBonePosition = Bones[i].Transform.position;
-                var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetPosition).sqrMagnitude;
-
-                // If generally correcting positions only and applying hand correction,
-                // skip positional fix a) if the error relative to body tracking is low,
-                // b) and the position influence due to IK fixes is small.
-                if ((_correctPositionsLateUpdate && !handCorrectionTurnedOn) &&
-                    errorRelativeToBodyTracking < Mathf.Epsilon &&
-                    positionOffset.sqrMagnitude < Mathf.Epsilon)
-                {
-                    continue;
-                }
-
-                var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
-                bool isLeftHandFingersOrWrist =
-                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.LeftHand ||
-                    humanBodyBone == HumanBodyBones.LeftHand;
-                bool isRightHandFingersOrWrist =
-                    bodySectionOfJoint == OVRHumanBodyBonesMappings.BodySection.RightHand ||
-                    humanBodyBone == HumanBodyBones.RightHand;
-                bool isHandJoint = isLeftHandFingersOrWrist || isRightHandFingersOrWrist;
-
-                // Pick the correct hand correction weight based on handedness.
-                float handWeight = isLeftHandFingersOrWrist ?
-                    _leftHandCorrectionWeightLateUpdate :
-                    _rightHandCorrectionWeightLateUpdate;
-                // Exclude any position offsets from IK if correcting hand joints to
-                // what body tracking indicates they are.
-                if (isHandJoint)
-                {
-                    positionOffset = Vector3.Lerp(positionOffset, Vector3.zero,
-                        handWeight);
-                }
-
-                float rtWeight = _retargetingAnimationConstraint.weight;
-                if (adjustment == null)
-                {
-                    if (handCorrectionTurnedOn && isHandJoint)
-                    {
-                        targetJoint.rotation =
-                            Quaternion.Slerp(targetJoint.rotation,
-                                Bones[i].Transform.rotation *
-                                targetData.CorrectionQuaternion.Value * GetRotationTweak(humanBodyBone),
-                                handWeight);
-                    }
-                    if (_correctPositionsLateUpdate)
-                    {
-                        targetJoint.position =
-                            Vector3.Lerp(currentTargetPosition,
-                                currentOVRBonePosition + positionOffset, rtWeight);
-                    }
-                }
-                else
-                {
-                    if (handCorrectionTurnedOn && isHandJoint)
-                    {
-                        if (!adjustment.DisableRotationTransform)
-                        {
-                            targetJoint.rotation =
-                                Quaternion.Slerp(targetJoint.rotation,
-                                    Bones[i].Transform.rotation *
-                                    targetData.CorrectionQuaternion.Value * GetRotationTweak(humanBodyBone),
-                                    handWeight);
-                        }
-
-                        targetJoint.rotation *= adjustment.RotationChange;
-                    }
-                    if (!adjustment.DisablePositionTransform &&
-                        _correctPositionsLateUpdate)
-                    {
-                        targetJoint.position =
-                            Vector3.Lerp(currentTargetPosition,
-                                currentOVRBonePosition + positionOffset, rtWeight);
-                    }
-                }
-            }
-        }
-
-        protected Quaternion GetRotationTweak(HumanBodyBones humanBody)
-        {
-            Quaternion rotation;
-
-            if (!_humanBoneToAccumulatedRotationTweaks.TryGetValue(humanBody, out rotation))
-            {
-                rotation = Quaternion.identity;
-            }
-
-            return rotation;
         }
 
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
         {
-            var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
-            return IsBodySectionInArray(bodySectionOfJoint, BodySectionToPosition);
+            var bodySectionOfJoint =
+                OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+            return IsBodySectionInArray(bodySectionOfJoint,
+                _skeletonType == SkeletonType.FullBody ? FullBodySectionToPosition : BodySectionToPosition);
         }
 
         private void RunConstraints()
@@ -734,7 +574,7 @@ namespace Oculus.Movement.AnimationRigging
                 if (avatarMask != null)
                 {
                     jointFailsMask = !avatarMask.GetHumanoidBodyPartActive(
-                        CustomMappings.HumanBoneToAvatarBodyPart[targetHumanBodyBone]);
+                        BoneMappingsExtension.HumanBoneToAvatarBodyPart[targetHumanBodyBone]);
                 }
 
                 if (adjustment == null)
@@ -808,16 +648,145 @@ namespace Oculus.Movement.AnimationRigging
             return (targetData, humanBodyBone);
         }
 
+        #region Public API
+
         /// <inheritdoc/>
         public void AddProcessor(IOVRSkeletonProcessor processor)
         {
-            SkeletonPostProcessing += processor.ProcessSkeleton;
+            _skeletonPostProcessing += processor.ProcessSkeleton;
         }
 
         /// <inheritdoc/>
         public void RemoveProcessor(IOVRSkeletonProcessor processor)
         {
-            SkeletonPostProcessing -= processor.ProcessSkeleton;
+            _skeletonPostProcessing -= processor.ProcessSkeleton;
         }
+
+        /// <summary>
+        /// Add the specified retargeting processor.
+        /// </summary>
+        /// <param name="processor">The processor to be added.</param>
+        public void AddRetargetingProcessor(RetargetingProcessor processor)
+        {
+            _retargetingProcessors.Add(processor);
+        }
+
+        /// <summary>
+        /// Gets number of transforms being retargeted currently. This can change during
+        /// initialization.
+        /// </summary>
+        /// <returns>Number of transforms with a valid correction quaternion.</returns>
+        public int GetNumberOfTransformsRetargeted()
+        {
+            int numTransforms = 0;
+            // return default case if this is called before initialization.
+            if (TargetSkeletonData == null || TargetSkeletonData.BodyToBoneData == null)
+            {
+                return numTransforms;
+            }
+            foreach (var boneData in TargetSkeletonData.BodyToBoneData.Values)
+            {
+                if (boneData.CorrectionQuaternion != null)
+                {
+                    numTransforms++;
+                }
+            }
+            return numTransforms;
+        }
+
+        /// <summary>
+        /// Returns the custom bone id to human body bone pairing, if it exists.
+        /// </summary>
+        /// <param name="boneId">The bone id to check for.</param>
+        /// <returns>The human body bone for a custom bone id. Returns null if it doesn't exist.</returns>
+        public HumanBodyBones? GetCustomBoneIdToHumanBodyBone(BoneId boneId)
+        {
+            if (CustomBoneIdToHumanBodyBone == null)
+            {
+                return null;
+            }
+            if (!CustomBoneIdToHumanBodyBone.TryGetValue(boneId, out var humanBodyBone))
+            {
+                return null;
+            }
+            return humanBodyBone;
+        }
+
+        /// <summary>
+        /// Returns the correction quaternion for a human body bone, if it exists.
+        /// </summary>
+        /// <param name="humanBodyBone">The human body bone to check for.</param>
+        /// <returns>The correction quaternion for a human body bone. Returns null if it doesn't exist.</returns>
+        public Quaternion? GetCorrectionQuaternion(HumanBodyBones humanBodyBone)
+        {
+            if (!TargetSkeletonData.BodyToBoneData.TryGetValue(humanBodyBone, out var targetData))
+            {
+                return null;
+            }
+            if (!targetData.CorrectionQuaternion.HasValue)
+            {
+                return null;
+            }
+            return targetData.CorrectionQuaternion.Value;
+        }
+
+        /// <summary>
+        /// Returns the original joint for a human body bone.
+        /// </summary>
+        /// <param name="humanBodyBone">The human body bone to check for.</param>
+        /// <returns>The original joint for a human body bone.</returns>
+        public Transform GetOriginalJoint(HumanBodyBones humanBodyBone)
+        {
+            if (!TargetSkeletonData.BodyToBoneData.TryGetValue(humanBodyBone, out var targetData))
+            {
+                return null;
+            }
+            return targetData.OriginalJoint;
+        }
+
+        /// <summary>
+        /// Returns the animator used for retargeting.
+        /// </summary>
+        /// <returns>The animator used for retargeting.</returns>
+        public Animator GetAnimatorTargetSkeleton()
+        {
+            return AnimatorTargetSkeleton;
+        }
+
+        /// <summary>
+        /// Returns the rotation tweak for a human body bone.
+        /// </summary>
+        /// <param name="humanBodyBone">The human body bone to check for.</param>
+        /// <returns>The rotation tweak for a human body bone.</returns>
+        public Quaternion GetRotationTweak(HumanBodyBones humanBodyBone)
+        {
+            if (!_humanBoneToAccumulatedRotationTweaks.TryGetValue(humanBodyBone, out var rotation))
+            {
+                rotation = Quaternion.identity;
+            }
+            return rotation;
+        }
+
+        /// <summary>
+        /// Returns the joint adjustment for a human body bone.
+        /// </summary>
+        /// <param name="humanBodyBone">The human body bone to check for.</param>
+        /// <returns>The joint adjustment for a human body bone.</returns>
+        public JointAdjustment GetFindAdjustment(HumanBodyBones humanBodyBone)
+        {
+            return FindAdjustment(humanBodyBone);
+        }
+
+        /// <summary>
+        /// Returns true if the position of a human body bone should be updated.
+        /// </summary>
+        /// <param name="humanBodyBone">The human body bone to check for.</param>
+        /// <returns>True if the position of a human body should be updated.</returns>
+        public bool GetShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
+        {
+            return ShouldUpdatePositionOfBone(humanBodyBone);
+        }
+
+        #endregion
     }
 }

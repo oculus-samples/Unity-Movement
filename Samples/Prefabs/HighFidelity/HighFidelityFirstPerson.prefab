@@ -611,15 +611,22 @@ MonoBehaviour:
     _customSkeleton: {fileID: 1024561555539579727}
     _animator: {fileID: 0}
     _spineTranslationCorrectionType: 1
-    _correctSpineOnce: 0
-    _applyToArms: 1
-    _applyToHands: 0
-    _useMoveTowardsArms: 0
-    _snapThreshold: 0.1
-    _armWeight: 0
-    _handWeight: 0
-    _armMoveSpeed: 0
+    _spineAlignmentWeight: 0
+    _leftShoulderWeight: 0
+    _rightShoulderWeight: 0
+    _leftArmWeight: 0
+    _rightArmWeight: 0
+    _leftHandWeight: 0
+    _rightHandWeight: 0
     _hipsToHeadBones:
+    - {fileID: 4614795461479404054}
+    - {fileID: 7185562945170467144}
+    - {fileID: 4255657312160527834}
+    - {fileID: 8123629613239412764}
+    - {fileID: 8571687220460749114}
+    - {fileID: 7218135907072257976}
+    - {fileID: 6369423367587295010}
+    _hipsToHeadBoneTargets:
     - {fileID: 4614795461479404054}
     - {fileID: 7185562945170467144}
     - {fileID: 4255657312160527834}
@@ -632,90 +639,86 @@ MonoBehaviour:
       UpperArmBone: {fileID: 4319023010721011036}
       LowerArmBone: {fileID: 2061263398344273555}
       HandBone: {fileID: 4076173765156699471}
-      ArmWeight: 0
-      HandWeight: 0
-      MoveSpeed: 0
+      ShoulderLocalPos: {x: -0.066512585, y: 0.09479429, z: 0.0282178}
+      LowerArmToHandAxis: {x: -1, y: -0.000000050878956, z: -0.000000043610534}
     _rightArmData:
       ShoulderBone: {fileID: 2563644540292334074}
       UpperArmBone: {fileID: 6432989413210236746}
       LowerArmBone: {fileID: 5740937155685247320}
       HandBone: {fileID: 8608038177421147514}
-      ArmWeight: 0
-      HandWeight: 0
-      MoveSpeed: 0
+      ShoulderLocalPos: {x: -0.066512585, y: 0.09479429, z: -0.0282178}
+      LowerArmToHandAxis: {x: 1, y: -0.0000008067804, z: 0.000000101756086}
     _bonePairData:
     - StartBone: {fileID: 4614795461479404054}
       EndBone: {fileID: 7185562945170467144}
-      SnapThreshold: 0
-      MoveTowardsSpeed: 0
       Distance: 0.038306892
-      IsMoveTowards: 0
+      HeightProportion: 0.0623864
+      LimbProportion: 0.0623864
     - StartBone: {fileID: 7185562945170467144}
       EndBone: {fileID: 4255657312160527834}
-      SnapThreshold: 0
-      MoveTowardsSpeed: 0
       Distance: 0.11096214
-      IsMoveTowards: 0
+      HeightProportion: 0.18071236
+      LimbProportion: 0.18071236
     - StartBone: {fileID: 4255657312160527834}
       EndBone: {fileID: 8123629613239412764}
-      SnapThreshold: 0
-      MoveTowardsSpeed: 0
       Distance: 0.11240488
-      IsMoveTowards: 0
+      HeightProportion: 0.183062
+      LimbProportion: 0.183062
     - StartBone: {fileID: 8123629613239412764}
       EndBone: {fileID: 8571687220460749114}
-      SnapThreshold: 0
-      MoveTowardsSpeed: 0
       Distance: 0.1846194
-      IsMoveTowards: 0
+      HeightProportion: 0.30067018
+      LimbProportion: 0.30067018
     - StartBone: {fileID: 8571687220460749114}
       EndBone: {fileID: 7218135907072257976}
-      SnapThreshold: 0
-      MoveTowardsSpeed: 0
       Distance: 0.13176535
-      IsMoveTowards: 0
+      HeightProportion: 0.21459235
+      LimbProportion: 0.21459235
     - StartBone: {fileID: 7218135907072257976}
       EndBone: {fileID: 6369423367587295010}
-      SnapThreshold: 0
-      MoveTowardsSpeed: 0
       Distance: 0.07068894
-      IsMoveTowards: 0
+      HeightProportion: 0.11512364
+      LimbProportion: 0.11512364
     - StartBone: {fileID: 8571687220460749114}
       EndBone: {fileID: 2701536249310486477}
-      SnapThreshold: 0.1
-      MoveTowardsSpeed: 0
       Distance: 0.119189434
-      IsMoveTowards: 0
+      HeightProportion: 0
+      LimbProportion: 0
     - StartBone: {fileID: 8571687220460749114}
       EndBone: {fileID: 2563644540292334074}
-      SnapThreshold: 0.1
-      MoveTowardsSpeed: 0
       Distance: 0.119189434
-      IsMoveTowards: 0
+      HeightProportion: 0
+      LimbProportion: 0
     - StartBone: {fileID: 2701536249310486477}
       EndBone: {fileID: 4319023010721011036}
-      SnapThreshold: 0.1
-      MoveTowardsSpeed: 0
       Distance: 0.17650495
-      IsMoveTowards: 0
+      HeightProportion: 0
+      LimbProportion: 0
     - StartBone: {fileID: 2563644540292334074}
       EndBone: {fileID: 6432989413210236746}
-      SnapThreshold: 0.1
-      MoveTowardsSpeed: 0
       Distance: 0.17650484
-      IsMoveTowards: 0
+      HeightProportion: 0
+      LimbProportion: 0
     - StartBone: {fileID: 4319023010721011036}
       EndBone: {fileID: 2061263398344273555}
-      SnapThreshold: 0.1
-      MoveTowardsSpeed: 0
       Distance: 0.25680098
-      IsMoveTowards: 0
+      HeightProportion: 0
+      LimbProportion: 0
     - StartBone: {fileID: 6432989413210236746}
       EndBone: {fileID: 5740937155685247320}
-      SnapThreshold: 0.1
-      MoveTowardsSpeed: 0
       Distance: 0.25679642
-      IsMoveTowards: 0
+      HeightProportion: 0
+      LimbProportion: 0
+    - StartBone: {fileID: 2061263398344273555}
+      EndBone: {fileID: 4076173765156699471}
+      Distance: 0.2562654
+      HeightProportion: 0
+      LimbProportion: 0
+    - StartBone: {fileID: 5740937155685247320}
+      EndBone: {fileID: 8608038177421147514}
+      Distance: 0.25626996
+      HeightProportion: 0
+      LimbProportion: 0
     _startingScale: {x: 1, y: 1, z: 1}
     _hipsToHeadDistance: 0.6140263
 --- !u!1001 &169993673699794201
@@ -865,7 +868,7 @@ MonoBehaviour:
   - {fileID: 4460941168362880823}
   _rebindAnimator: 0
   _reEnableRig: 0
-  _rigToggleOnFocus: 1
+  _rigToggleOnFocus: 0
   _retargetingLayer: {fileID: 0}
   _checkSkeletalUpdatesByProxy: 0
 --- !u!114 &4416254126646396801

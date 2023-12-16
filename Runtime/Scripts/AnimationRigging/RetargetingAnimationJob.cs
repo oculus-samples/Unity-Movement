@@ -49,7 +49,19 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void ProcessRootMotion(AnimationStream stream)
         {
-            // Not applicable to retargeting. For now.
+            float weight = jobWeight.Get(stream);
+            // Update hips for root motion.
+            if (weight > 0f)
+            {
+                UpdateTargetTransform(stream, 0, weight);
+            }
+            else
+            {
+                if (TargetTransforms.Length > 0)
+                {
+                    AnimationRuntimeUtils.PassThrough(stream, TargetTransforms[0]);
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -60,30 +72,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 for (int i = 0; i < TargetTransforms.Length; ++i)
                 {
-                    var targetTransform = TargetTransforms[i];
-                    var sourceTransform = SourceTransforms[i];
-
-                    if (ShouldUpdateRotation[i])
-                    {
-                        var rotationOffset = RotationOffsets[i];
-                        var rotationAdjustment = RotationAdjustments[i];
-                        var originalRotation = sourceTransform.GetRotation(stream);
-                        var finalRotation = originalRotation * rotationOffset * rotationAdjustment;
-                        targetTransform.SetRotation(stream,
-                           Quaternion.Slerp(targetTransform.GetRotation(stream), finalRotation, weight));
-                    }
-
-                    if (ShouldUpdatePosition[i])
-                    {
-                        var originalPosition = targetTransform.GetPosition(stream);
-                        var finalPosition = sourceTransform.GetPosition(stream);
-                        targetTransform.SetPosition(stream,
-                            Vector3.Lerp(originalPosition, finalPosition, weight));
-                    }
-
-                    // update handles with binding info
-                    SourceTransforms[i] = sourceTransform;
-                    TargetTransforms[i] = targetTransform;
+                    UpdateTargetTransform(stream, i, weight);
                 }
             }
             else
@@ -93,6 +82,34 @@ namespace Oculus.Movement.AnimationRigging
                     AnimationRuntimeUtils.PassThrough(stream, TargetTransforms[i]);
                 }
             }
+        }
+
+        private void UpdateTargetTransform(AnimationStream stream, int i, float weight)
+        {
+            var targetTransform = TargetTransforms[i];
+            var sourceTransform = SourceTransforms[i];
+
+            if (ShouldUpdateRotation[i])
+            {
+                var rotationOffset = RotationOffsets[i];
+                var rotationAdjustment = RotationAdjustments[i];
+                var originalRotation = sourceTransform.GetRotation(stream);
+                var finalRotation = originalRotation * rotationOffset * rotationAdjustment;
+                targetTransform.SetRotation(stream,
+                   Quaternion.Slerp(targetTransform.GetRotation(stream), finalRotation, weight));
+            }
+
+            if (ShouldUpdatePosition[i])
+            {
+                var originalPosition = targetTransform.GetPosition(stream);
+                var finalPosition = sourceTransform.GetPosition(stream);
+                targetTransform.SetPosition(stream,
+                    Vector3.Lerp(originalPosition, finalPosition, weight));
+            }
+
+            // update handles with binding info
+            SourceTransforms[i] = sourceTransform;
+            TargetTransforms[i] = targetTransform;
         }
     }
 

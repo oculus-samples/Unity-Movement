@@ -2,6 +2,7 @@
 
 using System;
 using UnityEngine;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -61,16 +62,25 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="animator"><see cref="Animator"/> to query.</param>
         /// <param name="boneId"><see cref="OVRSkeleton.BoneId"/> of transform to find.</param>
+        /// <param name="isFullBody">If is full body bone or not.</param>
         /// <returns></returns>
         public static Transform FindBoneTransformAnimator(
             Animator animator,
-            OVRSkeleton.BoneId boneId)
+            OVRSkeleton.BoneId boneId,
+            bool isFullBody)
         {
-            if (!CustomMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
+            if ((isFullBody && !OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone.ContainsKey(boneId)) ||
+                (!isFullBody && !OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone.ContainsKey(boneId))
+                )
             {
                 return null;
             }
-            return animator.GetBoneTransform(CustomMappings.BoneIdToHumanBodyBone[boneId]);
+
+            if (isFullBody)
+            {
+                return animator.GetBoneTransform(OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone[boneId]);
+            }
+            return animator.GetBoneTransform(OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone[boneId]);
         }
 
         /// <summary>
@@ -82,6 +92,34 @@ namespace Oculus.Movement.AnimationRigging
         {
             return float.IsFinite(v.x) && float.IsFinite(v.y) && float.IsFinite(v.z) &&
                    !float.IsNaN(v.x) && !float.IsNaN(v.y) && !float.IsNaN(v.z);
+        }
+
+        /// <summary>
+        /// Returns the result of diving a Vector3 by another Vector3.
+        /// </summary>
+        /// <param name="dividend">The Vector3 dividend.</param>
+        /// <param name="divisor">The Vector3 divisor.</param>
+        /// <returns>The divided Vector3.</returns>
+        public static Vector3 DivideVector3(Vector3 dividend, Vector3 divisor)
+        {
+            Vector3 targetScale = Vector3.one;
+            if (Vector3IsNonZero(divisor))
+            {
+                targetScale = new Vector3(
+                    dividend.x / divisor.x, dividend.y / divisor.y, dividend.z / divisor.z);
+            }
+
+            return targetScale;
+        }
+
+        /// <summary>
+        /// Returns true if this Vector3 contains no zero values.
+        /// </summary>
+        /// <param name="v">The Vector3 to test</param>
+        /// <returns>True if this Vector3 contains no zero values.</returns>
+        public static bool Vector3IsNonZero(Vector3 v)
+        {
+            return v.x != 0.0f && v.y != 0.0f && v.z != 0.0f;
         }
     }
 

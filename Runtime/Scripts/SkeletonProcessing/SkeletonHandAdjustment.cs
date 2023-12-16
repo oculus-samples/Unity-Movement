@@ -7,7 +7,7 @@ using Oculus.Movement.AnimationRigging;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Oculus.Movement.Experimental.Effects.SkeletonPostprocess
+namespace Oculus.Movement.AnimationRigging
 {
     /// <summary>
     /// A filter for skeleton data that will apply a hand pose.
