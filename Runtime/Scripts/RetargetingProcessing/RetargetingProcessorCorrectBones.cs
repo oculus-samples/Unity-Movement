@@ -120,7 +120,7 @@ namespace Oculus.Movement.AnimationRigging
                 }
                 var targetCorrectionQuaternion = (Quaternion)nullableTargetCorrectionQuaternion;
 
-                var bodyPart = CustomMappings.HumanBoneToAvatarBodyPart[humanBodyBone];
+                var bodyPart = BoneMappingsExtension.HumanBoneToAvatarBodyPart[humanBodyBone];
                 var targetJoint = retargetingLayer.GetOriginalJoint(humanBodyBone);
 
                 // Make sure body part passes mask, and bone's position should be updated.

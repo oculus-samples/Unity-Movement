@@ -224,7 +224,7 @@ namespace Oculus.Movement
         public const string RecalculateIndependently =
             "Allows recalculate normals to be calculated independently on LateUpdate, instead of being driven from DriveSkeletalLateUpdateLogic.";
 
-        public const string DuplicateLayerName =
+        public const string DuplicateLayer =
             "The visible layer of the duplicate mesh with recalculate normals.";
 
         public const string HiddenMeshLayerName =
@@ -775,6 +775,27 @@ namespace Oculus.Movement
 
         public const string FingerOffsets =
             "Offsets that will be applied to the fingers.";
+
+        public const string Animator =
+            "The character's animator.";
+
+        public const string Skeleton =
+            "The source skeleton.";
+
+        public const string LeftHand =
+            "The character's left hand bone.";
+
+        public const string RightHand =
+            "The character's right hand bone.";
+
+        public const string InterpolatedFingers =
+            "Possible metacarpal bones.";
+
+        public const string Fingers =
+            "All finger joints.";
+
+        public const string CalculateFingerData =
+            "If finger data has been calculated or not.";
     }
 
     public static class DeformationLogicTooltips
@@ -929,6 +950,9 @@ namespace Oculus.Movement
         public const string SpineAlignmentWeight =
             "The weight for the spine alignment.";
 
+        public const string ChestAlignmentWeight =
+            "The weight for the chest alignment.";
+
         public const string LeftShoulderWeight =
             "The weight for the deformation on the left shoulder.";
 
@@ -942,10 +966,25 @@ namespace Oculus.Movement
             "The weight for the deformation on the right arm.";
 
         public const string LeftHandWeight =
-            "The weight for the deformation on hands.";
+            "The weight for the deformation on the left hand.";
 
         public const string RightHandWeight =
-            "The weight for the deformation on hands.";
+            "The weight for the deformation on the right hand.";
+
+        public const string LeftLegWeight =
+            "The weight for the deformation on the left leg.";
+
+        public const string RightLegWeight =
+            "The weight for the deformation on the right leg.";
+
+        public const string LeftToesWeight =
+            "The weight for the deformation on the left toe.";
+
+        public const string RightToesWeight =
+            "The weight for the deformation on the right toe.";
+
+        public const string AlignFeetWeight =
+            "Weight used for feet alignment.";
 
         public const string HipsToHeadBones =
             "Array of transform bones from hips to head.";
@@ -959,6 +998,12 @@ namespace Oculus.Movement
         public const string RightArmData =
             "Right arm data.";
 
+        public const string LeftLegData =
+            "Left leg data.";
+
+        public const string RightLegData =
+            "Right leg data.";
+
         public const string BonePairData =
             "All bone pair data.";
 
@@ -967,6 +1012,15 @@ namespace Oculus.Movement
 
         public const string HipsToHeadDistance =
             "Distances between head and hips.";
+
+        public const string HipsToFootDistance =
+            "Distances between hips and feet.";
+    }
+
+    public static class FullBodyDeformationConstraintToolTips
+    {
+        public const string CalculateBoneData =
+            "Allows calculating bone data via a button.";
     }
 
     public static class HipPinningDataTooltips
@@ -1519,6 +1573,21 @@ namespace Oculus.Movement
             + "example, {\"_Leg\"} will disable all rig constraints with \"_Leg\" in the name.";
     }
 
+    public static class AnimationConstraintBlenderTooltips
+    {
+        public const string ActivityExitTime =
+            "Seconds of inactivity till entire animator follows body tracking again.";
+
+        public const string Animator =
+            "The body being animated.";
+
+        public const string ConstraintsToDeactivate =
+            "Constraints to deactivate when animation is active.";
+
+        public const string ConstraintsToBlend =
+            "Constraints to blend when animation is active.";
+    }
+
     public static class AnimatorHooksTooltips
     {
         public const string AutoAssignAnimatorsFromChildren =
@@ -1603,11 +1672,11 @@ namespace Oculus.Movement
         public const string CharacterRoot =
             "Root of the character object, which has specially named body tracked bones as children somewhere in it's hierarchy";
 
-        public const string TrackingHipsNames =
-            "Partial names (in the hierarchy) of Transforms that track the hips";
+        public const string TrackedHipTransform =
+            "Transform that move when the player moves in real life.";
 
-        public const string TrackingToesNames =
-            "Partial names (in the hierarchy) of Transforms that track the toes or bottom of feet";
+        public const string TrackingToes =
+            "Transforms belonging to feet, at the ground, that move when the animated character moves.";
 
         public const string ColliderFollowsToes =
             "If true, the sphere collider will be influenced by the y-position of toes";
@@ -1686,5 +1755,57 @@ namespace Oculus.Movement
 
         public const string Skeleton =
             "The skeleton object that needs to be tracked.";
+    }
+
+    public static class BodyTrackingFidelityToggleTooltips
+    {
+        public const string CurrentFidelity =
+            "The current fidelity set.";
+
+        public const string WorldText =
+            "The text to update after body tracking fidelity is changed.";
+    }
+
+    public static class SuggestBodyTrackingCalibrationButtonTooltips
+    {
+        public const string WorldText =
+            "The text to modify once height is modified.";
+
+        public const string Height =
+            "The height to set in meters.";
+
+        public const string CalibrateOnStartup =
+            "Allows calibration on startup.";
+    }
+
+    public static class BlendHandConstraintsFullBodyTooltips
+    {
+        public const string Constraints =
+            "Constraints to control the weight of.";
+
+        public const string RetargetingLayer =
+            "The character's retargeting layer.";
+
+        public const string BoneIdToTest =
+            "Bone ID, usually the wrist. Can be modified depending " +
+            "on the skeleton used.";
+
+        public const string HeadTransform =
+            "Head transform to do distance checks against.";
+
+        public const string AutoAddTo =
+            "MonoBehaviour to add to.";
+
+        public const string ConstraintsMinDistance =
+            "Distance where constraints are set to 1.0.";
+
+        public const string ConstraintsMaxDistance =
+            "Distance where constraints are set to 0.0.";
+
+        public const string BlendCurve =
+            "Multiplier that influences weight interpolation based on distance.";
+
+        public const string MaxWeight =
+            "Max constraint weight.";
     }
 }

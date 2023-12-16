@@ -19,13 +19,13 @@ namespace Oculus.Movement.Effects
         public enum MacroExpressionType
         {
             /// <summary>
-            /// Smiling expression.
+            /// Smile
             /// </summary>
-            Happy = 0,
+            Smile = 0,
             /// <summary>
-            /// Angry or frowning expression.
+            /// Frowning
             /// </summary>
-            Angry = 1
+            Frown = 1
         }
 
         /// <summary>

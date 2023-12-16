@@ -193,6 +193,8 @@ namespace Oculus.Movement.Locomotion
             set => _snapTurnRight = value;
         }
 
+        private bool _canUpdate;
+
         /// <inheritdoc/>
         private void Awake()
         {
@@ -205,6 +207,7 @@ namespace Oculus.Movement.Locomotion
             {
                 _cameraRig = GetComponentInChildren<OVRCameraRig>();
             }
+            _canUpdate = true;
         }
 
         /// <inheritdoc/>
@@ -216,6 +219,16 @@ namespace Oculus.Movement.Locomotion
         /// <inheritdoc/>
         private void FixedUpdate()
         {
+            if (!_canUpdate)
+            {
+                // Reset the inputs while the locomotion can't receive any updates, so that no erroneous input is
+                // captured and applied when update is enabled again.
+                SetJoystickInput(Vector2.zero);
+                _receivedScriptedJoystickInputThisFrame = false;
+                _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
+                _locomotionDirection = Vector3.zero;
+                return;
+            }
             if (_smoothTurnLeft)
             {
                 transform.Rotate(0, -_rotationPerSecond * Time.deltaTime, 0);
@@ -237,6 +250,13 @@ namespace Oculus.Movement.Locomotion
             {
                 SnapTurn();
             }
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            _canUpdate = hasFocus;
+            _rigidbody.isKinematic = !hasFocus;
+            _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
         }
 
         /// <summary>
@@ -311,7 +331,7 @@ namespace Oculus.Movement.Locomotion
         {
             if (_rigidbody.isKinematic)
             {
-                _rigidbody.MovePosition(_rigidbody.position + _locomotionDirection * _speed * Time.fixedDeltaTime);
+                _rigidbody.MovePosition(_rigidbody.position + _locomotionDirection * (_speed * Time.fixedDeltaTime));
             }
             else
             {

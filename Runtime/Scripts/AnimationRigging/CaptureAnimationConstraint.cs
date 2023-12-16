@@ -204,7 +204,7 @@ namespace Oculus.Movement.AnimationRigging
     /// Capture animation constraint. Captures the current animator's reference pose and current pose,
     /// to be used to blend animation playback and tracking in another animation job.
     /// </summary>
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Capture Animation Constraint")]
     public class CaptureAnimationConstraint : RigConstraint<
             CaptureAnimationJob,
             CaptureAnimationData,

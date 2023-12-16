@@ -129,7 +129,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.EnableTrackingByProxy)]
-        protected bool _enableTrackingByProxy = false;
+        protected bool _enableTrackingByProxy = true;
         /// <inheritdoc cref="_enableTrackingByProxy"/>
         public bool EnableTrackingByProxy
         {
@@ -194,7 +194,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         private Dictionary<HumanBodyBones, Quaternion> _humanBoneToAccumulatedRotationTweaks =
             new Dictionary<HumanBodyBones, Quaternion>();
-        private List<HumanBodyBones> _bonesToRemove = new List<HumanBodyBones> ();
+        private List<HumanBodyBones> _bonesToRemove = new List<HumanBodyBones>();
 
         private Pose[] _defaultPoses;
         private IJointConstraint[] _jointConstraints;
@@ -228,23 +228,22 @@ namespace Oculus.Movement.AnimationRigging
             try
             {
                 base.Start();
+                ConstructDefaultPoseInformation();
+                ConstructBoneAdjustmentInformation();
+                CacheJointConstraints();
+
+                ValidateHumanoid();
+
+                PrecomputeJointRotationTweaks();
+
+                foreach (var retargetingProcessor in _retargetingProcessors)
+                {
+                    retargetingProcessor.SetupRetargetingProcessor(this);
+                }
             }
             catch (Exception e)
             {
                 Debug.LogWarning(e);
-            }
-
-            ConstructDefaultPoseInformation();
-            ConstructBoneAdjustmentInformation();
-            CacheJointConstraints();
-
-            ValidateHumanoid();
-
-            PrecomputeJointRotationTweaks();
-
-            foreach (var retargetingProcessor in _retargetingProcessors)
-            {
-                retargetingProcessor.SetupRetargetingProcessor(this);
             }
         }
 
@@ -402,7 +401,7 @@ namespace Oculus.Movement.AnimationRigging
                     _bonesToRemove.Add(bone);
                 }
             }
-            foreach(var boneToRemove in _bonesToRemove)
+            foreach (var boneToRemove in _bonesToRemove)
             {
                 _humanBoneToAccumulatedRotationTweaks.Remove(boneToRemove);
             }
@@ -448,8 +447,10 @@ namespace Oculus.Movement.AnimationRigging
 
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
         {
-            var bodySectionOfJoint = OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
-            return IsBodySectionInArray(bodySectionOfJoint, BodySectionToPosition);
+            var bodySectionOfJoint =
+                OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+            return IsBodySectionInArray(bodySectionOfJoint,
+                _skeletonType == SkeletonType.FullBody ? FullBodySectionToPosition : BodySectionToPosition);
         }
 
         private void RunConstraints()
@@ -573,7 +574,7 @@ namespace Oculus.Movement.AnimationRigging
                 if (avatarMask != null)
                 {
                     jointFailsMask = !avatarMask.GetHumanoidBodyPartActive(
-                        CustomMappings.HumanBoneToAvatarBodyPart[targetHumanBodyBone]);
+                        BoneMappingsExtension.HumanBoneToAvatarBodyPart[targetHumanBodyBone]);
                 }
 
                 if (adjustment == null)

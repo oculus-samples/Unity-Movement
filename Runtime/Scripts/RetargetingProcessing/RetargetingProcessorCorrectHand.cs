@@ -138,9 +138,9 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 if ((Handedness == Handedness.Left &&
-                     CustomMappings.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.LeftArm) ||
+                     BoneMappingsExtension.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.LeftArm) ||
                     (Handedness == Handedness.Right &&
-                     CustomMappings.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.RightArm))
+                     BoneMappingsExtension.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.RightArm))
                 {
                     armBones.Add(boneTransform);
                 }
@@ -157,17 +157,23 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
         {
+            var isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
+            var leftHandWristIndex = isFullBody ? (int)OVRSkeleton.BoneId.FullBody_LeftHandWrist :
+                (int)OVRSkeleton.BoneId.Body_LeftHandWrist;
+            var rightHandWristIndex = isFullBody ? (int)OVRSkeleton.BoneId.FullBody_RightHandWrist :
+                (int)OVRSkeleton.BoneId.Body_RightHandWrist;
+
             if ((Handedness == Handedness.Left &&
-                 ovrBones.Count < (int)OVRSkeleton.BoneId.Body_LeftHandWrist) ||
+                 ovrBones.Count < leftHandWristIndex) ||
                 (Handedness == Handedness.Right &&
-                 ovrBones.Count < (int)OVRSkeleton.BoneId.Body_RightHandWrist))
+                 ovrBones.Count < rightHandWristIndex))
             {
                 return;
             }
 
             var targetHand = ovrBones[Handedness == Handedness.Left ?
-                (int)OVRSkeleton.BoneId.Body_LeftHandWrist :
-                (int)OVRSkeleton.BoneId.Body_RightHandWrist]?.Transform;
+                leftHandWristIndex :
+                rightHandWristIndex]?.Transform;
             if (targetHand == null)
             {
                 return;

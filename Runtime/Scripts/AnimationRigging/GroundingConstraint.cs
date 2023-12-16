@@ -477,7 +477,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Grounding constraint.
     /// </summary>
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, AddComponentMenu("Movement Animation Rigging/Grounding Constraint")]
     public class GroundingConstraint : RigConstraint<
         GroundingJob,
         GroundingData,

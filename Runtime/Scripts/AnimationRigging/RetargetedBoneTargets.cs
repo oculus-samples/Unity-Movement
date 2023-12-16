@@ -4,6 +4,7 @@ using Oculus.Interaction;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -44,7 +45,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc/>
-        public string SkeletonProcessorLabel => "Retarget Hands";
+        public string SkeletonProcessorLabel => "Retargeted Bone Targets";
 
         /// <summary>
         /// The <see cref="IOVRSkeletonProcessorAggregator"/> to give self to
@@ -86,7 +87,7 @@ namespace Oculus.Movement.AnimationRigging
         protected virtual void Awake()
         {
             var humanBodyBoneToOVRBoneId =
-                CustomMappings.BoneIdToHumanBodyBone.ToDictionary(
+                OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone.ToDictionary(
                     x => x.Value, x => x.Key);
             foreach (var retargetedBoneTarget in _retargetedBoneTargets)
             {

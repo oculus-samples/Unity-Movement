@@ -308,11 +308,11 @@ MonoBehaviour:
     OnStartMove:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 657627064}
-          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimatorBodyTrackingActivityMask,
-            Assembly-CSharp
-          m_MethodName: StartApplyingMaskFor
-          m_Mode: 5
+        - m_Target: {fileID: 657627065}
+          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimationConstraintBlender,
+            Meta.Movement
+          m_MethodName: StartApplyingAnimFor
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -336,11 +336,11 @@ MonoBehaviour:
     OnStopMove:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 657627064}
-          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimatorBodyTrackingActivityMask,
-            Assembly-CSharp
-          m_MethodName: FinishApplyingMaskFor
-          m_Mode: 5
+        - m_Target: {fileID: 657627065}
+          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimationConstraintBlender,
+            Meta.Movement
+          m_MethodName: FinishApplyingAnimFor
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -422,11 +422,9 @@ MonoBehaviour:
   _floorLayerMask:
     serializedVersion: 2
     m_Bits: 1
-  _trackingHipsNames:
-  - Hips
-  _trackingToesNames:
-  - _ToesEnd
-  - FootTip
+  _trackingHips: {fileID: 314474975}
+  _trackingToes:
+  - {fileID: 2122434358}
   _colliderFollowsToes: 0
 --- !u!1001 &51453787
 PrefabInstance:
@@ -864,7 +862,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 307227082}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1277,19 +1275,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: Oculus.Movement.Experimental.Effects.SkeletonPostprocess.VelocityIndicator,
-            Assembly-CSharp
-          m_MethodName: SetVector2Local
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   _onUpdate: 0
   _onFixedUpdate: 1
 --- !u!114 &317372563
@@ -1639,6 +1624,63 @@ MonoBehaviour:
   _myTransform: {fileID: 396246438}
   _mirroredTransformPairs: []
   _mirrorScale: 0
+--- !u!1001 &398028469
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.875
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.407
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7010574
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.09229593
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7010574
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.09229593
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362976725013471434, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_Name
+      value: BodyTrackingFidelityToggle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
 --- !u!4 &417665234 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1091656508850216855, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
@@ -2590,9 +2632,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 657627063}
-  - component: {fileID: 657627064}
+  - component: {fileID: 657627065}
   m_Layer: 0
-  m_Name: LocomotionAnimationConstraintMaskForLegs
+  m_Name: LocomotionAnimationConstraintBlender
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2613,7 +2655,7 @@ Transform:
   m_Father: {fileID: 39895793}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &657627064
+--- !u!114 &657627065
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2622,14 +2664,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 657627062}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4154875e392cb344d9dd4d74b39327fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ff1502fa0de15543a539011dffe8033, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mask: {fileID: 31900000, guid: d4369de8655fb8440998832adc6fb866, type: 2}
   _activityExitTime: 1
   _animator: {fileID: 1313172172}
-  _constraintsToDeactivate:
-  - Leg
+  _constraintsToDeactivate: []
+  _constraintsToBlend:
+  - {fileID: 1077107419}
 --- !u!1 &674130230
 GameObject:
   m_ObjectHideFlags: 0
@@ -3803,7 +3845,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[5].label
-      value: Retarget Hands
+      value: Retargeted Bone Targets
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[6].label
@@ -3868,11 +3910,11 @@ PrefabInstance:
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[5].Processor
       value: 
-      objectReference: {fileID: 1313172174}
+      objectReference: {fileID: 1077107418}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[6].Processor
       value: 
-      objectReference: {fileID: 1313172174}
+      objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[7].Processor
       value: 
@@ -4120,6 +4162,28 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8760844189829344787, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1077107418 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2519393238448185555, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+  m_PrefabInstance: {fileID: 1077107416}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e99c227ec21d72d45b36011069f2b263, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1077107419 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5858254439604359654, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+  m_PrefabInstance: {fileID: 1077107416}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ac6230484089474898c6890ca09d24e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1080009793 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2143258140644656283, guid: e7fbb376593cff24f9db4ecf8d465aaf, type: 3}
@@ -5175,17 +5239,6 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 8172159923276885446, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
   m_PrefabInstance: {fileID: 1077107416}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1313172174 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1483202515538247245, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
-  m_PrefabInstance: {fileID: 1077107416}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e00344307bbe4d949bfcf8eddb0caf22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1324704613 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 417454297435961822, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
@@ -5245,7 +5298,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1335521943}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -6510,7 +6563,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1836032976}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -6826,7 +6879,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2056065453}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7134,7 +7187,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 657627064}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimatorBodyTrackingActivityMask,
             Assembly-CSharp
           m_MethodName: StartApplyingMaskFor
@@ -7208,7 +7261,7 @@ MonoBehaviour:
     OnJumpFinished:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 657627064}
+        - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimatorBodyTrackingActivityMask,
             Assembly-CSharp
           m_MethodName: FinishApplyingMaskFor

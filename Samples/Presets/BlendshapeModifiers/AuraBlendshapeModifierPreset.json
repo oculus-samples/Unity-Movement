@@ -2,7 +2,7 @@
   "FaceExpressionModifiers": [
     {
       "FaceExpressions": [
-        63
+        70
       ],
       "MinValue": 0.0,
       "MaxValue": 1.0,
@@ -301,6 +301,62 @@
       "MinValue": 0.0,
       "MaxValue": 1.0,
       "Multiplier": 1.5
+    },
+    {
+      "FaceExpressions": [
+        63
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
+    },
+    {
+      "FaceExpressions": [
+        64
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
+    },
+    {
+      "FaceExpressions": [
+        65
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
+    },
+    {
+      "FaceExpressions": [
+        66
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
+    },
+    {
+      "FaceExpressions": [
+        67
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
+    },
+    {
+      "FaceExpressions": [
+        68
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
+    },
+    {
+      "FaceExpressions": [
+        69
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
     }
   ]
 }

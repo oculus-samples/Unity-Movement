@@ -11,6 +11,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using static Oculus.Movement.AnimationRigging.RetargetedBoneTargets;
+using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.Utils
 {
@@ -87,12 +88,12 @@ namespace Oculus.Movement.Utils
 
             AddRetargetedBoneTargetComponent(activeGameObject, spineBoneTargets);
 
-            AddHandBlendConstraint(activeGameObject, null,
-                retargetingLayer, CustomMappings.BodyTrackingBoneId.Body_LeftHandWrist,
+            AddHandBlendConstraint(activeGameObject,
+                retargetingLayer, OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist,
                 animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
-            AddHandBlendConstraint(activeGameObject, null,
-                retargetingLayer, CustomMappings.BodyTrackingBoneId.Body_RightHandWrist,
+            AddHandBlendConstraint(activeGameObject,
+                retargetingLayer, OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist,
                 animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
             // Add final components to tie everything together.
@@ -189,6 +190,7 @@ namespace Oculus.Movement.Utils
                 retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
                 Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
             }
+            retargetingLayer.EnableTrackingByProxy = true;
 
             var bodySectionToPosition =
                 typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
@@ -235,7 +237,7 @@ namespace Oculus.Movement.Utils
             if (!rigBuilder)
             {
                 rigBuilder = mainParent.AddComponent<RigBuilder>();
-                rigBuilder.layers = new System.Collections.Generic.List<RigLayer>
+                rigBuilder.layers = new List<RigLayer>
                 {
                     new RigLayer(rigComponent, true)
                 };
@@ -288,9 +290,9 @@ namespace Oculus.Movement.Utils
             {
                 return;
             }
+            var animatorComponent = mainParent.GetComponent<Animator>();
             rigSetup = mainParent.AddComponent<AnimationRigSetup>();
             rigSetup.Skeleton = skeletalComponent;
-            var animatorComponent = mainParent.GetComponent<Animator>();
             rigSetup.AnimatorComp = animatorComponent;
             rigSetup.RigbuilderComp = rigBuilder;
             if (constraintComponents != null)
@@ -303,6 +305,7 @@ namespace Oculus.Movement.Utils
             rigSetup.RebindAnimator = true;
             rigSetup.ReEnableRig = true;
             rigSetup.RetargetingLayerComp = retargetingLayer;
+            rigSetup.CheckSkeletalUpdatesByProxy = true;
             Undo.RegisterCreatedObjectUndo(rigSetup, "Create Anim Rig Setup");
         }
 
@@ -387,7 +390,7 @@ namespace Oculus.Movement.Utils
                 RetargetedBoneTarget boneRTTarget = new RetargetedBoneTarget();
                 boneRTTarget.BoneId = boneToRetarget.Item1;
                 boneRTTarget.Target = boneToRetarget.Item2;
-                boneRTTarget.HumanBodyBone = CustomMappings.BoneIdToHumanBodyBone[boneRTTarget.BoneId];
+                boneRTTarget.HumanBodyBone = OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone[boneRTTarget.BoneId];
                 boneTargets.Add(boneRTTarget);
             }
             return boneTargets.ToArray();
@@ -522,8 +525,8 @@ namespace Oculus.Movement.Utils
         }
 
         private static BlendHandConstraints AddHandBlendConstraint(
-            GameObject mainParent, MonoBehaviour[] constraints, RetargetingLayer retargetingLayer,
-            CustomMappings.BodyTrackingBoneId boneIdToTest, Transform headTransform)
+            GameObject mainParent, RetargetingLayer retargetingLayer,
+            OVRHumanBodyBonesMappings.BodyTrackingBoneId boneIdToTest, Transform headTransform)
         {
             var blendHandConstraints = mainParent.GetComponentsInChildren<BlendHandConstraints>();
             foreach (var blendHandConstraint in blendHandConstraints)
@@ -567,6 +570,11 @@ namespace Oculus.Movement.Utils
             }
         }
 
+        /// <summary>
+        /// Validates GameObject for face mapping.
+        /// </summary>
+        /// <param name="go">GameObject to check.</param>
+        /// <exception cref="InvalidOperationException">Exception thrown if GameObject fails check.</exception>
         public static void ValidateGameObjectForFaceMapping(GameObject go)
         {
             var renderer = go.GetComponent<SkinnedMeshRenderer>();

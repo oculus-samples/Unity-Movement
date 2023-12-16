@@ -126,7 +126,7 @@ namespace Oculus.Movement.Effects
             {
                 return;
             }
-            if (eventArgs.Expression != MacroExpressionType.Happy)
+            if (eventArgs.Expression != MacroExpressionType.Smile)
             {
                 return;
             }
@@ -152,12 +152,12 @@ namespace Oculus.Movement.Effects
                 _smileTime = -1.0f;
             }
 
-            if (!_facialExpressionDetector.MacroExpressionTypeToStrength.ContainsKey(MacroExpressionType.Happy))
+            if (!_facialExpressionDetector.MacroExpressionTypeToStrength.ContainsKey(MacroExpressionType.Smile))
             {
                 return;
             }
 
-            var currentStateInfo =_animator.GetCurrentAnimatorStateInfo(0);
+            var currentStateInfo = _animator.GetCurrentAnimatorStateInfo(0);
             bool isSmiling = currentStateInfo.IsName(_smileStateName);
             bool isSmileReversing = currentStateInfo.IsName(_reverseSmileStateName);
             if (isSmiling || isSmileReversing)
@@ -168,7 +168,7 @@ namespace Oculus.Movement.Effects
                 // lerp value obtained while smiling.
                 float currentLerpValue = isSmiling ?
                     currentStateInfo.normalizedTime :
-                    _lastLerpValueSmiling*(1.0f - currentStateInfo.normalizedTime);
+                    _lastLerpValueSmiling * (1.0f - currentStateInfo.normalizedTime);
                 if (isSmiling)
                 {
                     _lastLerpValueSmiling = currentLerpValue;

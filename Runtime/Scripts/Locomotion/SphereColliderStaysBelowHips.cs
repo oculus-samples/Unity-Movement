@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Oculus.Movement.Locomotion
@@ -39,18 +38,18 @@ namespace Oculus.Movement.Locomotion
         protected LayerMask _floorLayerMask = 1;
 
         /// <summary>
-        /// Partial names (in the hierarchy) of Transforms that track the hips
+        /// Transform that move when the player moves in real life.
         /// </summary>
-        [Tooltip(SphereColliderStaysBelowHipsTooltips.TrackingHipsNames)]
+        [Tooltip(SphereColliderStaysBelowHipsTooltips.TrackedHipTransform)]
         [SerializeField]
-        protected string[] _trackingHipsNames = { "Hips" };
+        protected Transform _trackingHips;
 
         /// <summary>
-        /// Partial names (in the hierarchy) of Transforms that track the toes or bottom of feet
+        /// Transforms belonging to feet, at the ground, that move when the animated character moves.
         /// </summary>
-        [Tooltip(SphereColliderStaysBelowHipsTooltips.TrackingToesNames)]
+        [Tooltip(SphereColliderStaysBelowHipsTooltips.TrackingToes)]
         [SerializeField]
-        protected string[] _trackingToesNames = { "_ToesEnd", "FootTip" };
+        protected Transform[] _trackingToes;
 
         /// <summary>
         /// If true, the sphere collider will be influenced by the y-position of toes
@@ -65,75 +64,9 @@ namespace Oculus.Movement.Locomotion
         private Vector3 _lastPosition;
 
         /// <summary>
-        /// Transform that move when the player moves IRL.
-        /// </summary>
-        protected Transform _trackingHips;
-
-        /// <summary>
-        /// Transforms belonging to feet, at the ground, that move when the animated character moves.
-        /// </summary>
-        protected Transform[] _trackingToes;
-
-        /// <summary>
         /// Statically allocated memory for collision detection, for performance reasons
         /// </summary>
         private RaycastHit[] _nonallocSphereCastHits = new RaycastHit[10];
-
-        /// <inheritdoc cref="_characterRoot"/>
-        public Transform CharacterRoot
-        {
-            get => _characterRoot;
-            set
-            {
-                _characterRoot = value;
-                RefreshBodytrackedRoot();
-            }
-        }
-
-        /// <inheritdoc cref="_colliderFollowsToes"/>
-        public bool TrackToes
-        {
-            get => _colliderFollowsToes;
-            set => _colliderFollowsToes = value;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="_trackingHips"/>
-        /// Automatically set when CharacterRoot is set. Can be manually reset later.
-        /// </summary>
-        public Transform TrackedToDetermineGroundPosition
-        {
-            get => _trackingHips;
-            set => _trackingHips = value;
-        }
-
-        /// <summary>
-        /// Discovers an active transform named by <see cref="_trackingHipsNames"/>
-        /// </summary>
-        public void RefreshBodytrackedRoot()
-        {
-            Transform[] trackingHips = FindTransformsWithNamesContaining(CharacterRoot, _trackingHipsNames);
-            _trackingHips = trackingHips[0];
-            _trackingToes = FindTransformsWithNamesContaining(CharacterRoot, _trackingToesNames);
-        }
-
-        private static Transform[] FindTransformsWithNamesContaining(Transform root, IEnumerable<string> partialNames)
-        {
-            Transform[] transforms = root.GetComponentsInChildren<Transform>();
-            List<Transform> result = new List<Transform>();
-            foreach (string partialName in partialNames)
-            {
-                for (int i = 0; i < transforms.Length; ++i)
-                {
-                    Transform t = transforms[i];
-                    if (t.name.Contains(partialName))
-                    {
-                        result.Add(t);
-                    }
-                }
-            }
-            return result.ToArray();
-        }
 
         protected Vector3 GetPlausibleFeetAbsolutePosition()
         {
@@ -161,11 +94,6 @@ namespace Oculus.Movement.Locomotion
                     toesY = toePositionY;
                 }
             }
-        }
-
-        private void Start()
-        {
-            RefreshBodytrackedRoot();
         }
 
         private void Update()
