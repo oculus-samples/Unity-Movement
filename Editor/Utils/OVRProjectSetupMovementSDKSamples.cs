@@ -34,9 +34,13 @@ namespace Oculus.Movement.Utils
                 level: OVRProjectSetup.TaskLevel.Required,
                 group: _group,
                 platform: BuildTargetGroup.Android,
-                isDone: group => OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingFidelity == OVRPlugin.BodyTrackingFidelity2.High,
+                isDone: group => OVRRuntimeSettings.Instance.BodyTrackingFidelity == OVRPlugin.BodyTrackingFidelity2.High,
                 message: "Body Tracking Fidelity should be set to High.",
-                fix: group => OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingFidelity = OVRPlugin.BodyTrackingFidelity2.High,
+                fix: group =>
+                {
+                    OVRRuntimeSettings.Instance.BodyTrackingFidelity = OVRPlugin.BodyTrackingFidelity2.High;
+                    OVRRuntimeSettings.CommitRuntimeSettings(OVRRuntimeSettings.Instance);
+                },
                 fixMessage: "Set OVRRuntimeSettings.BodyTrackingFidelity = High"
             );
 
@@ -46,7 +50,11 @@ namespace Oculus.Movement.Utils
                 platform: BuildTargetGroup.Android,
                 isDone: group => OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet == OVRPlugin.BodyJointSet.FullBody,
                 message: "Body Tracking Joint Set should be set to Full Body.",
-                fix: group => OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet = OVRPlugin.BodyJointSet.FullBody,
+                fix: group =>
+                {
+                    OVRRuntimeSettings.Instance.BodyTrackingJointSet = OVRPlugin.BodyJointSet.FullBody;
+                    OVRRuntimeSettings.CommitRuntimeSettings(OVRRuntimeSettings.Instance);
+                },
                 fixMessage: "Set OVRRuntimeSettings.BodyTrackingJointSet = FullBody"
             );
 
