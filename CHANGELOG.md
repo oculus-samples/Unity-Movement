@@ -1,3 +1,68 @@
+# [4.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v3.1.1...v4.0.0) (2023-12-16)
+
+
+### Bug Fixes
+
+* **Runtime:** Add max stretch for CCDIK and update deformation ([dbe19d1](https://github.com/oculus-samples/Unity-Movement/commit/dbe19d149ec58b7332868e14ace0dc02f476ee97))
+* **Runtime:** Allow controlling blendshape example's constraints via skeletal state ([6579f9e](https://github.com/oculus-samples/Unity-Movement/commit/6579f9e7d5e9e0f7f4288abf28d815c087a18fda)), closes [#1](https://github.com/oculus-samples/Unity-Movement/issues/1) [#2](https://github.com/oculus-samples/Unity-Movement/issues/2)
+* **Runtime:** Disable null check on BlendHandConstraint _autoAddTo ([c3fd6ad](https://github.com/oculus-samples/Unity-Movement/commit/c3fd6ad03195c5ae3f6458bd31a7621ca659a808))
+* **Runtime:** Update the accurate head option in deformation ([7a20b3b](https://github.com/oculus-samples/Unity-Movement/commit/7a20b3bf0f4ea3cebdfe4ce5d18abdc0b049b3b1))
+* **Samples:** Disable _rigToggleOnFocus ([c6dc3bc](https://github.com/oculus-samples/Unity-Movement/commit/c6dc3bcdda0abd2a4dd1cdc5ac77a31f76036bfc))
+
+
+### Features
+
+* **Editor/Runtime/Samples:** Update for v60 ([8d5f1bb](https://github.com/oculus-samples/Unity-Movement/commit/8d5f1bb429a116b177ffefd1bd2e61b4e75b11c0))
+* **Editor:** Add IntAsEnum property attribute and drawer ([ccaa9cd](https://github.com/oculus-samples/Unity-Movement/commit/ccaa9cd300a8a188c7b3c5053f63284c4e0a3493))
+* **Editor:** Update helper menus to add retargeting processors on the one-click setup ([cb2d5da](https://github.com/oculus-samples/Unity-Movement/commit/cb2d5daa0b218505548872022bb1922fc70d850a))
+* **Editor:** Update one-click to also setup elbows and new deformation parameters ([11bf4b0](https://github.com/oculus-samples/Unity-Movement/commit/11bf4b067c616fb92241163f279ffe13534e2378))
+* **Runtime:** Add a weight to correct shoulder rotations in late update ([fb8d357](https://github.com/oculus-samples/Unity-Movement/commit/fb8d3572782f1fc88a2fafed9388a6c45d0036df))
+* **Runtime:** Add additional spine alignment weights for the other spine bones ([63ba963](https://github.com/oculus-samples/Unity-Movement/commit/63ba96322049d358c38ad689c9f65b0549f82fa5))
+* **Runtime:** Add animation playback constraint ([5854f9e](https://github.com/oculus-samples/Unity-Movement/commit/5854f9e7fcd12d204b85c088f60527c96348c7cf))
+* **Runtime:** Add retargeting processors for retargeting layer, and update hand placement in deformation ([29e529b](https://github.com/oculus-samples/Unity-Movement/commit/29e529b2846c8ed151704b3d8b9c3248842dbeb3))
+* **Runtime:** Add shoulder stretch to RetargetingProcessorCorrectHand ([bf05baa](https://github.com/oculus-samples/Unity-Movement/commit/bf05baa01c6475677487b70cb685e24b9863345e))
+* **Runtime:** Hip pinning supports animator ([67a19fe](https://github.com/oculus-samples/Unity-Movement/commit/67a19fe585d9398218d10299a7ee368d16d95f98))
+* **Runtime:** Retargeter sets hips via root motion function ([d79ee8f](https://github.com/oculus-samples/Unity-Movement/commit/d79ee8f68470d964ca87e05a81bdabe51c1bf573))
+* **Runtime:** Update BlendHandConstraint to control the weight of the correct hand retargeting processor ([cc340eb](https://github.com/oculus-samples/Unity-Movement/commit/cc340eb8a499c3f1a58fe4db95cc0aac571c416c))
+* **Runtime:** Update Deformation constraint logic to correct the spine more accurately along with the shoulders ([c4d9e31](https://github.com/oculus-samples/Unity-Movement/commit/c4d9e314506b4f5a08fa10c82ee29643f85215ef))
+* **Samples:** Buttons for ISDK and locomotion scenes ([02de41b](https://github.com/oculus-samples/Unity-Movement/commit/02de41bb84066f066fe7af6b5236e6cde58ef935))
+* **Samples:** Trilinear/aniso settings for locomotion textures ([eb1f38f](https://github.com/oculus-samples/Unity-Movement/commit/eb1f38f5f044ed03e139c3daac4d41ecb96cac04))
+* **Samples:** Turn on translate dof on HighFi model ([ff68e17](https://github.com/oculus-samples/Unity-Movement/commit/ff68e176a1ce4e8db13965a263335cb7eab4fe03))
+
+
+### BREAKING CHANGES
+
+* **Editor/Runtime/Samples:** Samples rely on scripts found in v60 of the Meta SDK.
+
+Editor:
+- Add OVRProjectSetupMovementSDKSamples task to integrate with the Oculus Project Setup Tool for sample specific tasks
+- Remove ProjectValidationWindow, as the Project Setup Tool is used instead now
+
+Runtime:
+- Add support for tongue tracking
+- Add DeformationRig for driving available correctives on the face
+- Add full body for retargeting
+- Add full body animation constraints
+- Add toggle between high and low fidelity upper body tracking (IOBT)
+- Add body tracking calibration example
+- Updated helper menus to include setup for full body, and new constraints for upper body
+- Updated locomotion to support full body, and fix several bugs with locomotion
+- Updated locomotion to use animation blending between tracking (full body) and the locomotion animator
+
+Samples:
+- Updated the MovementAura scene with tongue support
+- Updated the MovementRetargeting scene to use a full body
+- Updated the MovementISDKIntegration scene to use a full body
+- Updated the MovementLocomotion scene to use a full body
+
+DEPRECATED: All legacy scripts have been placed in the Legacy folder. This includes the following: CustomMappings, FullBodyCustomMappings, AnimationConstraintMasker.
+
+Reviewed By: sohailshafiiWk
+
+Differential Revision: D52219081
+
+fbshipit-source-id: 3dbdebc730609ec9c51ea8dee581ef36c831e9db
+
 ## [3.1.1](https://github.com/oculus-samples/Unity-Movement/compare/v3.1.0...v3.1.1) (2023-09-21)
 
 
