@@ -331,7 +331,7 @@ namespace Oculus.Movement.AnimationRigging
             _isFocusedWhileInBuild = hasFocus;
         }
 
-        protected virtual void OnValidate()
+        protected override void OnValidate()
         {
             PrecomputeJointRotationTweaks();
         }
