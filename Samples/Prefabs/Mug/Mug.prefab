@@ -177,6 +177,7 @@ MonoBehaviour:
   _resetGrabOnGrabsUpdated: 1
   _scoringModifier:
     _positionRotationWeight: 0.3
+  _slippiness: 0
   _supportedGrabTypes: 3
   _pinchGrabRules:
     _thumbRequirement: 0
@@ -497,6 +498,7 @@ MonoBehaviour:
   _resetGrabOnGrabsUpdated: 1
   _scoringModifier:
     _positionRotationWeight: 0.8
+  _slippiness: 0
   _supportedGrabTypes: 3
   _pinchGrabRules:
     _thumbRequirement: 0
@@ -575,6 +577,7 @@ MonoBehaviour:
   _resetGrabOnGrabsUpdated: 1
   _scoringModifier:
     _positionRotationWeight: 0.8
+  _slippiness: 0
   _supportedGrabTypes: 3
   _pinchGrabRules:
     _thumbRequirement: 0
@@ -848,7 +851,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1020858034697310453}
   - component: {fileID: 2846935810701387289}
-  - component: {fileID: 2908179738489928143}
+  - component: {fileID: 3683067564037373463}
   m_Layer: 0
   m_Name: BasicGrabPickupAudio
   m_TagString: Untagged
@@ -967,7 +970,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &2908179738489928143
+--- !u!114 &3683067564037373463
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -976,13 +979,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1031987598474852964}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 925ef87c5bafc37469a2f7ec825dee4b, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ab2f6af53ca0b840ba2c30a5c45d138, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _audioSource: {fileID: 0}
   _audioClips:
   - {fileID: 8300000, guid: 95bd698be82abc240a9c2e84342c2878, type: 3}
-  _volume: 0.4
+  _volume: 0.5
   _volumeRandomization:
     _useRandomRange: 0
     _min: 0
@@ -1253,8 +1256,8 @@ MonoBehaviour:
   _whenSelect:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2908179738489928143}
-        m_TargetAssemblyTypeName: Oculus.Interaction.AudioTrigger, Oculus.Interaction.Samples
+      - m_Target: {fileID: 3683067564037373463}
+        m_TargetAssemblyTypeName: Oculus.Movement.Utils.MovementAudioTrigger, Meta.Movement
         m_MethodName: PlayAudio
         m_Mode: 1
         m_Arguments:
@@ -1268,8 +1271,8 @@ MonoBehaviour:
   _whenUnselect:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6391698420450482352}
-        m_TargetAssemblyTypeName: Oculus.Interaction.AudioTrigger, Oculus.Interaction.Samples
+      - m_Target: {fileID: 7665953431676622696}
+        m_TargetAssemblyTypeName: Oculus.Movement.Utils.MovementAudioTrigger, Meta.Movement
         m_MethodName: PlayAudio
         m_Mode: 1
         m_Arguments:
@@ -1626,6 +1629,7 @@ MonoBehaviour:
   _resetGrabOnGrabsUpdated: 1
   _scoringModifier:
     _positionRotationWeight: 0.8
+  _slippiness: 0
   _supportedGrabTypes: 3
   _pinchGrabRules:
     _thumbRequirement: 0
@@ -2120,6 +2124,7 @@ MonoBehaviour:
   _resetGrabOnGrabsUpdated: 1
   _scoringModifier:
     _positionRotationWeight: 0.8
+  _slippiness: 0
   _supportedGrabTypes: 3
   _pinchGrabRules:
     _thumbRequirement: 0
@@ -2230,6 +2235,7 @@ MonoBehaviour:
   _resetGrabOnGrabsUpdated: 1
   _scoringModifier:
     _positionRotationWeight: 0.3
+  _slippiness: 0
   _supportedGrabTypes: 3
   _pinchGrabRules:
     _thumbRequirement: 0
@@ -2484,7 +2490,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9134110591977451914}
   - component: {fileID: 6298962203328350054}
-  - component: {fileID: 6391698420450482352}
+  - component: {fileID: 7665953431676622696}
   m_Layer: 0
   m_Name: BasicGrabReleaseAudio
   m_TagString: Untagged
@@ -2603,7 +2609,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &6391698420450482352
+--- !u!114 &7665953431676622696
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2612,13 +2618,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 9131728334621629211}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 925ef87c5bafc37469a2f7ec825dee4b, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ab2f6af53ca0b840ba2c30a5c45d138, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _audioSource: {fileID: 0}
   _audioClips:
   - {fileID: 8300000, guid: 5607e3fc4a1743c4caf6b4f6d8d56d9b, type: 3}
-  _volume: 0.015
+  _volume: 0.5
   _volumeRandomization:
     _useRandomRange: 0
     _min: 0

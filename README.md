@@ -3,7 +3,7 @@ Unity-Movement is a package that uses OpenXR’s tracking layer APIs to expose M
 
 ### Requirements
 - Unity 2021.3.26f1 (2021 LTS) or newer installed
-- v60.0 or newer of the Meta XR SDK. You will need the Meta XR Core SDK, Meta XR Interaction SDK and Meta XR Interaction SDK OVR Samples packages found [on this page](https://assetstore.unity.com/publishers/25353).
+- v60.0 or newer of the Meta XR SDK. You will need the Meta XR Core SDK and the Meta XR Interaction SDK packages found [on this page](https://assetstore.unity.com/publishers/25353).
 - A project set up with these [configuration settings](https://developer.oculus.com/documentation/unity/unity-conf-settings/)
 
 ### Licenses
