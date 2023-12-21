@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/oculus-samples/Unity-Movement/compare/v4.0.0...v4.0.1) (2023-12-21)
+
+
+### Bug Fixes
+
+* **Samples:** Add OVRBody to high fidelity prefabs ([3326a4f](https://github.com/oculus-samples/Unity-Movement/commit/3326a4f393616ce78bee49df387edfd71bf733c5))
+
 # [4.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v3.1.1...v4.0.0) (2023-12-16)
 
 
