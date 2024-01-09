@@ -67,7 +67,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [Tooltip(RetargetingLayerTooltips.MaxHandStretch)]
         [SerializeField]
-        private float _maxShoulderStretch = 0.1f;
+        private float _maxShoulderStretch = 0.02f;
         /// <inheritdoc cref="_maxShoulderStretch" />
         public float MaxShoulderStretch
         {
