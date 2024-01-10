@@ -85,6 +85,11 @@ namespace Oculus.Movement.Utils
                 retargetingLayer, OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist,
                 animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
+            // Disable root motion.
+            animatorComp.applyRootMotion = false;
+            Debug.Log($"Disabling root motion on the {animatorComp.gameObject.name} animator.");
+            EditorUtility.SetDirty(animatorComp);
+
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
                 constraintMonos.ToArray(), retargetingLayer);
