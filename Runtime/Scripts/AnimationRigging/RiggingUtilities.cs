@@ -13,6 +13,29 @@ namespace Oculus.Movement.AnimationRigging
     public static class RiggingUtilities
     {
         /// <summary>
+        /// Returns true if animator is a humanoid.
+        /// </summary>
+        /// <param name="animator">Animator to check.</param>
+        /// <returns>True if humanoid, false if not.</returns>
+        public static bool IsHumanoidAnimator(
+            Animator animator)
+        {
+            if (animator.avatar == null)
+            {
+                return false;
+            }
+
+            var avatar = animator.avatar;
+            if (!avatar.isValid ||
+                !avatar.isHuman)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Find bone transform from <see cref="OVRCustomSkeleton"/> assuming
         /// it has a transform corresponding to <see cref="OVRSkeleton.BoneId"/>.
         /// </summary>
