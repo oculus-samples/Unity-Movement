@@ -1,3 +1,19 @@
+# [4.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.0.1...v4.1.0) (2024-01-11)
+
+
+### Bug Fixes
+
+* **Editor:** Update one-clicks for adding body tracking to disable apply root motion on animators ([cb7b68c](https://github.com/oculus-samples/Unity-Movement/commit/cb7b68c76b1308deeb52cad17498cf0d659800f5))
+* **Runtime:** DeformationJob checks for animator avatar for bone queries ([f91bb92](https://github.com/oculus-samples/Unity-Movement/commit/f91bb92aaefdc33ed6c053bd9f907b491b556870))
+* **Runtime:** Fix potential missing transform handle in CopyPoseJob ([10dd1bc](https://github.com/oculus-samples/Unity-Movement/commit/10dd1bcf76d342f8af7aa9ee7eeb5a94513544a7))
+
+
+### Features
+
+* **Runtime:** Add shoulders adjustments when using the one-click for setting up body tracking ([327ad57](https://github.com/oculus-samples/Unity-Movement/commit/327ad575dd2078c809940457eba25a1ec45c89df))
+* **Runtime:** Check for humanoid, translation DoF for retargeting ([591148f](https://github.com/oculus-samples/Unity-Movement/commit/591148fead153e9770f37a36d479d5469cd80a55))
+* **Samples:** Update Locomotion sample with character prefab ([217a99a](https://github.com/oculus-samples/Unity-Movement/commit/217a99a4e3aba2657d3d08614907d7421f0fa2f1))
+
 ## [4.0.1](https://github.com/oculus-samples/Unity-Movement/compare/v4.0.0...v4.0.1) (2023-12-21)
 
 
