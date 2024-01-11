@@ -217,6 +217,17 @@ namespace Oculus.Movement.AnimationRigging
                 instance.name = $"{name} {_retargetingProcessors[i].name}";
                 _retargetingProcessors[i] = instance;
             }
+
+            var animatorComp = GetComponent<Animator>();
+            Assert.IsTrue(animatorComp.avatar != null,
+                "Animator requires avatar component.");
+            Assert.IsTrue(animatorComp.avatar.isHuman,
+                "Animator avatar must be humanoid.");
+            if (!animatorComp.avatar.humanDescription.hasTranslationDoF)
+            {
+                Debug.LogError("Translation DoF is not enabled on your avatar, this " +
+                    "will prevent proper positional retargeting of its joints.");
+            }
         }
 
         /// <summary>

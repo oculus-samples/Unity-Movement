@@ -75,10 +75,9 @@ namespace Oculus.Movement.AnimationRigging
             for (int i = 0; i < data.AnimatorBones.Length; i++)
             {
                 job.Positions[i] = Vector3.zero;
-                if (data.AnimatorBones[i] != null)
-                {
-                    job.Bones[i] = ReadOnlyTransformHandle.Bind(animator, data.AnimatorBones[i]);
-                }
+                job.Bones[i] = data.AnimatorBones[i] != null ?
+                    ReadOnlyTransformHandle.Bind(animator, data.AnimatorBones[i]) :
+                    new ReadOnlyTransformHandle();
             }
 
             return job;

@@ -700,10 +700,14 @@ namespace Oculus.Movement.AnimationRigging
             job.RightLowerArmToHandAxis = data.RightArm.LowerArmToHandAxis;
             job.HipsIndex = (int)HumanBodyBones.Hips;
             job.SpineLowerIndex = job.HipsIndex + 1;
-            job.SpineUpperIndex = animator.GetBoneTransform(HumanBodyBones.Chest) != null ?
-                job.SpineLowerIndex + 1 : -1;
-            job.ChestIndex = animator.GetBoneTransform(HumanBodyBones.UpperChest) != null ?
-                job.SpineUpperIndex + 1 : -1;
+            job.SpineUpperIndex =
+                (RiggingUtilities.IsHumanoidAnimator(animator) &&
+                    animator.GetBoneTransform(HumanBodyBones.Chest) != null) ?
+                    job.SpineLowerIndex + 1 : -1;
+            job.ChestIndex =
+                (RiggingUtilities.IsHumanoidAnimator(animator) &&
+                    animator.GetBoneTransform(HumanBodyBones.UpperChest) != null) ?
+                    job.SpineUpperIndex + 1 : -1;
             job.HeadIndex = data.HipsToHeadBones.Length - 1;
 
             return job;

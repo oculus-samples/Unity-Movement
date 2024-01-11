@@ -96,6 +96,11 @@ namespace Oculus.Movement.Utils
                 retargetingLayer, OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist,
                 animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
+            // Disable root motion.
+            animatorComp.applyRootMotion = false;
+            Debug.Log($"Disabling root motion on the {animatorComp.gameObject.name} animator.");
+            EditorUtility.SetDirty(animatorComp);
+
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
                 constraintMonos.ToArray(), retargetingLayer);
@@ -209,6 +214,34 @@ namespace Oculus.Movement.Utils
                     OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.Head
                 });
             }
+
+            var adjustments =
+                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
+                    "_adjustments",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+
+            if (adjustments != null)
+            {
+                adjustments.SetValue(retargetingLayer, new[]
+                {
+                    new JointAdjustment
+                    {
+                        Joint = HumanBodyBones.Hips,
+                        RotationChange = Quaternion.Euler(60.0f, 0.0f, 0.0f)
+                    },
+                    new JointAdjustment
+                    {
+                        Joint = HumanBodyBones.LeftShoulder,
+                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
+                    },
+                    new JointAdjustment
+                    {
+                        Joint = HumanBodyBones.RightShoulder,
+                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
+                    }
+                });
+            }
+
             EditorUtility.SetDirty(retargetingLayer);
 
             OVRBody bodyComp = mainParent.GetComponent<OVRBody>();

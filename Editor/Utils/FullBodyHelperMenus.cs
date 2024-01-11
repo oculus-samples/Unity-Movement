@@ -85,6 +85,11 @@ namespace Oculus.Movement.Utils
                 retargetingLayer, OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist,
                 animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
+            // Disable root motion.
+            animatorComp.applyRootMotion = false;
+            Debug.Log($"Disabling root motion on the {animatorComp.gameObject.name} animator.");
+            EditorUtility.SetDirty(animatorComp);
+
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
                 constraintMonos.ToArray(), retargetingLayer);
@@ -202,14 +207,14 @@ namespace Oculus.Movement.Utils
                 Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
             }
 
-            var bodySectionToPosition =
+            var fullBodySectionToPosition =
                 typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
                     "_fullBodySectionToPosition",
                     BindingFlags.Instance | BindingFlags.NonPublic);
 
-            if (bodySectionToPosition != null)
+            if (fullBodySectionToPosition != null)
             {
-                bodySectionToPosition.SetValue(retargetingLayer, new[]
+                fullBodySectionToPosition.SetValue(retargetingLayer, new[]
                 {
                     OVRHumanBodyBonesMappings.BodySection.LeftArm,
                     OVRHumanBodyBonesMappings.BodySection.RightArm,
@@ -225,6 +230,53 @@ namespace Oculus.Movement.Utils
                     OVRHumanBodyBonesMappings.BodySection.RightFoot
                 });
             }
+
+            var bodySectionToPosition =
+                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
+                    "_bodySectionToPosition", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (bodySectionToPosition != null)
+            {
+                bodySectionToPosition.SetValue(retargetingLayer, new[]
+                {
+                    OVRHumanBodyBonesMappings.BodySection.LeftArm,
+                    OVRHumanBodyBonesMappings.BodySection.RightArm,
+                    OVRHumanBodyBonesMappings.BodySection.LeftHand,
+                    OVRHumanBodyBonesMappings.BodySection.RightHand,
+                    OVRHumanBodyBonesMappings.BodySection.Hips,
+                    OVRHumanBodyBonesMappings.BodySection.Back,
+                    OVRHumanBodyBonesMappings.BodySection.Neck,
+                    OVRHumanBodyBonesMappings.BodySection.Head
+                });
+            }
+
+            var adjustments =
+                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
+                    "_adjustments",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+
+            if (adjustments != null)
+            {
+                adjustments.SetValue(retargetingLayer, new[]
+                {
+                    new JointAdjustment
+                    {
+                        Joint = HumanBodyBones.Hips,
+                        RotationChange = Quaternion.Euler(60.0f, 0.0f, 0.0f)
+                    },
+                    new JointAdjustment
+                    {
+                        Joint = HumanBodyBones.LeftShoulder,
+                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
+                    },
+                    new JointAdjustment
+                    {
+                        Joint = HumanBodyBones.RightShoulder,
+                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
+                    }
+                });
+            }
+
+            EditorUtility.SetDirty(retargetingLayer);
 
             OVRBody bodyComp = mainParent.GetComponent<OVRBody>();
             if (!bodyComp)
