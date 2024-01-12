@@ -584,12 +584,12 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc cref="IFullBodyDeformationData.ConstraintCustomSkeleton"/>
-        [NotKeyable, SerializeField, ConditionalHide("_animator", null)]
+        [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.CustomSkeleton)]
         private OVRCustomSkeleton _customSkeleton;
 
         /// <inheritdoc cref="IFullBodyDeformationData.ConstraintAnimator"/>
-        [NotKeyable, SerializeField, ConditionalHide("_customSkeleton", null)]
+        [NotKeyable, SerializeField]
         [Tooltip(DeformationDataTooltips.Animator)]
         private Animator _animator;
 
@@ -1140,44 +1140,6 @@ namespace Oculus.Movement.AnimationRigging
         FullBodyDeformationJobBinder<FullBodyDeformationData>>,
         IOVRSkeletonConstraint
     {
-        /// <summary>
-        /// Allows calculating bone data via a button.
-        /// </summary>
-        [SerializeField, InspectorButton("CalculateBoneData")]
-        [Tooltip(FullBodyDeformationConstraintToolTips.CalculateBoneData)]
-        protected bool _calculateBoneData;
-
-        /// <summary>
-        /// Setup all variables required for the constraint.
-        /// </summary>
-        public void CalculateBoneData()
-        {
-#if UNITY_EDITOR
-            UnityEditor.Undo.RecordObject(this, "Undo Full Body Deformation Setup");
-#endif
-            var skeleton = GetComponentInParent<OVRCustomSkeleton>();
-            if (skeleton != null)
-            {
-                data.AssignOVRCustomSkeleton(skeleton);
-            }
-            else
-            {
-                data.AssignAnimator(GetComponentInParent<Animator>());
-            }
-            data.InitializeStartingScale();
-            data.ClearTransformData();
-            data.SetUpLeftArmData();
-            data.SetUpRightArmData();
-            data.SetUpLeftLegData();
-            data.SetUpRightLegData();
-            data.SetUpHipsAndHeadBones();
-            data.SetUpBonePairs();
-            data.SetUpBoneTargets(transform);
-#if UNITY_EDITOR
-            UnityEditor.PrefabUtility.RecordPrefabInstancePropertyModifications(this);
-#endif
-        }
-
         /// <inheritdoc />
         public void RegenerateData()
         {
