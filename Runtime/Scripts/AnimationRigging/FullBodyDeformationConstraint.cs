@@ -162,6 +162,21 @@ namespace Oculus.Movement.AnimationRigging
         public string ChestAlignmentWeightFloatProperty { get; }
 
         /// <summary>
+        /// The shoulders height adjustment weight float property.
+        /// </summary>
+        string ShouldersHeightAdjustmentWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The shoulders width adjustment weight float property.
+        /// </summary>
+        string ShouldersWidthAdjustmentWeightFloatProperty { get; }
+
+        /// <summary>
+        /// The arms height adjustment weight float property.
+        /// </summary>
+        string ArmsHeightAdjustmentWeightFloatProperty { get; }
+
+        /// <summary>
         /// The left shoulder weight float property.
         /// </summary>
         public string LeftShoulderWeightFloatProperty { get; }
@@ -357,6 +372,18 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_chestAlignmentWeight));
 
         /// <inheritdoc />
+        string IFullBodyDeformationData.ShouldersHeightAdjustmentWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersHeightAdjustmentWeight));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.ShouldersWidthAdjustmentWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersWidthAdjustmentWeight));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.ArmsHeightAdjustmentWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_armsHeightAdjustmentWeight));
+
+        /// <inheritdoc />
         string IFullBodyDeformationData.LeftShoulderWeightFloatProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_leftShoulderWeight));
 
@@ -439,6 +466,42 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _chestAlignmentWeight;
             set => _chestAlignmentWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for shoulders height adjustment.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.ShouldersHeightAdjustmentWeight)]
+        private float _shouldersHeightAdjustmentWeight;
+        public float ShouldersHeightAdjustmentWeight
+        {
+            get => _shouldersHeightAdjustmentWeight;
+            set => _shouldersHeightAdjustmentWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for shoulders width adjustment.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.ShouldersHeightAdjustmentWeight)]
+        private float _shouldersWidthAdjustmentWeight;
+        public float ShouldersWidthAdjustmentWeight
+        {
+            get => _shouldersWidthAdjustmentWeight;
+            set => _shouldersWidthAdjustmentWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for arms height adjustment.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.ArmsHeightAdjustmentWeight)]
+        private float _armsHeightAdjustmentWeight;
+        public float ArmsHeightAdjustmentWeight
+        {
+            get => _armsHeightAdjustmentWeight;
+            set => _armsHeightAdjustmentWeight = value;
         }
 
         /// <summary>
@@ -971,8 +1034,8 @@ namespace Oculus.Movement.AnimationRigging
                 bonePairs[i] = bonePair;
             }
 
-            // Calculate proportions for spine.
-            for (int i = 0; i < _hipsToHeadBones.Length - 1; i++)
+            // Calculate proportions for the upper body.
+            for (int i = 0; i < _hipsToHeadBones.Length + 1; i++)
             {
                 var bonePair = bonePairs[i];
                 bonePair.HeightProportion = bonePair.Distance / (_hipsToHeadDistance + _hipsToFootDistance);
@@ -980,7 +1043,7 @@ namespace Oculus.Movement.AnimationRigging
                 bonePairs[i] = bonePair;
             }
 
-            // Calculate proportions for legs.
+            // Calculate proportions for the lower body.
             for (int i = upperLegIndex; i < bonePairs.Count; i++)
             {
                 var bonePair = bonePairs[i];

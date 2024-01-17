@@ -785,8 +785,8 @@ MonoBehaviour:
     _spineLowerAlignmentWeight: 0
     _spineUpperAlignmentWeight: 0
     _chestAlignmentWeight: 0
-    _leftShoulderWeight: 0.05
-    _rightShoulderWeight: 0.05
+    _leftShoulderWeight: 0
+    _rightShoulderWeight: 0
     _leftArmWeight: 0
     _rightArmWeight: 0
     _leftHandWeight: 0
@@ -855,13 +855,13 @@ MonoBehaviour:
     - StartBone: {fileID: 5571723699023252082}
       EndBone: {fileID: 2223570764790469765}
       Distance: 0.119189434
-      HeightProportion: 0
-      LimbProportion: 0
+      HeightProportion: 0.18372235
+      LimbProportion: 0.18372235
     - StartBone: {fileID: 5571723699023252082}
       EndBone: {fileID: 1744467641500109490}
       Distance: 0.119189434
-      HeightProportion: 0
-      LimbProportion: 0
+      HeightProportion: 0.18372235
+      LimbProportion: 0.18372235
     - StartBone: {fileID: 2223570764790469765}
       EndBone: {fileID: 24274709243371028}
       Distance: 0.17650495

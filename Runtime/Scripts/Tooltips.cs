@@ -953,6 +953,15 @@ namespace Oculus.Movement
         public const string ChestAlignmentWeight =
             "The weight for the chest alignment.";
 
+        public const string ShouldersHeightAdjustmentWeight =
+            "The weight for the shoulders height adjustment.";
+
+        public const string ShouldersWidthAdjustmentWeight =
+            "The weight for the shoulders width adjustment.";
+
+        public const string ArmsHeightAdjustmentWeight =
+            "The weight for the arms height adjustment.";
+
         public const string LeftShoulderWeight =
             "The weight for the deformation on the left shoulder.";
 
