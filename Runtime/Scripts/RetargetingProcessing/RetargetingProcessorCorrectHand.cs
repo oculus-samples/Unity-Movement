@@ -65,9 +65,9 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The maximum stretch for the shoulder to help the hand reach the target position that is allowed.
         /// </summary>
-        [Tooltip(RetargetingLayerTooltips.MaxHandStretch)]
+        [Tooltip(RetargetingLayerTooltips.MaxShoulderStretch)]
         [SerializeField]
-        private float _maxShoulderStretch = 0.02f;
+        private float _maxShoulderStretch;
         /// <inheritdoc cref="_maxShoulderStretch" />
         public float MaxShoulderStretch
         {

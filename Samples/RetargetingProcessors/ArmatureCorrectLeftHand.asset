@@ -16,6 +16,6 @@ MonoBehaviour:
   _handedness: 0
   _handIKType: 1
   _maxHandStretch: 0.01
-  _maxShoulderStretch: 0.02
+  _maxShoulderStretch: 0
   _ikTolerance: 0.000001
   _ikIterations: 10
