@@ -45,7 +45,8 @@ namespace Oculus.Movement.Utils
             Undo.IncrementCurrentGroup();
 
             // Add the retargeting and body tracking components at root first.
-            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(activeGameObject);
+            Animator animatorComp = activeGameObject.GetComponent<Animator>();
+            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(animatorComp, activeGameObject);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
@@ -56,8 +57,6 @@ namespace Oculus.Movement.Utils
                 AddRetargetingConstraint(rigObject, retargetingLayer);
             retargetingLayer.RetargetingConstraint = retargetConstraint;
             constraintMonos.Add(retargetConstraint);
-
-            Animator animatorComp = activeGameObject.GetComponent<Animator>();
 
             // Destroy old components
             DestroyBoneTarget(rigObject, "LeftHandTarget");
@@ -104,6 +103,7 @@ namespace Oculus.Movement.Utils
 
             Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
         }
+
         private static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer)
         {
             bool needCorrectBones = true;
@@ -190,7 +190,7 @@ namespace Oculus.Movement.Utils
             return boneTargets.ToArray();
         }
 
-        private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent)
+        private static RetargetingLayer AddMainRetargetingComponents(Animator animator, GameObject mainParent)
         {
             RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
 
@@ -249,32 +249,7 @@ namespace Oculus.Movement.Utils
                 });
             }
 
-            var adjustments =
-                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
-                    "_adjustments",
-                    BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if (adjustments != null)
-            {
-                adjustments.SetValue(retargetingLayer, new[]
-                {
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.Hips,
-                        RotationChange = Quaternion.Euler(60.0f, 0.0f, 0.0f)
-                    },
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.LeftShoulder,
-                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
-                    },
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.RightShoulder,
-                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
-                    }
-                });
-            }
+            HelperMenusCommon.AddJointAdjustments(animator, retargetingLayer);
 
             EditorUtility.SetDirty(retargetingLayer);
 

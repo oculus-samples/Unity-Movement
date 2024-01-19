@@ -639,7 +639,7 @@ namespace Oculus.Movement.AnimationRigging
             shouldUpdateRotations[arrayId] =
                 !adjustment.DisableRotationTransform &&
                 !jointFailsMask;
-            rotationAdjustments[arrayId] = adjustment.RotationChange;
+            rotationAdjustments[arrayId] = adjustment.RotationChange * adjustment.PrecomputedRotationTweaks;
         }
 
         private (OVRSkeletonMetadata.BoneData, HumanBodyBones) GetTargetBoneDataFromOVRBone(OVRBone ovrBone,

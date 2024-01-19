@@ -1,10 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction;
-using Oculus.Movement.AnimationRigging;
-using UnityEngine.Animations.Rigging;
-using UnityEngine;
-
 namespace Oculus.Movement
 {
     public static class DriveSkeletalLateUpdateLogicTooltips
@@ -1816,5 +1811,11 @@ namespace Oculus.Movement
 
         public const string MaxWeight =
             "Max constraint weight.";
+    }
+
+    public static class RestPoseObjectHumanoidTooltips
+    {
+        public const string BonePoseDataArray =
+            "A flat array containing all bone pose data.";
     }
 }
