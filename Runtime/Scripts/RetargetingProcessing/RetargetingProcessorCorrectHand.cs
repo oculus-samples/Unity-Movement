@@ -49,6 +49,16 @@ namespace Oculus.Movement.AnimationRigging
             set => _handIKType = value;
         }
 
+        [Tooltip(RetargetingLayerTooltips.UseWorldHandPosition)]
+        [SerializeField]
+        private bool _useWorldHandPosition = true;
+        /// <inheritdoc cref="_useWorldHandPosition" />
+        public bool UseWorldHandPosition
+        {
+            get => _useWorldHandPosition;
+            set => _useWorldHandPosition = value;
+        }
+
         /// <summary>
         /// The maximum stretch for the hand to reach the target position that is allowed.
         /// </summary>
@@ -157,6 +167,11 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
         {
+            if (Weight < float.Epsilon)
+            {
+                return;
+            }
+
             var isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
             var leftHandWristIndex = isFullBody ? (int)OVRSkeleton.BoneId.FullBody_LeftHandWrist :
                 (int)OVRSkeleton.BoneId.Body_LeftHandWrist;
@@ -179,10 +194,17 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
+            var targetHandPosition = targetHand.position;
+            if (_useWorldHandPosition)
+            {
+                var localScale = retargetingLayer.transform.localScale;
+                targetHandPosition = RiggingUtilities.DivideVector3(targetHandPosition, localScale);
+            }
+
             var handBone = _armBones[0];
             handBone.position = _originalHandPosition;
             var handRotation = handBone.rotation;
-            Vector3 targetPosition = Vector3.Lerp(handBone.position, targetHand.position, Weight);
+            Vector3 targetPosition = Vector3.Lerp(handBone.position, targetHandPosition, Weight);
             bool solvedIK = false;
             if (Weight > 0.0f)
             {

@@ -1306,6 +1306,9 @@ namespace Oculus.Movement
             "The type of IK that should be applied to modify the arm bones toward the " +
             "correct hand target.";
 
+        public const string UseWorldHandPosition =
+            "If true, use the world hand position for placing the hand instead of the scaled position.";
+
         public const string MaxHandStretch =
             "The maximum stretch for the hand to reach the target position that is allowed.";
 
