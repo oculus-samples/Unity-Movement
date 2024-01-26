@@ -34,9 +34,33 @@ namespace Oculus.Movement.UI
         [Tooltip(RetargetingMenuTooltips.SpawnOffset)]
         protected Vector3 _spawnOffset = new Vector3(-1.0f, 0.0f, 0.0f);
 
+        private class SpawnMetadata
+        {
+            /// <summary>
+            /// Constructor for spawned character.
+            /// </summary>
+            /// <param name="isParentedCharacter">Is parented character.</param>
+            /// <param name="spawnedObject">Spawned GameObject.</param>
+            public SpawnMetadata(bool isParentedCharacter,
+                GameObject spawnedObject)
+            {
+                IsParentedCharacter = isParentedCharacter;
+                SpawnedObject = spawnedObject;
+            }
+
+            /// <summary>
+            /// Is parented to a transform or not.
+            /// </summary>
+            public readonly bool IsParentedCharacter;
+            /// <summary>
+            /// Actual spawned character.
+            /// </summary>
+            public readonly GameObject SpawnedObject;
+        }
+
         private const int _characterSpawnLimit = 20;
         private Vector3 _currentSpawnOffset, _currentSpawnOffsetNotParented;
-        private List<GameObject> _charactersSpawned = new List<GameObject>();
+        private List<SpawnMetadata> _charactersSpawned = new List<SpawnMetadata>();
 
         /// <summary>
         /// Move the non-mirrored characters out further so that they don't intersect any menus to the
@@ -66,11 +90,11 @@ namespace Oculus.Movement.UI
 
             AdjustSpawnedCharacterTransform(newCharacter, true, _currentSpawnOffset);
             _currentSpawnOffset += _spawnOffset;
-            _charactersSpawned.Add(newCharacter);
+            _charactersSpawned.Add(new SpawnMetadata(true, newCharacter));
         }
 
         /// <summary>
-        /// Spawn retargeted character with animation riggin gsupport.
+        /// Spawn retargeted character with animation rigging support.
         /// </summary>
         public void AddRiggedRetargetedCharacter()
         {
@@ -84,7 +108,7 @@ namespace Oculus.Movement.UI
 
             AdjustSpawnedCharacterTransform(newCharacter, true, _currentSpawnOffset);
             _currentSpawnOffset += _spawnOffset;
-            _charactersSpawned.Add(newCharacter);
+            _charactersSpawned.Add(new SpawnMetadata(true, newCharacter));
         }
 
         /// <summary>
@@ -102,7 +126,7 @@ namespace Oculus.Movement.UI
 
             AdjustSpawnedCharacterTransform(newCharacter, false, -_currentSpawnOffsetNotParented);
             _currentSpawnOffsetNotParented -= _spawnOffset * _NON_MIRRORED_OFFSET_MULTIPLIER;
-            _charactersSpawned.Add(newCharacter);
+            _charactersSpawned.Add(new SpawnMetadata(false, newCharacter));
         }
 
         /// <summary>
@@ -115,9 +139,17 @@ namespace Oculus.Movement.UI
                 return;
             }
             int lastCharacterIndex = _charactersSpawned.Count - 1;
-            Destroy(_charactersSpawned[lastCharacterIndex]);
+            var isLastCharacterParented = _charactersSpawned[lastCharacterIndex].IsParentedCharacter;
+            Destroy(_charactersSpawned[lastCharacterIndex].SpawnedObject);
             _charactersSpawned.RemoveAt(lastCharacterIndex);
-            _currentSpawnOffset -= _spawnOffset;
+            if (isLastCharacterParented)
+            {
+                _currentSpawnOffset -= _spawnOffset;
+            }
+            else
+            {
+                _currentSpawnOffsetNotParented += _spawnOffset * _NON_MIRRORED_OFFSET_MULTIPLIER;
+            }
         }
 
         private void AdjustSpawnedCharacterTransform(GameObject newCharacter,
