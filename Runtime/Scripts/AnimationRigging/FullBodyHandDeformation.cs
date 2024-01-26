@@ -474,6 +474,10 @@ namespace Oculus.Movement.AnimationRigging
         private InterpolateFinger CheckPossibleMetacarpal(Transform hand, HumanBodyBones targetBoneId)
         {
             var targetBone = _animator.GetBoneTransform(targetBoneId);
+            if (targetBone == null)
+            {
+                return null;
+            }
             var targetBoneParent = targetBone.parent;
             if (targetBoneParent != hand)
             {
