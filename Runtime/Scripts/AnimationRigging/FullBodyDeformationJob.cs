@@ -4,6 +4,7 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.UIElements;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -588,20 +589,27 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     return;
                 }
-
                 weight *= ArmsHeightAdjustmentWeight.Get(stream);
-                var leftShoulderPos = LeftShoulderBone.GetPosition(stream);
-                var rightShoulderPos = RightShoulderBone.GetPosition(stream);
-                var shouldersParentPos = HipsToHeadBones[ShouldersParentIndex].GetPosition(stream);
-                var leftShoulderOffset = (shouldersParentPos - leftShoulderPos).normalized *
-                                         shoulderHeightAdjustment * BoneAnimData[_leftShoulderIndex].LimbProportion;
-                var rightShoulderOffset = (shouldersParentPos - rightShoulderPos).normalized *
-                                          shoulderHeightAdjustment * BoneAnimData[_rightShoulderIndex].LimbProportion;
 
-                LeftUpperArmBone.SetPosition(stream, LeftUpperArmBone.GetPosition(stream) +
-                                                     Vector3.Lerp(Vector3.zero, leftShoulderOffset, weight));
-                RightUpperArmBone.SetPosition(stream, RightUpperArmBone.GetPosition(stream) +
-                                                     Vector3.Lerp(Vector3.zero, rightShoulderOffset, weight));
+                var shouldersParentPos = HipsToHeadBones[ShouldersParentIndex].GetPosition(stream);
+
+                if (RightShoulderBone.IsValid(stream))
+                {
+                    var rightShoulderPos = RightShoulderBone.GetPosition(stream);
+                    var rightShoulderOffset = (shouldersParentPos - rightShoulderPos).normalized *
+                                              shoulderHeightAdjustment * BoneAnimData[_rightShoulderIndex].LimbProportion;
+                    RightUpperArmBone.SetPosition(stream, RightUpperArmBone.GetPosition(stream) +
+                                                         Vector3.Lerp(Vector3.zero, rightShoulderOffset, weight));
+                }
+
+                if (LeftShoulderBone.IsValid(stream))
+                {
+                    var leftShoulderPos = LeftShoulderBone.GetPosition(stream);
+                    var leftShoulderOffset = (shouldersParentPos - leftShoulderPos).normalized *
+                                             shoulderHeightAdjustment * BoneAnimData[_leftShoulderIndex].LimbProportion;
+                    LeftUpperArmBone.SetPosition(stream, LeftUpperArmBone.GetPosition(stream) +
+                                                         Vector3.Lerp(Vector3.zero, leftShoulderOffset, weight));
+                }
             }
         }
 
