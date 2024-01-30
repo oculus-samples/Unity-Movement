@@ -79,22 +79,28 @@ namespace Oculus.Movement.AnimationRigging.Utils
         /// </summary>
         public int ProxyChangeCount { get; private set; } = 0;
 
+        private const string _PROXY_CONTAINER_NAME = "ProxyBones-";
+        private const string _PROXY_NAME_PREFIX = "Proxy-Bone-";
+
         /// <summary>
         /// Updates the state of the proxies using the skeletal
         /// bones provided.
         /// </summary>
         /// <param name="bones">Bones of the skeleton tracked by
         /// proxy transforms.</param>
-        public void UpdateState(IList<OVRBone> bones)
+        /// <param name="proxyContainerParent">Parent of proxy collection.</param>
+        public void UpdateState(IList<OVRBone> bones,
+            Transform proxyContainerParent = null)
         {
-            ReallocateProxiesIfBoneIdsHaveChanged(bones);
+            ReallocateProxiesIfBoneIdsHaveChanged(bones, proxyContainerParent);
 
             ValidateProxySourceTransforms(bones);
 
             UpdateProxyTransforms(bones);
         }
 
-        private void ReallocateProxiesIfBoneIdsHaveChanged(IList<OVRBone> bones)
+        private void ReallocateProxiesIfBoneIdsHaveChanged(IList<OVRBone> bones,
+            Transform proxyContainerParent)
         {
             int numBones = bones.Count;
             if (!BoneIdsChanged(bones))
@@ -102,13 +108,23 @@ namespace Oculus.Movement.AnimationRigging.Utils
                 return;
             }
 
+            if (numBones == 0)
+            {
+                return;
+            }
+
             Debug.Log($"Creating a new set of {numBones} bone proxies.");
             CleanUpOldProxyTransforms();
             _proxyTransforms = new ProxyTransform[numBones];
+            var parentName = proxyContainerParent != null ? proxyContainerParent.name : string.Empty;
+            var proxyParent = new GameObject($"{_PROXY_CONTAINER_NAME}{parentName}").transform;
+
             for (int boneIndex = 0; boneIndex < numBones; boneIndex++)
             {
                 var originalBone = bones[boneIndex];
-                var drivenTransform = new GameObject($"Proxy {boneIndex}").transform;
+                var drivenTransform = new GameObject($"{_PROXY_NAME_PREFIX}{boneIndex}").transform;
+                drivenTransform.SetParent(proxyParent, true);
+
                 _proxyTransforms[boneIndex] =
                     new ProxyTransform(drivenTransform,
                         originalBone.Transform, originalBone.Id);
@@ -140,15 +156,19 @@ namespace Oculus.Movement.AnimationRigging.Utils
 
         private void CleanUpOldProxyTransforms()
         {
-            if (_proxyTransforms == null)
+            if (_proxyTransforms == null  || _proxyTransforms.Length == 0)
             {
                 return;
             }
+
+            var proxyParent = _proxyTransforms[0].DrivenTransform.parent;
             foreach (var proxyTransform in _proxyTransforms)
             {
                 GameObject.Destroy(proxyTransform.DrivenTransform.gameObject);
             }
             _proxyTransforms = null;
+
+            GameObject.Destroy(proxyParent.gameObject);
         }
 
         // <summary>

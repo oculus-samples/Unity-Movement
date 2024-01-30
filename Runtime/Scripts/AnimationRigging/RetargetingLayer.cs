@@ -427,7 +427,7 @@ namespace Oculus.Movement.AnimationRigging
 
             if (_enableTrackingByProxy)
             {
-                _proxyTransformLogic.UpdateState(Bones);
+                _proxyTransformLogic.UpdateState(Bones, this.transform);
             }
         }
 
