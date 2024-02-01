@@ -697,8 +697,8 @@ namespace Oculus.Movement.AnimationRigging
                 bonePairs[i] = bonePair;
             }
 
-            // Calculate proportions for spine.
-            for (int i = 0; i < _hipsToHeadBones.Length - 1; i++)
+            // Calculate proportions for the upper body.
+            for (int i = 0; i < _hipsToHeadBones.Length + 1; i++)
             {
                 var bonePair = bonePairs[i];
                 bonePair.HeightProportion = bonePair.Distance / _hipsToHeadDistance;

@@ -665,13 +665,13 @@ MonoBehaviour:
     - StartBone: {fileID: 167868239173931932}
       EndBone: {fileID: 372011279931233274}
       Distance: 0.19169338
-      HeightProportion: 0
-      LimbProportion: 0
+      HeightProportion: 0.12565297
+      LimbProportion: 0.2976425
     - StartBone: {fileID: 167868239173931932}
       EndBone: {fileID: 6698092073795100007}
       Distance: 0.19169505
-      HeightProportion: 0
-      LimbProportion: 0
+      HeightProportion: 0.12565407
+      LimbProportion: 0.2976451
     - StartBone: {fileID: 372011279931233274}
       EndBone: {fileID: 2853792523736699549}
       Distance: 0.16743502
@@ -735,7 +735,6 @@ MonoBehaviour:
     _startingScale: {x: 1, y: 1, z: 1}
     _hipsToHeadDistance: 0.64403903
     _hipsToFootDistance: 0.8815387
-  _calculateBoneData: 0
 --- !u!1 &6569133656184895074
 GameObject:
   m_ObjectHideFlags: 0

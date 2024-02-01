@@ -118,18 +118,23 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Returns the result of diving a Vector3 by another Vector3.
+        /// Returns the result of dividing a Vector3 by another Vector3.
         /// </summary>
         /// <param name="dividend">The Vector3 dividend.</param>
         /// <param name="divisor">The Vector3 divisor.</param>
         /// <returns>The divided Vector3.</returns>
         public static Vector3 DivideVector3(Vector3 dividend, Vector3 divisor)
         {
-            Vector3 targetScale = Vector3.one;
+            Vector3 targetScale;
             if (Vector3IsNonZero(divisor))
             {
                 targetScale = new Vector3(
                     dividend.x / divisor.x, dividend.y / divisor.y, dividend.z / divisor.z);
+            }
+            else
+            {
+                Debug.LogError("Zero detected inside divisor. Returning dividend.");
+                return dividend;
             }
 
             return targetScale;

@@ -22,7 +22,6 @@ namespace Oculus.Movement.Utils
     internal static class HelperMenus
     {
         private const string _MOVEMENT_SAMPLES_MENU =
-
             "GameObject/Movement Samples/";
         private const string _MOVEMENT_SAMPLES_BT_MENU =
             "Body Tracking/";
@@ -58,7 +57,8 @@ namespace Oculus.Movement.Utils
             Undo.IncrementCurrentGroup();
 
             // Add the retargeting and body tracking components at root first.
-            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(activeGameObject);
+            Animator animatorComp = activeGameObject.GetComponent<Animator>();
+            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(animatorComp, activeGameObject);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
@@ -69,8 +69,6 @@ namespace Oculus.Movement.Utils
                 AddRetargetingConstraint(rigObject, retargetingLayer);
             retargetingLayer.RetargetingConstraint = retargetConstraint;
             constraintMonos.Add(retargetConstraint);
-
-            Animator animatorComp = activeGameObject.GetComponent<Animator>();
 
             // Destroy old components
             DestroyBoneTarget(rigObject, "LeftHandTarget");
@@ -187,7 +185,7 @@ namespace Oculus.Movement.Utils
             SetUpCharacterForARKitFace(activeGameObject, false);
         }
 
-        private static RetargetingLayer AddMainRetargetingComponents(GameObject mainParent)
+        private static RetargetingLayer AddMainRetargetingComponents(Animator animator, GameObject mainParent)
         {
             RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
             if (!retargetingLayer)
@@ -215,32 +213,7 @@ namespace Oculus.Movement.Utils
                 });
             }
 
-            var adjustments =
-                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
-                    "_adjustments",
-                    BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if (adjustments != null)
-            {
-                adjustments.SetValue(retargetingLayer, new[]
-                {
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.Hips,
-                        RotationChange = Quaternion.Euler(60.0f, 0.0f, 0.0f)
-                    },
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.LeftShoulder,
-                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
-                    },
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.RightShoulder,
-                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
-                    }
-                });
-            }
+            HelperMenusCommon.AddJointAdjustments(animator, retargetingLayer);
 
             EditorUtility.SetDirty(retargetingLayer);
 
@@ -357,7 +330,7 @@ namespace Oculus.Movement.Utils
             {
                 var retargetingProcessorCorrectBones = ScriptableObject.CreateInstance<RetargetingProcessorCorrectBones>();
                 Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectBones, "Create correct bones retargeting processor.");
-                Undo.RecordObject (retargetingLayer, "Add retargeting processor to retargeting layer.");
+                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
                 retargetingProcessorCorrectBones.name = "CorrectBones";
                 retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectBones);
             }
@@ -383,7 +356,7 @@ namespace Oculus.Movement.Utils
                 var retargetingProcessorCorrectHand = ScriptableObject.CreateInstance<RetargetingProcessorCorrectHand>();
                 var handednessString = handedness == Handedness.Left ? "Left" : "Right";
                 Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand ({handednessString}) retargeting processor.");
-                Undo.RecordObject (retargetingLayer, "Add retargeting processor to retargeting layer.");
+                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
                 retargetingProcessorCorrectHand.Handedness = handedness;
                 retargetingProcessorCorrectHand.HandIKType = RetargetingProcessorCorrectHand.IKType.CCDIK;
                 retargetingProcessorCorrectHand.name = $"Correct{handednessString}Hand";

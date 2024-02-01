@@ -1,10 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction;
-using Oculus.Movement.AnimationRigging;
-using UnityEngine.Animations.Rigging;
-using UnityEngine;
-
 namespace Oculus.Movement
 {
     public static class DriveSkeletalLateUpdateLogicTooltips
@@ -953,6 +948,15 @@ namespace Oculus.Movement
         public const string ChestAlignmentWeight =
             "The weight for the chest alignment.";
 
+        public const string ShouldersHeightAdjustmentWeight =
+            "The weight for the shoulders height adjustment.";
+
+        public const string ShouldersWidthAdjustmentWeight =
+            "The weight for the shoulders width adjustment.";
+
+        public const string ArmsHeightAdjustmentWeight =
+            "The weight for the arms height adjustment.";
+
         public const string LeftShoulderWeight =
             "The weight for the deformation on the left shoulder.";
 
@@ -1301,6 +1305,9 @@ namespace Oculus.Movement
         public const string HandIKType =
             "The type of IK that should be applied to modify the arm bones toward the " +
             "correct hand target.";
+
+        public const string UseWorldHandPosition =
+            "If true, use the world hand position for placing the hand instead of the scaled position.";
 
         public const string MaxHandStretch =
             "The maximum stretch for the hand to reach the target position that is allowed.";
@@ -1807,5 +1814,11 @@ namespace Oculus.Movement
 
         public const string MaxWeight =
             "Max constraint weight.";
+    }
+
+    public static class RestPoseObjectHumanoidTooltips
+    {
+        public const string BonePoseDataArray =
+            "A flat array containing all bone pose data.";
     }
 }
