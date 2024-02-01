@@ -1,3 +1,22 @@
+# [4.2.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.1.0...v4.2.0) (2024-02-01)
+
+
+### Bug Fixes
+
+* **Runtime:** Check for invalid shoulders in FullBodyDeformationJob ([6785b0c](https://github.com/oculus-samples/Unity-Movement/commit/6785b0ca14445d07b5770f35995e9cec819a6524))
+* **Runtime:** Check for null targetBone in CheckPossibleMetacarpal ([50dc6fb](https://github.com/oculus-samples/Unity-Movement/commit/50dc6fb22930c1a84d6ffd75f71ae4632905cab6))
+* **Runtime:** Fix spawning positional problems in retargeting scene ([70f0a7c](https://github.com/oculus-samples/Unity-Movement/commit/70f0a7c58aa3b61a801d7788d3198c125416d006))
+* **Runtime:** Set initial shoulder stretch to be optional ([3f55759](https://github.com/oculus-samples/Unity-Movement/commit/3f557594507f41c5902caff60fabf413ba83be16))
+
+
+### Features
+
+* **Editor:** Simplify full body deformation constraint parameters ([79b3acb](https://github.com/oculus-samples/Unity-Movement/commit/79b3acb7f867501ef2c017b75df9b98221ff7b67))
+* **Runtime:** Add an option for using world hand position as the target ([cc57dee](https://github.com/oculus-samples/Unity-Movement/commit/cc57dee48bda9e3b6f3b8849d121fa77ea3a076f))
+* **Runtime:** Allow precomputation of adjustments ([c3e8cde](https://github.com/oculus-samples/Unity-Movement/commit/c3e8cde8156223d679dac95d804f6b7f90add512))
+* **Runtime:** Put proxy bones under a parent transform ([11733ed](https://github.com/oculus-samples/Unity-Movement/commit/11733ed9650a82e009cc670fa712a8ac460bc047))
+* **Runtime:** Update FullBodyDeformation with additional settings for shoulders and arms ([576b0da](https://github.com/oculus-samples/Unity-Movement/commit/576b0da4687f073c17f37c07540c7bae40b67487))
+
 # [4.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.0.1...v4.1.0) (2024-01-11)
 
 
