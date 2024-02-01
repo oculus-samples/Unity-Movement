@@ -1,3 +1,10 @@
+## [4.2.1](https://github.com/oculus-samples/Unity-Movement/compare/v4.2.0...v4.2.1) (2024-02-01)
+
+
+### Bug Fixes
+
+* **Runtime:** Update tongue to use captured expression weights ([d1fb642](https://github.com/oculus-samples/Unity-Movement/commit/d1fb6426dbf63d7d824886e0445c165e1546ec3a))
+
 # [4.2.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.1.0...v4.2.0) (2024-02-01)
 
 
