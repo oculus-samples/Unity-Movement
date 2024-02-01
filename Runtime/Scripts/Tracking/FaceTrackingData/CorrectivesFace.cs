@@ -274,7 +274,7 @@ namespace Oculus.Movement.Tracking
                 {
                     // Fetch this from the underlying expressions in case the renderer being fixed
                     // has JawDrop but not TongueOut.
-                    var tongueWeight = _faceExpressions[OVRFaceExpressions.FaceExpression.TongueOut];
+                    var tongueWeight = ExpressionWeights[(int)OVRFaceExpressions.FaceExpression.TongueOut];
                     if (tongueWeight > _tongueOutThreshold)
                     {
                         currentWeight = Mathf.Max(_minJawDrop, currentWeight);
