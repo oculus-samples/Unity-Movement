@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System.Collections.Generic;
 using Oculus.Movement.AnimationRigging;
 using System.Reflection;
 using UnityEditor;
@@ -16,23 +17,37 @@ namespace Oculus.Movement.Utils
         const string _HUMANOID_REFERENCE_POSE_ASSET_NAME = "BodyTrackingHumanoidReferencePose";
 
         /// <summary>
-        /// Adds joint adjustments for an animator.
+        /// Find and return the reference rest pose humanoid object in the project.
         /// </summary>
-        /// <param name="animator">Animator component.</param>
-        /// <param name="retargetingLayer">Retargeting layer component to change adjustments of.</param>
-
-        public static void AddJointAdjustments(Animator animator, RetargetingLayer retargetingLayer)
+        /// <returns>The rest pose humanoid object.</returns>
+        public static RestPoseObjectHumanoid GetRestPoseObject()
         {
             string[] guids = AssetDatabase.FindAssets(_HUMANOID_REFERENCE_POSE_ASSET_NAME);
             if (guids == null || guids.Length == 0)
             {
-                Debug.LogError($"Cannot compute adjustments because asset {_HUMANOID_REFERENCE_POSE_ASSET_NAME} " +
-                    "cannot be found.");
-                return;
+                Debug.LogError($"Asset {_HUMANOID_REFERENCE_POSE_ASSET_NAME} cannot be found.");
+                return null;
             }
 
             var pathToAsset = AssetDatabase.GUIDToAssetPath(guids[0]);
-            RestPoseObjectHumanoid restPoseObject = AssetDatabase.LoadAssetAtPath<RestPoseObjectHumanoid>(pathToAsset);
+            return AssetDatabase.LoadAssetAtPath<RestPoseObjectHumanoid>(pathToAsset);
+        }
+
+        /// <summary>
+        /// Adds joint adjustments for an animator.
+        /// </summary>
+        /// <param name="animator">Animator component.</param>
+        /// <param name="retargetingLayer">Retargeting layer component to change adjustments of.</param>
+        public static void AddJointAdjustments(Animator animator, RetargetingLayer retargetingLayer)
+        {
+            var restPoseObject = GetRestPoseObject();
+            if (restPoseObject == null)
+            {
+                Debug.LogError($"Cannot compute adjustments because asset {_HUMANOID_REFERENCE_POSE_ASSET_NAME} " +
+                               "cannot be found.");
+                return;
+            }
+
             var hipAngleDifference = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorJoint
                 (animator, HumanBodyBones.Hips);
 
@@ -47,7 +62,7 @@ namespace Oculus.Movement.Utils
                     new JointAdjustment
                     {
                         Joint = HumanBodyBones.Hips,
-                        RotationTweaks = new Quaternion[] { hipAngleDifference } 
+                        RotationTweaks = new Quaternion[] { hipAngleDifference }
                     },
                     // manual adjustments follow to address possible shoulder issues
                     new JointAdjustment

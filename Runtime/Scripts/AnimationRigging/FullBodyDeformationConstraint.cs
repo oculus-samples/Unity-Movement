@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction;
 using Oculus.Movement.Utils;
 using System;
 using System.Collections.Generic;
@@ -110,6 +109,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The position info for the bone pairs used for FullBodyDeformation.
         /// </summary>
         public BonePairData[] BonePairs { get; }
+
+        /// <summary>
+        /// The adjustment info for the bones.
+        /// </summary>
+        public BoneAdjustmentData[] BoneAdjustments { get; }
 
         /// <summary>
         /// The position info for the left arm.
@@ -274,7 +278,14 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Try to set up bone targets.
         /// </summary>
+        /// <param name="setupParent">The parent for the bone targets.</param>
         public void SetUpBoneTargets(Transform setupParent);
+
+        /// <summary>
+        /// Try to set up adjustments.
+        /// </summary>
+        /// <param name="restPoseObject">The rest pose object used to calculate adjustments.</param>
+        public void SetUpAdjustments(RestPoseObjectHumanoid restPoseObject);
 
         /// <summary>
         /// Computes initial starting scale.
@@ -339,6 +350,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         BonePairData[] IFullBodyDeformationData.BonePairs => _bonePairData;
+
+        /// <inheritdoc />
+        BoneAdjustmentData[] IFullBodyDeformationData.BoneAdjustments => _boneAdjustmentData;
 
         /// <inheritdoc />
         ArmPosData IFullBodyDeformationData.LeftArm => _leftArmData;
@@ -704,6 +718,13 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(DeformationDataTooltips.BonePairData)]
         private BonePairData[] _bonePairData;
+
+        /// <summary>
+        /// All bone adjustment data.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(DeformationDataTooltips.BoneAdjustmentData)]
+        private BoneAdjustmentData[] _boneAdjustmentData;
 
         /// <summary>
         /// Starting scale of character.
@@ -1083,6 +1104,49 @@ namespace Oculus.Movement.AnimationRigging
             hipsToHeadBoneTargets.Add(headTarget);
 
             _hipsToHeadBoneTargets = hipsToHeadBoneTargets.ToArray();
+        }
+
+        /// <inheritdoc />
+        public void SetUpAdjustments(RestPoseObjectHumanoid restPoseObject)
+        {
+            var boneAdjustments = new List<BoneAdjustmentData>();
+
+            // Apply auto adjustments for the spine.
+            var spineHumanBodyBones = new[]
+            {
+                HumanBodyBones.Hips,
+                HumanBodyBones.Spine,
+                HumanBodyBones.Chest,
+                HumanBodyBones.UpperChest,
+                HumanBodyBones.Neck
+            };
+
+            foreach (var spineHumanBodyBone in spineHumanBodyBones)
+            {
+                if (_animator.GetBoneTransform(spineHumanBodyBone) != null)
+                {
+                    var spineChildBone = FindChildHumanBodyBones(_animator, spineHumanBodyBone);
+                    var adjustmentData = new BoneAdjustmentData
+                    {
+                        Bone = spineHumanBodyBone,
+                        Adjustment =
+                            restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
+                                _animator, spineHumanBodyBone, spineChildBone),
+                        ChildBone1 = spineChildBone,
+                        ChildBone2 = FindChildHumanBodyBones(_animator, spineHumanBodyBone, 1),
+                        ChildBone3 = FindChildHumanBodyBones(_animator, spineHumanBodyBone, 2)
+                    };
+                    // If we have the same child bone, discard as invalid.
+                    if (adjustmentData.ChildBone2 == adjustmentData.ChildBone3)
+                    {
+                        adjustmentData.ChildBone2 = HumanBodyBones.LastBone;
+                        adjustmentData.ChildBone3 = HumanBodyBones.LastBone;
+                    }
+                    boneAdjustments.Add(adjustmentData);
+                }
+            }
+
+            _boneAdjustmentData = boneAdjustments.ToArray();
         }
 
         /// <inheritdoc />

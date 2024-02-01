@@ -1011,6 +1011,9 @@ namespace Oculus.Movement
         public const string BonePairData =
             "All bone pair data.";
 
+        public const string BoneAdjustmentData =
+            "All bone adjustment data.";
+
         public const string StartingScale =
             "Starting scale of character.";
 
