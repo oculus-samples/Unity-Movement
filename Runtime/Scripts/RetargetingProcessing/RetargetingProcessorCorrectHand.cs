@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction;
 using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,7 +19,8 @@ namespace Oculus.Movement.AnimationRigging
         public enum IKType
         {
             None,
-            CCDIK
+            CCDIK,
+            FABRIK
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Oculus.Movement.AnimationRigging
         /// The maximum distance between the resulting position and target position that is allowed.
         /// </summary>
         [Tooltip(RetargetingLayerTooltips.IKTolerance)]
-        [SerializeField, ConditionalHide("_handIKType", IKType.CCDIK)]
+        [SerializeField]
         private float _ikTolerance = 1e-6f;
         /// <inheritdoc cref="_ikTolerance" />
         public float IKTolerance
@@ -102,7 +102,7 @@ namespace Oculus.Movement.AnimationRigging
         /// The maximum number of iterations allowed for the IK algorithm.
         /// </summary>
         [Tooltip(RetargetingLayerTooltips.IKIterations)]
-        [SerializeField, ConditionalHide("_handIKType", IKType.CCDIK)]
+        [SerializeField]
         private int _ikIterations = 10;
         /// <inheritdoc cref="_ikIterations" />
         public int IKIterations
@@ -112,6 +112,8 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         private Transform[] _armBones;
+        private Transform[] _armBonesEndEffectorlast;
+        private float[] _distanceToNextBoneEndEffectorLast;
         private Vector3 _originalHandPosition;
 
         /// <inheritdoc />
@@ -139,7 +141,7 @@ namespace Oculus.Movement.AnimationRigging
 
             // We iterate from the jaw downward, as the first bone is the effector, which is the hand.
             // Hand -> Lower Arm -> Upper Arm -> Shoulder.
-            for (var i = HumanBodyBones.Jaw; i >= HumanBodyBones.Hips; i-- )
+            for (var i = HumanBodyBones.Jaw; i >= HumanBodyBones.Hips; i--)
             {
                 var boneTransform = animator.GetBoneTransform(i);
                 if (boneTransform == null)
@@ -156,6 +158,11 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
             _armBones = armBones.ToArray();
+            armBones.Reverse();
+            // some IK solutions require end effector to be last.
+            _armBonesEndEffectorlast = armBones.ToArray();
+            _distanceToNextBoneEndEffectorLast = new float[_armBones.Length];
+            UpdateBoneDistances();
         }
 
         /// <inheritdoc />
@@ -212,6 +219,13 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     solvedIK = AnimationUtilities.SolveCCDIK(_armBones, targetPosition, IKTolerance, IKIterations);
                 }
+                else if (HandIKType == IKType.FABRIK)
+                {
+                    UpdateBoneDistances();
+                    solvedIK = AnimationUtilities.SolveFABRIK(
+                        _armBonesEndEffectorlast, _distanceToNextBoneEndEffectorLast,
+                        targetPosition, IKTolerance, IKIterations, true);
+                }
             }
             handBone.position = Vector3.MoveTowards(handBone.position, targetPosition, MaxHandStretch);
             handBone.rotation = handRotation;
@@ -222,6 +236,23 @@ namespace Oculus.Movement.AnimationRigging
                 var shoulderStretchMagnitude = Mathf.Clamp(shoulderStretchDirection.magnitude, 0, MaxShoulderStretch);
                 var shoulderStretchVector = shoulderStretchDirection.normalized * shoulderStretchMagnitude;
                 _armBones[^1].position += shoulderStretchVector;
+            }
+        }
+
+        private void UpdateBoneDistances()
+        {
+            for (int i = 0; i < _armBonesEndEffectorlast.Length; i++)
+            {
+                bool lastJoint = i == _armBonesEndEffectorlast.Length - 1;
+                if (lastJoint)
+                {
+                    _distanceToNextBoneEndEffectorLast[i] = 0f;
+                }
+                else
+                {
+                    _distanceToNextBoneEndEffectorLast[i] = (_armBonesEndEffectorlast[i + 1].position -
+                        _armBonesEndEffectorlast[i].position).magnitude;
+                }
             }
         }
     }
