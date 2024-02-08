@@ -1312,6 +1312,12 @@ namespace Oculus.Movement
         public const string UseWorldHandPosition =
             "If true, use the world hand position for placing the hand instead of the scaled position.";
 
+        public const string UseCustomHandTargetPosition =
+            "If true, use the custom hand target position for the target position.";
+
+        public const string CustomHandTargetPosition =
+            "The custom hand target position.";
+
         public const string MaxHandStretch =
             "The maximum stretch for the hand to reach the target position that is allowed.";
 

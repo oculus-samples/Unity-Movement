@@ -249,14 +249,7 @@ namespace Oculus.Movement.Utils
                 });
             }
 
-            var adjustmentsField =
-                typeof(RetargetingLayer).GetField(
-                    "_adjustments",
-                    BindingFlags.Instance | BindingFlags.NonPublic);
-            if (adjustmentsField != null)
-            {
-                adjustmentsField.SetValue(retargetingLayer, null);
-            }
+            HelperMenusCommon.AddJointAdjustments(animator, retargetingLayer);
 
             EditorUtility.SetDirty(retargetingLayer);
 
@@ -409,8 +402,8 @@ namespace Oculus.Movement.Utils
 
             deformationConstraint.data.SpineTranslationCorrectionTypeField
                 = FullBodyDeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead;
-            deformationConstraint.data.SpineLowerAlignmentWeight = 0.0f;
-            deformationConstraint.data.SpineUpperAlignmentWeight = 0.0f;
+            deformationConstraint.data.SpineLowerAlignmentWeight = 1.0f;
+            deformationConstraint.data.SpineUpperAlignmentWeight = 0.5f;
             deformationConstraint.data.ChestAlignmentWeight = 0.0f;
             deformationConstraint.data.LeftShoulderWeight = 1.0f;
             deformationConstraint.data.RightShoulderWeight = 1.0f;
@@ -432,7 +425,6 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SetUpHipsAndHeadBones();
             deformationConstraint.data.SetUpBonePairs();
             deformationConstraint.data.SetUpBoneTargets(deformationConstraint.transform);
-            deformationConstraint.data.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject());
             deformationConstraint.data.InitializeStartingScale();
 
             PrefabUtility.RecordPrefabInstancePropertyModifications(deformationConstraint);

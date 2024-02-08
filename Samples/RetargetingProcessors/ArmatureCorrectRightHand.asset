@@ -15,6 +15,8 @@ MonoBehaviour:
   Weight: 1
   _handedness: 1
   _handIKType: 1
+  _useWorldHandPosition: 1
+  _useCorrectedHandPosition: 1
   _maxHandStretch: 0.01
   _maxShoulderStretch: 0
   _ikTolerance: 0.000001

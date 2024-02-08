@@ -49,6 +49,9 @@ namespace Oculus.Movement.AnimationRigging
             set => _handIKType = value;
         }
 
+        /// <summary>
+        /// If true, use the world hand position for placing the hand instead of the scaled position.
+        /// </summary>
         [Tooltip(RetargetingLayerTooltips.UseWorldHandPosition)]
         [SerializeField]
         private bool _useWorldHandPosition = true;
@@ -57,6 +60,30 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _useWorldHandPosition;
             set => _useWorldHandPosition = value;
+        }
+
+        /// <summary>
+        /// If true, use the custom hand target position for the target position.
+        /// </summary>
+        [Tooltip(RetargetingLayerTooltips.UseCustomHandTargetPosition)]
+        [SerializeField]
+        private bool _useCustomHandTargetPosition = true;
+        /// <inheritdoc cref="_useCustomHandTargetPosition" />
+        public bool UseCustomHandTargetPosition
+        {
+            get => _useCustomHandTargetPosition;
+            set => _useCustomHandTargetPosition = value;
+        }
+
+        /// <summary>
+        /// The custom hand target position.
+        /// </summary>
+        private Vector3? _customHandTargetPosition;
+        /// <inheritdoc cref="_customHandTargetPosition" />
+        public Vector3? CustomHandTargetPosition
+        {
+            get => _customHandTargetPosition;
+            set => _customHandTargetPosition = value;
         }
 
         /// <summary>
@@ -130,6 +157,8 @@ namespace Oculus.Movement.AnimationRigging
             _handIKType = sourceCorrectHand.HandIKType;
             _ikTolerance = sourceCorrectHand.IKTolerance;
             _ikIterations = sourceCorrectHand.IKIterations;
+            _useWorldHandPosition = sourceCorrectHand.UseWorldHandPosition;
+            _useCustomHandTargetPosition = sourceCorrectHand.UseCustomHandTargetPosition;
         }
 
         /// <inheritdoc />
@@ -206,6 +235,10 @@ namespace Oculus.Movement.AnimationRigging
             {
                 var localScale = retargetingLayer.transform.localScale;
                 targetHandPosition = RiggingUtilities.DivideVector3(targetHandPosition, localScale);
+            }
+            if (_useCustomHandTargetPosition && _customHandTargetPosition.HasValue)
+            {
+                targetHandPosition = _customHandTargetPosition.Value;
             }
 
             var handBone = _armBones[0];

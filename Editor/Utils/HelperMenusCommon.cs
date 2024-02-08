@@ -62,18 +62,18 @@ namespace Oculus.Movement.Utils
                     new JointAdjustment
                     {
                         Joint = HumanBodyBones.Hips,
-                        RotationTweaks = new Quaternion[] { hipAngleDifference }
+                        RotationChange = hipAngleDifference
                     },
                     // manual adjustments follow to address possible shoulder issues
                     new JointAdjustment
                     {
                         Joint = HumanBodyBones.LeftShoulder,
-                        RotationTweaks = new Quaternion[] { Quaternion.Euler(0.0f, 0.0f, 15.0f) }
+                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
                     },
                     new JointAdjustment
                     {
                         Joint = HumanBodyBones.RightShoulder,
-                        RotationTweaks = new Quaternion[] { Quaternion.Euler(0.0f, 0.0f, 15.0f) }
+                        RotationChange = Quaternion.Euler(0.0f, 0.0f, 15.0f)
                     }
                 });
             }
