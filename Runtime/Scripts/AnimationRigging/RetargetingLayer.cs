@@ -344,6 +344,7 @@ namespace Oculus.Movement.AnimationRigging
 
         protected override void OnValidate()
         {
+            base.OnValidate();
             PrecomputeJointRotationTweaks();
         }
 
