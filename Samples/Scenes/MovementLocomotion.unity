@@ -308,11 +308,11 @@ MonoBehaviour:
     OnStartMove:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 657627065}
-          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimationConstraintBlender,
+        - m_Target: {fileID: 657627066}
+          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.TemporaryStateTransition,
             Meta.Movement
-          m_MethodName: StartApplyingAnimFor
-          m_Mode: 1
+          m_MethodName: HoldStartedByNamedSource
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -336,11 +336,11 @@ MonoBehaviour:
     OnStopMove:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 657627065}
-          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimationConstraintBlender,
+        - m_Target: {fileID: 657627066}
+          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.TemporaryStateTransition,
             Meta.Movement
-          m_MethodName: FinishApplyingAnimFor
-          m_Mode: 1
+          m_MethodName: HoldReleasedByNamedSource
+          m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2691,7 +2691,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 657627063}
-  - component: {fileID: 657627065}
+  - component: {fileID: 657627066}
   m_Layer: 0
   m_Name: LocomotionAnimationConstraintBlender
   m_TagString: Untagged
@@ -2714,7 +2714,7 @@ Transform:
   m_Father: {fileID: 39895793}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &657627065
+--- !u!114 &657627066
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2723,14 +2723,57 @@ MonoBehaviour:
   m_GameObject: {fileID: 657627062}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ff1502fa0de15543a539011dffe8033, type: 3}
+  m_Script: {fileID: 11500000, guid: aadbc81b84bfbf14ea6551e1267ead56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _activityExitTime: 1
-  _animator: {fileID: 1313172172}
-  _constraintsToDeactivate: []
-  _constraintsToBlend:
-  - {fileID: 1077107419}
+  _duration: 0.5
+  _enterTime: 0.5
+  _exitTime: 0.5
+  _onTransition:
+    Entering:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1077107419}
+          m_TargetAssemblyTypeName: UnityEngine.Animations.Rigging.RigConstraint`3[[Oculus.Movement.AnimationRigging.PlaybackAnimationJob,
+            Meta.Movement
+          m_MethodName: set_weight
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    Exiting:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1077107419}
+          m_TargetAssemblyTypeName: UnityEngine.Animations.Rigging.RigConstraint`3[[Oculus.Movement.AnimationRigging.PlaybackAnimationJob,
+            Meta.Movement
+          m_MethodName: set_weight
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    EnterStart:
+      m_PersistentCalls:
+        m_Calls: []
+    ExitStart:
+      m_PersistentCalls:
+        m_Calls: []
+    Entered:
+      m_PersistentCalls:
+        m_Calls: []
+    Exited:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &674130230
 GameObject:
   m_ObjectHideFlags: 0
@@ -4949,11 +4992,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1309374988}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!95 &1313172172 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 1447068267235101010, guid: df3e9f047a37f494089fb2971d445b28, type: 3}
-  m_PrefabInstance: {fileID: 7312821920429293132}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1324704613 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6969114480419708234, guid: df3e9f047a37f494089fb2971d445b28, type: 3}
@@ -7172,6 +7210,18 @@ MonoBehaviour:
     OnJump:
       m_PersistentCalls:
         m_Calls:
+        - m_Target: {fileID: 657627066}
+          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.StateTransition, Meta.Movement
+          m_MethodName: HoldStartedByNamedSource
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Jump
+            m_BoolArgument: 1
+          m_CallState: 2
         - m_Target: {fileID: 2060050695}
           m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
           m_MethodName: Play
@@ -7183,19 +7233,6 @@ MonoBehaviour:
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimatorBodyTrackingActivityMask,
-            Assembly-CSharp
-          m_MethodName: StartApplyingMaskFor
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: Jump
-            m_BoolArgument: 1
           m_CallState: 2
         - m_Target: {fileID: 1438153950}
           m_TargetAssemblyTypeName: Oculus.Movement.Experimental.Effects.SkeletonPostprocess.AnimatorHooks,
@@ -7258,10 +7295,9 @@ MonoBehaviour:
     OnJumpFinished:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimatorBodyTrackingActivityMask,
-            Assembly-CSharp
-          m_MethodName: FinishApplyingMaskFor
+        - m_Target: {fileID: 657627066}
+          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.StateTransition, Meta.Movement
+          m_MethodName: HoldReleasedByNamedSource
           m_Mode: 5
           m_Arguments:
             m_ObjectArgument: {fileID: 0}

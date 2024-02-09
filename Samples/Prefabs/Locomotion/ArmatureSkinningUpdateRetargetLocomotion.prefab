@@ -7,6 +7,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 79654816551811449, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+      propertyPath: m_Name
+      value: RememberAnimatedBodyPose
+      objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.size
       value: 4
@@ -90,6 +94,10 @@ PrefabInstance:
     - target: {fileID: 1443914921768874357, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1584733199703806809, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+      propertyPath: m_Name
+      value: ApplyBodyTrackedBodyPose
       objectReference: {fileID: 0}
     - target: {fileID: 1896002546147319835, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_LocalPosition.x
@@ -182,6 +190,10 @@ PrefabInstance:
     - target: {fileID: 5906453063303414921, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.026573163
+      objectReference: {fileID: 0}
+    - target: {fileID: 5934253929075069038, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+      propertyPath: m_Name
+      value: PartiallyReapplyAnimatedBodyPose
       objectReference: {fileID: 0}
     - target: {fileID: 6149187573652144265, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_LocalPosition.x
