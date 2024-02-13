@@ -1345,9 +1345,6 @@ namespace Oculus.Movement
 
         public const string RetargetingProcessors =
             "List of retargeting processors, which run in late update after retargeting and animation rigging.";
-
-        public const string JointRotationTweaks =
-            "Joint rotation tweaks array.";
     }
 
     public static class LateMirroredObjectTooltips

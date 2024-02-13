@@ -64,25 +64,6 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Allows one to adjust the per-joint rotation offsets computed between
-        /// source (OVRBody) and target characters. To avoid gimbal lock,
-        /// a series of rotations are permitted.
-        /// </summary>
-        [Serializable]
-        public class JointRotationTweaks
-        {
-            /// <summary>
-            /// Joint to affect.
-            /// </summary>
-            public HumanBodyBones Joint;
-
-            /// <summary>
-            /// A series of rotation tweaks.
-            /// </summary>
-            public Quaternion[] RotationTweaks;
-        }
-
-        /// <summary>
         /// Triggered if proxy transforms were recreated.
         /// </summary>
         public int ProxyChangeCount => _proxyTransformLogic.ProxyChangeCount;
@@ -176,19 +157,6 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Joint rotation tweaks array.
-        /// </summary>
-        [SerializeField]
-        [Tooltip(RetargetingLayerTooltips.JointRotationTweaks)]
-        protected JointRotationTweaks[] _jointRotationTweaks;
-        /// <inheritdoc cref="_jointRotationTweaks"/>
-        public JointRotationTweaks[] JointRotationTweaksArray
-        {
-            get => _jointRotationTweaks;
-            set => _jointRotationTweaks = value;
-        }
-
-        /// <summary>
         /// Pre-compute these values each time the editor changes for the purposes
         /// of efficiency.
         /// </summary>
@@ -244,8 +212,6 @@ namespace Oculus.Movement.AnimationRigging
                 CacheJointConstraints();
 
                 ValidateHumanoid();
-
-                PrecomputeJointRotationTweaks();
 
                 foreach (var retargetingProcessor in _retargetingProcessors)
                 {
@@ -340,83 +306,6 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             _isFocusedWhileInBuild = hasFocus;
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            PrecomputeJointRotationTweaks();
-        }
-
-        /// <summary>
-        /// When the object's properties are modified, accumulate joint rotations
-        /// and cache those values. This saves on computation when the tweaks field is used.
-        /// </summary>
-        protected virtual void PrecomputeJointRotationTweaks()
-        {
-#if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlaying)
-            {
-                return;
-            }
-#endif
-            if (_jointRotationTweaks == null || _jointRotationTweaks.Length == 0)
-            {
-                return;
-            }
-
-            foreach (var rotationTweak in _jointRotationTweaks)
-            {
-                var allRotations = rotationTweak.RotationTweaks;
-                var joint = rotationTweak.Joint;
-
-                Quaternion accumulatedRotation = Quaternion.identity;
-                foreach (var rotationValue in allRotations)
-                {
-                    // Make sure the quaternion is valid. Quaternions are initialized to all
-                    // zeroes by default, which makes them invalid.
-                    if (rotationValue.w < Mathf.Epsilon && rotationValue.x < Mathf.Epsilon &&
-                        rotationValue.y < Mathf.Epsilon && rotationValue.z < Mathf.Epsilon)
-                    {
-                        continue;
-                    }
-
-                    accumulatedRotation *= rotationValue;
-                }
-
-                if (!_humanBoneToAccumulatedRotationTweaks.ContainsKey(joint))
-                {
-                    _humanBoneToAccumulatedRotationTweaks.Add(joint, accumulatedRotation);
-                }
-                else
-                {
-                    _humanBoneToAccumulatedRotationTweaks[joint] = accumulatedRotation;
-                }
-            }
-
-            _bonesToRemove.Clear();
-            // If the user removed bones from the UI, remove those from the dictionary.
-            foreach (var bone in _humanBoneToAccumulatedRotationTweaks.Keys)
-            {
-                bool boneFound = false;
-                foreach (var rotationTweak in _jointRotationTweaks)
-                {
-                    if (rotationTweak.Joint == bone)
-                    {
-                        boneFound = true;
-                        break;
-                    }
-                }
-
-                if (!boneFound)
-                {
-                    _bonesToRemove.Add(bone);
-                }
-            }
-            foreach (var boneToRemove in _bonesToRemove)
-            {
-                _humanBoneToAccumulatedRotationTweaks.Remove(boneToRemove);
-            }
         }
 
         /// <inheritdoc />
@@ -524,8 +413,7 @@ namespace Oculus.Movement.AnimationRigging
                 targetTransforms.Add(targetBoneData.OriginalJoint);
                 shouldUpdatePositions.Add(false);
                 shouldUpdateRotations.Add(false);
-                rotationOffsets.Add(targetBoneData.CorrectionQuaternion.Value *
-                    GetRotationTweak(targetHumanBodyBone));
+                rotationOffsets.Add(targetBoneData.CorrectionQuaternion.Value);
                 rotationAdjustments.Add(Quaternion.identity);
             }
         }
@@ -617,8 +505,7 @@ namespace Oculus.Movement.AnimationRigging
             OVRSkeletonMetadata.BoneData targetBoneData,
             bool bodySectionInPositionArray, bool jointFailsMask)
         {
-            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value *
-                GetRotationTweak(humanBodyBone);
+            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value;
             shouldUpdatePositions[arrayId] = !jointFailsMask && bodySectionInPositionArray;
             shouldUpdateRotations[arrayId] = !jointFailsMask;
             rotationAdjustments[arrayId] = Quaternion.identity;
@@ -631,8 +518,7 @@ namespace Oculus.Movement.AnimationRigging
             OVRSkeletonMetadata.BoneData targetBoneData,
             bool bodySectionInPositionArray, bool jointFailsMask)
         {
-            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value *
-                GetRotationTweak(humanBodyBone);
+            rotationOffsets[arrayId] = targetBoneData.CorrectionQuaternion.Value;
             shouldUpdatePositions[arrayId] =
                 !adjustment.DisablePositionTransform &&
                 bodySectionInPositionArray &&
@@ -763,20 +649,6 @@ namespace Oculus.Movement.AnimationRigging
         public Animator GetAnimatorTargetSkeleton()
         {
             return AnimatorTargetSkeleton;
-        }
-
-        /// <summary>
-        /// Returns the rotation tweak for a human body bone.
-        /// </summary>
-        /// <param name="humanBodyBone">The human body bone to check for.</param>
-        /// <returns>The rotation tweak for a human body bone.</returns>
-        public Quaternion GetRotationTweak(HumanBodyBones humanBodyBone)
-        {
-            if (!_humanBoneToAccumulatedRotationTweaks.TryGetValue(humanBodyBone, out var rotation))
-            {
-                rotation = Quaternion.identity;
-            }
-            return rotation;
         }
 
         /// <summary>

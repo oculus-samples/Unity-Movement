@@ -143,7 +143,6 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 var rtWeight = Weight * retargetingLayer.RetargetingConstraint.weight;
-                var rotationTweak = retargetingLayer.GetRotationTweak(humanBodyBone);
 
                 var bodySectionOfJoint =
                     OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
@@ -193,7 +192,6 @@ namespace Oculus.Movement.AnimationRigging
                     CorrectShoulders(targetJoint,
                         ovrBones[i].Transform.rotation,
                         targetCorrectionQuaternion,
-                        rotationTweak,
                         adjustment);
                 }
 
@@ -203,7 +201,7 @@ namespace Oculus.Movement.AnimationRigging
                     {
                         targetJoint.rotation =
                             Quaternion.Slerp(targetJoint.rotation,
-                                ovrBones[i].Transform.rotation * targetCorrectionQuaternion * rotationTweak,
+                                ovrBones[i].Transform.rotation * targetCorrectionQuaternion,
                                 handWeight);
                     }
 
@@ -222,7 +220,7 @@ namespace Oculus.Movement.AnimationRigging
                         {
                             targetJoint.rotation =
                                 Quaternion.Slerp(targetJoint.rotation,
-                                    ovrBones[i].Transform.rotation * targetCorrectionQuaternion * rotationTweak,
+                                    ovrBones[i].Transform.rotation * targetCorrectionQuaternion,
                                     handWeight);
                         }
 
@@ -245,7 +243,6 @@ namespace Oculus.Movement.AnimationRigging
         private void CorrectShoulders(Transform targetJoint,
             Quaternion boneRotation,
             Quaternion correctionQuaternion,
-            Quaternion rotationTweak,
             OVRUnityHumanoidSkeletonRetargeter.JointAdjustment adjustment)
         {
             // Restore the child transform when correcting shoulders.
@@ -260,7 +257,7 @@ namespace Oculus.Movement.AnimationRigging
             var rotationChange = adjustment?.RotationChange ?? Quaternion.identity;
             targetJoint.rotation =
                 Quaternion.Slerp(targetJoint.rotation,
-                    boneRotation * correctionQuaternion * rotationTweak,
+                    boneRotation * correctionQuaternion,
                     targetWeight) *
                     rotationChange;
 

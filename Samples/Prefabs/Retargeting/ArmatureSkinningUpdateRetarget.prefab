@@ -1727,6 +1727,26 @@ MonoBehaviour:
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
     BoneIdOverrideValue: 71
+  - Joint: 17
+    PositionChange: {x: 0, y: 0, z: 0}
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    FullBodyBoneIdOverrideValue: 85
+    BoneIdOverrideValue: 71
+  - Joint: 18
+    PositionChange: {x: 0, y: 0, z: 0}
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    FullBodyBoneIdOverrideValue: 85
+    BoneIdOverrideValue: 71
   _fullBodySectionsToAlign: 0400000006000000050000000700000008000000090000000a0000000b00000000000000010000000200000003000000
   _bodySectionsToAlign: 0400000006000000050000000700000008000000090000000a0000000b000000
   _fullBodySectionToPosition: 0400000006000000050000000700000008000000090000000a0000000b00000000000000010000000200000003000000
@@ -1739,15 +1759,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
   - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
   - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}
-  _jointRotationTweaks:
-  - Joint: 17
-    RotationTweaks:
-    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
-    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
-  - Joint: 18
-    RotationTweaks:
-    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
-    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
 --- !u!114 &8041379379990558817
 MonoBehaviour:
   m_ObjectHideFlags: 0
