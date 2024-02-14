@@ -50,6 +50,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterToSpawn: {fileID: 3095215436059244498, guid: 5d5cf77ca551ff84cb219f05d1f9e349, type: 3}
   _spawnParent: {fileID: 0}
+  _restPoseObject: {fileID: 11400000, guid: 0f999a13f709d074e9d0cc3f42bd945e, type: 2}
+  _restTPoseObject: {fileID: 11400000, guid: 58cb8f494ff557e41beec5481aa5d538, type: 2}
   _spawnOffset: {x: -1, y: 0, z: 0}
 --- !u!1 &8751418975657857256
 GameObject:

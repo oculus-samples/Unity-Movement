@@ -28,6 +28,20 @@ namespace Oculus.Movement.UI
         protected Transform _spawnParent;
 
         /// <summary>
+        /// The rest pose humanoid object.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingMenuTooltips.RestPoseObject)]
+        protected RestPoseObjectHumanoid _restPoseObject;
+
+        /// <summary>
+        /// The rest T-pose humanoid object.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingMenuTooltips.RestTPoseObject)]
+        protected RestPoseObjectHumanoid _restTPoseObject;
+
+        /// <summary>
         /// Offset per spawn.
         /// </summary>
         [SerializeField]
@@ -122,7 +136,10 @@ namespace Oculus.Movement.UI
                 return;
             }
             GameObject newCharacter = Instantiate(_characterToSpawn);
-            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, true);
+            RestPoseObjectHumanoid restPoseToUse = CheckIfTPose(newCharacter.GetComponent<Animator>()) ?
+                _restTPoseObject :
+                _restPoseObject;
+            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, true, _restPoseObject);
 
             AdjustSpawnedCharacterTransform(newCharacter, false, -_currentSpawnOffsetNotParented);
             _currentSpawnOffsetNotParented -= _spawnOffset * _NON_MIRRORED_OFFSET_MULTIPLIER;
@@ -161,6 +178,30 @@ namespace Oculus.Movement.UI
                 characterTransform.SetParent(_spawnParent, false);
             }
             characterTransform.localPosition = offsetToUse;
+        }
+
+        /// <summary>
+        /// Given an animator, determine if the avatar is in T-pose or A-pose.
+        /// </summary>
+        /// <param name="animator">The animator.</param>
+        /// <param name="matchThreshold">The dot product threshold to match for poses.</param>
+        /// <returns>True if T-pose.</returns>
+        private bool CheckIfTPose(Animator animator, float matchThreshold = 0.95f)
+        {
+            var shoulder = animator.GetBoneTransform(HumanBodyBones.LeftShoulder);
+            var upperArm = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
+            var lowerArm = animator.GetBoneTransform(HumanBodyBones.LeftLowerArm);
+            var hand = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+            if (shoulder == null)
+            {
+                // Naive approach to check if the lowerArm is placed in A-pose or not when
+                // missing a shoulder bone.
+                return upperArm.position.y - lowerArm.position.y < matchThreshold / 10.0f;
+            }
+            var shoulderToUpperArm = (shoulder.position - upperArm.position).normalized;
+            var lowerArmToHand = (lowerArm.position - hand.position).normalized;
+            var armDirectionMatch = Vector3.Dot(shoulderToUpperArm, lowerArmToHand);
+            return armDirectionMatch >= matchThreshold;
         }
     }
 }

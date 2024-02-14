@@ -10,7 +10,6 @@ using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using static Oculus.Movement.AnimationRigging.RetargetedBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
-using UnityEditor;
 
 namespace Oculus.Movement.Utils
 {
@@ -118,10 +117,12 @@ namespace Oculus.Movement.Utils
         /// <param name="selectedGameObject">GameObject to add animation rigging + retargeting too.</param>
         /// <param name="isFullBody">Allows toggling full body or not.</param>
         /// <param name="addConstraints">Allows adding constraints or not.</param>
+        /// <param name="restPoseObjectHumanoid">Allows using the rest pose object or not.</param>
         public static void SetupCharacterForAnimationRiggingRetargeting(
             GameObject selectedGameObject,
             bool isFullBody = false,
-            bool addConstraints = false)
+            bool addConstraints = false,
+            RestPoseObjectHumanoid restPoseObjectHumanoid = null)
         {
             try
             {
@@ -163,7 +164,7 @@ namespace Oculus.Movement.Utils
                 {
                     RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
                     FullBodyDeformationConstraint deformationConstraint =
-                        AddFullBodyDeformationConstraint(rigObject, animatorComp, spineBoneTargets);
+                        AddFullBodyDeformationConstraint(rigObject, animatorComp, spineBoneTargets, restPoseObjectHumanoid);
 
                     AddRetargetedFullBodyBoneTargetComponent(selectedGameObject, spineBoneTargets);
 
@@ -208,6 +209,7 @@ namespace Oculus.Movement.Utils
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(mainParent, retargetingLayer, rigBuilder,
                 constraintMonos.ToArray(), retargetingLayer);
+            AddJointAdjustments(animatorComp, retargetingLayer, restPoseObjectHumanoid);
 
             // Add retargeting processors to the retargeting layer.
             AddCorrectBonesRetargetingProcessor(retargetingLayer);
@@ -469,7 +471,8 @@ namespace Oculus.Movement.Utils
         }
 
         private static FullBodyDeformationConstraint AddFullBodyDeformationConstraint(
-            GameObject rigObject, Animator animator, RetargetedBoneTarget[] spineBoneTargets)
+            GameObject rigObject, Animator animator, RetargetedBoneTarget[] spineBoneTargets,
+            RestPoseObjectHumanoid restPoseObjectHumanoid)
         {
             FullBodyDeformationConstraint deformationConstraint = null;
 
@@ -491,7 +494,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SpineTranslationCorrectionTypeField
                 = FullBodyDeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead;
             deformationConstraint.data.SpineLowerAlignmentWeight = 1.0f;
-            deformationConstraint.data.SpineUpperAlignmentWeight = 0.5f;
+            deformationConstraint.data.SpineUpperAlignmentWeight = 1.0f;
             deformationConstraint.data.ChestAlignmentWeight = 0.0f;
             deformationConstraint.data.LeftShoulderWeight = 0.75f;
             deformationConstraint.data.RightShoulderWeight = 0.75f;
@@ -517,6 +520,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SetUpHipsAndHeadBones();
             deformationConstraint.data.SetUpBonePairs();
             deformationConstraint.data.SetUpBoneTargets(deformationConstraint.transform);
+            deformationConstraint.data.SetUpAdjustments(restPoseObjectHumanoid);
             deformationConstraint.data.InitializeStartingScale();
             animator.gameObject.SetActive(false);
             // re-enable deformation so that when the animator game object is turned on, it will activate
@@ -621,6 +625,72 @@ namespace Oculus.Movement.Utils
             rigSetup.ReEnableRig = true;
             rigSetup.RetargetingLayerComp = retargetingLayer;
             rigSetup.CheckSkeletalUpdatesByProxy = true;
+        }
+
+        private static void AddJointAdjustments(Animator animator, RetargetingLayer retargetingLayer,
+            RestPoseObjectHumanoid restPoseObjectHumanoid)
+        {
+            var adjustmentsField =
+                typeof(RetargetingLayer).GetField(
+                    "_adjustments",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+            if (adjustmentsField != null)
+            {
+                var adjustments = new List<JointAdjustment>();
+                var fullBodyDeformationConstraint = retargetingLayer.GetComponentInChildren<FullBodyDeformationConstraint>(true);
+                if (fullBodyDeformationConstraint != null)
+                {
+                    var deformationData = fullBodyDeformationConstraint.data as IFullBodyDeformationData;
+                    var isMissingUpperChestBone = animator.GetBoneTransform(HumanBodyBones.UpperChest) == null;
+                    var boneAdjustmentData = deformationData.BoneAdjustments;
+                    foreach (var boneAdjustment in boneAdjustmentData)
+                    {
+                        var rotationTweak = boneAdjustment.Adjustment;
+                        if (isMissingUpperChestBone && boneAdjustment.Bone == HumanBodyBones.Chest)
+                        {
+                            // As UpperChest -> Neck and Chest -> Neck bone pair directions on the rest pose
+                            // skeleton are opposite, this rotation tweak is inverted.
+                            rotationTweak = Quaternion.Inverse(rotationTweak);
+                        }
+                        if (boneAdjustment.Bone == HumanBodyBones.UpperChest)
+                        {
+                            // Reducing the rotation adjustment on the upper chest yields a better result visually.
+                            rotationTweak =
+                                Quaternion.Slerp(Quaternion.identity, rotationTweak, 0.5f);
+                        }
+                        var adjustment = new JointAdjustment()
+                        {
+                            Joint = boneAdjustment.Bone,
+                            RotationTweaks = new [] { rotationTweak }
+                        };
+                        adjustments.Add(adjustment);
+                    }
+                    adjustmentsField.SetValue(retargetingLayer, adjustments.ToArray());
+                }
+                else
+                {
+                    var hipAngleDifference = restPoseObjectHumanoid.CalculateRotationDifferenceFromRestPoseToAnimatorJoint
+                                 (animator, HumanBodyBones.Hips);
+                    adjustmentsField.SetValue(retargetingLayer, new[]
+                    {
+                        new JointAdjustment()
+                        {
+                            Joint = HumanBodyBones.Hips,
+                            RotationTweaks = new [] { hipAngleDifference }
+                        },
+                        new JointAdjustment()
+                        {
+                            Joint = HumanBodyBones.LeftShoulder,
+                            RotationTweaks = new [] { Quaternion.Euler(0,0, 15) }
+                        },
+                        new JointAdjustment()
+                        {
+                            Joint = HumanBodyBones.RightShoulder,
+                            RotationTweaks = new [] { Quaternion.Euler(0,0, 15) }
+                        }
+                    });
+                }
+            }
         }
 
         private static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer)

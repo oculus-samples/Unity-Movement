@@ -1424,6 +1424,12 @@ namespace Oculus.Movement
         public const string SpawnOffset =
             "Offset per spawn.";
 
+        public const string RestPoseObject =
+            "The rest pose humanoid object.";
+
+        public const string RestTPoseObject =
+            "The rest T-pose humanoid object.";
+
         public const string TPoseMask =
             "Positions to correct mask, intended to set certain joints of " +
             "animation rigged characters to T-Pose during retargeting.";
