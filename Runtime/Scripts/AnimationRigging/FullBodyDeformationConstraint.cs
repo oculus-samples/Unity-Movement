@@ -1109,43 +1109,27 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void SetUpAdjustments(RestPoseObjectHumanoid restPoseObject)
         {
-            var boneAdjustments = new List<BoneAdjustmentData>();
-
-            // Apply auto adjustments for the spine.
-            var spineHumanBodyBones = new[]
+            // Calculate spine adjustments.
+            var shoulderParentAdjustmentBone = GetValidShoulderParentBone(_animator);
+            var shoulderParentAdjustment = Quaternion.identity;
+            var spineBoneAdjustments = GetSpineJointAdjustments(_animator, restPoseObject);
+            foreach (var spineBoneAdjustment in spineBoneAdjustments)
             {
-                HumanBodyBones.Hips,
-                HumanBodyBones.Spine,
-                HumanBodyBones.Chest,
-                HumanBodyBones.UpperChest,
-                HumanBodyBones.Neck
-            };
-
-            foreach (var spineHumanBodyBone in spineHumanBodyBones)
-            {
-                if (_animator.GetBoneTransform(spineHumanBodyBone) != null)
+                if (spineBoneAdjustment.Bone == shoulderParentAdjustmentBone)
                 {
-                    var spineChildBone = FindChildHumanBodyBones(_animator, spineHumanBodyBone);
-                    var adjustmentData = new BoneAdjustmentData
-                    {
-                        Bone = spineHumanBodyBone,
-                        Adjustment =
-                            restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-                                _animator, spineHumanBodyBone, spineChildBone),
-                        ChildBone1 = spineChildBone,
-                        ChildBone2 = FindChildHumanBodyBones(_animator, spineHumanBodyBone, 1),
-                        ChildBone3 = FindChildHumanBodyBones(_animator, spineHumanBodyBone, 2)
-                    };
-                    // If we have the same child bone, discard as invalid.
-                    if (adjustmentData.ChildBone2 == adjustmentData.ChildBone3)
-                    {
-                        adjustmentData.ChildBone2 = HumanBodyBones.LastBone;
-                        adjustmentData.ChildBone3 = HumanBodyBones.LastBone;
-                    }
-                    boneAdjustments.Add(adjustmentData);
+                    shoulderParentAdjustment = spineBoneAdjustment.Adjustment;
+                    break;
                 }
             }
 
+            // Calculate adjustments for the shoulders (or upper arms, if shoulders are unavailable).
+            var shoulderBoneAdjustments =
+                GetShoulderAdjustments(_animator, restPoseObject, shoulderParentAdjustment);
+
+            // Combine calculated adjustments.
+            var boneAdjustments = new List<BoneAdjustmentData>();
+            boneAdjustments.AddRange(spineBoneAdjustments);
+            boneAdjustments.AddRange(shoulderBoneAdjustments);
             _boneAdjustmentData = boneAdjustments.ToArray();
         }
 

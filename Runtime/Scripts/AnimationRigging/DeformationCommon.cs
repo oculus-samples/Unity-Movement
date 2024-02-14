@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Movement.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -202,6 +203,156 @@ namespace Oculus.Movement.AnimationRigging
                 LowerArmBone = null;
                 HandBone = null;
             }
+        }
+
+        /// <summary>
+        /// Get the valid parent HumanBodyBone of the shoulders.
+        /// </summary>
+        /// <param name="animator">The animator to check.</param>
+        /// <returns>The valid HumanBodyBone parent of the shoulders.</returns>
+        public static HumanBodyBones GetValidShoulderParentBone(Animator animator)
+        {
+            if (animator.GetBoneTransform(HumanBodyBones.UpperChest) != null)
+            {
+                return HumanBodyBones.UpperChest;
+            }
+            if (animator.GetBoneTransform(HumanBodyBones.Chest) != null)
+            {
+                return HumanBodyBones.Chest;
+            }
+            return HumanBodyBones.Spine;
+        }
+
+        /// <summary>
+        /// Get the valid shoulder bones of the animator. Returns the UpperArm if the shoulders
+        /// are invalid.
+        /// </summary>
+        /// <param name="animator">The animator to check.</param>
+        /// <returns>The array of valid shoulder bones.</returns>
+        public static HumanBodyBones[] GetValidShoulderBones(Animator animator)
+        {
+            return new[]
+            {
+                animator.GetBoneTransform(HumanBodyBones.LeftShoulder) != null ?
+                    HumanBodyBones.LeftShoulder :
+                    HumanBodyBones.LeftUpperArm,
+                animator.GetBoneTransform(HumanBodyBones.RightShoulder) != null ?
+                    HumanBodyBones.RightShoulder :
+                    HumanBodyBones.RightUpperArm
+            };
+        }
+
+        /// <summary>
+        /// Get the spine joint adjustments given an animator and the rest pose.
+        /// </summary>
+        /// <param name="animator">The animator.</param>
+        /// <param name="restPoseObject">The rest pose humanoid object.</param>
+        /// <returns>The calculated spine joint adjustments.</returns>
+        public static BoneAdjustmentData[] GetSpineJointAdjustments(Animator animator,
+            RestPoseObjectHumanoid restPoseObject)
+        {
+            // Apply auto adjustments for the spine.
+            var spineHumanBodyBones = new[]
+            {
+                HumanBodyBones.Hips,
+                HumanBodyBones.Spine,
+                HumanBodyBones.Chest,
+                HumanBodyBones.UpperChest
+            };
+            var boneAdjustments = new List<BoneAdjustmentData>();
+            for (int i = 0; i < spineHumanBodyBones.Length; i++)
+            {
+                var spineHumanBodyBone = spineHumanBodyBones[i];
+                if (animator.GetBoneTransform(spineHumanBodyBone) != null)
+                {
+                    var spineChildBone = FindChildHumanBodyBones(animator, spineHumanBodyBone);
+                    var adjustment = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
+                        animator, spineHumanBodyBone, spineChildBone);
+                    var adjustmentData = new BoneAdjustmentData
+                    {
+                        Bone = spineHumanBodyBone,
+                        Adjustment = adjustment,
+                        ChildBone1 = spineChildBone,
+                        ChildBone2 = FindChildHumanBodyBones(animator, spineHumanBodyBone, 1),
+                        ChildBone3 = FindChildHumanBodyBones(animator, spineHumanBodyBone, 2)
+                    };
+
+                    // If we have the same child bone, discard as invalid.
+                    if (adjustmentData.ChildBone2 == adjustmentData.ChildBone3)
+                    {
+                        adjustmentData.ChildBone2 = HumanBodyBones.LastBone;
+                        adjustmentData.ChildBone3 = HumanBodyBones.LastBone;
+                    }
+
+                    boneAdjustments.Add(adjustmentData);
+                }
+            }
+            return boneAdjustments.ToArray();
+        }
+
+        /// <summary>
+        /// Get the shoulder joint adjustments given an animator and the rest pose.
+        /// </summary>
+        /// <param name="animator">The animator.</param>
+        /// <param name="restPoseObject">The rest pose humanoid object.</param>
+        /// <param name="shoulderParentAdjustment">The shoulder parent joint adjustment.</param>
+        /// <returns>The calculated shoulder joint adjustments.</returns>
+        public static BoneAdjustmentData[] GetShoulderAdjustments(Animator animator,
+            RestPoseObjectHumanoid restPoseObject, Quaternion shoulderParentAdjustment)
+        {
+            var shoulderHumanBodyBones = GetValidShoulderBones(animator);
+
+            // If the dot product is opposite (-1), mirror the shoulder adjustment as the shoulders
+            // are symmetric in that case.
+            var leftShoulder = animator.GetBoneTransform(shoulderHumanBodyBones[0]);
+            var rightShoulder = animator.GetBoneTransform(shoulderHumanBodyBones[1]);
+            var shoulderDotProduct = Vector3.Dot(leftShoulder.forward, rightShoulder.forward);
+            bool shouldMirrorShoulderAdjustment = shoulderDotProduct < 0.0f;
+
+            // Calculate shoulder rotations.
+            var leftShoulderBone = shoulderHumanBodyBones[0];
+            var rightShoulderBone = shoulderHumanBodyBones[1];
+            var leftShoulderChildBone = FindChildHumanBodyBones(animator, leftShoulderBone);
+            var rightShoulderChildBone = FindChildHumanBodyBones(animator, rightShoulderBone);
+
+            var rightShoulderRotation = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
+                animator, rightShoulderBone, rightShoulderChildBone);
+            var rightShoulderAdjustment = Quaternion.Inverse(rightShoulderRotation * shoulderParentAdjustment);
+
+            // We need to remove the Y euler angle portion, as the shoulders are rotated on OVRSkeleton in a way
+            // that isn't rotated on the character, and shouldn't be represented.
+            var rightShoulderAdjustmentEuler = rightShoulderAdjustment.eulerAngles;
+            rightShoulderAdjustmentEuler.y = 0.0f;
+            rightShoulderAdjustment = Quaternion.Euler(rightShoulderAdjustmentEuler);
+            var rightShoulderData = new BoneAdjustmentData
+            {
+                Bone = rightShoulderBone,
+                Adjustment = rightShoulderAdjustment,
+                ChildBone1 = rightShoulderChildBone,
+                ChildBone2 = HumanBodyBones.LastBone,
+                ChildBone3 = HumanBodyBones.LastBone
+            };
+
+            var leftShoulderAdjustment = rightShoulderAdjustment;
+            if (!shouldMirrorShoulderAdjustment)
+            {
+                var leftShoulderRotation = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
+                    animator, leftShoulderBone, leftShoulderChildBone);
+                leftShoulderAdjustment = Quaternion.Inverse(leftShoulderRotation * shoulderParentAdjustment);
+                var leftShoulderAdjustmentEuler = leftShoulderAdjustment.eulerAngles;
+                leftShoulderAdjustmentEuler.y = 0.0f;
+                leftShoulderAdjustment = Quaternion.Euler(leftShoulderAdjustmentEuler);
+            }
+            var leftShoulderData = new BoneAdjustmentData
+            {
+                Bone = leftShoulderBone,
+                Adjustment = leftShoulderAdjustment,
+                ChildBone1 = leftShoulderChildBone,
+                ChildBone2 = HumanBodyBones.LastBone,
+                ChildBone3 = HumanBodyBones.LastBone
+            };
+
+            return new[] { leftShoulderData, rightShoulderData };
         }
 
         /// <summary>

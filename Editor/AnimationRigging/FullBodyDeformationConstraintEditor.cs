@@ -4,6 +4,7 @@ using Oculus.Movement.Utils;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -218,6 +219,11 @@ namespace Oculus.Movement.AnimationRigging
             {
                 DisplayCalculateBoneData(constraint);
             }
+            if (Application.isPlaying && GUILayout.Button("Update job arrays"))
+            {
+                var rigBuilder = constraint.GetComponentInParent<RigBuilder>();
+                rigBuilder.Build();
+            }
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -227,14 +233,18 @@ namespace Oculus.Movement.AnimationRigging
             Undo.RecordObject(constraint, "Calculate bone data");
             var constraintData = constraint.data;
             var skeleton = constraint.GetComponentInParent<OVRCustomSkeleton>();
+            var animator = constraint.GetComponentInParent<Animator>();
             if (skeleton != null)
             {
                 constraintData.AssignOVRCustomSkeleton(skeleton);
             }
             else
             {
-                constraintData.AssignAnimator(constraint.GetComponentInParent<Animator>());
+                constraintData.AssignAnimator(animator);
             }
+            // Determine if this character is in T-pose or A-pose.
+            var isTPose = HelperMenusCommon.CheckIfTPose(animator);
+
             constraintData.InitializeStartingScale();
             constraintData.ClearTransformData();
             constraintData.SetUpLeftArmData();
@@ -244,7 +254,7 @@ namespace Oculus.Movement.AnimationRigging
             constraintData.SetUpHipsAndHeadBones();
             constraintData.SetUpBonePairs();
             constraintData.SetUpBoneTargets(constraint.transform);
-            constraintData.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject());
+            constraintData.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject(isTPose));
             constraint.data = constraintData;
             EditorUtility.SetDirty(target);
             PrefabUtility.RecordPrefabInstancePropertyModifications(target);

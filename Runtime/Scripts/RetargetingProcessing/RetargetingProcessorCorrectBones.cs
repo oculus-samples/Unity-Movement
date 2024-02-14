@@ -254,7 +254,7 @@ namespace Oculus.Movement.AnimationRigging
             };
             var targetWeight = adjustment != null && adjustment.DisableRotationTransform ?
                 0.0f : ShoulderCorrectionWeightLateUpdate;
-            var rotationChange = adjustment?.RotationChange ?? Quaternion.identity;
+            var rotationChange = adjustment?.PrecomputedRotationTweaks ?? Quaternion.identity;
             targetJoint.rotation =
                 Quaternion.Slerp(targetJoint.rotation,
                     boneRotation * correctionQuaternion,
