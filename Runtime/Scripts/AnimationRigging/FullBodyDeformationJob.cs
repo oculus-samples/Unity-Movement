@@ -1,10 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
-using UnityEngine.UIElements;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -17,7 +17,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Bone animation data for the FullBodyDeformation job.
         /// </summary>
-        public struct BoneAnimationData
+        public struct BoneDeformationAnimationData
         {
             /// <summary>
             /// The distance between the start and end bone transforms.
@@ -33,6 +33,52 @@ namespace Oculus.Movement.AnimationRigging
             /// The proportion of this bone relative to its limb.
             /// </summary>
             public float LimbProportion;
+        }
+
+        /// <summary>
+        /// Bone adjustment data for the FullBodyDeformation job.
+        /// </summary>
+        public struct BoneDeformationAdjustmentData
+        {
+            /// <summary>
+            /// The main bone to be adjusted.
+            /// </summary>
+            public ReadWriteTransformHandle MainBone;
+
+            /// <summary>
+            /// The rotation adjustment amount.
+            /// </summary>
+            public Quaternion RotationAdjustment;
+
+            /// <summary>
+            /// The first child bone transform handle if present.
+            /// </summary>
+            public ReadWriteTransformHandle ChildBone1;
+
+            /// <summary>
+            /// The second child bone transform handle if present.
+            /// </summary>
+            public ReadWriteTransformHandle ChildBone2;
+
+            /// <summary>
+            /// The third child bone transform handle if present.
+            /// </summary>
+            public ReadWriteTransformHandle ChildBone3;
+
+            /// <summary>
+            /// True if the position should also be set when restoring the first child transform data.
+            /// </summary>
+            public bool SetPosition1;
+
+            /// <summary>
+            /// True if the position should also be set when restoring the second child transform data.
+            /// </summary>
+            public bool SetPosition2;
+
+            /// <summary>
+            /// True if the position should also be set when restoring the third child transform data.
+            /// </summary>
+            public bool SetPosition3;
         }
 
         /// <summary>
@@ -158,7 +204,12 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The array of bone animation data for the start and end bone pairs.
         /// </summary>
-        public NativeArray<BoneAnimationData> BoneAnimData;
+        public NativeArray<BoneDeformationAnimationData> BoneAnimData;
+
+        /// <summary>
+        /// The array of bone adjustment data.
+        /// </summary>
+        public NativeArray<BoneDeformationAdjustmentData> BoneAdjustData;
 
         /// <summary>
         /// The array of directions between the start and end bones.
@@ -328,8 +379,8 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3 _preDeformationRightLowerArmPos;
         private Vector3 _preDeformationLeftHandPos;
         private Vector3 _preDeformationRightHandPos;
-        private Vector3 _preDeformationLeftFootPos;
-        private Vector3 _preDeformationRightFootPos;
+        private Vector3 _targetLeftFootPos;
+        private Vector3 _targetRightFootPos;
         private Vector3 _preDeformationLeftToesPos;
         private Vector3 _preDeformationRightToesPos;
 
@@ -380,17 +431,19 @@ namespace Oculus.Movement.AnimationRigging
                 _preDeformationRightLowerArmPos = RightLowerArmBone.GetPosition(stream);
                 _preDeformationLeftHandPos = LeftHandBone.GetPosition(stream);
                 _preDeformationRightHandPos = RightHandBone.GetPosition(stream);
-                _preDeformationLeftFootPos = LeftFootBone.GetPosition(stream);
-                _preDeformationRightFootPos = RightFootBone.GetPosition(stream);
+                _targetLeftFootPos = LeftFootBone.GetPosition(stream);
+                _targetRightFootPos = RightFootBone.GetPosition(stream);
 
                 _targetHipsPos = HipsToHeadBoneTargets[HipsIndex].GetPosition(stream);
                 _targetHeadPos = HipsToHeadBoneTargets[^1].GetPosition(stream);
+
                 if (SpineLowerAlignmentWeight.Get(stream) != 0.0f ||
                     SpineUpperAlignmentWeight.Get(stream) != 0.0f ||
                     ChestAlignmentWeight.Get(stream) != 0.0f)
                 {
                     AlignSpine(stream, weight);
                 }
+                ApplyAdjustments(stream, weight);
                 InterpolateShoulders(stream, weight);
                 UpdateBoneDirections(stream);
                 EnforceOriginalSkeletalProportions(stream, weight);
@@ -423,6 +476,50 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Apply bone adjustments.
+        /// </summary>
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">The weight.</param>
+        private void ApplyAdjustments(AnimationStream stream, float weight)
+        {
+            var spineAdjustmentWeight = weight;
+
+            for (int i = 0; i < BoneAdjustData.Length; i++)
+            {
+                var data = BoneAdjustData[i];
+                var previousRotation = data.MainBone.GetRotation(stream);
+                var targetRotation = data.MainBone.GetRotation(stream) *
+                    Quaternion.Slerp(Quaternion.identity, data.RotationAdjustment, spineAdjustmentWeight);
+                data.MainBone.SetRotation(stream, targetRotation);
+
+                var childAffineTransform1 = data.ChildBone1.IsValid(stream) ?
+                    new AffineTransform(data.ChildBone1.GetPosition(stream), data.ChildBone1.GetRotation(stream)) :
+                    AffineTransform.identity;
+                var childAffineTransform2 = data.ChildBone2.IsValid(stream) ?
+                    new AffineTransform(data.ChildBone2.GetPosition(stream), data.ChildBone2.GetRotation(stream)) :
+                    AffineTransform.identity;
+                var childAffineTransform3 = data.ChildBone3.IsValid(stream) ?
+                    new AffineTransform(data.ChildBone3.GetPosition(stream), data.ChildBone3.GetRotation(stream)) :
+                    AffineTransform.identity;
+                data.MainBone.SetRotation(stream, previousRotation);
+
+                // We want to restore the child positions after previewing what the parent adjustment would be.
+                if (data.ChildBone1.IsValid(stream) && data.SetPosition1)
+                {
+                    data.ChildBone1.SetPosition(stream, childAffineTransform1.translation);
+                }
+                if (data.ChildBone2.IsValid(stream) && data.SetPosition2)
+                {
+                    data.ChildBone2.SetPosition(stream, childAffineTransform2.translation);
+                }
+                if (data.ChildBone3.IsValid(stream) && data.SetPosition3)
+                {
+                    data.ChildBone3.SetPosition(stream, childAffineTransform3.translation);
+                }
+            }
+        }
+
+        /// <summary>
         /// Align the spine positions with the tracked spine positions,
         /// adding an offset on spine bones to align with the hips for a straight spine.
         /// </summary>
@@ -435,7 +532,7 @@ namespace Oculus.Movement.AnimationRigging
             var chestOffset = Vector3.zero;
 
             var hipsPosition = HipsToHeadBoneTargets[HipsIndex].GetPosition(stream);
-            var neckPosition = HipsToHeadBoneTargets[HeadIndex - 1].GetPosition(stream);
+            var headPosition = HipsToHeadBoneTargets[HeadIndex].GetPosition(stream);
             var accumulatedProportion = 0.0f;
 
             if (HipsToHeadBoneTargets[SpineLowerIndex].IsValid(stream))
@@ -445,8 +542,6 @@ namespace Oculus.Movement.AnimationRigging
                 // Ensure that the spine lower bone is straight up from the hips bone.
                 spineLowerOffset = hipsPosition - spineTargetPosition;
                 spineLowerOffset.y = 0.0f;
-                spineLowerOffset = Vector3.Lerp(Vector3.zero, spineLowerOffset,
-                    SpineLowerAlignmentWeight.Get(stream) * weight);
             }
 
             if (SpineUpperIndex > 0 && HipsToHeadBoneTargets[SpineUpperIndex].IsValid(stream))
@@ -454,10 +549,8 @@ namespace Oculus.Movement.AnimationRigging
                 var spineTargetPosition = HipsToHeadBoneTargets[SpineUpperIndex].GetPosition(stream);
                 accumulatedProportion += BoneAnimData[SpineUpperIndex - 1].LimbProportion;
                 spineUpperOffset = (hipsPosition - spineTargetPosition) * (1 - accumulatedProportion) +
-                                   (neckPosition - spineTargetPosition) * accumulatedProportion;
+                                   (headPosition - spineTargetPosition) * accumulatedProportion;
                 spineUpperOffset.y = 0.0f;
-                spineUpperOffset = Vector3.Lerp(Vector3.zero, spineUpperOffset,
-                    SpineUpperAlignmentWeight.Get(stream) * weight);
             }
 
             if (ChestIndex > 0 && HipsToHeadBoneTargets[ChestIndex].IsValid(stream))
@@ -465,39 +558,40 @@ namespace Oculus.Movement.AnimationRigging
                 var spineTargetPosition = HipsToHeadBoneTargets[ChestIndex].GetPosition(stream);
                 accumulatedProportion += BoneAnimData[ChestIndex - 1].LimbProportion;
                 chestOffset = (hipsPosition - spineTargetPosition) * (1 - accumulatedProportion) +
-                              (neckPosition - spineTargetPosition) * accumulatedProportion;
+                              (headPosition - spineTargetPosition) * accumulatedProportion;
                 chestOffset.y = 0.0f;
-                chestOffset = Vector3.Lerp(Vector3.zero, chestOffset,
-                    ChestAlignmentWeight.Get(stream) * weight);
             }
 
-            for (int i = SpineLowerIndex; i < HeadIndex; i++)
+            for (int i = SpineLowerIndex; i <= HeadIndex; i++)
             {
-                var targetBone = HipsToHeadBoneTargets[i];
                 var originalBone = HipsToHeadBones[i];
+                var targetBone = HipsToHeadBoneTargets[i];
                 if (targetBone.IsValid(stream))
                 {
-                    var spineCorrectionWeight = weight;
+                    var spineCorrectionWeight = 0.0f;
                     var spineOffset = Vector3.zero;
 
                     if (i == SpineLowerIndex)
                     {
                         spineOffset = spineLowerOffset;
+                        spineCorrectionWeight = SpineLowerAlignmentWeight.Get(stream) * weight;
                     }
                     else if (i == SpineUpperIndex)
                     {
                         spineOffset = spineUpperOffset;
+                        spineCorrectionWeight = SpineUpperAlignmentWeight.Get(stream) * weight;
                     }
                     else if (i == ChestIndex)
                     {
                         spineOffset = chestOffset;
+                        spineCorrectionWeight = ChestAlignmentWeight.Get(stream) * weight;
                     }
 
-                    var targetPos = targetBone.GetPosition(stream) + spineOffset;
                     var originalPos = originalBone.GetPosition(stream);
+                    var targetPos = targetBone.GetPosition(stream) + spineOffset;
                     targetPos.y = originalPos.y;
-                    targetPos = Vector3.Lerp(originalPos, targetPos, spineCorrectionWeight);
-                    originalBone.SetPosition(stream, targetPos);
+                    var endPos = Vector3.Lerp(originalPos, targetPos, spineCorrectionWeight);
+                    originalBone.SetPosition(stream, endPos);
                 }
                 HipsToHeadBoneTargets[i] = targetBone;
                 HipsToHeadBones[i] = originalBone;
@@ -644,7 +738,7 @@ namespace Oculus.Movement.AnimationRigging
 
             // Separate head offset application to upper and lower body.
             var upperBodyProportion = 0.0f;
-            for (int i = HipsIndex; i < HeadIndex; i++)
+            for (int i = HipsIndex; i <= HeadIndex; i++)
             {
                 upperBodyProportion += BoneAnimData[i].HeightProportion;
             }
@@ -654,15 +748,15 @@ namespace Oculus.Movement.AnimationRigging
             UpperBodyOffsets[HipsIndex] = headOffset * (lowerBodyProportion + BoneAnimData[HipsIndex].HeightProportion);
             UpperBodyTargetPositions[HipsIndex] = HipsBone.GetPosition(stream) +
                                                   Vector3.Lerp(Vector3.zero, UpperBodyOffsets[HipsIndex], weight);
-            for (int i = SpineLowerIndex; i < HeadIndex; i++)
+            for (int i = SpineLowerIndex; i <= HeadIndex; i++)
             {
                 var bone = HipsToHeadBones[i];
-                UpperBodyOffsets[i] = UpperBodyOffsets[i - 1] + headOffset * BoneAnimData[i].LimbProportion;
+                UpperBodyOffsets[i] = UpperBodyOffsets[i - 1] + headOffset * BoneAnimData[i].HeightProportion;
                 UpperBodyTargetPositions[i] = bone.GetPosition(stream) +
                                               Vector3.Lerp(Vector3.zero, UpperBodyOffsets[i], weight);
             }
 
-            // Lower body.
+            // Hips and lower body.
             var leftUpperLegOffset = -_hipsGroundingOffset;
             var rightUpperLegOffset = -_hipsGroundingOffset;
             var leftLowerLegOffset = headOffset *
@@ -680,15 +774,22 @@ namespace Oculus.Movement.AnimationRigging
             var targetRightLowerLegPos = RightLowerLegBone.GetPosition(stream) +
                                          Vector3.Lerp(Vector3.zero, rightLowerLegOffset, weight);
 
+            // Keep the feet grounded vertically but offset by the lower leg offset.
+            var targetLeftFootY = _targetLeftFootPos.y;
+            var targetRightFootY = _targetRightFootPos.y;
+            _targetLeftFootPos += Vector3.Lerp(Vector3.zero, leftLowerLegOffset, weight);
+            _targetRightFootPos += Vector3.Lerp(Vector3.zero, rightLowerLegOffset, weight);
+            _targetLeftFootPos.y = targetLeftFootY;
+            _targetRightFootPos.y = targetRightFootY;
+
             // Set bone positions.
-            for (int i = HipsIndex; i < HeadIndex; i++)
+            for (int i = HipsIndex; i <= HeadIndex; i++)
             {
                 var bone = HipsToHeadBones[i];
                 bone.SetPosition(stream, UpperBodyTargetPositions[i]);
                 HipsToHeadBones[i] = bone;
             }
             HeadBone.SetPosition(stream, _targetHeadPos);
-
             LeftUpperLegBone.SetLocalPosition(stream, targetLeftUpperLegPos);
             RightUpperLegBone.SetLocalPosition(stream, targetRightUpperLegPos);
             LeftLowerLegBone.SetPosition(stream, targetLeftLowerLegPos);
@@ -744,7 +845,7 @@ namespace Oculus.Movement.AnimationRigging
             _requiredSpineOffset = headOffset;
 
             UpperBodyOffsets[HipsIndex] = headOffset * BoneAnimData[HipsIndex].LimbProportion;
-            for (int i = SpineLowerIndex; i < HeadIndex; i++)
+            for (int i = SpineLowerIndex; i <= HeadIndex; i++)
             {
                 var bone = HipsToHeadBones[i];
                 UpperBodyOffsets[i] = UpperBodyOffsets[i - 1] + headOffset * BoneAnimData[i].LimbProportion;
@@ -753,7 +854,7 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             HipsBone.SetPosition(stream, _targetHipsPos);
-            for (int i = SpineLowerIndex; i < HeadIndex; i++)
+            for (int i = SpineLowerIndex; i <= HeadIndex; i++)
             {
                 var bone = HipsToHeadBones[i];
                 bone.SetPosition(stream, UpperBodyTargetPositions[i]);
@@ -772,9 +873,9 @@ namespace Oculus.Movement.AnimationRigging
             var leftFootPos = LeftFootBone.GetPosition(stream);
             var rightFootPos = RightFootBone.GetPosition(stream);
             LeftFootBone.SetPosition(stream,
-                Vector3.Lerp(leftFootPos, _preDeformationLeftFootPos, weight));
+                Vector3.Lerp(leftFootPos, _targetLeftFootPos, weight));
             RightFootBone.SetPosition(stream,
-                Vector3.Lerp(rightFootPos, _preDeformationRightFootPos, weight));
+                Vector3.Lerp(rightFootPos, _targetRightFootPos, weight));
         }
 
         /// <summary>
@@ -968,9 +1069,9 @@ namespace Oculus.Movement.AnimationRigging
             var leftLegOffsetWeight = weight * LeftLegOffsetWeight.Get(stream);
             var rightLegOffsetWeight = weight * RightLegOffsetWeight.Get(stream);
             _leftFootOffset = ApplyScaleAndWeight(
-                _preDeformationLeftFootPos - LeftFootBone.GetPosition(stream), leftLegOffsetWeight);
+                _targetLeftFootPos - LeftFootBone.GetPosition(stream), leftLegOffsetWeight);
             _rightFootOffset = ApplyScaleAndWeight(
-                _preDeformationRightFootPos - RightFootBone.GetPosition(stream), rightLegOffsetWeight);
+                _targetRightFootPos - RightFootBone.GetPosition(stream), rightLegOffsetWeight);
 
             var targetLeftUpperLegPos = LeftUpperLegBone.GetPosition(stream) + _leftFootOffset;
             var targetRightUpperLegPos = RightUpperLegBone.GetPosition(stream) + _rightFootOffset;
@@ -1036,6 +1137,15 @@ namespace Oculus.Movement.AnimationRigging
         {
             var job = new FullBodyDeformationJob();
 
+            var bonesToResetPositions = new List<HumanBodyBones>()
+            {
+                HumanBodyBones.LeftUpperLeg,
+                HumanBodyBones.RightUpperLeg,
+                HumanBodyBones.LeftShoulder,
+                HumanBodyBones.RightShoulder,
+                HumanBodyBones.Neck
+            };
+
             job.HipsBone = ReadWriteTransformHandle.Bind(animator, data.HipsToHeadBones[0]);
             job.HeadBone = ReadWriteTransformHandle.Bind(animator, data.HipsToHeadBones[^1]);
             job.LeftShoulderBone = data.LeftArm.ShoulderBone != null ?
@@ -1073,7 +1183,10 @@ namespace Oculus.Movement.AnimationRigging
                 NativeArrayOptions.UninitializedMemory);
             job.UpperBodyTargetPositions = new NativeArray<Vector3>(data.HipsToHeadBones.Length, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
-            job.BoneAnimData = new NativeArray<FullBodyDeformationJob.BoneAnimationData>(data.BonePairs.Length,
+            job.BoneAnimData = new NativeArray<FullBodyDeformationJob.BoneDeformationAnimationData>(data.BonePairs.Length,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.BoneAdjustData = new NativeArray<FullBodyDeformationJob.BoneDeformationAdjustmentData>(data.BoneAdjustments.Length,
                 Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
             job.BoneDirections = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
@@ -1095,7 +1208,7 @@ namespace Oculus.Movement.AnimationRigging
 
             for (int i = 0; i < data.BonePairs.Length; i++)
             {
-                var boneAnimData = new FullBodyDeformationJob.BoneAnimationData
+                var boneAnimData = new FullBodyDeformationJob.BoneDeformationAnimationData
                 {
                     Distance = data.BonePairs[i].Distance,
                     HeightProportion = data.BonePairs[i].HeightProportion,
@@ -1104,6 +1217,35 @@ namespace Oculus.Movement.AnimationRigging
                 job.StartBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].StartBone);
                 job.EndBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].EndBone);
                 job.BoneAnimData[i] = boneAnimData;
+            }
+
+            for (int i = 0; i < data.BoneAdjustments.Length; i++)
+            {
+                var boneAdjustment = data.BoneAdjustments[i];
+                var boneAdjustmentData = new FullBodyDeformationJob.BoneDeformationAdjustmentData()
+                {
+                    MainBone = ReadWriteTransformHandle.Bind(animator, animator.GetBoneTransform(boneAdjustment.Bone)),
+                    RotationAdjustment = boneAdjustment.Adjustment,
+                    ChildBone1 =
+                        boneAdjustment.ChildBone1 != HumanBodyBones.LastBone ?
+                            ReadWriteTransformHandle.Bind(animator,
+                                animator.GetBoneTransform(boneAdjustment.ChildBone1)) :
+                            new ReadWriteTransformHandle(),
+                    ChildBone2 =
+                        boneAdjustment.ChildBone2 != HumanBodyBones.LastBone ?
+                            ReadWriteTransformHandle.Bind(animator,
+                                animator.GetBoneTransform(boneAdjustment.ChildBone2)) :
+                            new ReadWriteTransformHandle(),
+                    ChildBone3 =
+                        boneAdjustment.ChildBone3 != HumanBodyBones.LastBone ?
+                            ReadWriteTransformHandle.Bind(animator,
+                                animator.GetBoneTransform(boneAdjustment.ChildBone3)) :
+                            new ReadWriteTransformHandle(),
+                    SetPosition1 = !bonesToResetPositions.Contains(boneAdjustment.ChildBone1),
+                    SetPosition2 = !bonesToResetPositions.Contains(boneAdjustment.ChildBone2),
+                    SetPosition3 = !bonesToResetPositions.Contains(boneAdjustment.ChildBone3),
+                };
+                job.BoneAdjustData[i] = boneAdjustmentData;
             }
 
             job.SpineCorrectionType = IntProperty.Bind(animator, component, data.SpineCorrectionTypeIntProperty);
@@ -1149,7 +1291,7 @@ namespace Oculus.Movement.AnimationRigging
             }
             job.ShouldersParentIndex = job.ChestIndex > 0 ? job.ChestIndex :
                 job.SpineUpperIndex > 0 ? job.SpineUpperIndex : job.SpineLowerIndex;
-            job.HeadIndex = data.HipsToHeadBones.Length;
+            job.HeadIndex = data.HipsToHeadBones.Length - 1;
             job.LeftToesOriginalLocalPos = data.LeftLeg.ToesLocalPos;
             job.RightToesOriginalLocalPos = data.RightLeg.ToesLocalPos;
             job.LeftShoulderOriginalLocalPos = data.LeftArm.ShoulderLocalPos;
@@ -1187,6 +1329,7 @@ namespace Oculus.Movement.AnimationRigging
             job.StartBones.Dispose();
             job.EndBones.Dispose();
             job.BoneAnimData.Dispose();
+            job.BoneAdjustData.Dispose();
             job.HipsToHeadBones.Dispose();
             job.HipsToHeadBoneTargets.Dispose();
             job.UpperBodyOffsets.Dispose();

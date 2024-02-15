@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6520329247888166650}
   - component: {fileID: 5858254439604359654}
   m_Layer: 0
-  m_Name: PlaybackAnimationConstraint
+  m_Name: PartiallyReapplyBodyPose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -191,6 +191,10 @@ PrefabInstance:
     - target: {fileID: 3817605947884828321, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5509279618122473931, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
+      propertyPath: m_Name
+      value: RememberBodyPose
       objectReference: {fileID: 0}
     - target: {fileID: 5509279618122473931, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
       propertyPath: m_IsActive

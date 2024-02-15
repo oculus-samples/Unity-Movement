@@ -142,6 +142,7 @@ namespace Oculus.Movement.AnimationRigging
         private HandBodyJointPair[] _jointPairs;
         private Quaternion _rigRotationOffset;
         private Vector3 _rigPositionOffset;
+        private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
 
         /// <summary>
         /// If the camera rig moves but the body is stationary, this should be true
@@ -199,6 +200,8 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             IList<OVRBone> bones = skeleton.Bones;
+            var bodyHand = bones[(int)_jointPairs[0].body];
+            var startingHandPose = new Pose(bodyHand.Transform.position, bodyHand.Transform.rotation);
             UpdateRigOffsetCalculations();
             foreach (HandBodyJointPair pair in _jointPairs)
             {
@@ -220,6 +223,56 @@ namespace Oculus.Movement.AnimationRigging
                 else
                 {
                     SimplePosePropagation(ref bone, ref pose);
+                }
+            }
+
+            // Find the correct hand retargeting processor.
+            // As the skeleton hand adjustment only updates the hand and not the rest of the arm,
+            // we need to position the hand with an IK solver so that it affects the entire arm.
+            // By setting the custom target hand position for the correct hand retargeting processor
+            // and using the body tracked hand instead, misaligned hands from the arms shouldn't occur.
+            if (_retargetingProcessorCorrectHand == null)
+            {
+                FindRetargetingProcessorCorrectHand(skeleton);
+            }
+            if (_retargetingProcessorCorrectHand == null)
+            {
+                return;
+            }
+
+            // Store the target hand position.
+            var targetHandPosition = bodyHand.Transform.position;
+            var vectorToStartingHandPosition = startingHandPose.position - targetHandPosition;
+
+            // Apply the offset to the entire hand including fingers.
+            foreach (HandBodyJointPair pair in _jointPairs)
+            {
+                int joint = (int)pair.body;
+                if (pair.hand == HandJointId.Invalid || joint < 0)
+                {
+                    continue;
+                }
+                Transform bone = bones[joint].Transform;
+                bone.position += vectorToStartingHandPosition;
+            }
+            // Update the custom target hand position for the IK solver to be at the ISDK hand position.
+            _retargetingProcessorCorrectHand.CustomHandTargetPosition = targetHandPosition;
+        }
+
+        private void FindRetargetingProcessorCorrectHand(OVRSkeleton skeleton)
+        {
+            var retargetingLayer = skeleton as RetargetingLayer;
+            if (retargetingLayer == null)
+            {
+                return;
+            }
+            foreach (var processor in retargetingLayer.RetargetingProcessors)
+            {
+                var correctHands = processor as RetargetingProcessorCorrectHand;
+                if (correctHands != null && correctHands.Handedness == Hand.Handedness)
+                {
+                    _retargetingProcessorCorrectHand = correctHands;
+                    break;
                 }
             }
         }

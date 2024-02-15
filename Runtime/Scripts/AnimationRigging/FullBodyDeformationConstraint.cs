@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction;
 using Oculus.Movement.Utils;
 using System;
 using System.Collections.Generic;
@@ -110,6 +109,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The position info for the bone pairs used for FullBodyDeformation.
         /// </summary>
         public BonePairData[] BonePairs { get; }
+
+        /// <summary>
+        /// The adjustment info for the bones.
+        /// </summary>
+        public BoneAdjustmentData[] BoneAdjustments { get; }
 
         /// <summary>
         /// The position info for the left arm.
@@ -274,7 +278,14 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Try to set up bone targets.
         /// </summary>
+        /// <param name="setupParent">The parent for the bone targets.</param>
         public void SetUpBoneTargets(Transform setupParent);
+
+        /// <summary>
+        /// Try to set up adjustments.
+        /// </summary>
+        /// <param name="restPoseObject">The rest pose object used to calculate adjustments.</param>
+        public void SetUpAdjustments(RestPoseObjectHumanoid restPoseObject);
 
         /// <summary>
         /// Computes initial starting scale.
@@ -339,6 +350,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         BonePairData[] IFullBodyDeformationData.BonePairs => _bonePairData;
+
+        /// <inheritdoc />
+        BoneAdjustmentData[] IFullBodyDeformationData.BoneAdjustments => _boneAdjustmentData;
 
         /// <inheritdoc />
         ArmPosData IFullBodyDeformationData.LeftArm => _leftArmData;
@@ -704,6 +718,13 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(DeformationDataTooltips.BonePairData)]
         private BonePairData[] _bonePairData;
+
+        /// <summary>
+        /// All bone adjustment data.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(DeformationDataTooltips.BoneAdjustmentData)]
+        private BoneAdjustmentData[] _boneAdjustmentData;
 
         /// <summary>
         /// Starting scale of character.
@@ -1083,6 +1104,33 @@ namespace Oculus.Movement.AnimationRigging
             hipsToHeadBoneTargets.Add(headTarget);
 
             _hipsToHeadBoneTargets = hipsToHeadBoneTargets.ToArray();
+        }
+
+        /// <inheritdoc />
+        public void SetUpAdjustments(RestPoseObjectHumanoid restPoseObject)
+        {
+            // Calculate spine adjustments.
+            var shoulderParentAdjustmentBone = GetValidShoulderParentBone(_animator);
+            var shoulderParentAdjustment = Quaternion.identity;
+            var spineBoneAdjustments = GetSpineJointAdjustments(_animator, restPoseObject);
+            foreach (var spineBoneAdjustment in spineBoneAdjustments)
+            {
+                if (spineBoneAdjustment.Bone == shoulderParentAdjustmentBone)
+                {
+                    shoulderParentAdjustment = spineBoneAdjustment.Adjustment;
+                    break;
+                }
+            }
+
+            // Calculate adjustments for the shoulders (or upper arms, if shoulders are unavailable).
+            var shoulderBoneAdjustments =
+                GetShoulderAdjustments(_animator, restPoseObject, shoulderParentAdjustment);
+
+            // Combine calculated adjustments.
+            var boneAdjustments = new List<BoneAdjustmentData>();
+            boneAdjustments.AddRange(spineBoneAdjustments);
+            boneAdjustments.AddRange(shoulderBoneAdjustments);
+            _boneAdjustmentData = boneAdjustments.ToArray();
         }
 
         /// <inheritdoc />

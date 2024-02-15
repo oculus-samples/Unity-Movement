@@ -1011,6 +1011,9 @@ namespace Oculus.Movement
         public const string BonePairData =
             "All bone pair data.";
 
+        public const string BoneAdjustmentData =
+            "All bone adjustment data.";
+
         public const string StartingScale =
             "Starting scale of character.";
 
@@ -1309,6 +1312,12 @@ namespace Oculus.Movement
         public const string UseWorldHandPosition =
             "If true, use the world hand position for placing the hand instead of the scaled position.";
 
+        public const string UseCustomHandTargetPosition =
+            "If true, use the custom hand target position for the target position.";
+
+        public const string CustomHandTargetPosition =
+            "The custom hand target position.";
+
         public const string MaxHandStretch =
             "The maximum stretch for the hand to reach the target position that is allowed.";
 
@@ -1336,9 +1345,6 @@ namespace Oculus.Movement
 
         public const string RetargetingProcessors =
             "List of retargeting processors, which run in late update after retargeting and animation rigging.";
-
-        public const string JointRotationTweaks =
-            "Joint rotation tweaks array.";
     }
 
     public static class LateMirroredObjectTooltips
@@ -1417,6 +1423,12 @@ namespace Oculus.Movement
 
         public const string SpawnOffset =
             "Offset per spawn.";
+
+        public const string RestPoseObject =
+            "The rest pose humanoid object.";
+
+        public const string RestTPoseObject =
+            "The rest T-pose humanoid object.";
 
         public const string TPoseMask =
             "Positions to correct mask, intended to set certain joints of " +

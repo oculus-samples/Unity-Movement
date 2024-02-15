@@ -149,14 +149,6 @@ namespace Oculus.Movement.Utils
         public Quaternion CalculateRotationDifferenceFromRestPoseToAnimatorJoint(
             Animator otherAnimator, HumanBodyBones humanBodyBone)
         {
-            Quaternion rotationDifference = Quaternion.identity;
-
-            if (!RiggingUtilities.IsHumanoidAnimator(otherAnimator))
-            {
-                Debug.LogError("Reference pose is not humanoid character");
-                return Quaternion.identity;
-            }
-
             // To compute the rotation difference, an axis is required for the
             // animator character and rest pose. Find the joints of the axis first.
             if (!OVRHumanBodyBonesMappings.BoneToJointPair.TryGetValue(
@@ -166,23 +158,47 @@ namespace Oculus.Movement.Utils
                 return Quaternion.identity;
             }
 
-            Transform startJointOther = otherAnimator.GetBoneTransform(jointPair.Item1),
-                endJointOther = otherAnimator.GetBoneTransform(jointPair.Item2);
+            return CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
+                otherAnimator, jointPair.Item1, jointPair.Item2);
+        }
+
+        /// <summary>
+        /// Calculates the rotation difference between the
+        /// specified bone pair in the animator character and
+        /// the bone pair in the reference rest pose.
+        /// </summary>
+        /// <param name="otherAnimator">Animator to compare against.</param>
+        /// <param name="humanBodyBone">HumanBodyBones joint to be referenced for the
+        /// angle comparison.</param>
+        /// <param name="otherHumanBodyBone">Other HumanBodyBones joint to be referenced for the
+        /// angle comparison.</param>
+        /// <returns>Rotation difference.</returns>
+        public Quaternion CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
+            Animator otherAnimator, HumanBodyBones humanBodyBone, HumanBodyBones otherHumanBodyBone)
+        {
+            if (!RiggingUtilities.IsHumanoidAnimator(otherAnimator))
+            {
+                Debug.LogError("Reference pose is not humanoid character");
+                return Quaternion.identity;
+            }
+
+            Transform startJointOther = otherAnimator.GetBoneTransform(humanBodyBone),
+                endJointOther = otherAnimator.GetBoneTransform(otherHumanBodyBone);
             if (startJointOther == null || endJointOther == null)
             {
                 Debug.LogError("Other animator has at least one null joint pair: " +
                     $"{startJointOther}, {endJointOther}. Are the joints properly mapped for " +
-                    $"{jointPair.Item1}-{jointPair.Item2}?");
+                    $"{humanBodyBone}-{otherHumanBodyBone}?");
                 return Quaternion.identity;
             }
 
-            var startJointReferenceData = GetBonePoseData(jointPair.Item1);
-            var endJointReferenceData = GetBonePoseData(jointPair.Item2);
+            var startJointReferenceData = GetBonePoseData(humanBodyBone);
+            var endJointReferenceData = GetBonePoseData(otherHumanBodyBone);
             if (startJointReferenceData == null || endJointReferenceData == null)
             {
                 Debug.LogError("Reference has at least one null joint pair: " +
                     $"{startJointReferenceData}, {endJointReferenceData}. Are the joints properly mapped for " +
-                    $"{jointPair.Item1}-{jointPair.Item2}?");
+                    $"{humanBodyBone}-{otherHumanBodyBone}?");
                 return Quaternion.identity;
             }
 

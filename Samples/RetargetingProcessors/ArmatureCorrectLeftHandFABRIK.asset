@@ -10,13 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e245a3cf228c72d4ab693be869f73596, type: 3}
-  m_Name: ArmatureCorrectRightHand
+  m_Name: ArmatureCorrectLeftHandFABRIK
   m_EditorClassIdentifier: 
   Weight: 1
-  _handedness: 1
-  _handIKType: 1
+  _handedness: 0
+  _handIKType: 2
   _useWorldHandPosition: 1
-  _useCorrectedHandPosition: 1
   _maxHandStretch: 0.01
   _maxShoulderStretch: 0
   _ikTolerance: 0.000001

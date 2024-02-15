@@ -92,6 +92,8 @@ namespace Oculus.Movement.Utils
             // Add final components to tie everything together.
             AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
                 constraintMonos.ToArray(), retargetingLayer);
+            HelperMenusCommon.AddJointAdjustments(animatorComp, retargetingLayer);
+            EditorUtility.SetDirty(retargetingLayer);
 
             // Add retargeting processors to the retargeting layer.
             AddCorrectBonesRetargetingProcessor(retargetingLayer);
@@ -249,8 +251,6 @@ namespace Oculus.Movement.Utils
                 });
             }
 
-            HelperMenusCommon.AddJointAdjustments(animator, retargetingLayer);
-
             EditorUtility.SetDirty(retargetingLayer);
 
             OVRBody bodyComp = mainParent.GetComponent<OVRBody>();
@@ -402,11 +402,11 @@ namespace Oculus.Movement.Utils
 
             deformationConstraint.data.SpineTranslationCorrectionTypeField
                 = FullBodyDeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead;
-            deformationConstraint.data.SpineLowerAlignmentWeight = 1.0f;
-            deformationConstraint.data.SpineUpperAlignmentWeight = 0.5f;
+            deformationConstraint.data.SpineLowerAlignmentWeight = 0.5f;
+            deformationConstraint.data.SpineUpperAlignmentWeight = 1.0f;
             deformationConstraint.data.ChestAlignmentWeight = 0.0f;
-            deformationConstraint.data.LeftShoulderWeight = 0.75f;
-            deformationConstraint.data.RightShoulderWeight = 0.75f;
+            deformationConstraint.data.LeftShoulderWeight = 1.0f;
+            deformationConstraint.data.RightShoulderWeight = 1.0f;
             deformationConstraint.data.LeftArmWeight = 1.0f;
             deformationConstraint.data.RightArmWeight = 1.0f;
             deformationConstraint.data.LeftHandWeight = 1.0f;
@@ -425,6 +425,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SetUpHipsAndHeadBones();
             deformationConstraint.data.SetUpBonePairs();
             deformationConstraint.data.SetUpBoneTargets(deformationConstraint.transform);
+            deformationConstraint.data.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject(HelperMenusCommon.CheckIfTPose(animator)));
             deformationConstraint.data.InitializeStartingScale();
 
             PrefabUtility.RecordPrefabInstancePropertyModifications(deformationConstraint);

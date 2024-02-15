@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Movement.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,6 +16,17 @@ namespace Oculus.Movement.AnimationRigging
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            if (GUILayout.Button("Calculate Adjustments"))
+            {
+                var retargetingLayer = serializedObject.targetObject as RetargetingLayer;
+                if (retargetingLayer != null)
+                {
+                    var animator = retargetingLayer.GetComponent<Animator>();
+                    HelperMenusCommon.AddJointAdjustments(animator, retargetingLayer);
+                    EditorUtility.SetDirty(retargetingLayer);
+                }
+            }
 
             serializedObject.Update();
 

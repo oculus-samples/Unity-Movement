@@ -576,10 +576,13 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _spineLowerAlignmentWeight: 1
-    _spineUpperAlignmentWeight: 0.5
+    _spineUpperAlignmentWeight: 1
     _chestAlignmentWeight: 0
-    _leftShoulderWeight: 0.75
-    _rightShoulderWeight: 0.75
+    _shouldersHeightAdjustmentWeight: 0
+    _shouldersWidthAdjustmentWeight: 0
+    _armsHeightAdjustmentWeight: 0
+    _leftShoulderWeight: 1
+    _rightShoulderWeight: 1
     _leftArmWeight: 1
     _rightArmWeight: 1
     _leftHandWeight: 1
@@ -732,6 +735,37 @@ MonoBehaviour:
       Distance: 0.41403958
       HeightProportion: 0.27139854
       LimbProportion: 0.46967828
+    _boneAdjustmentData:
+    - Bone: 0
+      Adjustment: {x: 0.49502963, y: 0, z: 0, w: 0.8688761}
+      ChildBone1: 7
+      ChildBone2: 1
+      ChildBone3: 2
+    - Bone: 7
+      Adjustment: {x: -0.049799785, y: 0, z: 0, w: 0.9987592}
+      ChildBone1: 8
+      ChildBone2: 55
+      ChildBone3: 55
+    - Bone: 8
+      Adjustment: {x: 0.116232045, y: 0, z: 0, w: 0.9932221}
+      ChildBone1: 54
+      ChildBone2: 55
+      ChildBone3: 55
+    - Bone: 54
+      Adjustment: {x: -0.13111039, y: 0, z: 0, w: 0.9913678}
+      ChildBone1: 9
+      ChildBone2: 11
+      ChildBone3: 12
+    - Bone: 11
+      Adjustment: {x: 0.14328793, y: -0.0089229, z: 0.061508276, w: 0.9877275}
+      ChildBone1: 13
+      ChildBone2: 55
+      ChildBone3: 55
+    - Bone: 12
+      Adjustment: {x: 0.14328793, y: -0.0089229, z: 0.061508276, w: 0.9877275}
+      ChildBone1: 14
+      ChildBone2: 55
+      ChildBone3: 55
     _startingScale: {x: 1, y: 1, z: 1}
     _hipsToHeadDistance: 0.64403903
     _hipsToFootDistance: 0.8815387
@@ -989,7 +1023,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1371976685920341362, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1371976685920341362, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_LocalRotation.y
@@ -997,7 +1031,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1371976685920341362, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1371976685920341362, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1717,8 +1751,36 @@ MonoBehaviour:
   _adjustments:
   - Joint: 0
     PositionChange: {x: 0, y: 0, z: 0}
-    RotationChange: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-    RotationTweaks: []
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: 0.49502963, y: 0, z: 0, w: 0.8688761}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    FullBodyBoneIdOverrideValue: 85
+    BoneIdOverrideValue: 71
+  - Joint: 7
+    PositionChange: {x: 0, y: 0, z: 0}
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: -0.049799785, y: 0, z: 0, w: 0.9987592}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    FullBodyBoneIdOverrideValue: 85
+    BoneIdOverrideValue: 71
+  - Joint: 8
+    PositionChange: {x: 0, y: 0, z: 0}
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: 0.116232045, y: 0, z: 0, w: 0.9932221}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    FullBodyBoneIdOverrideValue: 85
+    BoneIdOverrideValue: 71
+  - Joint: 54
+    PositionChange: {x: 0, y: 0, z: 0}
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: -0.065697126, y: 0, z: 0, w: 0.9978396}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
@@ -1726,7 +1788,8 @@ MonoBehaviour:
   - Joint: 11
     PositionChange: {x: 0, y: 0, z: 0}
     RotationChange: {x: 0, y: 0, z: 0, w: 1}
-    RotationTweaks: []
+    RotationTweaks:
+    - {x: 0.14328793, y: -0.0089229, z: 0.061508276, w: 0.9877275}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
@@ -1734,7 +1797,28 @@ MonoBehaviour:
   - Joint: 12
     PositionChange: {x: 0, y: 0, z: 0}
     RotationChange: {x: 0, y: 0, z: 0, w: 1}
-    RotationTweaks: []
+    RotationTweaks:
+    - {x: 0.14328793, y: -0.0089229, z: 0.061508276, w: 0.9877275}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    FullBodyBoneIdOverrideValue: 85
+    BoneIdOverrideValue: 71
+  - Joint: 17
+    PositionChange: {x: 0, y: 0, z: 0}
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
+    DisableRotationTransform: 0
+    DisablePositionTransform: 0
+    FullBodyBoneIdOverrideValue: 85
+    BoneIdOverrideValue: 71
+  - Joint: 18
+    PositionChange: {x: 0, y: 0, z: 0}
+    RotationChange: {x: 0, y: 0, z: 0, w: 1}
+    RotationTweaks:
+    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
+    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
@@ -1751,15 +1835,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
   - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
   - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}
-  _jointRotationTweaks:
-  - Joint: 17
-    RotationTweaks:
-    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
-    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
-  - Joint: 18
-    RotationTweaks:
-    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
-    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
 --- !u!114 &8041379379990558817
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Movement.AnimationRigging;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -13,28 +14,71 @@ namespace Oculus.Movement.Utils
     /// </summary>
     public class HelperMenusCommon
     {
-        const string _HUMANOID_REFERENCE_POSE_ASSET_NAME = "BodyTrackingHumanoidReferencePose";
+        private const string _HUMANOID_REFERENCE_POSE_ASSET_NAME = "BodyTrackingHumanoidReferencePose";
+        private const string _HUMANOID_REFERENCE_T_POSE_ASSET_NAME = "BodyTrackingHumanoidReferenceTPose";
+        private const float _tPoseArmDirectionMatchThreshold = 0.95f;
+        private const float _tPoseArmHeightMatchThreshold = 0.1f;
+        private static readonly HumanBodyBones[] _excludedAccumulatedRotationBones = new HumanBodyBones[]
+        {
+            HumanBodyBones.Hips, HumanBodyBones.LeftShoulder, HumanBodyBones.RightShoulder
+        };
+
+        /// <summary>
+        /// Find and return the reference rest pose humanoid object in the project.
+        /// </summary>
+        /// <returns>The rest pose humanoid object.</returns>
+        public static RestPoseObjectHumanoid GetRestPoseObject(bool isTPose = false)
+        {
+            var poseAssetName = isTPose ?
+                _HUMANOID_REFERENCE_T_POSE_ASSET_NAME : _HUMANOID_REFERENCE_POSE_ASSET_NAME;
+            string[] guids = AssetDatabase.FindAssets(poseAssetName);
+            if (guids == null || guids.Length == 0)
+            {
+                Debug.LogError($"Asset {poseAssetName} cannot be found.");
+                return null;
+            }
+
+            var pathToAsset = AssetDatabase.GUIDToAssetPath(guids[0]);
+            return AssetDatabase.LoadAssetAtPath<RestPoseObjectHumanoid>(pathToAsset);
+        }
+
+        /// <summary>
+        /// Given an animator, determine if the avatar is in T-pose or A-pose.
+        /// </summary>
+        /// <param name="animator">The animator.</param>
+        /// <returns>True if T-pose.</returns>
+        public static bool CheckIfTPose(Animator animator)
+        {
+            var shoulder = animator.GetBoneTransform(HumanBodyBones.LeftShoulder);
+            var upperArm = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
+            var lowerArm = animator.GetBoneTransform(HumanBodyBones.LeftLowerArm);
+            var hand = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+            if (shoulder == null)
+            {
+                // Naive approach to check if the lowerArm is placed in A-pose or not when
+                // missing a shoulder bone.
+                return upperArm.position.y - lowerArm.position.y < _tPoseArmHeightMatchThreshold;
+            }
+            var shoulderToUpperArm = (shoulder.position - upperArm.position).normalized;
+            var lowerArmToHand = (lowerArm.position - hand.position).normalized;
+            var armDirectionMatch = Vector3.Dot(shoulderToUpperArm, lowerArmToHand);
+            return armDirectionMatch >= _tPoseArmDirectionMatchThreshold;
+        }
 
         /// <summary>
         /// Adds joint adjustments for an animator.
         /// </summary>
         /// <param name="animator">Animator component.</param>
         /// <param name="retargetingLayer">Retargeting layer component to change adjustments of.</param>
-
         public static void AddJointAdjustments(Animator animator, RetargetingLayer retargetingLayer)
         {
-            string[] guids = AssetDatabase.FindAssets(_HUMANOID_REFERENCE_POSE_ASSET_NAME);
-            if (guids == null || guids.Length == 0)
+            var restPoseObject = GetRestPoseObject(CheckIfTPose(animator));
+            if (restPoseObject == null)
             {
                 Debug.LogError($"Cannot compute adjustments because asset {_HUMANOID_REFERENCE_POSE_ASSET_NAME} " +
-                    "cannot be found.");
+                               "cannot be found.");
                 return;
             }
-
-            var pathToAsset = AssetDatabase.GUIDToAssetPath(guids[0]);
-            RestPoseObjectHumanoid restPoseObject = AssetDatabase.LoadAssetAtPath<RestPoseObjectHumanoid>(pathToAsset);
-            var hipAngleDifference = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorJoint
-                (animator, HumanBodyBones.Hips);
 
             var adjustmentsField =
                 typeof(RetargetingLayer).GetField(
@@ -42,26 +86,75 @@ namespace Oculus.Movement.Utils
                     BindingFlags.Instance | BindingFlags.NonPublic);
             if (adjustmentsField != null)
             {
-                adjustmentsField.SetValue(retargetingLayer, new[]
+                var fullBodyDeformationConstraint = retargetingLayer.GetComponentInChildren<FullBodyDeformationConstraint>(true);
+                if (fullBodyDeformationConstraint != null)
                 {
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.Hips,
-                        RotationTweaks = new Quaternion[] { hipAngleDifference } 
-                    },
-                    // manual adjustments follow to address possible shoulder issues
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.LeftShoulder,
-                        RotationTweaks = new Quaternion[] { Quaternion.Euler(0.0f, 0.0f, 15.0f) }
-                    },
-                    new JointAdjustment
-                    {
-                        Joint = HumanBodyBones.RightShoulder,
-                        RotationTweaks = new Quaternion[] { Quaternion.Euler(0.0f, 0.0f, 15.0f) }
-                    }
-                });
+                    adjustmentsField.SetValue(retargetingLayer,
+                        GetDeformationJointAdjustments(animator, fullBodyDeformationConstraint));
+                }
+                else
+                {
+                    adjustmentsField.SetValue(retargetingLayer,
+                        GetFallbackJointAdjustments(animator, restPoseObject));
+                }
             }
+        }
+
+        private static JointAdjustment[] GetDeformationJointAdjustments(Animator animator, FullBodyDeformationConstraint constraint)
+        {
+            var adjustments = new List<JointAdjustment>();
+            var deformationData = constraint.data as IFullBodyDeformationData;
+            var isMissingUpperChestBone = animator.GetBoneTransform(HumanBodyBones.UpperChest) == null;
+            var boneAdjustmentData = deformationData.BoneAdjustments;
+            foreach (var boneAdjustment in boneAdjustmentData)
+            {
+                var rotationTweak = boneAdjustment.Adjustment;
+                if (isMissingUpperChestBone && boneAdjustment.Bone == HumanBodyBones.Chest)
+                {
+                    // As UpperChest -> Neck and Chest -> Neck bone pair directions on the rest pose
+                    // skeleton are opposite, this rotation tweak is inverted.
+                    rotationTweak = Quaternion.Inverse(rotationTweak);
+                }
+                if (boneAdjustment.Bone == HumanBodyBones.UpperChest)
+                {
+                    // Reducing the rotation adjustment on the upper chest yields a better result visually.
+                    rotationTweak =
+                        Quaternion.Slerp(Quaternion.identity, rotationTweak, 0.5f);
+                }
+                var adjustment = new JointAdjustment()
+                {
+                    Joint = boneAdjustment.Bone,
+                    RotationTweaks = new [] { rotationTweak }
+                };
+                adjustments.Add(adjustment);
+            }
+            return adjustments.ToArray();
+        }
+
+        private static JointAdjustment[] GetFallbackJointAdjustments(Animator animator, RestPoseObjectHumanoid restPoseObject)
+        {
+            var hipAngleDifference = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorJoint
+                (animator, HumanBodyBones.Hips);
+            var shoulderAngleDifferences =
+                DeformationCommon.GetShoulderAdjustments(animator, restPoseObject, Quaternion.identity);
+            return new[]
+            {
+                new JointAdjustment()
+                {
+                    Joint = HumanBodyBones.Hips,
+                    RotationTweaks = new[] { hipAngleDifference }
+                },
+                new JointAdjustment()
+                {
+                    Joint = HumanBodyBones.LeftShoulder,
+                    RotationTweaks = new[] { shoulderAngleDifferences[0].Adjustment }
+                },
+                new JointAdjustment()
+                {
+                    Joint = HumanBodyBones.RightShoulder,
+                    RotationTweaks = new[] { shoulderAngleDifferences[1].Adjustment }
+                }
+            };
         }
     }
 }

@@ -1,8 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Movement.Utils;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -114,6 +116,7 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _leftLegDataProperty;
         private SerializedProperty _rightLegDataProperty;
         private SerializedProperty _bonePairDataProperty;
+        private SerializedProperty _boneAdjustmentDataProperty;
 
         private SerializedProperty _startingScaleProperty;
         private SerializedProperty _hipsToHeadDistanceProperty;
@@ -156,6 +159,7 @@ namespace Oculus.Movement.AnimationRigging
             _leftLegDataProperty = data.FindPropertyRelative("_leftLegData");
             _rightLegDataProperty = data.FindPropertyRelative("_rightLegData");
             _bonePairDataProperty = data.FindPropertyRelative("_bonePairData");
+            _boneAdjustmentDataProperty = data.FindPropertyRelative("_boneAdjustmentData");
 
             _startingScaleProperty = data.FindPropertyRelative("_startingScale");
             _hipsToHeadDistanceProperty = data.FindPropertyRelative("_hipsToHeadDistance");
@@ -215,6 +219,11 @@ namespace Oculus.Movement.AnimationRigging
             {
                 DisplayCalculateBoneData(constraint);
             }
+            if (Application.isPlaying && GUILayout.Button("Update job arrays"))
+            {
+                var rigBuilder = constraint.GetComponentInParent<RigBuilder>();
+                rigBuilder.Build();
+            }
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -224,14 +233,18 @@ namespace Oculus.Movement.AnimationRigging
             Undo.RecordObject(constraint, "Calculate bone data");
             var constraintData = constraint.data;
             var skeleton = constraint.GetComponentInParent<OVRCustomSkeleton>();
+            var animator = constraint.GetComponentInParent<Animator>();
             if (skeleton != null)
             {
                 constraintData.AssignOVRCustomSkeleton(skeleton);
             }
             else
             {
-                constraintData.AssignAnimator(constraint.GetComponentInParent<Animator>());
+                constraintData.AssignAnimator(animator);
             }
+            // Determine if this character is in T-pose or A-pose.
+            var isTPose = HelperMenusCommon.CheckIfTPose(animator);
+
             constraintData.InitializeStartingScale();
             constraintData.ClearTransformData();
             constraintData.SetUpLeftArmData();
@@ -241,6 +254,7 @@ namespace Oculus.Movement.AnimationRigging
             constraintData.SetUpHipsAndHeadBones();
             constraintData.SetUpBonePairs();
             constraintData.SetUpBoneTargets(constraint.transform);
+            constraintData.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject(isTPose));
             constraint.data = constraintData;
             EditorUtility.SetDirty(target);
             PrefabUtility.RecordPrefabInstancePropertyModifications(target);
@@ -327,6 +341,7 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.Label(new GUIContent("Cached Data"), EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
             DisplayBonePairArray("Bone Pair Data", _bonePairDataProperty);
+            DisplayBoneAdjustmentArray("Bone Adjustment Data", _boneAdjustmentDataProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBonesProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBoneTargetsProperty);
             EditorGUILayout.PropertyField(_leftArmDataProperty);
@@ -357,6 +372,31 @@ namespace Oculus.Movement.AnimationRigging
                         new GUIContent($"{propertyElement.FindPropertyRelative("StartBone").objectReferenceValue.name} -> " +
                             $"{propertyElement.FindPropertyRelative("EndBone").objectReferenceValue.name}",
                             "Bone pair."));
+                }
+                EditorGUI.indentLevel--;
+            }
+            EditorGUILayout.Space(3);
+        }
+
+        private void DisplayBoneAdjustmentArray(string propertyName, SerializedProperty property)
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(-3);
+            property.isExpanded = EditorGUILayout.Foldout(property.isExpanded,
+                new GUIContent(propertyName, property.tooltip), true, EditorStyles.foldoutHeader);
+            EditorGUILayout.Space();
+            property.arraySize = EditorGUILayout.IntField(string.Empty, property.arraySize, GUILayout.MaxWidth(63));
+            EditorGUILayout.EndHorizontal();
+            if (property.isExpanded)
+            {
+                EditorGUI.indentLevel++;
+                for (int i = 0; i < property.arraySize; i++)
+                {
+                    var propertyElement = property.GetArrayElementAtIndex(i);
+                    var boneProperty = propertyElement.FindPropertyRelative("Bone");
+                    EditorGUILayout.PropertyField(propertyElement,
+                        new GUIContent(boneProperty.enumNames[boneProperty.enumValueIndex],
+                            "Bone adjustment."));
                 }
                 EditorGUI.indentLevel--;
             }
