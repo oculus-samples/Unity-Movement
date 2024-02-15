@@ -1,3 +1,20 @@
+# [4.3.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.2.1...v4.3.0) (2024-02-15)
+
+
+### Bug Fixes
+
+* **Runtime:** RetargetingProcessorCorrectBones uses base class adjustments, update all adjustments in RtLayer ([7fa22af](https://github.com/oculus-samples/Unity-Movement/commit/7fa22af527f153cf7496f8a7386d046b60bb9192))
+* **Runtime:** Update AddComponentsRuntime with new adjustments ([3fd5cd6](https://github.com/oculus-samples/Unity-Movement/commit/3fd5cd6a467d4f8f2ff76ac58267781e37d9ba55))
+
+
+### Features
+
+* **Runtime:** Add custom target hand position for correct hands and update one-click adjustments ([46c642b](https://github.com/oculus-samples/Unity-Movement/commit/46c642b9fa8dc824506f3b8d258ad99f9d61ff3d))
+* **Runtime:** Add FABRIK option for hand correction processor ([0837ee4](https://github.com/oculus-samples/Unity-Movement/commit/0837ee4e6fcafc2322c3a1aa62bbee548c45190a))
+* **Runtime:** Add spine bone adjustments to deformation and automate adjustments ([a38ed8f](https://github.com/oculus-samples/Unity-Movement/commit/a38ed8f1b18346e073cfabe9a0bc1a88c8ecc217))
+* **Runtime:** Automatic adjustments for retargeting and deformation on full body ([5fec824](https://github.com/oculus-samples/Unity-Movement/commit/5fec824b68b3dd5ffbf77799ff5c811c970d18f0))
+* **Runtime:** Update feet placement for accurate head full body deformation ([b8543cd](https://github.com/oculus-samples/Unity-Movement/commit/b8543cda5db6e9facb91f3a4efd89b2f1eacfdda))
+
 ## [4.2.1](https://github.com/oculus-samples/Unity-Movement/compare/v4.2.0...v4.2.1) (2024-02-01)
 
 
