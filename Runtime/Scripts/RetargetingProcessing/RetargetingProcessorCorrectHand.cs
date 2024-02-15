@@ -234,6 +234,8 @@ namespace Oculus.Movement.AnimationRigging
             if (_useWorldHandPosition)
             {
                 var localScale = retargetingLayer.transform.localScale;
+                // divide by absolute value of scale to avoid sign of scale
+                localScale = new Vector3 (Mathf.Abs(localScale.x), Mathf.Abs(localScale.y), Mathf.Abs(localScale.z));
                 targetHandPosition = RiggingUtilities.DivideVector3(targetHandPosition, localScale);
             }
             if (_useCustomHandTargetPosition && _customHandTargetPosition.HasValue)
