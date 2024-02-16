@@ -45,10 +45,220 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _whenToRender: 2
-  _visualizationGuideType: 0
+  _visualizationGuideType: 1
   _maskToVisualize: {fileID: 0}
   _customBoneVisualData:
-    BoneTuples: []
+    BoneTuples:
+    - FirstBone: 1
+      SecondBone: 2
+      Hide: 0
+    - FirstBone: 1
+      SecondBone: 70
+      Hide: 0
+    - FirstBone: 1
+      SecondBone: 77
+      Hide: 0
+    - FirstBone: 2
+      SecondBone: 3
+      Hide: 0
+    - FirstBone: 3
+      SecondBone: 4
+      Hide: 0
+    - FirstBone: 4
+      SecondBone: 5
+      Hide: 0
+    - FirstBone: 5
+      SecondBone: 6
+      Hide: 0
+    - FirstBone: 5
+      SecondBone: 8
+      Hide: 0
+    - FirstBone: 5
+      SecondBone: 13
+      Hide: 0
+    - FirstBone: 6
+      SecondBone: 7
+      Hide: 0
+    - FirstBone: 8
+      SecondBone: 10
+      Hide: 0
+    - FirstBone: 9
+      SecondBone: 10
+      Hide: 1
+    - FirstBone: 10
+      SecondBone: 11
+      Hide: 0
+    - FirstBone: 11
+      SecondBone: 19
+      Hide: 0
+    - FirstBone: 12
+      SecondBone: 29
+      Hide: 1
+    - FirstBone: 13
+      SecondBone: 15
+      Hide: 0
+    - FirstBone: 14
+      SecondBone: 15
+      Hide: 1
+    - FirstBone: 15
+      SecondBone: 16
+      Hide: 0
+    - FirstBone: 16
+      SecondBone: 45
+      Hide: 0
+    - FirstBone: 17
+      SecondBone: 55
+      Hide: 1
+    - FirstBone: 18
+      SecondBone: 29
+      Hide: 1
+    - FirstBone: 19
+      SecondBone: 29
+      Hide: 0
+    - FirstBone: 20
+      SecondBone: 21
+      Hide: 0
+    - FirstBone: 21
+      SecondBone: 22
+      Hide: 0
+    - FirstBone: 22
+      SecondBone: 23
+      Hide: 0
+    - FirstBone: 24
+      SecondBone: 25
+      Hide: 0
+    - FirstBone: 25
+      SecondBone: 26
+      Hide: 0
+    - FirstBone: 26
+      SecondBone: 27
+      Hide: 0
+    - FirstBone: 27
+      SecondBone: 28
+      Hide: 0
+    - FirstBone: 29
+      SecondBone: 30
+      Hide: 0
+    - FirstBone: 30
+      SecondBone: 31
+      Hide: 0
+    - FirstBone: 31
+      SecondBone: 32
+      Hide: 0
+    - FirstBone: 32
+      SecondBone: 33
+      Hide: 0
+    - FirstBone: 34
+      SecondBone: 35
+      Hide: 0
+    - FirstBone: 35
+      SecondBone: 36
+      Hide: 0
+    - FirstBone: 36
+      SecondBone: 37
+      Hide: 0
+    - FirstBone: 37
+      SecondBone: 38
+      Hide: 0
+    - FirstBone: 39
+      SecondBone: 40
+      Hide: 0
+    - FirstBone: 40
+      SecondBone: 41
+      Hide: 0
+    - FirstBone: 41
+      SecondBone: 42
+      Hide: 0
+    - FirstBone: 42
+      SecondBone: 43
+      Hide: 0
+    - FirstBone: 42
+      SecondBone: 38
+      Hide: 0
+    - FirstBone: 44
+      SecondBone: 55
+      Hide: 1
+    - FirstBone: 45
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 46
+      SecondBone: 47
+      Hide: 0
+    - FirstBone: 47
+      SecondBone: 48
+      Hide: 0
+    - FirstBone: 48
+      SecondBone: 49
+      Hide: 0
+    - FirstBone: 50
+      SecondBone: 51
+      Hide: 0
+    - FirstBone: 51
+      SecondBone: 52
+      Hide: 0
+    - FirstBone: 52
+      SecondBone: 53
+      Hide: 0
+    - FirstBone: 53
+      SecondBone: 54
+      Hide: 0
+    - FirstBone: 55
+      SecondBone: 56
+      Hide: 0
+    - FirstBone: 56
+      SecondBone: 57
+      Hide: 0
+    - FirstBone: 57
+      SecondBone: 58
+      Hide: 0
+    - FirstBone: 58
+      SecondBone: 59
+      Hide: 0
+    - FirstBone: 60
+      SecondBone: 61
+      Hide: 0
+    - FirstBone: 61
+      SecondBone: 62
+      Hide: 0
+    - FirstBone: 62
+      SecondBone: 63
+      Hide: 0
+    - FirstBone: 63
+      SecondBone: 64
+      Hide: 0
+    - FirstBone: 65
+      SecondBone: 66
+      Hide: 0
+    - FirstBone: 66
+      SecondBone: 67
+      Hide: 0
+    - FirstBone: 67
+      SecondBone: 68
+      Hide: 0
+    - FirstBone: 68
+      SecondBone: 69
+      Hide: 0
+    - FirstBone: 68
+      SecondBone: 64
+      Hide: 0
+    - FirstBone: 70
+      SecondBone: 71
+      Hide: 0
+    - FirstBone: 71
+      SecondBone: 73
+      Hide: 0
+    - FirstBone: 73
+      SecondBone: 76
+      Hide: 0
+    - FirstBone: 77
+      SecondBone: 78
+      Hide: 0
+    - FirstBone: 78
+      SecondBone: 80
+      Hide: 0
+    - FirstBone: 80
+      SecondBone: 83
+      Hide: 0
   _lineRendererPrefab: {fileID: 7812178534108119229, guid: 91a281e92421c464e837420766cafd02, type: 3}
   _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}
   _visualType: 0

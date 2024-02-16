@@ -6334,10 +6334,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 669339439527238448, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
-      propertyPath: _visualType
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 669339439527238448, guid: 83912ab7fbdf5db41822aa92a1698430, type: 3}
       propertyPath: _animatorComp
       value: 
       objectReference: {fileID: 2878048534481306166}
@@ -8664,10 +8660,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1236458827194487761, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
-      propertyPath: _visualType
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1236458827194487761, guid: 8919fa825b25b4544b361623e5d62aba, type: 3}
       propertyPath: _maskToVisualize
       value: 
