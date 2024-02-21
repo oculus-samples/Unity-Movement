@@ -84,7 +84,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The initial rotation offset for the feet.
         /// </summary>
-        public Vector3 FootRotationOffset { get; }
+        public Quaternion FootRotationOffset { get; }
 
         /// <summary>
         /// The animation curve for evaluating the step height value.
@@ -193,7 +193,7 @@ namespace Oculus.Movement.AnimationRigging
         Quaternion IGroundingData.LegRotOffset => _legRotOffset;
 
         /// <inheritdoc />
-        Vector3 IGroundingData.FootRotationOffset => _footRotationOffset;
+        Quaternion IGroundingData.FootRotationOffset => _footRotationOffset;
 
         /// <inheritdoc />
         AnimationCurve IGroundingData.StepCurve => _stepCurve;
@@ -292,7 +292,7 @@ namespace Oculus.Movement.AnimationRigging
         [Header("Step Settings")]
         [NotKeyable, SerializeField]
         [Tooltip(GroundingDataTooltips.FootRotationOffset)]
-        private Vector3 _footRotationOffset;
+        private Quaternion _footRotationOffset;
 
         /// <inheritdoc cref="IGroundingData.StepCurve"/>
         [NotKeyable, SerializeField]
@@ -457,7 +457,7 @@ namespace Oculus.Movement.AnimationRigging
             _kneeTarget = null;
             _footTarget = null;
             _foot = null;
-            _footRotationOffset = Vector3.zero;
+            _footRotationOffset = Quaternion.identity;
             _stepCurve = new AnimationCurve();
             _stepSpeed = 0.0f;
             _stepHeight = 0.0f;

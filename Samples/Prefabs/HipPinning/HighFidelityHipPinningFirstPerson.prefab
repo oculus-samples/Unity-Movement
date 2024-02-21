@@ -600,7 +600,7 @@ MonoBehaviour:
     _footTarget: {fileID: 4358668238228419541}
     _leg: {fileID: 2359356313597749183}
     _foot: {fileID: 6171397758821561763}
-    _footRotationOffset: {x: 0, y: 165, z: 0}
+    _footRotationOffset: {x: 0, y: -0.25881904, z: 0, w: 0.9659258}
     _stepCurve:
       serializedVersion: 2
       m_Curve:
@@ -1009,7 +1009,7 @@ MonoBehaviour:
     _footTarget: {fileID: 1326272731640492124}
     _leg: {fileID: 8065065785454080346}
     _foot: {fileID: 4154210162335435616}
-    _footRotationOffset: {x: 0, y: 205, z: 0}
+    _footRotationOffset: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
     _stepCurve:
       serializedVersion: 2
       m_Curve:
