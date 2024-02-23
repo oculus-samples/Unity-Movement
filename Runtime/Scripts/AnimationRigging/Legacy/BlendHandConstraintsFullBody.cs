@@ -1,13 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
-using Oculus.Interaction.Input;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
-namespace Oculus.Movement.AnimationRigging
+namespace Oculus.Movement.AnimationRigging.Deprecated
 {
     /// <summary>
     /// Allows disabling TwoBoneIK constraints when the hands move far away,
@@ -16,7 +15,7 @@ namespace Oculus.Movement.AnimationRigging
     /// might be ok because they are far from the body.
     /// </summary>
     [DefaultExecutionOrder(225)]
-    public class BlendHandConstraints : MonoBehaviour, IOVRSkeletonProcessor
+    public class BlendHandConstraintsFullBody : MonoBehaviour, IOVRSkeletonProcessor
     {
         /// <inheritdoc />
         public bool EnableSkeletonProcessing
@@ -24,16 +23,16 @@ namespace Oculus.Movement.AnimationRigging
             get => enabled;
             set => enabled = value;
         }
+
         /// <inheritdoc />
-        public string SkeletonProcessorLabel => "Blend Hands";
+        public string SkeletonProcessorLabel => "Blend Hands" + (IsLeftSideOfBody() ? " Left" : " Right");
 
         /// <summary>
         /// Constraints to control the weight of.
         /// </summary>
         [SerializeField, Interface(typeof(IRigConstraint))]
-        [Tooltip(BlendHandConstraintsTooltips.Constraints)]
-        private MonoBehaviour[] _constraints;
-        /// <inheritdoc cref="_constraints"/>
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.Constraints)]
+        protected MonoBehaviour[] _constraints;
         public MonoBehaviour[] Constraints
         {
             get => _constraints;
@@ -44,9 +43,8 @@ namespace Oculus.Movement.AnimationRigging
         /// The character's retargeting layer.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintsTooltips.RetargetingLayer)]
-        private RetargetingLayer _retargetingLayer;
-        /// <inheritdoc cref="_retargetingLayer"/>
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.RetargetingLayer)]
+        protected RetargetingLayer _retargetingLayer;
         public RetargetingLayer RetargetingLayerComp
         {
             get => _retargetingLayer;
@@ -58,10 +56,10 @@ namespace Oculus.Movement.AnimationRigging
         /// on the skeleton used.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintsTooltips.BoneIdToTest)]
-        private OVRHumanBodyBonesMappings.BodyTrackingBoneId _boneIdToTest =
-            OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
-        public OVRHumanBodyBonesMappings.BodyTrackingBoneId BoneIdToTest
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.BoneIdToTest)]
+        protected OVRHumanBodyBonesMappings.FullBodyTrackingBoneId _boneIdToTest =
+            OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
+        public OVRHumanBodyBonesMappings.FullBodyTrackingBoneId BoneIdToTest
         {
             get => _boneIdToTest;
             set => _boneIdToTest = value;
@@ -71,8 +69,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Head transform to do distance checks against.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintsTooltips.HeadTransform)]
-        private Transform _headTransform;
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.HeadTransform)]
+        protected Transform _headTransform;
         public Transform HeadTransform
         {
             get => _headTransform;
@@ -82,9 +80,9 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// MonoBehaviour to add to.
         /// </summary>
-        [Optional, SerializeField]
+        [SerializeField]
         [Interface(typeof(IOVRSkeletonProcessorAggregator))]
-        [Tooltip(BlendHandConstraintsTooltips.AutoAddTo)]
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.AutoAddTo)]
         protected MonoBehaviour _autoAddTo;
         public MonoBehaviour AutoAddTo
         {
@@ -96,8 +94,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Distance where constraints are set to 1.0.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintsTooltips.ConstraintsMinDistance)]
-        private float _constraintsMinDistance = 0.2f;
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.ConstraintsMinDistance)]
+        protected float _constraintsMinDistance = 0.2f;
         public float ConstraintsMinDistance
         {
             get => _constraintsMinDistance;
@@ -108,8 +106,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Distance where constraints are set to 0.0.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintsTooltips.ConstraintsMaxDistance)]
-        private float _constraintsMaxDistance = 0.5f;
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.ConstraintsMaxDistance)]
+        protected float _constraintsMaxDistance = 0.5f;
         public float ConstraintsMaxDistance
         {
             get => _constraintsMaxDistance;
@@ -120,8 +118,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Multiplier that influences weight interpolation based on distance.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintsTooltips.BlendMultiplier)]
-        private AnimationCurve _blendCurve;
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.BlendCurve)]
+        protected AnimationCurve _blendCurve;
         public AnimationCurve BlendCurve
         {
             get => _blendCurve;
@@ -132,8 +130,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Max constraint weight.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintsTooltips.MaxWeight)]
-        private float _maxWeight = 1.0f;
+        [Tooltip(BlendHandConstraintsFullBodyTooltips.MaxWeight)]
+        protected float _maxWeight = 1.0f;
         public float MaxWeight
         {
             get => _maxWeight;
@@ -142,9 +140,8 @@ namespace Oculus.Movement.AnimationRigging
 
         private IRigConstraint[] _iRigConstraints;
         private Transform _cachedTransform;
-        private float _cachedConstraintWeight;
+        private float _cachedConstraintWeight = 0.0f;
         private RetargetingProcessorCorrectBones _retargetingProcessorCorrectBones;
-        private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
 
         /// <summary>
         /// Adds constraint. Valid for use via editor scripts only.
@@ -214,19 +211,7 @@ namespace Oculus.Movement.AnimationRigging
                 if (correctBonesProcessor != null)
                 {
                     _retargetingProcessorCorrectBones = correctBonesProcessor;
-                }
-
-                var correctHandProcessor = retargetingProcessor as RetargetingProcessorCorrectHand;
-                if (correctHandProcessor != null)
-                {
-                    if (correctHandProcessor.Handedness == Handedness.Left && IsLeftSideOfBody())
-                    {
-                        _retargetingProcessorCorrectHand = correctHandProcessor;
-                    }
-                    else if (correctHandProcessor.Handedness == Handedness.Right && !IsLeftSideOfBody())
-                    {
-                        _retargetingProcessorCorrectHand = correctHandProcessor;
-                    }
+                    break;
                 }
             }
         }
@@ -271,15 +256,11 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = constraintWeight;
             }
-            if (_retargetingProcessorCorrectHand != null)
-            {
-                _retargetingProcessorCorrectHand.Weight = constraintWeight;
-            }
         }
 
         private bool IsLeftSideOfBody()
         {
-            return _boneIdToTest < OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandPalm;
+            return _boneIdToTest < OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandPalm;
         }
 
         private bool BonesAreValid(OVRSkeleton skeleton)

@@ -10,6 +10,7 @@ using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using static Oculus.Movement.AnimationRigging.RetargetedBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
+using Oculus.Movement.AnimationRigging.Deprecated;
 
 namespace Oculus.Movement.Utils
 {
