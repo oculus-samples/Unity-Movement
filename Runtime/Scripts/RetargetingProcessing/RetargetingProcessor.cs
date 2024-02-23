@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Oculus.Movement.AnimationRigging
 {
+    /// <summary>
+    /// Base class for retargeting processors, meant to be used as a scriptable object.
+    /// </summary>
     [Serializable]
     public class RetargetingProcessor : ScriptableObject, IRetargetingProcessor
     {

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Oculus.Movement.AnimationRigging
 {
+    /// <summary>
+    /// Interface for retargeting processors.
+    /// </summary>
     public interface IRetargetingProcessor
     {
         /// <summary>

@@ -4,6 +4,7 @@ using Oculus.Interaction;
 using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
@@ -12,39 +13,41 @@ namespace Oculus.Movement.AnimationRigging
     /// Increases hand accuracy as they appear into view.
     /// </summary>
     [CreateAssetMenu(fileName = "Blend Hands", menuName = "Movement Samples/Data/Retargeting Processors/Blend Hands", order = 2)]
-
-    public sealed class BlendHandConstraintProcessor : RetargetingProcessor
+    public sealed class RetargetingBlendHandProcessor : RetargetingProcessor
     {
         /// <summary>
-        /// Distance where constraints are set to 1.0.
+        /// Distance where weight is set to 1.0.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintProcessorTooltips.ConstraintsMinDistance)]
-        private float _constraintsMinDistance = 0.2f;
-        public float ConstraintsMinDistance
+        [Tooltip(RetargetingBlendHandProcessorTooltips.MinDistance)]
+        private float _minDistance = 0.2f;
+        /// <inheritdoc cref="_minDistance"/>
+        public float MinDistance
         {
-            get => _constraintsMinDistance;
-            set => _constraintsMinDistance = value;
+            get => _minDistance;
+            set => _minDistance = value;
         }
 
         /// <summary>
-        /// Distance where constraints are set to 0.0.
+        /// Distance where weight is set to 0.0.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintProcessorTooltips.ConstraintsMaxDistance)]
-        private float _constraintsMaxDistance = 0.5f;
-        public float ConstraintsMaxDistance
+        [Tooltip(RetargetingBlendHandProcessorTooltips.MaxDistance)]
+        private float _maxDistance = 0.5f;
+        /// <inheritdoc cref="_maxDistance"/>
+        public float MaxDistance
         {
-            get => _constraintsMaxDistance;
-            set => _constraintsMaxDistance = value;
+            get => _maxDistance;
+            set => _maxDistance = value;
         }
 
         /// <summary>
         /// Multiplier that influences weight interpolation based on distance.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintProcessorTooltips.BlendCurve)]
+        [Tooltip(RetargetingBlendHandProcessorTooltips.BlendCurve)]
         private AnimationCurve _blendCurve;
+        /// <inheritdoc cref="_blendCurve"/>
         public AnimationCurve BlendCurve
         {
             get => _blendCurve;
@@ -56,9 +59,10 @@ namespace Oculus.Movement.AnimationRigging
         /// on the skeleton used.
         /// </summary>
         [SerializeField, ConditionalHide("_isFullBody", true)]
-        [Tooltip(BlendHandConstraintProcessorTooltips.FullBodyBoneIdToTest)]
+        [Tooltip(RetargetingBlendHandProcessorTooltips.FullBodyBoneIdToTest)]
         private OVRHumanBodyBonesMappings.FullBodyTrackingBoneId _fullBodyBoneIdToTest =
             OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
+        /// <inheritdoc cref="_fullBodyBoneIdToTest"/>
         public OVRHumanBodyBonesMappings.FullBodyTrackingBoneId FullBodyBoneIdToTest
         {
             get => _fullBodyBoneIdToTest;
@@ -70,9 +74,10 @@ namespace Oculus.Movement.AnimationRigging
         /// on the skeleton used.
         /// </summary>
         [SerializeField, ConditionalHide("_isFullBody", false)]
-        [Tooltip(BlendHandConstraintProcessorTooltips.BoneIdToTest)]
+        [Tooltip(RetargetingBlendHandProcessorTooltips.BoneIdToTest)]
         private OVRHumanBodyBonesMappings.BodyTrackingBoneId _boneIdToTest =
             OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+        /// <inheritdoc cref="_boneIdToTest"/>
         public OVRHumanBodyBonesMappings.BodyTrackingBoneId BoneIdToTest
         {
             get => _boneIdToTest;
@@ -83,8 +88,9 @@ namespace Oculus.Movement.AnimationRigging
         /// Specifies if this is full body or not.
         /// </summary>
         [SerializeField]
-        [Tooltip(BlendHandConstraintProcessorTooltips.IsFullBody)]
+        [Tooltip(RetargetingBlendHandProcessorTooltips.IsFullBody)]
         private bool _isFullBody;
+        /// <inheritdoc cref="_isFullBody"/>
         public bool IsFullBody
         {
             get => _isFullBody;
@@ -101,11 +107,12 @@ namespace Oculus.Movement.AnimationRigging
         public override void CopyData(RetargetingProcessor source)
         {
             Weight = source.Weight;
-            var sourceBlendHand = source as BlendHandConstraintProcessor;
+            var sourceBlendHand = source as RetargetingBlendHandProcessor;
+            Assert.IsNotNull(sourceBlendHand);
 
-            _constraintsMinDistance = sourceBlendHand.ConstraintsMinDistance;
-            _constraintsMaxDistance = sourceBlendHand.ConstraintsMaxDistance;
-            _blendCurve = sourceBlendHand.BlendCurve;
+            _minDistance = sourceBlendHand._minDistance;
+            _maxDistance = sourceBlendHand._maxDistance;
+            _blendCurve = sourceBlendHand._blendCurve;
             _fullBodyBoneIdToTest = sourceBlendHand._fullBodyBoneIdToTest;
             _boneIdToTest = sourceBlendHand._boneIdToTest;
             _isFullBody = sourceBlendHand._isFullBody;
@@ -119,7 +126,7 @@ namespace Oculus.Movement.AnimationRigging
 
             foreach (var retargetingProcessor in retargetingLayer.RetargetingProcessors)
             {
-                var blendHandProcessor = retargetingProcessor as BlendHandConstraintProcessor;
+                var blendHandProcessor = retargetingProcessor as RetargetingBlendHandProcessor;
                 if (blendHandProcessor != null && blendHandProcessor == this)
                 {
                     foundOurProcessor = true;
@@ -155,11 +162,6 @@ namespace Oculus.Movement.AnimationRigging
                     }
                 }
             }
-        }
-
-        /// <inheritdoc />
-        public override void PrepareRetargetingProcessor(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
-        {
         }
 
         /// <inheritdoc />
@@ -200,6 +202,10 @@ namespace Oculus.Movement.AnimationRigging
             return _boneIdToTest < OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandPalm;
         }
 
+        /// <summary>
+        /// Returns handedness value of processor.
+        /// </summary>
+        /// <returns>Handedness.</returns>
         public Handedness GetHandedness()
         {
             return IsLeftSideOfBody() ? Handedness.Left : Handedness.Right;
@@ -210,6 +216,7 @@ namespace Oculus.Movement.AnimationRigging
             return IsFullBody ? skeleton.Bones.Count >= (int)_fullBodyBoneIdToTest : skeleton.Bones.Count >= (int)_boneIdToTest;
         }
 
+        /// <inheritdoc />
         public override void DrawGizmos()
         {
             if (_cachedTransform == null || _cachedHeadTransform == null)
@@ -235,8 +242,8 @@ namespace Oculus.Movement.AnimationRigging
             var boneDistanceToViewVector = GetDistanceToViewVector(boneToTest.position);
 
             _cachedWeight = 0.0f;
-            var scaledMaxDistance = _constraintsMaxDistance * skeleton.transform.lossyScale.x;
-            var scaledMinDistance = _constraintsMinDistance * skeleton.transform.lossyScale.x;
+            var scaledMaxDistance = _maxDistance * skeleton.transform.lossyScale.x;
+            var scaledMinDistance = _minDistance * skeleton.transform.lossyScale.x;
             // If the hand is close enough to the view vector, start to increase the
             // weight.
             if (boneDistanceToViewVector <= scaledMaxDistance)

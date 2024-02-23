@@ -1834,13 +1834,13 @@ namespace Oculus.Movement
             "A flat array containing all bone pose data.";
     }
 
-    public static class BlendHandConstraintProcessorTooltips
+    public static class RetargetingBlendHandProcessorTooltips
     {
-        public const string ConstraintsMinDistance =
-            "Distance where constraints are set to 1.0.";
+        public const string MinDistance =
+            "Distance where weight is set to 1.0.";
 
-        public const string ConstraintsMaxDistance =
-            "Distance where constraints are set to 0.0.";
+        public const string MaxDistance =
+            "Distance where weight is set to 0.0.";
 
         public const string BlendCurve =
             "Multiplier that influences weight interpolation based on distance.";

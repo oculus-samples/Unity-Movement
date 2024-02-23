@@ -163,7 +163,7 @@ namespace Oculus.Movement.Utils
             bool needCorrectHand = true;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
             {
-                var correctHand = processor as BlendHandConstraintProcessor;
+                var correctHand = processor as RetargetingBlendHandProcessor;
                 if (correctHand != null)
                 {
                     if (correctHand.GetHandedness() == handedness)
@@ -179,7 +179,7 @@ namespace Oculus.Movement.Utils
             }
 
             bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
-            var blendHand = ScriptableObject.CreateInstance<BlendHandConstraintProcessor>();
+            var blendHand = ScriptableObject.CreateInstance<RetargetingBlendHandProcessor>();
             var handednessString = handedness == Handedness.Left ? "Left" : "Right";
             Undo.RegisterCreatedObjectUndo(blendHand, $"Create ({handednessString}) blend hand.");
             Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
