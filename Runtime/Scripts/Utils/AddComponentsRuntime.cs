@@ -10,7 +10,6 @@ using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using static Oculus.Movement.AnimationRigging.RetargetedBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
-using Oculus.Movement.AnimationRigging.Deprecated;
 
 namespace Oculus.Movement.Utils
 {
@@ -168,20 +167,6 @@ namespace Oculus.Movement.Utils
                         AddFullBodyDeformationConstraint(rigObject, animatorComp, spineBoneTargets, restPoseObjectHumanoid);
 
                     AddRetargetedFullBodyBoneTargetComponent(selectedGameObject, spineBoneTargets);
-
-                    // enable only to get the transform, then disable.
-                    // if blendhand constraint is added on a enabled gameobject, errors might be thrown
-                    // due to Awake being run too early.
-                    animatorComp.gameObject.SetActive(true);
-                    var headTransform = animatorComp.GetBoneTransform(HumanBodyBones.Head);
-                    animatorComp.gameObject.SetActive(false);
-                    AddHandBlendConstraintFullBody(selectedGameObject, null,
-                        retargetingLayer, OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist,
-                        headTransform);
-
-                    AddHandBlendConstraintFullBody(selectedGameObject, null,
-                        retargetingLayer, OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist,
-                        headTransform);
                 }
                 else
                 {
@@ -191,19 +176,6 @@ namespace Oculus.Movement.Utils
                     constraintMonos.Add(deformationConstraint);
 
                     AddRetargetedBoneTargetComponent(selectedGameObject, spineBoneTargets);
-
-                    // enable only to get the transform, then disable.
-                    // if blendhand constraint is added on a enabled gameobject, errors might be thrown
-                    // due to Awake being run too early.
-                    animatorComp.gameObject.SetActive(true);
-                    var headTransform = animatorComp.GetBoneTransform(HumanBodyBones.Head);
-                    animatorComp.gameObject.SetActive(false);
-                    AddHandBlendConstraint(selectedGameObject,
-                        retargetingLayer, OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist,
-                        headTransform);
-                    AddHandBlendConstraint(selectedGameObject,
-                        retargetingLayer, OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist,
-                        headTransform);
                 }
             }
 
@@ -213,6 +185,8 @@ namespace Oculus.Movement.Utils
             AddJointAdjustments(animatorComp, retargetingLayer, restPoseObjectHumanoid);
 
             // Add retargeting processors to the retargeting layer.
+            AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
+            AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Right);
             AddCorrectBonesRetargetingProcessor(retargetingLayer);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
@@ -565,40 +539,6 @@ namespace Oculus.Movement.Utils
             return retargetedBoneTargets;
         }
 
-        private static BlendHandConstraints AddHandBlendConstraint(
-            GameObject mainParent, RetargetingLayer retargetingLayer,
-            OVRHumanBodyBonesMappings.BodyTrackingBoneId boneIdToTest, Transform headTransform)
-        {
-            BlendHandConstraints blendConstraint =
-                mainParent.AddComponent<BlendHandConstraints>();
-
-            blendConstraint.Constraints = null;
-            blendConstraint.RetargetingLayerComp = retargetingLayer;
-            blendConstraint.BoneIdToTest = boneIdToTest;
-            blendConstraint.HeadTransform = headTransform;
-            blendConstraint.AutoAddTo = mainParent.GetComponent<MonoBehaviour>();
-            blendConstraint.BlendCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
-
-            return blendConstraint;
-        }
-
-        private static BlendHandConstraintsFullBody AddHandBlendConstraintFullBody(
-            GameObject mainParent, MonoBehaviour[] constraints, RetargetingLayer retargetingLayer,
-            OVRHumanBodyBonesMappings.FullBodyTrackingBoneId boneIdToTest, Transform headTransform)
-        {
-            BlendHandConstraintsFullBody blendConstraint =
-                mainParent.AddComponent<BlendHandConstraintsFullBody>();
-
-            blendConstraint.Constraints = null;
-            blendConstraint.RetargetingLayerComp = retargetingLayer;
-            blendConstraint.BoneIdToTest = boneIdToTest;
-            blendConstraint.HeadTransform = headTransform;
-            blendConstraint.AutoAddTo = mainParent.GetComponent<RetargetingLayer>();
-            blendConstraint.BlendCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
-
-            return blendConstraint;
-        }
-
         private static void AddAnimationRiggingLayer(GameObject mainParent,
             OVRSkeleton skeletalComponent, RigBuilder rigBuilder,
             MonoBehaviour[] constraintComponents,
@@ -662,7 +602,7 @@ namespace Oculus.Movement.Utils
                         var adjustment = new JointAdjustment()
                         {
                             Joint = boneAdjustment.Bone,
-                            RotationTweaks = new [] { rotationTweak }
+                            RotationTweaks = new[] { rotationTweak }
                         };
                         adjustments.Add(adjustment);
                     }
@@ -670,8 +610,11 @@ namespace Oculus.Movement.Utils
                 }
                 else
                 {
+                    // enable animator to find bones, temporarily.
+                    animator.gameObject.SetActive(true);
                     var hipAngleDifference = restPoseObjectHumanoid.CalculateRotationDifferenceFromRestPoseToAnimatorJoint
                                  (animator, HumanBodyBones.Hips);
+                    animator.gameObject.SetActive(false);
                     adjustmentsField.SetValue(retargetingLayer, new[]
                     {
                         new JointAdjustment()
@@ -691,6 +634,55 @@ namespace Oculus.Movement.Utils
                         }
                     });
                 }
+            }
+        }
+
+        public static void AddBlendHandRetargetingProcessor(RetargetingLayer retargetingLayer, Handedness handedness)
+        {
+            bool needCorrectHand = true;
+            foreach (var processor in retargetingLayer.RetargetingProcessors)
+            {
+                var correctHand = processor as BlendHandConstraintProcessor;
+                if (correctHand != null)
+                {
+                    if (correctHand.GetHandedness() == handedness)
+                    {
+                        needCorrectHand = false;
+                    }
+                }
+            }
+
+            if (!needCorrectHand)
+            {
+                return;
+            }
+
+            bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
+            var blendHand = ScriptableObject.CreateInstance<BlendHandConstraintProcessor>();
+            var handednessString = handedness == Handedness.Left ? "Left" : "Right";
+            blendHand.BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            blendHand.IsFullBody = isFullBody;
+            if (isFullBody)
+            {
+                blendHand.FullBodyBoneIdToTest = handedness == Handedness.Left ?
+                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist :
+                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
+            }
+            else
+            {
+                blendHand.BoneIdToTest = handedness == Handedness.Left ?
+                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist :
+                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
+            }
+            blendHand.name = $"Blend{handednessString}Hand";
+            // Add processor at beginning so that it runs before other processors.
+            if (retargetingLayer.RetargetingProcessors.Count > 0)
+            {
+                retargetingLayer.RetargetingProcessors.Insert(0, blendHand);
+            }
+            else
+            {
+                retargetingLayer.AddRetargetingProcessor(blendHand);
             }
         }
 

@@ -66,6 +66,7 @@ namespace Oculus.Movement.Utils
             DestroyBoneTarget(rigObject, "RightElbowTarget");
             DestroyTwoBoneIKConstraint(rigObject, "LeftArmIK");
             DestroyTwoBoneIKConstraint(rigObject, "RightArmIK");
+            HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraintsFullBody>(activeGameObject);
 
             // Full body deformation.
             RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
@@ -75,15 +76,6 @@ namespace Oculus.Movement.Utils
 
             // Setup retargeted bone targets.
             AddRetargetedBoneTargetComponent(activeGameObject, spineBoneTargets);
-
-            // Hand blend constraints.
-            AddHandBlendConstraint(activeGameObject, null,
-                retargetingLayer, OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist,
-                animatorComp.GetBoneTransform(HumanBodyBones.Head));
-
-            AddHandBlendConstraint(activeGameObject, null,
-                retargetingLayer, OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist,
-                animatorComp.GetBoneTransform(HumanBodyBones.Head));
 
             // Disable root motion.
             animatorComp.applyRootMotion = false;
@@ -97,6 +89,8 @@ namespace Oculus.Movement.Utils
             EditorUtility.SetDirty(retargetingLayer);
 
             // Add retargeting processors to the retargeting layer.
+            HelperMenusCommon.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
+            HelperMenusCommon.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Right);
             AddCorrectBonesRetargetingProcessor(retargetingLayer);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
@@ -514,47 +508,6 @@ namespace Oculus.Movement.Utils
                 return true;
             }
             return false;
-        }
-
-        private static BlendHandConstraintsFullBody AddHandBlendConstraint(
-            GameObject mainParent, MonoBehaviour[] constraints, RetargetingLayer retargetingLayer,
-            OVRHumanBodyBonesMappings.FullBodyTrackingBoneId boneIdToTest, Transform headTransform)
-        {
-            var blendHandConstraints = mainParent.GetComponents<BlendHandConstraintsFullBody>();
-            var baseBlendHandConstraints = mainParent.GetComponents<BlendHandConstraints>();
-            if (blendHandConstraints.Length == 0 && baseBlendHandConstraints.Length > 0)
-            {
-                for (int i = 0; i < baseBlendHandConstraints.Length; i++)
-                {
-                    Undo.DestroyObjectImmediate(baseBlendHandConstraints[i]);
-                }
-            }
-            foreach (var blendHandConstraint in blendHandConstraints)
-            {
-                if (blendHandConstraint.BoneIdToTest == boneIdToTest)
-                {
-                    blendHandConstraint.Constraints = null;
-                    blendHandConstraint.RetargetingLayerComp = retargetingLayer;
-                    blendHandConstraint.BoneIdToTest = boneIdToTest;
-                    blendHandConstraint.HeadTransform = headTransform;
-                    blendHandConstraint.AutoAddTo = mainParent.GetComponent<RetargetingLayer>();
-                    blendHandConstraint.BlendCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(blendHandConstraint);
-                    return blendHandConstraint;
-                }
-            }
-            BlendHandConstraintsFullBody blendConstraint =
-                mainParent.AddComponent<BlendHandConstraintsFullBody>();
-            Undo.RegisterCreatedObjectUndo(blendConstraint, "Add blend constraint");
-
-            blendConstraint.Constraints = null;
-            blendConstraint.RetargetingLayerComp = retargetingLayer;
-            blendConstraint.BoneIdToTest = boneIdToTest;
-            blendConstraint.HeadTransform = headTransform;
-            blendConstraint.AutoAddTo = mainParent.GetComponent<RetargetingLayer>();
-            blendConstraint.BlendCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
-
-            return blendConstraint;
         }
 
         private static void AddFullBodyHandDeformation(GameObject mainParent,

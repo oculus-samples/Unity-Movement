@@ -1603,50 +1603,6 @@ MonoBehaviour:
     EndRotOffset: {x: 0, y: 0, z: 0, w: 1}
     Distance: 0.020225074
   _calculateFingerData: 0
---- !u!114 &3064921622629090106
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442339640571472327}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _constraints: []
-  _retargetingLayer: {fileID: 7866900989153904485}
-  _boneIdToTest: 45
-  _headTransform: {fileID: 813562241272511791}
-  _autoAddTo: {fileID: 7866900989153904485}
-  _constraintsMinDistance: 0.2
-  _constraintsMaxDistance: 0.5
-  _blendCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _maxWeight: 1
 --- !u!114 &7065894658369251356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1687,50 +1643,6 @@ MonoBehaviour:
   - m_Rig: {fileID: 720078950}
     m_Active: 1
   m_Effectors: []
---- !u!114 &7819795630976784685
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442339640571472327}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _constraints: []
-  _retargetingLayer: {fileID: 7866900989153904485}
-  _boneIdToTest: 19
-  _headTransform: {fileID: 813562241272511791}
-  _autoAddTo: {fileID: 7866900989153904485}
-  _constraintsMinDistance: 0.2
-  _constraintsMaxDistance: 0.5
-  _blendCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _maxWeight: 1
 --- !u!114 &7866900989153904485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1832,6 +1744,8 @@ MonoBehaviour:
   _enableTrackingByProxy: 1
   _retargetingAnimationConstraint: {fileID: 3289871368579812835}
   _retargetingProcessors:
+  - {fileID: 11400000, guid: 050b10261d9b9bd4ebce9c2c08d9d757, type: 2}
+  - {fileID: 11400000, guid: 89f86b76c1fd36e47a44da808dc59836, type: 2}
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
   - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
   - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}

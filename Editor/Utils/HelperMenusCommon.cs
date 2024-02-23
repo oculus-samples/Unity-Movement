@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
 using System.Collections.Generic;
 using System.Reflection;
@@ -124,7 +125,7 @@ namespace Oculus.Movement.Utils
                 var adjustment = new JointAdjustment()
                 {
                     Joint = boneAdjustment.Bone,
-                    RotationTweaks = new [] { rotationTweak }
+                    RotationTweaks = new[] { rotationTweak }
                 };
                 adjustments.Add(adjustment);
             }
@@ -155,6 +156,69 @@ namespace Oculus.Movement.Utils
                     RotationTweaks = new[] { shoulderAngleDifferences[1].Adjustment }
                 }
             };
+        }
+
+        public static void AddBlendHandRetargetingProcessor(RetargetingLayer retargetingLayer, Handedness handedness)
+        {
+            bool needCorrectHand = true;
+            foreach (var processor in retargetingLayer.RetargetingProcessors)
+            {
+                var correctHand = processor as BlendHandConstraintProcessor;
+                if (correctHand != null)
+                {
+                    if (correctHand.GetHandedness() == handedness)
+                    {
+                        needCorrectHand = false;
+                    }
+                }
+            }
+
+            if (!needCorrectHand)
+            {
+                return;
+            }
+
+            bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
+            var blendHand = ScriptableObject.CreateInstance<BlendHandConstraintProcessor>();
+            var handednessString = handedness == Handedness.Left ? "Left" : "Right";
+            Undo.RegisterCreatedObjectUndo(blendHand, $"Create ({handednessString}) blend hand.");
+            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+            blendHand.BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            blendHand.IsFullBody = isFullBody;
+            if (isFullBody)
+            {
+                blendHand.FullBodyBoneIdToTest = handedness == Handedness.Left ?
+                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist :
+                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
+            }
+            else
+            {
+                blendHand.BoneIdToTest = handedness == Handedness.Left ?
+                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist :
+                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
+            }
+            blendHand.name = $"Blend{handednessString}Hand";
+            // Add processor at beginning so that it runs before other processors.
+            if (retargetingLayer.RetargetingProcessors.Count > 0)
+            {
+                retargetingLayer.RetargetingProcessors.Insert(0, blendHand);
+            }
+            else
+            {
+                retargetingLayer.AddRetargetingProcessor(blendHand);
+            }
+        }
+
+        public static bool DestroyLegacyComponents<Component>(GameObject gameObject)
+        {
+            var componentsFound = gameObject.GetComponents<Component>();
+
+            foreach(var componentFound in componentsFound)
+            {
+                Undo.DestroyObjectImmediate(componentFound as Object);
+            }
+
+            return componentsFound.Length > 0;
         }
     }
 }

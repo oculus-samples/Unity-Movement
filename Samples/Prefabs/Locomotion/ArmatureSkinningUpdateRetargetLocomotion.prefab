@@ -13,7 +13,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.size
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[0].label
@@ -21,7 +21,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[1].label
-      value: Blend Hands Right
+      value: Retargeted Bone Targets
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[2].label
@@ -41,7 +41,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[2].Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[3].Enabled
@@ -54,11 +54,11 @@ PrefabInstance:
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[1].Processor
       value: 
-      objectReference: {fileID: 187616323942891292}
+      objectReference: {fileID: 5155198838510339143}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[2].Processor
       value: 
-      objectReference: {fileID: 4942484284994970891}
+      objectReference: {fileID: 0}
     - target: {fileID: 490024389854361152, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: _skeletonProcessors.Array.data[3].Processor
       value: 
@@ -317,28 +317,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
---- !u!114 &187616323942891292 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7486900986326145928, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
-  m_PrefabInstance: {fileID: 7312821921502192788}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4942484284994970891 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2444161089806565791, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
-  m_PrefabInstance: {fileID: 7312821921502192788}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5155198838510339143 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2519393238448185555, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}

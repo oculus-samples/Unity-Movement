@@ -1836,9 +1836,6 @@ namespace Oculus.Movement
 
     public static class BlendHandConstraintProcessorTooltips
     {
-        public const string HeadTransform =
-            "Head transform to do distance checks against.";
-
         public const string ConstraintsMinDistance =
             "Distance where constraints are set to 1.0.";
 

@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Interaction;
+using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using UnityEngine;
 using static OVRUnityHumanoidSkeletonRetargeter;
@@ -14,18 +15,6 @@ namespace Oculus.Movement.AnimationRigging
 
     public sealed class BlendHandConstraintProcessor : RetargetingProcessor
     {
-        /// <summary>
-        /// Head transform to do distance checks against.
-        /// </summary>
-        [SerializeField]
-        [Tooltip(BlendHandConstraintProcessorTooltips.HeadTransform)]
-        private Transform _headTransform;
-        public Transform HeadTransform
-        {
-            get => _headTransform;
-            set => _headTransform = value;
-        }
-
         /// <summary>
         /// Distance where constraints are set to 1.0.
         /// </summary>
@@ -104,6 +93,9 @@ namespace Oculus.Movement.AnimationRigging
 
         private RetargetingProcessorCorrectBones _retargetingProcessorCorrectBones;
         private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
+        private Transform _cachedTransform;
+        private Transform _cachedHeadTransform;
+        private float _cachedWeight;
 
         /// <inheritdoc />
         public override void CopyData(RetargetingProcessor source)
@@ -111,7 +103,6 @@ namespace Oculus.Movement.AnimationRigging
             Weight = source.Weight;
             var sourceBlendHand = source as BlendHandConstraintProcessor;
 
-            _headTransform = sourceBlendHand.HeadTransform;
             _constraintsMinDistance = sourceBlendHand.ConstraintsMinDistance;
             _constraintsMaxDistance = sourceBlendHand.ConstraintsMaxDistance;
             _blendCurve = sourceBlendHand.BlendCurve;
@@ -123,24 +114,44 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)
         {
+            // Make sure our processor is before others.
+            bool foundOurProcessor = false;
+
             foreach (var retargetingProcessor in retargetingLayer.RetargetingProcessors)
             {
+                var blendHandProcessor = retargetingProcessor as BlendHandConstraintProcessor;
+                if (blendHandProcessor != null && blendHandProcessor == this)
+                {
+                    foundOurProcessor = true;
+                }
+
                 var correctBonesProcessor = retargetingProcessor as RetargetingProcessorCorrectBones;
                 if (correctBonesProcessor != null)
                 {
                     _retargetingProcessorCorrectBones = correctBonesProcessor;
+                    if (!foundOurProcessor)
+                    {
+                        Debug.LogWarning($"{this.GetType()} should be before {correctBonesProcessor} in processor " +
+                            $"stack as it needs to affect it.");
+                    }
+                    continue;
                 }
 
                 var correctHandProcessor = retargetingProcessor as RetargetingProcessorCorrectHand;
                 if (correctHandProcessor != null)
                 {
-                    if (correctHandProcessor.Handedness == Interaction.Input.Handedness.Left && IsLeftSideOfBody())
+                    if (correctHandProcessor.Handedness == Handedness.Left && IsLeftSideOfBody())
                     {
                         _retargetingProcessorCorrectHand = correctHandProcessor;
                     }
-                    else if (correctHandProcessor.Handedness == Interaction.Input.Handedness.Right && !IsLeftSideOfBody())
+                    else if (correctHandProcessor.Handedness == Handedness.Right && !IsLeftSideOfBody())
                     {
                         _retargetingProcessorCorrectHand = correctHandProcessor;
+                    }
+                    if (!foundOurProcessor)
+                    {
+                        Debug.LogWarning($"{this.GetType()} should be before {correctHandProcessor} in processor " +
+                            $"stack as it needs to affect it.");
                     }
                 }
             }
@@ -159,60 +170,97 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
-            float constraintWeight = ComputeCurrentConstraintWeight(retargetingLayer);
-
+            float blendWeight = ComputeCurrentBlendWeight(retargetingLayer);
+            // the weight of this processor can be used to reduce its effect
+            if (Weight < float.Epsilon)
+            {
+                blendWeight = 1.0f;
+            }
+            
             if (IsLeftSideOfBody())
             {
-                _retargetingProcessorCorrectBones.LeftHandCorrectionWeightLateUpdate = constraintWeight;
+                _retargetingProcessorCorrectBones.LeftHandCorrectionWeightLateUpdate = blendWeight;
             }
             else
             {
-                _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = constraintWeight;
+                _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = blendWeight;
             }
             if (_retargetingProcessorCorrectHand != null)
             {
-                _retargetingProcessorCorrectHand.Weight = constraintWeight;
+                _retargetingProcessorCorrectHand.Weight = blendWeight;
             }
         }
 
         private bool IsLeftSideOfBody()
         {
+            if (IsFullBody)
+            {
+                return _fullBodyBoneIdToTest < OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandPalm;
+            }
             return _boneIdToTest < OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandPalm;
+        }
+
+        public Handedness GetHandedness()
+        {
+            return IsLeftSideOfBody() ? Handedness.Left : Handedness.Right;
         }
 
         private bool BonesAreValid(OVRSkeleton skeleton)
         {
-            return skeleton.Bones.Count >= (int)_boneIdToTest;
+            return IsFullBody ? skeleton.Bones.Count >= (int)_fullBodyBoneIdToTest : skeleton.Bones.Count >= (int)_boneIdToTest;
         }
 
-        private float ComputeCurrentConstraintWeight(OVRSkeleton skeleton)
+        public override void DrawGizmos()
+        {
+            if (_cachedTransform == null || _cachedHeadTransform == null)
+            {
+                return;
+            }
+            var viewVector = GetViewVector();
+            var viewOriginToPointVector = GetViewOriginToPointVector(_cachedTransform.position);
+
+            Gizmos.color = new Color(_cachedWeight, _cachedWeight, _cachedWeight);
+            Gizmos.DrawRay(_cachedHeadTransform.position, viewOriginToPointVector);
+
+            Gizmos.color = Color.white;
+            Gizmos.DrawRay(_cachedHeadTransform.transform.position, 0.7f * viewVector);
+        }
+
+        private float ComputeCurrentBlendWeight(RetargetingLayer skeleton)
         {
             var bones = skeleton.Bones;
-            var boneToTest = bones[(int)_boneIdToTest].Transform;
+            var boneToTest = bones[GetBoneIndex()].Transform;
+            _cachedTransform = boneToTest;
+            _cachedHeadTransform = skeleton.GetAnimatorTargetSkeleton().GetBoneTransform(HumanBodyBones.Head);
             var boneDistanceToViewVector = GetDistanceToViewVector(boneToTest.position);
 
-            var constraintWeight = 0.0f;
-            var scaledMaxDistanceForConstraints = _constraintsMaxDistance * skeleton.transform.lossyScale.x;
-            var scaledMinDistanceForConstraints = _constraintsMinDistance * skeleton.transform.lossyScale.x;
+            _cachedWeight = 0.0f;
+            var scaledMaxDistance = _constraintsMaxDistance * skeleton.transform.lossyScale.x;
+            var scaledMinDistance = _constraintsMinDistance * skeleton.transform.lossyScale.x;
             // If the hand is close enough to the view vector, start to increase the
-            // weight of the constraint.
-            if (boneDistanceToViewVector <= scaledMaxDistanceForConstraints)
+            // weight.
+            if (boneDistanceToViewVector <= scaledMaxDistance)
             {
-                if (boneDistanceToViewVector <= scaledMinDistanceForConstraints)
+                if (boneDistanceToViewVector <= scaledMinDistance)
                 {
-                    constraintWeight = 1.0f;
+                    _cachedWeight = 1.0f;
                 }
                 else
                 {
-                    float lerpValue = (scaledMaxDistanceForConstraints - boneDistanceToViewVector) /
-                        (scaledMaxDistanceForConstraints - scaledMinDistanceForConstraints);
+                    float lerpValue = (scaledMaxDistance - boneDistanceToViewVector) /
+                        (scaledMaxDistance - scaledMinDistance);
                     float curveValue = _blendCurve.Evaluate(lerpValue);
                     // amplify lerping before clamping it
-                    constraintWeight = Mathf.Clamp01(curveValue);
+                    _cachedWeight = Mathf.Clamp01(curveValue);
                 }
             }
 
-            return constraintWeight;
+            return _cachedWeight;
+        }
+
+        private int GetBoneIndex()
+        {
+            return IsFullBody ? (int)_fullBodyBoneIdToTest : (int)_boneIdToTest;
         }
 
         /// <summary>
@@ -225,8 +273,8 @@ namespace Oculus.Movement.AnimationRigging
         /// and (point - viewOrigin) gives us the area of the parallelogram.
         /// To solve for the height, we divide the area by the magnitude of the base
         /// vector.
-        /// </summary>
-        /// <param name="point"></param>
+        /// </summary>=
+        /// <param name="point">Point to evaluate</param>
         /// <returns></returns>
         private float GetDistanceToViewVector(Vector3 point)
         {
@@ -240,12 +288,12 @@ namespace Oculus.Movement.AnimationRigging
 
         private Vector3 GetViewVector()
         {
-            return _headTransform.forward;
+            return _cachedHeadTransform.forward;
         }
 
         private Vector3 GetViewOriginToPointVector(Vector3 point)
         {
-            var viewOrigin = _headTransform.position;
+            var viewOrigin = _cachedHeadTransform.position;
             return point - viewOrigin;
         }
     }

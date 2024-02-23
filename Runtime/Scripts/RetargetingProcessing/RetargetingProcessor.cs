@@ -38,5 +38,10 @@ namespace Oculus.Movement.AnimationRigging
         public virtual void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
         {
         }
+
+        /// <inheritdoc />
+        public virtual void DrawGizmos()
+        {
+        }
     }
 }

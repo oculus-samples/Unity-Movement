@@ -346,6 +346,14 @@ namespace Oculus.Movement.AnimationRigging
             RunConstraints();
         }
 
+        protected virtual void OnDrawGizmos()
+        {
+            foreach (var retargetingProcessor in _retargetingProcessors)
+            {
+                retargetingProcessor.DrawGizmos();
+            }
+        }
+
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
         {
             var bodySectionOfJoint =
