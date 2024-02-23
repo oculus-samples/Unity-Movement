@@ -1833,4 +1833,28 @@ namespace Oculus.Movement
         public const string BonePoseDataArray =
             "A flat array containing all bone pose data.";
     }
+
+    public static class BlendHandConstraintProcessorTooltips
+    {
+        public const string HeadTransform =
+            "Head transform to do distance checks against.";
+
+        public const string ConstraintsMinDistance =
+            "Distance where constraints are set to 1.0.";
+
+        public const string ConstraintsMaxDistance =
+            "Distance where constraints are set to 0.0.";
+
+        public const string BlendCurve =
+            "Multiplier that influences weight interpolation based on distance.";
+
+        public const string FullBodyBoneIdToTest =
+            "(Full Body) Bone ID, usually the wrist. Can be modified depending on the skeleton used.";
+
+        public const string BoneIdToTest =
+            "Bone ID, usually the wrist. Can be modified depending on the skeleton used.";
+
+        public const string IsFullBody =
+            "Specifies if this is full body or not.";
+    }
 }
