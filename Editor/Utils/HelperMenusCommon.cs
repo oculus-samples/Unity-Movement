@@ -91,7 +91,7 @@ namespace Oculus.Movement.Utils
                 if (fullBodyDeformationConstraint != null)
                 {
                     adjustmentsField.SetValue(retargetingLayer,
-                        GetDeformationJointAdjustments(animator, fullBodyDeformationConstraint));
+                        GetDeformationJointAdjustments(animator, restPoseObject, fullBodyDeformationConstraint));
                 }
                 else
                 {
@@ -101,7 +101,8 @@ namespace Oculus.Movement.Utils
             }
         }
 
-        private static JointAdjustment[] GetDeformationJointAdjustments(Animator animator, FullBodyDeformationConstraint constraint)
+        private static JointAdjustment[] GetDeformationJointAdjustments(Animator animator,
+            RestPoseObjectHumanoid restPoseObject, FullBodyDeformationConstraint constraint)
         {
             var adjustments = new List<JointAdjustment>();
             var deformationData = constraint.data as IFullBodyDeformationData;
@@ -129,6 +130,9 @@ namespace Oculus.Movement.Utils
                 };
                 adjustments.Add(adjustment);
             }
+            // Assume that we want the feet to be pointing world space forward.
+            var footAdjustments = GetFootAdjustments(animator, restPoseObject, Vector3.forward);
+            adjustments.AddRange(footAdjustments);
             return adjustments.ToArray();
         }
 
@@ -138,6 +142,8 @@ namespace Oculus.Movement.Utils
                 (animator, HumanBodyBones.Hips);
             var shoulderAngleDifferences =
                 DeformationCommon.GetShoulderAdjustments(animator, restPoseObject, Quaternion.identity);
+            // Assume that we want the feet to be pointing world space forward.
+            var footAdjustments = GetFootAdjustments(animator, restPoseObject, Vector3.forward);
             return new[]
             {
                 new JointAdjustment()
@@ -154,7 +160,9 @@ namespace Oculus.Movement.Utils
                 {
                     Joint = HumanBodyBones.RightShoulder,
                     RotationTweaks = new[] { shoulderAngleDifferences[1].Adjustment }
-                }
+                },
+                footAdjustments[0],
+                footAdjustments[1]
             };
         }
 
@@ -219,6 +227,59 @@ namespace Oculus.Movement.Utils
             }
 
             return componentsFound.Length > 0;
+        }
+
+        private static JointAdjustment[] GetFootAdjustments(Animator animator,
+            RestPoseObjectHumanoid restPoseObject, Vector3 desiredFootDirection)
+        {
+            if (restPoseObject.GetBonePoseData(HumanBodyBones.LeftToes) == null ||
+                restPoseObject.GetBonePoseData(HumanBodyBones.RightToes) == null)
+            {
+                Debug.LogError("Expected valid toes data in the rest pose object for aligning the feet. " +
+                               "No foot adjustments will be created.");
+                return System.Array.Empty<JointAdjustment>();
+            }
+
+            var footAdjustments = new List<JointAdjustment>();
+            var leftLeg = animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
+            var rightLeg = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
+            var legDotProduct = Vector3.Dot(leftLeg.forward, rightLeg.forward);
+            bool shouldMirrorLegs = legDotProduct < 0.0f;
+
+            if (animator.GetBoneTransform(HumanBodyBones.LeftToes) == null)
+            {
+                var foot = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
+                // Align the feet in the desired foot direction.
+                var footToToes =
+                    (restPoseObject.GetBonePoseData(HumanBodyBones.LeftToes).WorldPose.position -
+                     restPoseObject.GetBonePoseData(HumanBodyBones.LeftFoot).WorldPose.position).normalized;
+                var footAngle = Vector3.Angle(desiredFootDirection, footToToes);
+                // Use the inverse rotation here as the rotation of the feet need to be inverted.
+                var adjustment = Quaternion.Inverse(Quaternion.AngleAxis(footAngle, foot.up));
+                footAdjustments.Add(new JointAdjustment
+                {
+                    Joint = HumanBodyBones.LeftFoot,
+                    RotationTweaks = new[] { adjustment }
+                });
+            }
+            if (animator.GetBoneTransform(HumanBodyBones.RightToes) == null)
+            {
+                var foot = animator.GetBoneTransform(HumanBodyBones.RightFoot);
+                // Align the feet in the desired foot direction.
+                var footToToes =
+                    (restPoseObject.GetBonePoseData(HumanBodyBones.RightToes).WorldPose.position -
+                     restPoseObject.GetBonePoseData(HumanBodyBones.RightFoot).WorldPose.position).normalized;
+                var footAngle = Vector3.Angle(desiredFootDirection, footToToes);
+                // Use the inverse rotation here as the rotation of the feet need to be inverted.
+                var adjustment = Quaternion.Inverse(Quaternion.AngleAxis(
+                    footAngle * (shouldMirrorLegs ? 1 : -1), foot.up));
+                footAdjustments.Add(new JointAdjustment
+                {
+                    Joint = HumanBodyBones.RightFoot,
+                    RotationTweaks = new[] { adjustment }
+                });
+            }
+            return footAdjustments.ToArray();
         }
     }
 }

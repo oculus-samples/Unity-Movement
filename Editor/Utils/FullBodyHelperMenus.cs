@@ -69,13 +69,13 @@ namespace Oculus.Movement.Utils
             HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraintsFullBody>(activeGameObject);
 
             // Full body deformation.
-            RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
+            RetargetedBoneTarget[] boneTargets = AddBoneTargets(rigObject, animatorComp);
             FullBodyDeformationConstraint deformationConstraint =
-                AddDeformationConstraint(rigObject, animatorComp, spineBoneTargets);
+                AddDeformationConstraint(rigObject, animatorComp, boneTargets);
             constraintMonos.Add(deformationConstraint);
 
             // Setup retargeted bone targets.
-            AddRetargetedBoneTargetComponent(activeGameObject, spineBoneTargets);
+            AddRetargetedBoneTargetComponent(activeGameObject, boneTargets);
 
             // Disable root motion.
             animatorComp.applyRootMotion = false;
@@ -150,21 +150,30 @@ namespace Oculus.Movement.Utils
             }
         }
 
-        private static RetargetedBoneTarget[] AddSpineBoneTargets(GameObject rigObject, Animator animator)
+        private static RetargetedBoneTarget[] AddBoneTargets(GameObject rigObject, Animator animator)
         {
             var boneTargets = new List<RetargetedBoneTarget>();
-            Transform hipsTarget = AddSpineTarget(rigObject, "HipsTarget",
+            Transform hipsTarget = AddBoneTarget(rigObject, "HipsTarget",
                 animator.GetBoneTransform(HumanBodyBones.Hips));
-            Transform spineLowerTarget = AddSpineTarget(rigObject, "SpineLowerTarget",
+            Transform spineLowerTarget = AddBoneTarget(rigObject, "SpineLowerTarget",
                 animator.GetBoneTransform(HumanBodyBones.Spine));
-            Transform spineUpperTarget = AddSpineTarget(rigObject, "SpineUpperTarget",
+            Transform spineUpperTarget = AddBoneTarget(rigObject, "SpineUpperTarget",
                 animator.GetBoneTransform(HumanBodyBones.Chest));
-            Transform chestTarget = AddSpineTarget(rigObject, "ChestTarget",
+            Transform chestTarget = AddBoneTarget(rigObject, "ChestTarget",
                 animator.GetBoneTransform(HumanBodyBones.UpperChest));
-            Transform neckTarget = AddSpineTarget(rigObject, "NeckTarget",
+            Transform neckTarget = AddBoneTarget(rigObject, "NeckTarget",
                 animator.GetBoneTransform(HumanBodyBones.Neck));
-            Transform headTarget = AddSpineTarget(rigObject, "HeadTarget",
+            Transform headTarget = AddBoneTarget(rigObject, "HeadTarget",
                 animator.GetBoneTransform(HumanBodyBones.Head));
+
+            Transform leftFootTarget = AddBoneTarget(rigObject, "LeftFootTarget",
+                animator.GetBoneTransform(HumanBodyBones.LeftFoot));
+            Transform leftToesTarget = AddBoneTarget(rigObject, "LeftToesTarget",
+                animator.GetBoneTransform(HumanBodyBones.LeftToes));
+            Transform rightFootTarget = AddBoneTarget(rigObject, "RightFootTarget",
+                animator.GetBoneTransform(HumanBodyBones.RightFoot));
+            Transform rightToesTarget = AddBoneTarget(rigObject, "RightToesTarget",
+                animator.GetBoneTransform(HumanBodyBones.RightToes));
 
             Tuple<OVRSkeleton.BoneId, Transform>[] bonesToRetarget =
             {
@@ -174,6 +183,10 @@ namespace Oculus.Movement.Utils
                 new(OVRSkeleton.BoneId.FullBody_Chest, chestTarget),
                 new(OVRSkeleton.BoneId.FullBody_Neck, neckTarget),
                 new(OVRSkeleton.BoneId.FullBody_Head, headTarget),
+                new(OVRSkeleton.BoneId.FullBody_LeftFootAnkle, leftFootTarget),
+                new(OVRSkeleton.BoneId.FullBody_LeftFootBall, leftToesTarget),
+                new(OVRSkeleton.BoneId.FullBody_RightFootAnkle, rightFootTarget),
+                new(OVRSkeleton.BoneId.FullBody_RightFootBall, rightToesTarget),
             };
 
             foreach (var boneToRetarget in bonesToRetarget)
@@ -359,7 +372,7 @@ namespace Oculus.Movement.Utils
         }
 
         private static FullBodyDeformationConstraint AddDeformationConstraint(
-            GameObject rigObject, Animator animator, RetargetedBoneTarget[] spineBoneTargets)
+            GameObject rigObject, Animator animator, RetargetedBoneTarget[] boneTargets)
         {
             FullBodyDeformationConstraint deformationConstraint =
                 rigObject.GetComponentInChildren<FullBodyDeformationConstraint>();
@@ -369,9 +382,10 @@ namespace Oculus.Movement.Utils
             {
                 Undo.DestroyObjectImmediate(baseDeformationConstraint.gameObject);
             }
+            GameObject deformationConstraintObject = null;
             if (deformationConstraint == null)
             {
-                GameObject deformationConstraintObject =
+                deformationConstraintObject =
                     new GameObject("Deformation");
                 deformationConstraint =
                     deformationConstraintObject.AddComponent<FullBodyDeformationConstraint>();
@@ -385,13 +399,24 @@ namespace Oculus.Movement.Utils
                 deformationConstraintObject.transform.localPosition = Vector3.zero;
                 deformationConstraintObject.transform.localRotation = Quaternion.identity;
                 deformationConstraintObject.transform.localScale = Vector3.one;
-
-                foreach (var spineBoneTarget in spineBoneTargets)
+            }
+            else
+            {
+                var rig = rigObject.GetComponentInChildren<Rig>();
+                if (rig != null)
                 {
-                    Undo.SetTransformParent(spineBoneTarget.Target, deformationConstraintObject.transform,
-                        $"Parent Spine Bone Target {spineBoneTarget.Target.name} to Deformation.");
-                    Undo.RegisterCompleteObjectUndo(spineBoneTarget.Target,
-                        $"Spine Bone Target {spineBoneTarget.Target.name} Init");
+                    var deformationTransform = rig.transform.FindChildRecursive("Deformation");
+                    deformationConstraintObject = deformationTransform.gameObject;
+                }
+            }
+            if (deformationConstraintObject != null)
+            {
+                foreach (var boneTarget in boneTargets)
+                {
+                    Undo.SetTransformParent(boneTarget.Target, deformationConstraintObject.transform,
+                        $"Parent Bone Target {boneTarget.Target.name} to Deformation.");
+                    Undo.RegisterCompleteObjectUndo(boneTarget.Target,
+                        $"Bone Target {boneTarget.Target.name} Init");
                 }
             }
 
@@ -428,37 +453,37 @@ namespace Oculus.Movement.Utils
             return deformationConstraint;
         }
 
-        private static Transform AddSpineTarget(GameObject mainParent,
+        private static Transform AddBoneTarget(GameObject mainParent,
             string nameOfTarget, Transform targetTransform = null)
         {
-            Transform spineTarget =
+            Transform boneTarget =
                 mainParent.transform.FindChildRecursive(nameOfTarget);
-            if (spineTarget == null)
+            if (boneTarget == null)
             {
-                GameObject spineTargetObject =
+                GameObject boneTargetObject =
                     new GameObject(nameOfTarget);
-                Undo.RegisterCreatedObjectUndo(spineTargetObject, "Create Spine Target " + nameOfTarget);
+                Undo.RegisterCreatedObjectUndo(boneTargetObject, "Create Bone Target " + nameOfTarget);
 
-                Undo.SetTransformParent(spineTargetObject.transform, mainParent.transform,
-                    $"Add Spine Target {nameOfTarget} To Main Parent");
-                Undo.RegisterCompleteObjectUndo(spineTargetObject,
-                    $"Spine Target {nameOfTarget} Transform Init");
-                spineTarget = spineTargetObject.transform;
+                Undo.SetTransformParent(boneTargetObject.transform, mainParent.transform,
+                    $"Add Bone Target {nameOfTarget} To Main Parent");
+                Undo.RegisterCompleteObjectUndo(boneTargetObject,
+                    $"Bone Target {nameOfTarget} Transform Init");
+                boneTarget = boneTargetObject.transform;
             }
 
             if (targetTransform != null)
             {
-                spineTarget.position = targetTransform.position;
-                spineTarget.rotation = targetTransform.rotation;
-                spineTarget.localScale = targetTransform.localScale;
+                boneTarget.position = targetTransform.position;
+                boneTarget.rotation = targetTransform.rotation;
+                boneTarget.localScale = targetTransform.localScale;
             }
             else
             {
-                spineTarget.localPosition = Vector3.zero;
-                spineTarget.localRotation = Quaternion.identity;
-                spineTarget.localScale = Vector3.one;
+                boneTarget.localPosition = Vector3.zero;
+                boneTarget.localRotation = Quaternion.identity;
+                boneTarget.localScale = Vector3.one;
             }
-            return spineTarget;
+            return boneTarget;
         }
 
         private static FullBodyRetargetedBoneTargets AddRetargetedBoneTargetComponent(GameObject mainParent,

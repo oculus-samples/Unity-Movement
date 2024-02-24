@@ -111,6 +111,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private SerializedProperty _hipsToHeadBonesProperty;
         private SerializedProperty _hipsToHeadBoneTargetsProperty;
+        private SerializedProperty _feetToToesBoneTargetsProperty;
         private SerializedProperty _leftArmDataProperty;
         private SerializedProperty _rightArmDataProperty;
         private SerializedProperty _leftLegDataProperty;
@@ -154,6 +155,7 @@ namespace Oculus.Movement.AnimationRigging
 
             _hipsToHeadBonesProperty = data.FindPropertyRelative("_hipsToHeadBones");
             _hipsToHeadBoneTargetsProperty = data.FindPropertyRelative("_hipsToHeadBoneTargets");
+            _feetToToesBoneTargetsProperty = data.FindPropertyRelative("_feetToToesBoneTargets");
             _leftArmDataProperty = data.FindPropertyRelative("_leftArmData");
             _rightArmDataProperty = data.FindPropertyRelative("_rightArmData");
             _leftLegDataProperty = data.FindPropertyRelative("_leftLegData");
@@ -344,6 +346,7 @@ namespace Oculus.Movement.AnimationRigging
             DisplayBoneAdjustmentArray("Bone Adjustment Data", _boneAdjustmentDataProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBonesProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBoneTargetsProperty);
+            EditorGUILayout.PropertyField(_feetToToesBoneTargetsProperty);
             EditorGUILayout.PropertyField(_leftArmDataProperty);
             EditorGUILayout.PropertyField(_rightArmDataProperty);
             EditorGUILayout.PropertyField(_leftLegDataProperty);

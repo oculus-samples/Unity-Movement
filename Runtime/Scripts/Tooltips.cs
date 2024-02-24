@@ -996,6 +996,9 @@ namespace Oculus.Movement
         public const string HipsToHeadBoneTargets =
             "Array of transform bone targets from hips to head.";
 
+        public const string FeetToToesBoneTargets =
+            "Array of transform bone targets from feet to toes.";
+
         public const string LeftArmData =
             "Left arm data.";
 

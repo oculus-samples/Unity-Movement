@@ -182,6 +182,11 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<ReadOnlyTransformHandle> HipsToHeadBoneTargets;
 
         /// <summary>
+        /// The inclusive array of bone targets from the feet to the toes.
+        /// </summary>
+        public NativeArray<ReadOnlyTransformHandle> FeetToToesBoneTargets;
+
+        /// <summary>
         /// The array of upper body offsets.
         /// </summary>
         public NativeArray<Vector3> UpperBodyOffsets;
@@ -381,8 +386,6 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3 _preDeformationRightHandPos;
         private Vector3 _targetLeftFootPos;
         private Vector3 _targetRightFootPos;
-        private Vector3 _preDeformationLeftToesPos;
-        private Vector3 _preDeformationRightToesPos;
 
         private Vector3 _leftFootOffset;
         private Vector3 _rightFootOffset;
@@ -413,16 +416,6 @@ namespace Oculus.Movement.AnimationRigging
                 if (StartBones.Length == 0 || EndBones.Length == 0)
                 {
                     return;
-                }
-
-                if (LeftToesBone.IsValid(stream))
-                {
-                    _preDeformationLeftToesPos = LeftToesBone.GetPosition(stream);
-                }
-
-                if (RightToesBone.IsValid(stream))
-                {
-                    _preDeformationRightToesPos = RightToesBone.GetPosition(stream);
                 }
 
                 _preDeformationLeftUpperArmPos = LeftUpperArmBone.GetPosition(stream);
@@ -613,6 +606,13 @@ namespace Oculus.Movement.AnimationRigging
                     LeftShoulderOriginalLocalPos - leftShoulderLocalPos, weight * LeftShoulderOffsetWeight.Get(stream));
                 LeftShoulderBone.SetLocalPosition(stream, leftShoulderLocalPos + leftShoulderOffset);
             }
+            else
+            {
+                var leftUpperArmLocalPos = LeftUpperArmBone.GetLocalPosition(stream);
+                var leftUpperArmOffset = Vector3.Lerp(Vector3.zero,
+                    LeftShoulderOriginalLocalPos - leftUpperArmLocalPos, weight * LeftShoulderOffsetWeight.Get(stream));
+                LeftUpperArmBone.SetLocalPosition(stream, leftUpperArmLocalPos + leftUpperArmOffset);
+            }
 
             if (RightShoulderBone.IsValid(stream))
             {
@@ -620,6 +620,13 @@ namespace Oculus.Movement.AnimationRigging
                 var rightShoulderOffset = Vector3.Lerp(Vector3.zero,
                     RightShoulderOriginalLocalPos - rightShoulderLocalPos, weight * RightShoulderOffsetWeight.Get(stream));
                 RightShoulderBone.SetLocalPosition(stream, rightShoulderLocalPos + rightShoulderOffset);
+            }
+            else
+            {
+                var rightUpperArmPos = LeftUpperArmBone.GetLocalPosition(stream);
+                var rightUpperArmOffset = Vector3.Lerp(Vector3.zero,
+                    RightShoulderOriginalLocalPos - rightUpperArmPos, weight * RightShoulderOffsetWeight.Get(stream));
+                RightUpperArmBone.SetLocalPosition(stream, rightUpperArmPos + rightUpperArmOffset);
             }
         }
 
@@ -885,24 +892,36 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="weight">The weight of this operation.</param>
         private void AlignFeet(AnimationStream stream, float weight)
         {
-            if (!LeftToesBone.IsValid(stream) || !RightToesBone.IsValid(stream))
-            {
-                return;
-            }
             var footAlignmentWeight = AlignFeetWeight.Get(stream) * weight;
             var originalLeftFootLocalRot = LeftFootBone.GetLocalRotation(stream);
             var originalRightFootLocalRot = RightFootBone.GetLocalRotation(stream);
-            LeftFootBone.SetLocalRotation(stream, LeftFootLocalRot);
-            RightFootBone.SetLocalRotation(stream, RightFootLocalRot);
+            if (!LeftToesBone.IsValid(stream) || !RightToesBone.IsValid(stream))
+            {
+                LeftFootBone.SetLocalRotation(stream,
+                    Quaternion.Slerp(originalLeftFootLocalRot, LeftFootLocalRot, footAlignmentWeight));
+                RightFootBone.SetLocalRotation(stream,
+                    Quaternion.Slerp(originalRightFootLocalRot, RightFootLocalRot, footAlignmentWeight));
+                return;
+            }
 
-            var leftFootTargetRotation = LeftFootLocalRot * GetRotationForFootAlignment(stream,
-                                             _preDeformationLeftToesPos,
-                                             LeftFootBone.GetRotation(stream) * Vector3.up,
-                                             LeftFootBone, LeftToesBone);
-            var rightFootTargetRotation = RightFootLocalRot * GetRotationForFootAlignment(stream,
-                                             _preDeformationRightToesPos,
-                                             RightFootBone.GetRotation(stream) * Vector3.up,
-                                             RightFootBone, RightToesBone);
+            var originalLeftFootToesDir = LeftToesBone.GetPosition(stream) - LeftFootBone.GetPosition(stream);
+            var originalRightFootToesDir = RightToesBone.GetPosition(stream) - RightFootBone.GetPosition(stream);
+            var targetLeftFootToesDir = originalLeftFootToesDir;
+            var targetRightFootToesDir = originalRightFootToesDir;
+            if (FeetToToesBoneTargets.Length > 0)
+            {
+                targetLeftFootToesDir = FeetToToesBoneTargets[1].GetPosition(stream) -
+                                            FeetToToesBoneTargets[0].GetPosition(stream);
+                targetRightFootToesDir = FeetToToesBoneTargets[3].GetPosition(stream) -
+                                             FeetToToesBoneTargets[2].GetPosition(stream);
+            }
+
+            var leftFootTargetRotation = LeftFootLocalRot * GetRotationForFootAlignment(
+                LeftFootLocalRot * Vector3.up,
+                originalLeftFootToesDir, targetLeftFootToesDir);
+            var rightFootTargetRotation = RightFootLocalRot * GetRotationForFootAlignment(
+                RightFootLocalRot * Vector3.up,
+                originalRightFootToesDir, targetRightFootToesDir);
 
             LeftFootBone.SetLocalRotation(stream,
                 Quaternion.Slerp(originalLeftFootLocalRot, leftFootTargetRotation, footAlignmentWeight));
@@ -913,33 +932,15 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Gets the rotation around an axis for aligning the feet.
         /// </summary>
-        /// <param name="stream">The animation stream.</param>
-        /// <param name="originalToesPos">The original toes position.</param>
         /// <param name="rotateAxis">The axis to rotate around.</param>
-        /// <param name="footBone">The foot bone.</param>
-        /// <param name="toesBone">The toes bone.</param>
-        /// <returns></returns>
-        private Quaternion GetRotationForFootAlignment(AnimationStream stream,
-            Vector3 originalToesPos, Vector3 rotateAxis,
-            ReadWriteTransformHandle footBone, ReadWriteTransformHandle toesBone)
+        /// <param name="originalFootToesDir">The original foot to toes direction.</param>
+        /// <param name="targetFootToesDir">The target foot to toes direction.</param>
+        /// <returns>The rotation between the foot to toes directions around an axis.</returns>
+        private Quaternion GetRotationForFootAlignment(
+            Vector3 rotateAxis, Vector3 originalFootToesDir, Vector3 targetFootToesDir)
         {
-            var footPosition = footBone.GetPosition(stream);
-            var originalToesDir = footPosition - originalToesPos;
-            // don't do anything if the foot has not been deformed from the original position
-            if (originalToesDir.magnitude < Mathf.Epsilon)
-            {
-                return Quaternion.identity;
-            }
-            var targetToesDir = footPosition - toesBone.GetPosition(stream);
-            var dot = Vector3.Dot(originalToesDir, targetToesDir);
-            var cosineValue = dot / (originalToesDir.magnitude * targetToesDir.magnitude);
-
-            var angle = Mathf.Acos(cosineValue);
-            if (float.IsNaN(angle))
-            {
-                return Quaternion.identity;
-            }
-            return Quaternion.AngleAxis(angle, rotateAxis);
+            var footAngle = Vector3.Angle(originalFootToesDir, targetFootToesDir);
+            return Quaternion.AngleAxis(footAngle, rotateAxis);
         }
 
         /// <summary>
@@ -1179,6 +1180,9 @@ namespace Oculus.Movement.AnimationRigging
             job.HipsToHeadBoneTargets = new NativeArray<ReadOnlyTransformHandle>(data.HipsToHeadBoneTargets.Length,
                 Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
+            job.FeetToToesBoneTargets = new NativeArray<ReadOnlyTransformHandle>(data.FeetToToesBoneTargets.Length,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
             job.UpperBodyOffsets = new NativeArray<Vector3>(data.HipsToHeadBones.Length, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
             job.UpperBodyTargetPositions = new NativeArray<Vector3>(data.HipsToHeadBones.Length, Allocator.Persistent,
@@ -1204,6 +1208,11 @@ namespace Oculus.Movement.AnimationRigging
             for (int i = 0; i < data.HipsToHeadBoneTargets.Length; i++)
             {
                 job.HipsToHeadBoneTargets[i] = ReadOnlyTransformHandle.Bind(animator, data.HipsToHeadBoneTargets[i]);
+            }
+
+            for (int i = 0; i < data.FeetToToesBoneTargets.Length; i++)
+            {
+                job.FeetToToesBoneTargets[i] = ReadOnlyTransformHandle.Bind(animator, data.FeetToToesBoneTargets[i]);
             }
 
             for (int i = 0; i < data.BonePairs.Length; i++)
@@ -1332,6 +1341,7 @@ namespace Oculus.Movement.AnimationRigging
             job.BoneAdjustData.Dispose();
             job.HipsToHeadBones.Dispose();
             job.HipsToHeadBoneTargets.Dispose();
+            job.FeetToToesBoneTargets.Dispose();
             job.UpperBodyOffsets.Dispose();
             job.UpperBodyTargetPositions.Dispose();
             job.BoneDirections.Dispose();

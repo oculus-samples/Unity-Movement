@@ -106,6 +106,11 @@ namespace Oculus.Movement.AnimationRigging
         public Transform[] HipsToHeadBoneTargets { get; }
 
         /// <summary>
+        /// The array of transform targets from the feet to the toes bones.
+        /// </summary>
+        public Transform[] FeetToToesBoneTargets { get; }
+
+        /// <summary>
         /// The position info for the bone pairs used for FullBodyDeformation.
         /// </summary>
         public BonePairData[] BonePairs { get; }
@@ -347,6 +352,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         Transform[] IFullBodyDeformationData.HipsToHeadBoneTargets => _hipsToHeadBoneTargets;
+
+        /// <inheritdoc />
+        Transform[] IFullBodyDeformationData.FeetToToesBoneTargets => _feetToToesBoneTargets;
 
         /// <inheritdoc />
         BonePairData[] IFullBodyDeformationData.BonePairs => _bonePairData;
@@ -685,6 +693,13 @@ namespace Oculus.Movement.AnimationRigging
         private Transform[] _hipsToHeadBoneTargets;
 
         /// <summary>
+        /// Array of transform bone targets from feet to toes.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.FeetToToesBoneTargets)]
+        private Transform[] _feetToToesBoneTargets;
+
+        /// <summary>
         /// Left arm data.
         /// </summary>
         [SyncSceneToStream, SerializeField]
@@ -808,15 +823,16 @@ namespace Oculus.Movement.AnimationRigging
         public void SetUpLeftArmData()
         {
             var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder);
+            var upperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper);
             var lowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower);
             var handBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftHandWrist);
             _leftArmData = new ArmPosData()
             {
                 ShoulderBone = shoulder,
-                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper),
+                UpperArmBone = upperArmBone,
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
-                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero,
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
@@ -826,15 +842,16 @@ namespace Oculus.Movement.AnimationRigging
         public void SetUpRightArmData()
         {
             var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder);
+            var upperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper);
             var lowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower);
             var handBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightHandWrist);
             _rightArmData = new ArmPosData()
             {
                 ShoulderBone = shoulder,
-                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper),
+                UpperArmBone = upperArmBone,
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
-                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero,
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
@@ -1091,19 +1108,29 @@ namespace Oculus.Movement.AnimationRigging
                 hipsTarget, spineLowerTarget
             };
 
-            // Add optional bones, based on the length of the original array.
-            if (_hipsToHeadBones.Length > 4)
+            // Add optional bones, based on the valid animator.
+            if (_animator.GetBoneTransform(HumanBodyBones.Chest) != null)
             {
                 hipsToHeadBoneTargets.Add(spineUpperTarget);
             }
-            if (_hipsToHeadBones.Length > 5)
+            if (_animator.GetBoneTransform(HumanBodyBones.UpperChest) != null)
             {
                 hipsToHeadBoneTargets.Add(chestTarget);
             }
-            hipsToHeadBoneTargets.Add(neckTarget);
+            if (_animator.GetBoneTransform(HumanBodyBones.Neck) != null)
+            {
+                hipsToHeadBoneTargets.Add(neckTarget);
+            }
             hipsToHeadBoneTargets.Add(headTarget);
 
             _hipsToHeadBoneTargets = hipsToHeadBoneTargets.ToArray();
+            _feetToToesBoneTargets = new[]
+            {
+                setupParent.FindChildRecursive("LeftFoot"),
+                setupParent.FindChildRecursive("LeftToes"),
+                setupParent.FindChildRecursive("RightFoot"),
+                setupParent.FindChildRecursive("RightToes")
+            };
         }
 
         /// <inheritdoc />
@@ -1113,6 +1140,13 @@ namespace Oculus.Movement.AnimationRigging
             var shoulderParentAdjustmentBone = GetValidShoulderParentBone(_animator);
             var shoulderParentAdjustment = Quaternion.identity;
             var spineBoneAdjustments = GetSpineJointAdjustments(_animator, restPoseObject);
+
+            // If the chest bone is missing, invert the spine rotation as the
+            // fallback rotation is the previous rotation.
+            if (_animator.GetBoneTransform(HumanBodyBones.Chest) == null)
+            {
+                spineBoneAdjustments[1].Adjustment = Quaternion.Inverse(spineBoneAdjustments[1].Adjustment);
+            }
             foreach (var spineBoneAdjustment in spineBoneAdjustments)
             {
                 if (spineBoneAdjustment.Bone == shoulderParentAdjustmentBone)

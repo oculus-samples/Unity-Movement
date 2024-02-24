@@ -266,8 +266,11 @@ namespace Oculus.Movement.AnimationRigging
                 if (animator.GetBoneTransform(spineHumanBodyBone) != null)
                 {
                     var spineChildBone = FindChildHumanBodyBones(animator, spineHumanBodyBone);
+                    var mappingChildBone = OVRUnityHumanoidSkeletonRetargeter.
+                        OVRHumanBodyBonesMappings.BoneToJointPair[spineHumanBodyBone].Item2;
                     var adjustment = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-                        animator, spineHumanBodyBone, spineChildBone);
+                        animator, spineHumanBodyBone, mappingChildBone,
+                        spineHumanBodyBone, spineChildBone);
                     var adjustmentData = new BoneAdjustmentData
                     {
                         Bone = spineHumanBodyBone,
@@ -316,7 +319,8 @@ namespace Oculus.Movement.AnimationRigging
             var rightShoulderChildBone = FindChildHumanBodyBones(animator, rightShoulderBone);
 
             var rightShoulderRotation = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-                animator, rightShoulderBone, rightShoulderChildBone);
+                animator, rightShoulderBone, rightShoulderChildBone,
+                rightShoulderBone, rightShoulderChildBone);
             var rightShoulderAdjustment = Quaternion.Inverse(rightShoulderRotation * shoulderParentAdjustment);
 
             // We need to remove the Y euler angle portion, as the shoulders are rotated on OVRSkeleton in a way
@@ -337,7 +341,8 @@ namespace Oculus.Movement.AnimationRigging
             if (!shouldMirrorShoulderAdjustment)
             {
                 var leftShoulderRotation = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-                    animator, leftShoulderBone, leftShoulderChildBone);
+                    animator, leftShoulderBone, leftShoulderChildBone,
+                    leftShoulderBone, leftShoulderChildBone);
                 leftShoulderAdjustment = Quaternion.Inverse(leftShoulderRotation * shoulderParentAdjustment);
                 var leftShoulderAdjustmentEuler = leftShoulderAdjustment.eulerAngles;
                 leftShoulderAdjustmentEuler.y = 0.0f;
