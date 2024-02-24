@@ -1164,6 +1164,20 @@ namespace Oculus.Movement.AnimationRigging
             var boneAdjustments = new List<BoneAdjustmentData>();
             boneAdjustments.AddRange(spineBoneAdjustments);
             boneAdjustments.AddRange(shoulderBoneAdjustments);
+
+            // Calculate an adjustment alignment if needed, using the right vector of the rest pose humanoid
+            // which is Vector3.right.
+            var adjustmentAlignment = GetHipsRightAlignmentForAdjustments(_animator, Vector3.right);
+            for (int i = 0; i < boneAdjustments.Count; i++)
+            {
+                var adjustment = boneAdjustments[i];
+                // We use euler angles here as we want to rotate the adjustment point with the alignment rotation,
+                // rather than combine the rotations.
+                var adjustmentPoint = adjustment.Adjustment.eulerAngles;
+                adjustment.Adjustment =
+                    Quaternion.Euler(adjustmentAlignment * adjustmentPoint);
+                boneAdjustments[i] = adjustment;
+            }
             _boneAdjustmentData = boneAdjustments.ToArray();
         }
 

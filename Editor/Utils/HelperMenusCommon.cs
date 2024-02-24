@@ -113,9 +113,17 @@ namespace Oculus.Movement.Utils
                 var rotationTweak = boneAdjustment.Adjustment;
                 if (isMissingUpperChestBone && boneAdjustment.Bone == HumanBodyBones.Chest)
                 {
-                    // As UpperChest -> Neck and Chest -> Neck bone pair directions on the rest pose
-                    // skeleton are opposite, this rotation tweak is inverted.
-                    rotationTweak = Quaternion.Inverse(rotationTweak);
+                    // If the spine to chest bone isn't aligned, then inverse the rotation as we want
+                    // to apply the adjustment relative to the character's spine direction.
+                    var currentBoneDir = (animator.GetBoneTransform(HumanBodyBones.Chest).position -
+                                         animator.GetBoneTransform(HumanBodyBones.Spine).position).normalized;
+                    var previousBoneDir = (animator.GetBoneTransform(HumanBodyBones.Chest).position -
+                                          animator.GetBoneTransform(HumanBodyBones.Hips).position).normalized;
+                    var boneDirDotComparison = Vector3.Dot(previousBoneDir, currentBoneDir);
+                    if (boneDirDotComparison < 1.0f - Mathf.Epsilon)
+                    {
+                        rotationTweak = Quaternion.Inverse(rotationTweak);
+                    }
                 }
                 if (boneAdjustment.Bone == HumanBodyBones.UpperChest)
                 {
@@ -126,7 +134,10 @@ namespace Oculus.Movement.Utils
                 var adjustment = new JointAdjustment()
                 {
                     Joint = boneAdjustment.Bone,
-                    RotationTweaks = new[] { rotationTweak }
+                    RotationTweaks = new []
+                    {
+                        rotationTweak
+                    }
                 };
                 adjustments.Add(adjustment);
             }
@@ -144,22 +155,33 @@ namespace Oculus.Movement.Utils
                 DeformationCommon.GetShoulderAdjustments(animator, restPoseObject, Quaternion.identity);
             // Assume that we want the feet to be pointing world space forward.
             var footAdjustments = GetFootAdjustments(animator, restPoseObject, Vector3.forward);
+            var adjustmentAlignment =
+                DeformationCommon.GetHipsRightAlignmentForAdjustments(animator, Vector3.right);
             return new[]
             {
                 new JointAdjustment()
                 {
                     Joint = HumanBodyBones.Hips,
-                    RotationTweaks = new[] { hipAngleDifference }
+                    RotationTweaks = new[]
+                    {
+                        Quaternion.Euler(adjustmentAlignment * hipAngleDifference.eulerAngles)
+                    }
                 },
                 new JointAdjustment()
                 {
                     Joint = HumanBodyBones.LeftShoulder,
-                    RotationTweaks = new[] { shoulderAngleDifferences[0].Adjustment }
+                    RotationTweaks = new[]
+                    {
+                        Quaternion.Euler(adjustmentAlignment * shoulderAngleDifferences[0].Adjustment.eulerAngles)
+                    }
                 },
                 new JointAdjustment()
                 {
                     Joint = HumanBodyBones.RightShoulder,
-                    RotationTweaks = new[] { shoulderAngleDifferences[1].Adjustment }
+                    RotationTweaks = new[]
+                    {
+                        Quaternion.Euler(adjustmentAlignment * shoulderAngleDifferences[1].Adjustment.eulerAngles)
+                    }
                 },
                 footAdjustments[0],
                 footAdjustments[1]
@@ -217,9 +239,9 @@ namespace Oculus.Movement.Utils
             }
         }
 
-        public static bool DestroyLegacyComponents<Component>(GameObject gameObject)
+        public static bool DestroyLegacyComponents<T>(GameObject gameObject)
         {
-            var componentsFound = gameObject.GetComponents<Component>();
+            var componentsFound = gameObject.GetComponents<T>();
 
             foreach(var componentFound in componentsFound)
             {
@@ -245,6 +267,8 @@ namespace Oculus.Movement.Utils
             var rightLeg = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
             var legDotProduct = Vector3.Dot(leftLeg.forward, rightLeg.forward);
             bool shouldMirrorLegs = legDotProduct < 0.0f;
+            var adjustmentAlignment =
+                DeformationCommon.GetHipsRightAlignmentForAdjustments(animator, Vector3.right);
 
             if (animator.GetBoneTransform(HumanBodyBones.LeftToes) == null)
             {
@@ -259,7 +283,10 @@ namespace Oculus.Movement.Utils
                 footAdjustments.Add(new JointAdjustment
                 {
                     Joint = HumanBodyBones.LeftFoot,
-                    RotationTweaks = new[] { adjustment }
+                    RotationTweaks = new[]
+                    {
+                        Quaternion.Euler(adjustmentAlignment * adjustment.eulerAngles)
+                    }
                 });
             }
             if (animator.GetBoneTransform(HumanBodyBones.RightToes) == null)
@@ -276,7 +303,10 @@ namespace Oculus.Movement.Utils
                 footAdjustments.Add(new JointAdjustment
                 {
                     Joint = HumanBodyBones.RightFoot,
-                    RotationTweaks = new[] { adjustment }
+                    RotationTweaks = new[]
+                    {
+                        Quaternion.Euler(adjustmentAlignment * adjustment.eulerAngles)
+                    }
                 });
             }
             return footAdjustments.ToArray();

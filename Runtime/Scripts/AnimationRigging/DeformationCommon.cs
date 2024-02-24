@@ -243,6 +243,18 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Calculate the from to rotation to align the hips right with the alignment right direction.
+        /// </summary>
+        /// <param name="animator">The animator.</param>
+        /// <param name="alignmentRightDirection">The alignment right direction.</param>
+        /// <returns>Rotation to align the hips right with the alignment right direction.</returns>
+        public static Quaternion GetHipsRightAlignmentForAdjustments(Animator animator, Vector3 alignmentRightDirection)
+        {
+            var hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+            return Quaternion.FromToRotation(hips.right, alignmentRightDirection);
+        }
+
+        /// <summary>
         /// Get the spine joint adjustments given an animator and the rest pose.
         /// </summary>
         /// <param name="animator">The animator.</param>
