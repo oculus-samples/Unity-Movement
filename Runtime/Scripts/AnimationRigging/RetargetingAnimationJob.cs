@@ -107,6 +107,11 @@ namespace Oculus.Movement.AnimationRigging
                     Vector3.Lerp(originalPosition, finalPosition, weight));
             }
 
+            // by modifying stream velocity, we avoid an edge cases in versions of Unity 2022 and
+            // 2023 that prevents jobs from setting bone positions even with Translation DoF has
+            // been enabled with the character if root motion is turned on *AND* an animation that
+            // moves the character is not affecting the character.
+            stream.velocity += Vector3.zero;
             // update handles with binding info
             SourceTransforms[i] = sourceTransform;
             TargetTransforms[i] = targetTransform;
