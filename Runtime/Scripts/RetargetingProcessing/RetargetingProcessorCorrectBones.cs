@@ -39,34 +39,6 @@ namespace Oculus.Movement.AnimationRigging
             set => _shoulderCorrectionWeightLateUpdate = value;
         }
 
-        /// <summary>
-        /// Allow correcting rotations. This can produce more
-        /// accurate hands, for instance.
-        /// </summary>
-        [Tooltip(RetargetingLayerTooltips.LeftHandCorrectionWeightLateUpdate)]
-        [SerializeField, Range(0.0f, 1.0f)]
-        private float _leftHandCorrectionWeightLateUpdate = 1.0f;
-        /// <inheritdoc cref="_leftHandCorrectionWeightLateUpdate"/>
-        public float LeftHandCorrectionWeightLateUpdate
-        {
-            get => _leftHandCorrectionWeightLateUpdate;
-            set => _leftHandCorrectionWeightLateUpdate = value;
-        }
-
-        /// <summary>
-        /// Allow correcting rotations. This can produce more
-        /// accurate hands, for instance.
-        /// </summary>
-        [Tooltip(RetargetingLayerTooltips.RightHandCorrectionWeightLateUpdate)]
-        [SerializeField, Range(0.0f, 1.0f)]
-        private float _rightHandCorrectionWeightLateUpdate = 1.0f;
-        /// <inheritdoc cref="_rightHandCorrectionWeightLateUpdate"/>
-        public float RightHandCorrectionWeightLateUpdate
-        {
-            get => _rightHandCorrectionWeightLateUpdate;
-            set => _rightHandCorrectionWeightLateUpdate = value;
-        }
-
         /// <inheritdoc />
         public override void CopyData(RetargetingProcessor source)
         {
@@ -79,8 +51,6 @@ namespace Oculus.Movement.AnimationRigging
             }
             _correctPositionsLateUpdate = sourceCorrectBones.CorrectPositionsLateUpdate;
             _shoulderCorrectionWeightLateUpdate = sourceCorrectBones.ShoulderCorrectionWeightLateUpdate;
-            _leftHandCorrectionWeightLateUpdate = sourceCorrectBones.LeftHandCorrectionWeightLateUpdate;
-            _rightHandCorrectionWeightLateUpdate = sourceCorrectBones.RightHandCorrectionWeightLateUpdate;
         }
 
         /// <inheritdoc />
@@ -91,14 +61,16 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
-            bool handCorrectionTurnedOn =
-                LeftHandCorrectionWeightLateUpdate > Mathf.Epsilon ||
-                RightHandCorrectionWeightLateUpdate > Mathf.Epsilon;
-
             if (ovrBones == null)
             {
                 return;
             }
+
+            var animator = retargetingLayer.GetAnimatorTargetSkeleton();
+            var leftHand = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+            var rightHand = animator.GetBoneTransform(HumanBodyBones.RightHand);
+            var startingLeftHandPos = leftHand.localPosition;
+            var startingRightHandPos = rightHand.localPosition;
 
             for (var i = 0; i < ovrBones.Count; i++)
             {
@@ -106,6 +78,8 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     continue;
                 }
+
+                // Check if there's a valid bone mapping to the HumanBodyBone.
                 var nullableHumanBodyBone = retargetingLayer.GetCustomBoneIdToHumanBodyBone(ovrBones[i].Id);
                 if (nullableHumanBodyBone == null)
                 {
@@ -113,6 +87,7 @@ namespace Oculus.Movement.AnimationRigging
                 }
                 var humanBodyBone = (HumanBodyBones)nullableHumanBodyBone;
 
+                // Check if there's a retargeting correction quaternion for the HumanBodyBone.
                 var nullableTargetCorrectionQuaternion = retargetingLayer.GetCorrectionQuaternion(humanBodyBone);
                 if (nullableTargetCorrectionQuaternion == null)
                 {
@@ -120,10 +95,9 @@ namespace Oculus.Movement.AnimationRigging
                 }
                 var targetCorrectionQuaternion = (Quaternion)nullableTargetCorrectionQuaternion;
 
+                // Make sure body part passes mask, and bone's position should be updated.
                 var bodyPart = BoneMappingsExtension.HumanBoneToAvatarBodyPart[humanBodyBone];
                 var targetJoint = retargetingLayer.GetOriginalJoint(humanBodyBone);
-
-                // Make sure body part passes mask, and bone's position should be updated.
                 if (retargetingLayer.CustomPositionsToCorrectLateUpdateMask != null &&
                     !retargetingLayer.CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
                 {
@@ -135,15 +109,14 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
-                var currentTargetPosition = targetJoint.position;
                 // Make sure the joint position is valid before fixing it.
+                var currentTargetPosition = targetJoint.position;
                 if (!RiggingUtilities.IsFiniteVector3(currentTargetPosition))
                 {
                     continue;
                 }
 
                 var rtWeight = Weight * retargetingLayer.RetargetingConstraint.weight;
-
                 var bodySectionOfJoint =
                     OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
                 bool isLeftHandFingersOrWrist =
@@ -152,41 +125,21 @@ namespace Oculus.Movement.AnimationRigging
                 bool isRightHandFingersOrWrist =
                     bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.RightHand ||
                     humanBodyBone == HumanBodyBones.RightHand;
-                bool isHandJoint =
-                    isLeftHandFingersOrWrist ||
-                    isRightHandFingersOrWrist;
-                bool isShoulderJoint =
-                    humanBodyBone == HumanBodyBones.LeftShoulder ||
-                    humanBodyBone == HumanBodyBones.RightShoulder;
-
-                // Pick the correct hand correction weight based on handedness.
-                var handWeight = Weight * (isLeftHandFingersOrWrist ?
-                    LeftHandCorrectionWeightLateUpdate :
-                    RightHandCorrectionWeightLateUpdate);
+                bool isHandJoint = isLeftHandFingersOrWrist || isRightHandFingersOrWrist;
+                bool isShoulderJoint = humanBodyBone == HumanBodyBones.LeftShoulder ||
+                                       humanBodyBone == HumanBodyBones.RightShoulder;
 
                 var constraintsPositionOffset = retargetingLayer.ApplyAnimationConstraintsToCorrectedPositions ?
                     retargetingLayer.JointPositionAdjustments[(int)humanBodyBone].GetPositionOffset() : Vector3.zero;
                 var currentOVRBonePosition = ovrBones[i].Transform.position;
 
+                // Move the hand and fingers to the tracked positions by setting the position offset to zero.
                 if (isHandJoint)
                 {
-                    var errorRelativeToBodyTracking = (currentOVRBonePosition - currentTargetPosition).sqrMagnitude;
-
-                    // If generally correcting positions only and applying hand correction,
-                    // skip positional fix a) if the error relative to body tracking is low,
-                    // b) and the position influence due to IK fixes is small.
-                    if (!handCorrectionTurnedOn &&
-                        errorRelativeToBodyTracking < Mathf.Epsilon &&
-                        constraintsPositionOffset.sqrMagnitude < Mathf.Epsilon)
-                    {
-                        continue;
-                    }
-
-                    // Exclude any position offsets from IK if correcting hand joints to
-                    // what body tracking indicates they are.
-                    constraintsPositionOffset = Vector3.Lerp(constraintsPositionOffset, Vector3.zero, handWeight);
+                    constraintsPositionOffset = Vector3.zero;
                 }
 
+                // Remove muscle space restrictions for the shoulders.
                 if (isShoulderJoint)
                 {
                     CorrectShoulders(targetJoint,
@@ -197,12 +150,10 @@ namespace Oculus.Movement.AnimationRigging
 
                 if (adjustment == null)
                 {
-                    if (handCorrectionTurnedOn && isHandJoint)
+                    if (isHandJoint)
                     {
-                        targetJoint.rotation =
-                            Quaternion.Slerp(targetJoint.rotation,
-                                ovrBones[i].Transform.rotation * targetCorrectionQuaternion,
-                                handWeight);
+                        targetJoint.rotation = Quaternion.Slerp(targetJoint.rotation,
+                                ovrBones[i].Transform.rotation * targetCorrectionQuaternion, rtWeight);
                     }
 
                     if (CorrectPositionsLateUpdate)
@@ -214,14 +165,12 @@ namespace Oculus.Movement.AnimationRigging
                 }
                 else
                 {
-                    if (handCorrectionTurnedOn && isHandJoint)
+                    if (isHandJoint)
                     {
                         if (!adjustment.DisableRotationTransform)
                         {
-                            targetJoint.rotation =
-                                Quaternion.Slerp(targetJoint.rotation,
-                                    ovrBones[i].Transform.rotation * targetCorrectionQuaternion,
-                                    handWeight);
+                            targetJoint.rotation = Quaternion.Slerp(targetJoint.rotation,
+                                    ovrBones[i].Transform.rotation * targetCorrectionQuaternion, rtWeight);
                         }
 
                         targetJoint.rotation *= adjustment.RotationChange * adjustment.PrecomputedRotationTweaks;
@@ -235,6 +184,10 @@ namespace Oculus.Movement.AnimationRigging
                     }
                 }
             }
+
+            // Revert to the original hand position, as this should be used to only correct the fingers.
+            leftHand.localPosition = startingLeftHandPos;
+            rightHand.localPosition = startingRightHandPos;
         }
 
         /// <summary>
@@ -267,6 +220,5 @@ namespace Oculus.Movement.AnimationRigging
                     childAffineTransform.rotation);
             }
         }
-
     }
 }

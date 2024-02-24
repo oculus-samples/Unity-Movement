@@ -97,7 +97,6 @@ namespace Oculus.Movement.AnimationRigging
             set => _isFullBody = value;
         }
 
-        private RetargetingProcessorCorrectBones _retargetingProcessorCorrectBones;
         private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
         private Transform _cachedTransform;
         private Transform _cachedHeadTransform;
@@ -132,18 +131,6 @@ namespace Oculus.Movement.AnimationRigging
                     foundOurProcessor = true;
                 }
 
-                var correctBonesProcessor = retargetingProcessor as RetargetingProcessorCorrectBones;
-                if (correctBonesProcessor != null)
-                {
-                    _retargetingProcessorCorrectBones = correctBonesProcessor;
-                    if (!foundOurProcessor)
-                    {
-                        Debug.LogWarning($"{this.GetType()} should be before {correctBonesProcessor} in processor " +
-                            $"stack as it needs to affect it.");
-                    }
-                    continue;
-                }
-
                 var correctHandProcessor = retargetingProcessor as RetargetingProcessorCorrectHand;
                 if (correctHandProcessor != null)
                 {
@@ -173,20 +160,13 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             float blendWeight = ComputeCurrentBlendWeight(retargetingLayer);
-            // the weight of this processor can be used to reduce its effect
+
+            // The weight of this processor can be used to reduce its effect
             if (Weight < float.Epsilon)
             {
-                blendWeight = 1.0f;
+                return;
             }
-            
-            if (IsLeftSideOfBody())
-            {
-                _retargetingProcessorCorrectBones.LeftHandCorrectionWeightLateUpdate = blendWeight;
-            }
-            else
-            {
-                _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = blendWeight;
-            }
+
             if (_retargetingProcessorCorrectHand != null)
             {
                 _retargetingProcessorCorrectHand.Weight = blendWeight;
@@ -257,7 +237,7 @@ namespace Oculus.Movement.AnimationRigging
                     float lerpValue = (scaledMaxDistance - boneDistanceToViewVector) /
                         (scaledMaxDistance - scaledMinDistance);
                     float curveValue = _blendCurve.Evaluate(lerpValue);
-                    // amplify lerping before clamping it
+                    // Amplify lerping before clamping it.
                     _cachedWeight = Mathf.Clamp01(curveValue);
                 }
             }

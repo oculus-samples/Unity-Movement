@@ -247,15 +247,6 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
                     constraint.weight = Mathf.Min(constraintWeight, _maxWeight);
                 }
             }
-
-            if (IsLeftSideOfBody())
-            {
-                _retargetingProcessorCorrectBones.LeftHandCorrectionWeightLateUpdate = constraintWeight;
-            }
-            else
-            {
-                _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = constraintWeight;
-            }
         }
 
         private bool IsLeftSideOfBody()

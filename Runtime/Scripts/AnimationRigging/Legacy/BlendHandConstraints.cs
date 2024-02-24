@@ -263,14 +263,6 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
                 }
             }
 
-            if (IsLeftSideOfBody())
-            {
-                _retargetingProcessorCorrectBones.LeftHandCorrectionWeightLateUpdate = constraintWeight;
-            }
-            else
-            {
-                _retargetingProcessorCorrectBones.RightHandCorrectionWeightLateUpdate = constraintWeight;
-            }
             if (_retargetingProcessorCorrectHand != null)
             {
                 _retargetingProcessorCorrectHand.Weight = constraintWeight;
