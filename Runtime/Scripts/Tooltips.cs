@@ -1857,4 +1857,24 @@ namespace Oculus.Movement
         public const string IsFullBody =
             "Specifies if this is full body or not.";
     }
+
+    public static class ExternalBoneTargetsTooltips
+    {
+        public static class BoneTargetTooltips
+        {
+            public const string BoneId =
+                "The OVRSkeleton.BoneId that must be tracked.";
+            public const string HumanBodyBone =
+                "The human body bone representation of this bone.";
+            public const string Target =
+                "The target transform to update with body tracking bone data.";
+        }
+
+        public const string BoneTargets =
+            "The array of bone targets.";
+        public const string IsFullBody =
+            "Is it full body (or not).";
+        public const string Enabled =
+            "Enables or disables functionality.";
+    }
 }
