@@ -11,7 +11,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using static Oculus.Movement.AnimationRigging.RetargetedBoneTargets;
+using static Oculus.Movement.AnimationRigging.Deprecated.RetargetedBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.Utils

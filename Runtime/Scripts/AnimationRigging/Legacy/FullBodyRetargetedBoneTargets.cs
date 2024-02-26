@@ -3,7 +3,7 @@
 using System.Linq;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
-namespace Oculus.Movement.AnimationRigging
+namespace Oculus.Movement.AnimationRigging.Deprecated
 {
     /// <summary>
     /// Similar to <see cref="RetargetedBoneTargets"/> but applied to full body.

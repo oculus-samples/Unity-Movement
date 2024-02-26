@@ -8,8 +8,9 @@ using Oculus.Movement.Tracking;
 using System.Reflection;
 using Oculus.Interaction.Input;
 using System.Collections.Generic;
-using static Oculus.Movement.AnimationRigging.RetargetedBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
+using static Oculus.Movement.AnimationRigging.Deprecated.RetargetedBoneTargets;
+using Oculus.Movement.AnimationRigging.Deprecated;
 
 namespace Oculus.Movement.Utils
 {

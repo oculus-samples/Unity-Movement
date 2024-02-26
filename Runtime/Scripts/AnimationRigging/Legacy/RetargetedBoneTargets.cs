@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
-namespace Oculus.Movement.AnimationRigging
+namespace Oculus.Movement.AnimationRigging.Deprecated
 {
     /// <summary>
     /// Update target transforms with retargeted bone data.
