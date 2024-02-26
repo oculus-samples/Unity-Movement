@@ -11,7 +11,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using static Oculus.Movement.AnimationRigging.Deprecated.RetargetedBoneTargets;
+using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.Utils
@@ -81,12 +81,13 @@ namespace Oculus.Movement.Utils
             HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraints>(activeGameObject);
 
             // Body deformation.
-            RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
+            BoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
             DeformationConstraint deformationConstraint =
                 AddDeformationConstraint(rigObject, animatorComp, spineBoneTargets);
             constraintMonos.Add(deformationConstraint);
 
-            AddRetargetedBoneTargetComponent(activeGameObject, spineBoneTargets);
+            HelperMenusCommon.DestroyLegacyComponents<RetargetedBoneTargets>(activeGameObject);
+            HelperMenusCommon.SetupExternalBoneTargets(retargetingLayer, false, spineBoneTargets);
 
             // Disable root motion.
             animatorComp.applyRootMotion = false;
@@ -360,10 +361,10 @@ namespace Oculus.Movement.Utils
             }
         }
 
-        private static RetargetedBoneTarget[] AddSpineBoneTargets(GameObject rigObject,
+        private static BoneTarget[] AddSpineBoneTargets(GameObject rigObject,
             Animator animator)
         {
-            var boneTargets = new List<RetargetedBoneTarget>();
+            var boneTargets = new List<BoneTarget>();
             Transform hipsTarget = AddSpineTarget(rigObject, "HipsTarget",
                 animator.GetBoneTransform(HumanBodyBones.Hips));
             Transform spineLowerTarget = AddSpineTarget(rigObject, "SpineLowerTarget",
@@ -389,7 +390,7 @@ namespace Oculus.Movement.Utils
 
             foreach (var boneToRetarget in bonesToRetarget)
             {
-                RetargetedBoneTarget boneRTTarget = new RetargetedBoneTarget();
+                BoneTarget boneRTTarget = new BoneTarget();
                 boneRTTarget.BoneId = boneToRetarget.Item1;
                 boneRTTarget.Target = boneToRetarget.Item2;
                 boneRTTarget.HumanBodyBone = OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone[boneRTTarget.BoneId];
@@ -432,7 +433,7 @@ namespace Oculus.Movement.Utils
         }
 
         private static DeformationConstraint AddDeformationConstraint(
-            GameObject rigObject, Animator animator, RetargetedBoneTarget[] spineBoneTargets)
+            GameObject rigObject, Animator animator, BoneTarget[] spineBoneTargets)
         {
             DeformationConstraint deformationConstraint =
                 rigObject.GetComponentInChildren<DeformationConstraint>();
@@ -495,24 +496,6 @@ namespace Oculus.Movement.Utils
                 return true;
             }
             return false;
-        }
-
-        private static RetargetedBoneTargets AddRetargetedBoneTargetComponent(GameObject mainParent,
-            RetargetedBoneTarget[] boneTargetsArray)
-        {
-            RetargetedBoneTargets retargetedBoneTargets = mainParent.GetComponent<RetargetedBoneTargets>();
-            if (retargetedBoneTargets == null)
-            {
-                retargetedBoneTargets =
-                    mainParent.AddComponent<RetargetedBoneTargets>();
-                Undo.RegisterCreatedObjectUndo(retargetedBoneTargets, "Add RT bone targets");
-            }
-
-            retargetedBoneTargets.AutoAddTo = mainParent.GetComponent<RetargetingLayer>();
-            retargetedBoneTargets.RetargetedBoneTargetsArray = boneTargetsArray;
-
-            PrefabUtility.RecordPrefabInstancePropertyModifications(retargetedBoneTargets);
-            return retargetedBoneTargets;
         }
 
         private static bool DestroyTwoBoneIKConstraint(GameObject rigObject, string name)

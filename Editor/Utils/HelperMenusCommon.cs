@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.Utils
@@ -134,7 +135,7 @@ namespace Oculus.Movement.Utils
                 var adjustment = new JointAdjustment()
                 {
                     Joint = boneAdjustment.Bone,
-                    RotationTweaks = new []
+                    RotationTweaks = new[]
                     {
                         rotationTweak
                     }
@@ -157,7 +158,7 @@ namespace Oculus.Movement.Utils
             var footAdjustments = GetFootAdjustments(animator, restPoseObject, Vector3.forward);
             var adjustmentAlignment =
                 DeformationCommon.GetHipsRightAlignmentForAdjustments(animator, Vector3.right);
-            return new[]
+            List<JointAdjustment> result = new List<JointAdjustment>
             {
                 new JointAdjustment()
                 {
@@ -182,10 +183,14 @@ namespace Oculus.Movement.Utils
                     {
                         Quaternion.Euler(adjustmentAlignment * shoulderAngleDifferences[1].Adjustment.eulerAngles)
                     }
-                },
-                footAdjustments[0],
-                footAdjustments[1]
+                }
             };
+            if (footAdjustments.Length > 0)
+            {
+                result.Add(footAdjustments[0]);
+                result.Add(footAdjustments[1]);
+            }
+            return result.ToArray();
         }
 
         public static void AddBlendHandRetargetingProcessor(RetargetingLayer retargetingLayer, Handedness handedness)
@@ -243,7 +248,7 @@ namespace Oculus.Movement.Utils
         {
             var componentsFound = gameObject.GetComponents<T>();
 
-            foreach(var componentFound in componentsFound)
+            foreach (var componentFound in componentsFound)
             {
                 Undo.DestroyObjectImmediate(componentFound as Object);
             }
@@ -310,6 +315,16 @@ namespace Oculus.Movement.Utils
                 });
             }
             return footAdjustments.ToArray();
+        }
+
+        public static void SetupExternalBoneTargets(RetargetingLayer retargetingLayer, bool isFullBody,
+            BoneTarget[] boneTargets)
+        {
+            var externalBoneTargets = new ExternalBoneTargets();
+            externalBoneTargets.FullBody = isFullBody;
+            externalBoneTargets.Enabled = true;
+            externalBoneTargets.BoneTargetsArray = boneTargets;
+            retargetingLayer.ExternalBoneTargetsInst = externalBoneTargets;
         }
     }
 }

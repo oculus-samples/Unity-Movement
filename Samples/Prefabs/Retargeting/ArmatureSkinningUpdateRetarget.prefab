@@ -1882,40 +1882,30 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
   - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
   - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}
---- !u!114 &8041379379990558817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442339640571472327}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e99c227ec21d72d45b36011069f2b263, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _autoAddTo: {fileID: 7866900989153904485}
-  _retargetedBoneTargets:
-  - HumanBodyBone: 0
-    Target: {fileID: 7587183840484842530}
-  - HumanBodyBone: 7
-    Target: {fileID: 9220256087756010015}
-  - HumanBodyBone: 8
-    Target: {fileID: 3762686855905044433}
-  - HumanBodyBone: 54
-    Target: {fileID: 7149144802348253193}
-  - HumanBodyBone: 9
-    Target: {fileID: 7277339581642933588}
-  - HumanBodyBone: 10
-    Target: {fileID: 9174775783855746668}
-  - HumanBodyBone: 5
-    Target: {fileID: 4021663687324486562}
-  - HumanBodyBone: 19
-    Target: {fileID: 2774367269256560322}
-  - HumanBodyBone: 6
-    Target: {fileID: 6588386940800100912}
-  - HumanBodyBone: 20
-    Target: {fileID: 4669446654929552590}
+  _externalBoneTargets:
+    _boneTargets:
+    - HumanBodyBone: 0
+      Target: {fileID: 7587183840484842530}
+    - HumanBodyBone: 7
+      Target: {fileID: 9220256087756010015}
+    - HumanBodyBone: 8
+      Target: {fileID: 3762686855905044433}
+    - HumanBodyBone: 54
+      Target: {fileID: 7149144802348253193}
+    - HumanBodyBone: 9
+      Target: {fileID: 7277339581642933588}
+    - HumanBodyBone: 10
+      Target: {fileID: 9174775783855746668}
+    - HumanBodyBone: 5
+      Target: {fileID: 4021663687324486562}
+    - HumanBodyBone: 19
+      Target: {fileID: 2774367269256560322}
+    - HumanBodyBone: 6
+      Target: {fileID: 6588386940800100912}
+    - HumanBodyBone: 20
+      Target: {fileID: 4669446654929552590}
+    _fullBody: 1
+    _enabled: 1
 --- !u!4 &6575490107108777790 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8984739037707363565, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}

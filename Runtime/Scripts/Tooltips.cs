@@ -1348,6 +1348,9 @@ namespace Oculus.Movement
 
         public const string RetargetingProcessors =
             "List of retargeting processors, which run in late update after retargeting and animation rigging.";
+
+        public const string ExternalBoneTargets =
+            "External bone targets to be updated based on body tracking.";
     }
 
     public static class LateMirroredObjectTooltips

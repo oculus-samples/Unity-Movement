@@ -139,7 +139,7 @@ namespace Oculus.Movement.UI
             RestPoseObjectHumanoid restPoseToUse = CheckIfTPose(newCharacter.GetComponent<Animator>()) ?
                 _restTPoseObject :
                 _restPoseObject;
-            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, false, true, _restPoseObject);
+            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, true, _restPoseObject);
 
             AdjustSpawnedCharacterTransform(newCharacter, false, -_currentSpawnOffsetNotParented);
             _currentSpawnOffsetNotParented -= _spawnOffset * _NON_MIRRORED_OFFSET_MULTIPLIER;

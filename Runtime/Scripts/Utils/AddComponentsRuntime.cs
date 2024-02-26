@@ -9,8 +9,7 @@ using System.Reflection;
 using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using static OVRUnityHumanoidSkeletonRetargeter;
-using static Oculus.Movement.AnimationRigging.Deprecated.RetargetedBoneTargets;
-using Oculus.Movement.AnimationRigging.Deprecated;
+using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
 
 namespace Oculus.Movement.Utils
 {
@@ -163,20 +162,20 @@ namespace Oculus.Movement.Utils
             {
                 if (isFullBody)
                 {
-                    RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
+                    BoneTarget[] spineBoneTargets = AddBoneTargets(rigObject, animatorComp, true);
                     FullBodyDeformationConstraint deformationConstraint =
                         AddFullBodyDeformationConstraint(rigObject, animatorComp, spineBoneTargets, restPoseObjectHumanoid);
 
-                    AddRetargetedFullBodyBoneTargetComponent(selectedGameObject, spineBoneTargets);
+                    SetupExternalBoneTargets(retargetingLayer, spineBoneTargets, true);
                 }
                 else
                 {
-                    RetargetedBoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
+                    BoneTarget[] spineBoneTargets = AddBoneTargets(rigObject, animatorComp, false);
                     DeformationConstraint deformationConstraint =
                         AddDeformationConstraint(rigObject, animatorComp, spineBoneTargets);
                     constraintMonos.Add(deformationConstraint);
 
-                    AddRetargetedBoneTargetComponent(selectedGameObject, spineBoneTargets);
+                    SetupExternalBoneTargets(retargetingLayer, spineBoneTargets, false);
                 }
             }
 
@@ -331,74 +330,103 @@ namespace Oculus.Movement.Utils
             return retargetConstraint;
         }
 
-        private static RetargetedBoneTarget[] AddSpineBoneTargets(GameObject rigObject,
-            Animator animator)
+        private static BoneTarget[] AddBoneTargets(GameObject rigObject,
+            Animator animator, bool isFullBody)
         {
-            var boneTargets = new List<RetargetedBoneTarget>();
-            Transform hipsTarget = AddSpineTarget(rigObject, "HipsTarget",
+            var boneTargets = new List<BoneTarget>();
+            Transform hipsTarget = AddBoneTargetTransform(rigObject, "HipsTarget",
                 animator.GetBoneTransform(HumanBodyBones.Hips));
-            Transform spineLowerTarget = AddSpineTarget(rigObject, "SpineLowerTarget",
+            Transform spineLowerTarget = AddBoneTargetTransform(rigObject, "SpineLowerTarget",
                 animator.GetBoneTransform(HumanBodyBones.Spine));
-            Transform spineUpperTarget = AddSpineTarget(rigObject, "SpineUpperTarget",
+            Transform spineUpperTarget = AddBoneTargetTransform(rigObject, "SpineUpperTarget",
                 animator.GetBoneTransform(HumanBodyBones.Chest));
-            Transform chestTarget = AddSpineTarget(rigObject, "ChestTarget",
+            Transform chestTarget = AddBoneTargetTransform(rigObject, "ChestTarget",
                 animator.GetBoneTransform(HumanBodyBones.UpperChest));
-            Transform neckTarget = AddSpineTarget(rigObject, "NeckTarget",
+            Transform neckTarget = AddBoneTargetTransform(rigObject, "NeckTarget",
                 animator.GetBoneTransform(HumanBodyBones.Neck));
-            Transform headTarget = AddSpineTarget(rigObject, "HeadTarget",
+            Transform headTarget = AddBoneTargetTransform(rigObject, "HeadTarget",
                 animator.GetBoneTransform(HumanBodyBones.Head));
 
-            Tuple<OVRSkeleton.BoneId, Transform>[] bonesToRetarget =
+            Tuple<OVRSkeleton.BoneId, Transform>[] bonesToRetarget;
+
+            if (isFullBody)
             {
-                new(OVRSkeleton.BoneId.Body_Hips, hipsTarget),
-                new(OVRSkeleton.BoneId.Body_SpineLower, spineLowerTarget),
-                new(OVRSkeleton.BoneId.Body_SpineUpper, spineUpperTarget),
-                new(OVRSkeleton.BoneId.Body_Chest, chestTarget),
-                new(OVRSkeleton.BoneId.Body_Neck, neckTarget),
-                new(OVRSkeleton.BoneId.Body_Head, headTarget),
-            };
+                Transform leftFootTarget = AddBoneTargetTransform(rigObject, "LeftFootTarget",
+                   animator.GetBoneTransform(HumanBodyBones.LeftFoot));
+                Transform leftToesTarget = AddBoneTargetTransform(rigObject, "LeftToesTarget",
+                    animator.GetBoneTransform(HumanBodyBones.LeftToes));
+                Transform rightFootTarget = AddBoneTargetTransform(rigObject, "RightFootTarget",
+                    animator.GetBoneTransform(HumanBodyBones.RightFoot));
+                Transform rightToesTarget = AddBoneTargetTransform(rigObject, "RightToesTarget",
+                    animator.GetBoneTransform(HumanBodyBones.RightToes));
+                bonesToRetarget = new Tuple<OVRSkeleton.BoneId, Transform>[] {
+                    new(OVRSkeleton.BoneId.FullBody_Hips, hipsTarget),
+                    new(OVRSkeleton.BoneId.FullBody_SpineLower, spineLowerTarget),
+                    new(OVRSkeleton.BoneId.FullBody_SpineUpper, spineUpperTarget),
+                    new(OVRSkeleton.BoneId.FullBody_Chest, chestTarget),
+                    new(OVRSkeleton.BoneId.FullBody_Neck, neckTarget),
+                    new(OVRSkeleton.BoneId.FullBody_Head, headTarget),
+                    new(OVRSkeleton.BoneId.FullBody_LeftFootAnkle, leftFootTarget),
+                    new(OVRSkeleton.BoneId.FullBody_LeftFootBall, leftToesTarget),
+                    new(OVRSkeleton.BoneId.FullBody_RightFootAnkle, rightFootTarget),
+                    new(OVRSkeleton.BoneId.FullBody_RightFootBall, rightToesTarget),
+                };
+            }
+            else
+            {
+                bonesToRetarget = new Tuple<OVRSkeleton.BoneId, Transform>[] {
+                    new(OVRSkeleton.BoneId.Body_Hips, hipsTarget),
+                    new(OVRSkeleton.BoneId.Body_SpineLower, spineLowerTarget),
+                    new(OVRSkeleton.BoneId.Body_SpineUpper, spineUpperTarget),
+                    new(OVRSkeleton.BoneId.Body_Chest, chestTarget),
+                    new(OVRSkeleton.BoneId.Body_Neck, neckTarget),
+                    new(OVRSkeleton.BoneId.Body_Head, headTarget),
+                };
+            }
 
             foreach (var boneToRetarget in bonesToRetarget)
             {
-                RetargetedBoneTarget boneRTTarget = new RetargetedBoneTarget();
+                BoneTarget boneRTTarget = new BoneTarget();
                 boneRTTarget.BoneId = boneToRetarget.Item1;
                 boneRTTarget.Target = boneToRetarget.Item2;
-                boneRTTarget.HumanBodyBone = OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone[boneRTTarget.BoneId];
+                boneRTTarget.HumanBodyBone = isFullBody ?
+                    OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone[boneRTTarget.BoneId] :
+                    OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone[boneRTTarget.BoneId];
                 boneTargets.Add(boneRTTarget);
             }
             return boneTargets.ToArray();
         }
 
-        private static Transform AddSpineTarget(GameObject mainParent,
+        private static Transform AddBoneTargetTransform(GameObject mainParent,
             string nameOfTarget, Transform targetTransform = null)
         {
-            Transform spineTarget =
+            Transform newTarget =
                 mainParent.transform.FindChildRecursive(nameOfTarget);
-            if (spineTarget == null)
+            if (newTarget == null)
             {
-                GameObject spineTargetObject =
+                GameObject newTargetObject =
                     new GameObject(nameOfTarget);
-                spineTargetObject.transform.SetParent(mainParent.transform, true);
-                spineTarget = spineTargetObject.transform;
+                newTargetObject.transform.SetParent(mainParent.transform, true);
+                newTarget = newTargetObject.transform;
             }
 
             if (targetTransform != null)
             {
-                spineTarget.position = targetTransform.position;
-                spineTarget.rotation = targetTransform.rotation;
-                spineTarget.localScale = targetTransform.localScale;
+                newTarget.position = targetTransform.position;
+                newTarget.rotation = targetTransform.rotation;
+                newTarget.localScale = targetTransform.localScale;
             }
             else
             {
-                spineTarget.localPosition = Vector3.zero;
-                spineTarget.localRotation = Quaternion.identity;
-                spineTarget.localScale = Vector3.one;
+                newTarget.localPosition = Vector3.zero;
+                newTarget.localRotation = Quaternion.identity;
+                newTarget.localScale = Vector3.one;
             }
-            return spineTarget;
+            return newTarget;
         }
 
         private static DeformationConstraint AddDeformationConstraint(
-            GameObject rigObject, Animator animator, RetargetedBoneTarget[] spineBoneTargets)
+            GameObject rigObject, Animator animator, BoneTarget[] spineBoneTargets)
         {
             DeformationConstraint deformationConstraint;
             GameObject deformationConstraintObject =
@@ -447,7 +475,7 @@ namespace Oculus.Movement.Utils
         }
 
         private static FullBodyDeformationConstraint AddFullBodyDeformationConstraint(
-            GameObject rigObject, Animator animator, RetargetedBoneTarget[] spineBoneTargets,
+            GameObject rigObject, Animator animator, BoneTarget[] spineBoneTargets,
             RestPoseObjectHumanoid restPoseObjectHumanoid)
         {
             FullBodyDeformationConstraint deformationConstraint = null;
@@ -505,39 +533,14 @@ namespace Oculus.Movement.Utils
             return deformationConstraint;
         }
 
-        private static RetargetedBoneTargets AddRetargetedBoneTargetComponent(GameObject mainParent,
-            RetargetedBoneTarget[] boneTargetsArray)
+        private static void SetupExternalBoneTargets(RetargetingLayer retargetingLayer,
+            BoneTarget[] boneTargetsArray, bool isFullBody)
         {
-            RetargetedBoneTargets retargetedBoneTargets =
-                mainParent.AddComponent<RetargetedBoneTargets>();
-
-            retargetedBoneTargets.AutoAddTo = mainParent.GetComponent<RetargetingLayer>();
-            retargetedBoneTargets.RetargetedBoneTargetsArray = boneTargetsArray;
-            return retargetedBoneTargets;
-        }
-
-        private static FullBodyRetargetedBoneTargets AddRetargetedFullBodyBoneTargetComponent(GameObject mainParent,
-            RetargetedBoneTarget[] boneTargetsArray)
-        {
-            FullBodyRetargetedBoneTargets retargetedBoneTargets =
-                mainParent.AddComponent<FullBodyRetargetedBoneTargets>();
-
-            retargetedBoneTargets.AutoAdd = mainParent.GetComponent<RetargetingLayer>();
-            retargetedBoneTargets.RetargetedBoneTargets = boneTargetsArray;
-
-            return retargetedBoneTargets;
-        }
-
-        private static FullBodyRetargetedBoneTargets AddFullBodyRetargetedBoneTargetComponent(GameObject mainParent,
-            RetargetedBoneTarget[] boneTargetsArray)
-        {
-            FullBodyRetargetedBoneTargets retargetedBoneTargets =
-                mainParent.AddComponent<FullBodyRetargetedBoneTargets>();
-
-            retargetedBoneTargets.AutoAdd = mainParent.GetComponent<RetargetingLayer>();
-            retargetedBoneTargets.RetargetedBoneTargets = boneTargetsArray;
-
-            return retargetedBoneTargets;
+            var externalBoneTargets = new ExternalBoneTargets();
+            externalBoneTargets.FullBody = isFullBody;
+            externalBoneTargets.Enabled = true;
+            externalBoneTargets.BoneTargetsArray = boneTargetsArray;
+            retargetingLayer.ExternalBoneTargetsInst = externalBoneTargets;
         }
 
         private static void AddAnimationRiggingLayer(GameObject mainParent,

@@ -77,11 +77,17 @@ namespace Oculus.Movement.AnimationRigging
             set => _enabled = value;
         }
 
+        private bool _initialized = false;
+
         /// <summary>
         /// Correlate HumanBodyBones to OVRSkeleton.BoneId.
         /// </summary>
-        public void Initialize()
+        private void Initialize()
         {
+            if (_initialized)
+            {
+                return;
+            }
             var humanBodyBoneToOVRBoneId = _fullBody ?
                 OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone.ToDictionary(
                     x => x.Value, x => x.Key) :
@@ -91,6 +97,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 retargetedBoneTarget.BoneId = humanBodyBoneToOVRBoneId[retargetedBoneTarget.HumanBodyBone];
             }
+            _initialized = true;
         }
 
         /// <summary>
@@ -103,7 +110,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-
+            Initialize();
             IList<OVRBone> bones = skeleton.Bones;
             for (var i = 0; i < bones.Count; i++)
             {

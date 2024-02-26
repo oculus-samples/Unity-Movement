@@ -157,6 +157,18 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// External bone targets to be updated based on body tracking.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.ExternalBoneTargets)]
+        protected ExternalBoneTargets _externalBoneTargets;
+        public ExternalBoneTargets ExternalBoneTargetsInst
+        {
+            get => _externalBoneTargets;
+            set => _externalBoneTargets = value;
+        }
+
+        /// <summary>
         /// Pre-compute these values each time the editor changes for the purposes
         /// of efficiency.
         /// </summary>
@@ -314,6 +326,8 @@ namespace Oculus.Movement.AnimationRigging
             UpdateSkeleton();
             _skeletonPostProcessing?.Invoke(this);
             RecomputeSkeletalOffsetsIfNecessary();
+
+            _externalBoneTargets.ProcessSkeleton(this);
 
             if (_enableTrackingByProxy)
             {
