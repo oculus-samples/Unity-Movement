@@ -248,7 +248,6 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
             CopyPoseConstraint copyPoseConstraint = copyPoseConstraintObj.AddComponent<CopyPoseConstraint>();
             copyPoseConstraint.data.CopyPoseToOriginal = shouldCopyPoseToOriginal;
             copyPoseConstraint.data.RetargetingLayerComp = _retargetingLayer;
-            copyPoseConstraint.data.ConstraintAnimator = _animator;
             if (shouldCopyPoseToOriginal)
             {
                 copyPoseConstraintObj.transform.SetParent(retargetConstraint.transform);
