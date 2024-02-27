@@ -1,12 +1,13 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Movement.AnimationRigging;
-using System;
-using UnityEngine.Animations.Rigging;
-using UnityEngine;
-using Oculus.Movement.Tracking;
-using System.Reflection;
 using Oculus.Interaction.Input;
+using Oculus.Movement.AnimationRigging;
+using Oculus.Movement.AnimationRigging.Deprecated;
+using Oculus.Movement.Tracking;
+using UnityEngine;
+using UnityEngine.Animations.Rigging;
+using System;
+using System.Reflection;
 using System.Collections.Generic;
 using static OVRUnityHumanoidSkeletonRetargeter;
 using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
