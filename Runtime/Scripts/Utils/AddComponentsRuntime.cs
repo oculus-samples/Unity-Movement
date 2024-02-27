@@ -181,9 +181,8 @@ namespace Oculus.Movement.Utils
             }
 
             // Add final components to tie everything together.
-            AddAnimationRiggingLayer(mainParent, retargetingLayer, rigBuilder,
-                constraintMonos.ToArray(), retargetingLayer);
             AddJointAdjustments(animatorComp, retargetingLayer, restPoseObjectHumanoid);
+            AddAnimationRiggingLayer(rigBuilder, constraintMonos.ToArray(), retargetingLayer);
 
             // Add retargeting processors to the retargeting layer.
             AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
@@ -544,33 +543,19 @@ namespace Oculus.Movement.Utils
             retargetingLayer.ExternalBoneTargetsInst = externalBoneTargets;
         }
 
-        private static void AddAnimationRiggingLayer(GameObject mainParent,
-            OVRSkeleton skeletalComponent, RigBuilder rigBuilder,
+        private static void AddAnimationRiggingLayer(RigBuilder rigBuilder,
             MonoBehaviour[] constraintComponents,
             RetargetingLayer retargetingLayer)
         {
-            AnimationRigSetup rigSetup = mainParent.GetComponent<AnimationRigSetup>();
-            if (rigSetup)
+            var retargetingAnimationRig = new RetargetingAnimationRig
             {
-                return;
-            }
-            var animatorComponent = mainParent.GetComponent<Animator>();
-            rigSetup = mainParent.AddComponent<AnimationRigSetup>();
-            rigSetup.Skeleton = skeletalComponent;
-            rigSetup.AnimatorComp = animatorComponent;
-            rigSetup.RigbuilderComp = rigBuilder;
-            if (constraintComponents != null)
-            {
-                foreach (var constraintComponent in constraintComponents)
-                {
-                    rigSetup.AddSkeletalConstraint(constraintComponent);
-                }
-            }
-
-            rigSetup.RebindAnimator = true;
-            rigSetup.ReEnableRig = true;
-            rigSetup.RetargetingLayerComp = retargetingLayer;
-            rigSetup.CheckSkeletalUpdatesByProxy = true;
+                RigBuilderComp = rigBuilder
+            };
+            retargetingAnimationRig.RebindAnimator = true;
+            retargetingAnimationRig.ReEnableRig = true;
+            retargetingAnimationRig.RigToggleOnFocus = false;
+            retargetingLayer.RetargetingAnimationRigInst = retargetingAnimationRig;
+            retargetingAnimationRig.OVRSkeletonConstraintComps = constraintComponents;
         }
 
         private static void AddJointAdjustments(Animator animator, RetargetingLayer retargetingLayer,

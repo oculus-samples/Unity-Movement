@@ -1736,30 +1736,6 @@ MonoBehaviour:
     EndRotOffset: {x: 0, y: 0, z: 0, w: 1}
     Distance: 0.020225074
   _calculateFingerData: 0
---- !u!114 &7065894658369251356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6442339640571472327}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 642f072a06af00f42b49882dbbda8521, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _skeleton: {fileID: 7866900989153904485}
-  _animator: {fileID: 4325497552437736820}
-  _rigBuilder: {fileID: 7335297518904446665}
-  _ovrSkeletonConstraints:
-  - {fileID: 520281171948095653}
-  - {fileID: 3289871368579812835}
-  - {fileID: 4457886994102197209}
-  _rebindAnimator: 1
-  _reEnableRig: 1
-  _rigToggleOnFocus: 0
-  _retargetingLayer: {fileID: 7866900989153904485}
-  _checkSkeletalUpdatesByProxy: 1
 --- !u!114 &7335297518904446665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1882,6 +1858,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
   - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
   - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}
+  _retargetingAnimationRig:
+    _rebindAnimator: 1
+    _reEnableRig: 1
+    _rigToggleOnFocus: 0
+    _rigBuilder: {fileID: 7335297518904446665}
+    _ovrSkeletonConstraints:
+    - {fileID: 3289871368579812835}
+    - {fileID: 4457886994102197209}
   _externalBoneTargets:
     _boneTargets:
     - HumanBodyBone: 0

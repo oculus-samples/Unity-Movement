@@ -7,10 +7,10 @@ using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
 {
-    [System.Serializable]
     /// <summary>
     /// Update target transforms with bone data.
     /// </summary>
+    [System.Serializable]
     public class ExternalBoneTargets
     {
         /// <summary>

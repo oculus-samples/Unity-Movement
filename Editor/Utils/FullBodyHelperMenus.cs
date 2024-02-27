@@ -67,6 +67,8 @@ namespace Oculus.Movement.Utils
             DestroyTwoBoneIKConstraint(rigObject, "LeftArmIK");
             DestroyTwoBoneIKConstraint(rigObject, "RightArmIK");
             HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraintsFullBody>(activeGameObject);
+            HelperMenusCommon.DestroyLegacyComponents<FullBodyRetargetedBoneTargets>(activeGameObject);
+            HelperMenusCommon.DestroyLegacyComponents<AnimationRigSetup>(activeGameObject);
 
             // Full body deformation.
             BoneTarget[] boneTargets = AddBoneTargets(rigObject, animatorComp);
@@ -75,7 +77,6 @@ namespace Oculus.Movement.Utils
             constraintMonos.Add(deformationConstraint);
 
             // Setup retargeted bone targets.
-            HelperMenusCommon.DestroyLegacyComponents<FullBodyRetargetedBoneTargets>(activeGameObject);
             HelperMenusCommon.SetupExternalBoneTargets(retargetingLayer, true, boneTargets);
 
             // Disable root motion.
@@ -83,10 +84,10 @@ namespace Oculus.Movement.Utils
             Debug.Log($"Disabling root motion on the {animatorComp.gameObject.name} animator.");
             EditorUtility.SetDirty(animatorComp);
 
-            // Add final components to tie everything together.
-            AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
-                constraintMonos.ToArray(), retargetingLayer);
+            // Add retargeting animation rig to tie everything together.
             HelperMenusCommon.AddJointAdjustments(animatorComp, retargetingLayer);
+            HelperMenusCommon.AddRetargetingAnimationRig(
+                retargetingLayer, rigBuilder, constraintMonos.ToArray());
             EditorUtility.SetDirty(retargetingLayer);
 
             // Add retargeting processors to the retargeting layer.

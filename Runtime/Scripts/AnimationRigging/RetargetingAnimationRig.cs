@@ -10,6 +10,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Handles the animation rig on the retargeting layer.
     /// </summary>
+    [System.Serializable]
     public class RetargetingAnimationRig
     {
         /// <summary>
@@ -70,6 +71,12 @@ namespace Oculus.Movement.AnimationRigging
         [Interface(typeof(IOVRSkeletonConstraint)), SerializeField]
         [Tooltip(AnimationRigSetupTooltips.OVRSkeletonConstraints)]
         protected MonoBehaviour[] _ovrSkeletonConstraints;
+        /// <inheritdoc cref="_ovrSkeletonConstraints"/>
+        public MonoBehaviour[] OVRSkeletonConstraintComps
+        {
+            get => _ovrSkeletonConstraints;
+            set => _ovrSkeletonConstraints = value;
+        }
 
         private IOVRSkeletonConstraint[] _skeletonConstraints;
         private bool _ranSetup;
@@ -77,6 +84,48 @@ namespace Oculus.Movement.AnimationRigging
         private int _proxyChangeCount;
         private int _lastSkeletonChangeCount = -1;
         private int _lastRetargetedTransformCount = -1;
+
+        /// <summary>
+        /// Adds skeletal constraint.
+        /// </summary>
+        /// <param name="newConstraint">New constraint to add.</param>
+        /// <param name="retargetingLayer">The retargeting layer.</param>
+        public virtual void AddSkeletalConstraint(RetargetingLayer retargetingLayer, MonoBehaviour newConstraint)
+        {
+            if (_skeletonConstraints == null)
+            {
+                _ovrSkeletonConstraints = new MonoBehaviour[1];
+                _ovrSkeletonConstraints[0] = newConstraint;
+            }
+            else
+            {
+                var oldConstraints = _ovrSkeletonConstraints;
+                _ovrSkeletonConstraints =
+                    new MonoBehaviour[oldConstraints.Length + 1];
+                for (int i = 0; i < oldConstraints.Length; i++)
+                {
+                    _ovrSkeletonConstraints[i] = oldConstraints[i];
+                }
+
+                _ovrSkeletonConstraints[oldConstraints.Length] =
+                    newConstraint;
+            }
+
+            // Update the interface references at runtime.
+            if (Application.isPlaying)
+            {
+                UpdateSkeletalConstraintInterfaceReferences(retargetingLayer);
+            }
+        }
+
+        /// <summary>
+        /// Validate the animation rig by checking the animation rigging skeleton constraints.
+        /// </summary>
+        /// <param name="retargetingLayer">The retargeting layer.</param>
+        public virtual void ValidateRig(RetargetingLayer retargetingLayer)
+        {
+            UpdateSkeletalConstraintInterfaceReferences(retargetingLayer);
+        }
 
         /// <summary>
         /// Initialize the animation rig if the skeleton is initialized, and check to re-enable the rig
@@ -108,12 +157,6 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="hasFocus">True if the application is currently focused.</param>
         public virtual void OnApplicationFocus(RetargetingLayer retargetingLayer, bool hasFocus)
         {
-            // Don't toggle the rig in editor.
-            if (Application.isEditor)
-            {
-                return;
-            }
-
             // Bail if we don't want the rig to toggle during focus events.
             if (!_rigToggleOnFocus)
             {
@@ -146,12 +189,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="retargetingLayer">The retargeting layer.</param>
         protected virtual void SetupRig(RetargetingLayer retargetingLayer)
         {
-            if (_ranSetup)
-            {
-                return;
-            }
-
-            if (!retargetingLayer.IsInitialized)
+            if (_ranSetup || !retargetingLayer.IsInitialized)
             {
                 return;
             }
@@ -200,44 +238,14 @@ namespace Oculus.Movement.AnimationRigging
 
                 if (copyPoseOriginalConstraint != null)
                 {
-                    AddSkeletalConstraint(copyPoseOriginalConstraint, retargetingLayer);
+                    AddSkeletalConstraint(retargetingLayer, copyPoseOriginalConstraint);
                 }
 
                 if (copyPoseFinalConstraint != null)
                 {
-                    AddSkeletalConstraint(copyPoseFinalConstraint, retargetingLayer);
+                    AddSkeletalConstraint(retargetingLayer, copyPoseFinalConstraint);
                 }
             }
-        }
-
-        /// <summary>
-        /// Adds skeletal constraint.
-        /// </summary>
-        /// <param name="newConstraint">New constraint to add.</param>
-        /// <param name="retargetingLayer">The retargeting layer.</param>
-        protected virtual void AddSkeletalConstraint(MonoBehaviour newConstraint, RetargetingLayer retargetingLayer)
-        {
-            if (_skeletonConstraints == null)
-            {
-                _ovrSkeletonConstraints = new MonoBehaviour[1];
-                _ovrSkeletonConstraints[0] = newConstraint;
-            }
-            else
-            {
-                var oldConstraints = _ovrSkeletonConstraints;
-                _ovrSkeletonConstraints =
-                    new MonoBehaviour[oldConstraints.Length + 1];
-                for (int i = 0; i < oldConstraints.Length; i++)
-                {
-                    _ovrSkeletonConstraints[i] = oldConstraints[i];
-                }
-
-                _ovrSkeletonConstraints[oldConstraints.Length] =
-                    newConstraint;
-            }
-
-            // Update the interface references in case this was called after awake, but before Update
-            UpdateSkeletalConstraintInterfaceReferences(retargetingLayer);
         }
 
         /// <summary>

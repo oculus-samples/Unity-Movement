@@ -79,6 +79,8 @@ namespace Oculus.Movement.Utils
             DestroyTwoBoneIKConstraint(rigObject, "LeftArmIK");
             DestroyTwoBoneIKConstraint(rigObject, "RightArmIK");
             HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraints>(activeGameObject);
+            HelperMenusCommon.DestroyLegacyComponents<RetargetedBoneTargets>(activeGameObject);
+            HelperMenusCommon.DestroyLegacyComponents<AnimationRigSetup>(activeGameObject);
 
             // Body deformation.
             BoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
@@ -86,7 +88,7 @@ namespace Oculus.Movement.Utils
                 AddDeformationConstraint(rigObject, animatorComp, spineBoneTargets);
             constraintMonos.Add(deformationConstraint);
 
-            HelperMenusCommon.DestroyLegacyComponents<RetargetedBoneTargets>(activeGameObject);
+            // Setup retargeted bone targets.
             HelperMenusCommon.SetupExternalBoneTargets(retargetingLayer, false, spineBoneTargets);
 
             // Disable root motion.
@@ -94,9 +96,9 @@ namespace Oculus.Movement.Utils
             Debug.Log($"Disabling root motion on the {animatorComp.gameObject.name} animator.");
             EditorUtility.SetDirty(animatorComp);
 
-            // Add final components to tie everything together.
-            AddAnimationRiggingLayer(activeGameObject, retargetingLayer, rigBuilder,
-                constraintMonos.ToArray(), retargetingLayer);
+            // Add retargeting animation rig to tie everything together.
+            HelperMenusCommon.AddRetargetingAnimationRig(
+                retargetingLayer, rigBuilder, constraintMonos.ToArray());
 
             // Add retargeting processors to the retargeting layer.
             HelperMenusCommon.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
@@ -281,35 +283,6 @@ namespace Oculus.Movement.Utils
             // Keep retargeter disabled until it initializes properly.
             retargetConstraint.gameObject.SetActive(false);
             return retargetConstraint;
-        }
-
-        private static void AddAnimationRiggingLayer(GameObject mainParent,
-            OVRSkeleton skeletalComponent, RigBuilder rigBuilder,
-            MonoBehaviour[] constraintComponents,
-            RetargetingLayer retargetingLayer)
-        {
-            AnimationRigSetup rigSetup = mainParent.GetComponent<AnimationRigSetup>();
-            if (rigSetup)
-            {
-                return;
-            }
-            var animatorComponent = mainParent.GetComponent<Animator>();
-            rigSetup = mainParent.AddComponent<AnimationRigSetup>();
-            rigSetup.Skeleton = skeletalComponent;
-            rigSetup.AnimatorComp = animatorComponent;
-            rigSetup.RigbuilderComp = rigBuilder;
-            if (constraintComponents != null)
-            {
-                foreach (var constraintComponent in constraintComponents)
-                {
-                    rigSetup.AddSkeletalConstraint(constraintComponent);
-                }
-            }
-            rigSetup.RebindAnimator = true;
-            rigSetup.ReEnableRig = true;
-            rigSetup.RetargetingLayerComp = retargetingLayer;
-            rigSetup.CheckSkeletalUpdatesByProxy = true;
-            Undo.RegisterCreatedObjectUndo(rigSetup, "Create Anim Rig Setup");
         }
 
         private static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer)

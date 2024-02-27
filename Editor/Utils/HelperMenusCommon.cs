@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
@@ -193,69 +194,6 @@ namespace Oculus.Movement.Utils
             return result.ToArray();
         }
 
-        public static void AddBlendHandRetargetingProcessor(RetargetingLayer retargetingLayer, Handedness handedness)
-        {
-            bool needCorrectHand = true;
-            foreach (var processor in retargetingLayer.RetargetingProcessors)
-            {
-                var correctHand = processor as RetargetingBlendHandProcessor;
-                if (correctHand != null)
-                {
-                    if (correctHand.GetHandedness() == handedness)
-                    {
-                        needCorrectHand = false;
-                    }
-                }
-            }
-
-            if (!needCorrectHand)
-            {
-                return;
-            }
-
-            bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
-            var blendHand = ScriptableObject.CreateInstance<RetargetingBlendHandProcessor>();
-            var handednessString = handedness == Handedness.Left ? "Left" : "Right";
-            Undo.RegisterCreatedObjectUndo(blendHand, $"Create ({handednessString}) blend hand.");
-            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
-            blendHand.BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-            blendHand.IsFullBody = isFullBody;
-            if (isFullBody)
-            {
-                blendHand.FullBodyBoneIdToTest = handedness == Handedness.Left ?
-                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist :
-                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
-            }
-            else
-            {
-                blendHand.BoneIdToTest = handedness == Handedness.Left ?
-                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist :
-                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
-            }
-            blendHand.name = $"Blend{handednessString}Hand";
-            // Add processor at beginning so that it runs before other processors.
-            if (retargetingLayer.RetargetingProcessors.Count > 0)
-            {
-                retargetingLayer.RetargetingProcessors.Insert(0, blendHand);
-            }
-            else
-            {
-                retargetingLayer.AddRetargetingProcessor(blendHand);
-            }
-        }
-
-        public static bool DestroyLegacyComponents<T>(GameObject gameObject)
-        {
-            var componentsFound = gameObject.GetComponents<T>();
-
-            foreach (var componentFound in componentsFound)
-            {
-                Undo.DestroyObjectImmediate(componentFound as Object);
-            }
-
-            return componentsFound.Length > 0;
-        }
-
         private static JointAdjustment[] GetFootAdjustments(Animator animator,
             RestPoseObjectHumanoid restPoseObject, Vector3 desiredFootDirection)
         {
@@ -317,14 +255,116 @@ namespace Oculus.Movement.Utils
             return footAdjustments.ToArray();
         }
 
+        /// <summary>
+        /// Add the blend hand retargeting processor.
+        /// </summary>
+        /// <param name="retargetingLayer">The retargeting layer to add to.</param>
+        /// <param name="handedness">The handedness of the processor.</param>
+        public static void AddBlendHandRetargetingProcessor(RetargetingLayer retargetingLayer, Handedness handedness)
+        {
+            bool needCorrectHand = true;
+            foreach (var processor in retargetingLayer.RetargetingProcessors)
+            {
+                var correctHand = processor as RetargetingBlendHandProcessor;
+                if (correctHand != null)
+                {
+                    if (correctHand.GetHandedness() == handedness)
+                    {
+                        needCorrectHand = false;
+                    }
+                }
+            }
+
+            if (!needCorrectHand)
+            {
+                return;
+            }
+
+            bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
+            var blendHand = ScriptableObject.CreateInstance<RetargetingBlendHandProcessor>();
+            var handednessString = handedness == Handedness.Left ? "Left" : "Right";
+            Undo.RegisterCreatedObjectUndo(blendHand, $"Create ({handednessString}) blend hand.");
+            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+            blendHand.BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            blendHand.IsFullBody = isFullBody;
+            if (isFullBody)
+            {
+                blendHand.FullBodyBoneIdToTest = handedness == Handedness.Left ?
+                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist :
+                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
+            }
+            else
+            {
+                blendHand.BoneIdToTest = handedness == Handedness.Left ?
+                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist :
+                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
+            }
+            blendHand.name = $"Blend{handednessString}Hand";
+            // Add processor at beginning so that it runs before other processors.
+            if (retargetingLayer.RetargetingProcessors.Count > 0)
+            {
+                retargetingLayer.RetargetingProcessors.Insert(0, blendHand);
+            }
+            else
+            {
+                retargetingLayer.AddRetargetingProcessor(blendHand);
+            }
+        }
+
+        /// <summary>
+        /// Setup external bone targets.
+        /// </summary>
+        /// <param name="retargetingLayer">The retargeting layer to add to.</param>
+        /// <param name="isFullBody">True if full body.</param>
+        /// <param name="boneTargets">The array of bone targets to setup.</param>
         public static void SetupExternalBoneTargets(RetargetingLayer retargetingLayer, bool isFullBody,
             BoneTarget[] boneTargets)
         {
-            var externalBoneTargets = new ExternalBoneTargets();
-            externalBoneTargets.FullBody = isFullBody;
-            externalBoneTargets.Enabled = true;
-            externalBoneTargets.BoneTargetsArray = boneTargets;
+            var externalBoneTargets = new ExternalBoneTargets
+            {
+                Enabled = true,
+                FullBody = isFullBody,
+                BoneTargetsArray = boneTargets
+            };
             retargetingLayer.ExternalBoneTargetsInst = externalBoneTargets;
+        }
+
+        /// <summary>
+        /// Add the retargeting animation rig.
+        /// </summary>
+        /// <param name="retargetingLayer">The retargeting layer.</param>
+        /// <param name="rigBuilder">The rig builder.</param>
+        /// <param name="constraintComponents">The constraint components.</param>
+        public static void AddRetargetingAnimationRig(
+            RetargetingLayer retargetingLayer, RigBuilder rigBuilder, MonoBehaviour[] constraintComponents)
+        {
+            var retargetingAnimationRig = new RetargetingAnimationRig
+            {
+                RigBuilderComp = rigBuilder
+            };
+            retargetingAnimationRig.RebindAnimator = true;
+            retargetingAnimationRig.ReEnableRig = true;
+            retargetingAnimationRig.RigToggleOnFocus = false;
+            retargetingLayer.RetargetingAnimationRigInst = retargetingAnimationRig;
+            retargetingAnimationRig.OVRSkeletonConstraintComps = constraintComponents;
+        }
+
+        /// <summary>
+        /// Destroy legacy components.
+        /// </summary>
+        /// <param name="gameObject">The object to check for the legacy components.</param>
+        /// <typeparam name="T">The legacy component type.</typeparam>
+        /// <returns>True if legacy components were destroyed.</returns>
+        public static bool DestroyLegacyComponents<T>(GameObject gameObject)
+        {
+            var componentsFound = gameObject.GetComponents<T>();
+
+            foreach (var componentFound in componentsFound)
+            {
+                Undo.DestroyObjectImmediate(componentFound as Object);
+            }
+
+            return componentsFound.Length > 0;
         }
     }
 }
