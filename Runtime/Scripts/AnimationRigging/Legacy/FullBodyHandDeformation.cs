@@ -6,7 +6,7 @@ using Oculus.Interaction;
 using UnityEngine;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
-namespace Oculus.Movement.AnimationRigging
+namespace Oculus.Movement.AnimationRigging.Deprecated
 {
     /// <summary>
     /// Used to try to maintain the same proportions in the fingers for both hands. Copied from HandDeformation,
