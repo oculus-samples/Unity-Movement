@@ -69,6 +69,7 @@ namespace Oculus.Movement.Utils
             HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraintsFullBody>(activeGameObject);
             HelperMenusCommon.DestroyLegacyComponents<FullBodyRetargetedBoneTargets>(activeGameObject);
             HelperMenusCommon.DestroyLegacyComponents<AnimationRigSetup>(activeGameObject);
+            HelperMenusCommon.DestroyLegacyComponents<FullBodyHandDeformation>(activeGameObject);
 
             // Full body deformation.
             BoneTarget[] boneTargets = AddBoneTargets(rigObject, animatorComp);
@@ -96,9 +97,7 @@ namespace Oculus.Movement.Utils
             AddCorrectBonesRetargetingProcessor(retargetingLayer);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
-
-            // Add full body hand deformation.
-            AddFullBodyHandDeformation(activeGameObject, animatorComp, retargetingLayer);
+            HelperMenusCommon.AddHandDeformationRetargetingProcessor(retargetingLayer);
 
             Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
         }
@@ -343,36 +342,6 @@ namespace Oculus.Movement.Utils
             return retargetConstraint;
         }
 
-        private static void AddAnimationRiggingLayer(GameObject mainParent,
-            OVRSkeleton skeletalComponent, RigBuilder rigBuilder,
-            MonoBehaviour[] constraintComponents,
-            RetargetingLayer retargetingLayer)
-        {
-            AnimationRigSetup rigSetup = mainParent.GetComponent<AnimationRigSetup>();
-            if (rigSetup)
-            {
-                return;
-            }
-            rigSetup = mainParent.AddComponent<AnimationRigSetup>();
-            rigSetup.Skeleton = skeletalComponent;
-            var animatorComponent = mainParent.GetComponent<Animator>();
-            rigSetup.AnimatorComp = animatorComponent;
-            rigSetup.RigbuilderComp = rigBuilder;
-            if (constraintComponents != null)
-            {
-                foreach (var constraintComponent in constraintComponents)
-                {
-                    rigSetup.AddSkeletalConstraint(constraintComponent);
-                }
-            }
-            rigSetup.RebindAnimator = true;
-            rigSetup.ReEnableRig = true;
-            rigSetup.RetargetingLayerComp = retargetingLayer;
-            rigSetup.CheckSkeletalUpdatesByProxy = true;
-
-            Undo.RegisterCreatedObjectUndo(rigSetup, "Create Anim Rig Setup");
-        }
-
         private static FullBodyDeformationConstraint AddDeformationConstraint(
             GameObject rigObject, Animator animator, BoneTarget[] boneTargets)
         {
@@ -488,7 +457,6 @@ namespace Oculus.Movement.Utils
             return boneTarget;
         }
 
-
         private static bool DestroyBoneTarget(GameObject mainParent, string nameOfTarget)
         {
             Transform handTarget =
@@ -510,25 +478,6 @@ namespace Oculus.Movement.Utils
                 return true;
             }
             return false;
-        }
-
-        private static void AddFullBodyHandDeformation(GameObject mainParent,
-            Animator animatorComp, OVRSkeleton skeletalComponent)
-        {
-            FullBodyHandDeformation fullBodyHandDeformation =
-                mainParent.GetComponent<FullBodyHandDeformation>();
-            if (fullBodyHandDeformation == null)
-            {
-                fullBodyHandDeformation = mainParent.AddComponent<FullBodyHandDeformation>();
-                Undo.RegisterCreatedObjectUndo(fullBodyHandDeformation, "Add full body hand deformation");
-            }
-
-            fullBodyHandDeformation.AnimatorComp = animatorComp;
-            fullBodyHandDeformation.Skeleton = skeletalComponent;
-            fullBodyHandDeformation.LeftHand = animatorComp.GetBoneTransform(HumanBodyBones.LeftHand);
-            fullBodyHandDeformation.RightHand = animatorComp.GetBoneTransform(HumanBodyBones.RightHand);
-            fullBodyHandDeformation.FingerOffsets = new FullBodyHandDeformation.FingerOffset[0];
-            fullBodyHandDeformation.CalculateFingerData();
         }
 
         private static void ValidGameObjectForAnimationRigging(GameObject go)

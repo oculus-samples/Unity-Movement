@@ -265,10 +265,10 @@ namespace Oculus.Movement.Utils
             bool needCorrectHand = true;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
             {
-                var correctHand = processor as RetargetingBlendHandProcessor;
-                if (correctHand != null)
+                var blendHandProcessor = processor as RetargetingBlendHandProcessor;
+                if (blendHandProcessor != null)
                 {
-                    if (correctHand.GetHandedness() == handedness)
+                    if (blendHandProcessor.GetHandedness() == handedness)
                     {
                         needCorrectHand = false;
                     }
@@ -309,6 +309,36 @@ namespace Oculus.Movement.Utils
             {
                 retargetingLayer.AddRetargetingProcessor(blendHand);
             }
+        }
+
+        /// <summary>
+        /// Add the hand deformation retargeting processor.
+        /// </summary>
+        /// <param name="retargetingLayer"></param>
+        public static void AddHandDeformationRetargetingProcessor(RetargetingLayer retargetingLayer)
+        {
+            bool needHandDeformation = true;
+            foreach (var processor in retargetingLayer.RetargetingProcessors)
+            {
+                var handDeformationProcessor = processor as RetargetingHandDeformationProcessor;
+                if (handDeformationProcessor != null)
+                {
+                    needHandDeformation = false;
+                    break;
+                }
+            }
+
+            if (!needHandDeformation)
+            {
+                return;
+            }
+
+            var handDeformation = ScriptableObject.CreateInstance<RetargetingHandDeformationProcessor>();
+            Undo.RegisterCreatedObjectUndo(handDeformation, "Create hand deformation.");
+            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+            handDeformation.name = "HandDeformation";
+            handDeformation.CalculateFingerData(retargetingLayer.GetComponent<Animator>());
+            retargetingLayer.AddRetargetingProcessor(handDeformation);
         }
 
         /// <summary>

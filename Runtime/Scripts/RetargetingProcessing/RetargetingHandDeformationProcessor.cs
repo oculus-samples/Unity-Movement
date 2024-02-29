@@ -198,14 +198,14 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)
         {
+            var animator = retargetingLayer.GetAnimatorTargetSkeleton();
             if (_fingerBonePairs.Count == 0)
             {
-                var animator = retargetingLayer.GetAnimatorTargetSkeleton();
                 CalculateFingerData(animator);
-                foreach (var bonePair in _fingerBonePairs)
-                {
-                    bonePair.CacheBonePairTransforms(animator);
-                }
+            }
+            foreach (var bonePair in _fingerBonePairs)
+            {
+                bonePair.CacheBonePairTransforms(animator);
             }
         }
 

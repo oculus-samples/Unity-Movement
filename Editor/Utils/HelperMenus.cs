@@ -81,6 +81,7 @@ namespace Oculus.Movement.Utils
             HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraints>(activeGameObject);
             HelperMenusCommon.DestroyLegacyComponents<RetargetedBoneTargets>(activeGameObject);
             HelperMenusCommon.DestroyLegacyComponents<AnimationRigSetup>(activeGameObject);
+            HelperMenusCommon.DestroyLegacyComponents<FullBodyHandDeformation>(activeGameObject);
 
             // Body deformation.
             BoneTarget[] spineBoneTargets = AddSpineBoneTargets(rigObject, animatorComp);
@@ -106,6 +107,7 @@ namespace Oculus.Movement.Utils
             AddCorrectBonesRetargetingProcessor(retargetingLayer);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
+            HelperMenusCommon.AddHandDeformationRetargetingProcessor(retargetingLayer);
 
             Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
         }

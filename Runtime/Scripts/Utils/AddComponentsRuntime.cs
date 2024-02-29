@@ -190,16 +190,12 @@ namespace Oculus.Movement.Utils
             AddCorrectBonesRetargetingProcessor(retargetingLayer);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
+            AddHandDeformationRetargetingProcessor(retargetingLayer);
 
             if (isFullBody)
             {
                 animatorComp.gameObject.SetActive(true);
-                var leftHand = animatorComp.GetBoneTransform(HumanBodyBones.LeftHand);
-                var rightHand = animatorComp.GetBoneTransform(HumanBodyBones.RightHand);
                 animatorComp.gameObject.SetActive(false);
-                AddFullBodyHandDeformation(selectedGameObject,
-                    animatorComp, retargetingLayer, leftHand,
-                    rightHand);
             }
 
             rigBuilder.enabled = true;
@@ -721,22 +717,12 @@ namespace Oculus.Movement.Utils
             }
         }
 
-        private static void AddFullBodyHandDeformation(GameObject mainParent,
-            Animator animatorComp, OVRSkeleton skeletalComponent, Transform leftHand,
-            Transform rightHand)
+        private static void AddHandDeformationRetargetingProcessor(RetargetingLayer retargetingLayer)
         {
-            FullBodyHandDeformation fullBodyHandDeformation =
-                mainParent.AddComponent<FullBodyHandDeformation>();
-
-            fullBodyHandDeformation.AnimatorComp = animatorComp;
-            fullBodyHandDeformation.Skeleton = skeletalComponent;
-            fullBodyHandDeformation.LeftHand = leftHand;
-            fullBodyHandDeformation.RightHand = rightHand;
-            fullBodyHandDeformation.FingerOffsets = new FullBodyHandDeformation.FingerOffset[0];
-            // enable animator to be able to calculate finger data
-            animatorComp.gameObject.SetActive(true);
-            fullBodyHandDeformation.CalculateFingerData();
-            animatorComp.gameObject.SetActive(false);
+            var handDeformation = ScriptableObject.CreateInstance<RetargetingHandDeformationProcessor>();
+            handDeformation.name = "HandDeformation";
+            handDeformation.CalculateFingerData(retargetingLayer.GetComponent<Animator>());
+            retargetingLayer.AddRetargetingProcessor(handDeformation);
         }
 
         private static void ValidateGameObjectForAnimationRigging(GameObject go)
