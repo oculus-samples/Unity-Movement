@@ -247,11 +247,15 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="animator">The animator.</param>
         /// <param name="alignmentRightDirection">The alignment right direction.</param>
+        /// <param name="alignmentForwardDirection">The alignment forward direction.</param>
         /// <returns>Rotation to align the hips right with the alignment right direction.</returns>
-        public static Quaternion GetHipsRightAlignmentForAdjustments(Animator animator, Vector3 alignmentRightDirection)
+        public static Quaternion GetHipsRightForwardAlignmentForAdjustments(Animator animator,
+            Vector3 alignmentRightDirection,
+            Vector3 alignmentForwardDirection)
         {
             var hips = animator.GetBoneTransform(HumanBodyBones.Hips);
-            return Quaternion.FromToRotation(hips.right, alignmentRightDirection);
+            return Quaternion.FromToRotation(hips.right, alignmentRightDirection) *
+                   Quaternion.FromToRotation(hips.forward, alignmentForwardDirection);
         }
 
         /// <summary>

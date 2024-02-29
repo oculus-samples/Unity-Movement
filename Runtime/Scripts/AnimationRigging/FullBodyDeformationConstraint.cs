@@ -1165,9 +1165,10 @@ namespace Oculus.Movement.AnimationRigging
             boneAdjustments.AddRange(spineBoneAdjustments);
             boneAdjustments.AddRange(shoulderBoneAdjustments);
 
-            // Calculate an adjustment alignment if needed, using the right vector of the rest pose humanoid
-            // which is Vector3.right.
-            var adjustmentAlignment = GetHipsRightAlignmentForAdjustments(_animator, Vector3.right);
+            // Calculate an adjustment alignment if needed, using the desired right and forward from the
+            // rest pose humanoid, which is Vector3.right and Vector3.forward.
+            var adjustmentAlignment =
+                GetHipsRightForwardAlignmentForAdjustments(_animator, Vector3.right, Vector3.forward);
             for (int i = 0; i < boneAdjustments.Count; i++)
             {
                 var adjustment = boneAdjustments[i];

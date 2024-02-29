@@ -158,7 +158,7 @@ namespace Oculus.Movement.Utils
             // Assume that we want the feet to be pointing world space forward.
             var footAdjustments = GetFootAdjustments(animator, restPoseObject, Vector3.forward);
             var adjustmentAlignment =
-                DeformationCommon.GetHipsRightAlignmentForAdjustments(animator, Vector3.right);
+                DeformationCommon.GetHipsRightForwardAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
             List<JointAdjustment> result = new List<JointAdjustment>
             {
                 new JointAdjustment()
@@ -211,7 +211,7 @@ namespace Oculus.Movement.Utils
             var legDotProduct = Vector3.Dot(leftLeg.forward, rightLeg.forward);
             bool shouldMirrorLegs = legDotProduct < 0.0f;
             var adjustmentAlignment =
-                DeformationCommon.GetHipsRightAlignmentForAdjustments(animator, Vector3.right);
+                DeformationCommon.GetHipsRightForwardAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
 
             if (animator.GetBoneTransform(HumanBodyBones.LeftToes) == null)
             {
