@@ -378,12 +378,12 @@ namespace Oculus.Movement.AnimationRigging
 
         private Vector3 _targetHipsPos;
         private Vector3 _targetHeadPos;
-        private Vector3 _preDeformationLeftUpperArmPos;
-        private Vector3 _preDeformationRightUpperArmPos;
-        private Vector3 _preDeformationLeftLowerArmPos;
-        private Vector3 _preDeformationRightLowerArmPos;
-        private Vector3 _preDeformationLeftHandPos;
-        private Vector3 _preDeformationRightHandPos;
+        private Vector3 _preDeformationLeftUpperArmLocalPos;
+        private Vector3 _preDeformationRightUpperArmLocalPos;
+        private Vector3 _preDeformationLeftLowerArmLocalPos;
+        private Vector3 _preDeformationRightLowerArmLocalPos;
+        private Vector3 _preDeformationLeftHandLocalPos;
+        private Vector3 _preDeformationRightHandLocalPos;
         private Vector3 _targetLeftFootPos;
         private Vector3 _targetRightFootPos;
 
@@ -418,24 +418,9 @@ namespace Oculus.Movement.AnimationRigging
                     return;
                 }
 
-                _preDeformationLeftUpperArmPos = LeftUpperArmBone.GetPosition(stream);
-                _preDeformationRightUpperArmPos = RightUpperArmBone.GetPosition(stream);
-                _preDeformationLeftLowerArmPos = LeftLowerArmBone.GetPosition(stream);
-                _preDeformationRightLowerArmPos = RightLowerArmBone.GetPosition(stream);
-                _preDeformationLeftHandPos = LeftHandBone.GetPosition(stream);
-                _preDeformationRightHandPos = RightHandBone.GetPosition(stream);
-                _targetLeftFootPos = LeftFootBone.GetPosition(stream);
-                _targetRightFootPos = RightFootBone.GetPosition(stream);
-
-                _targetHipsPos = HipsToHeadBoneTargets[HipsIndex].GetPosition(stream);
-                _targetHeadPos = HipsToHeadBoneTargets[^1].GetPosition(stream);
-
-                if (SpineLowerAlignmentWeight.Get(stream) != 0.0f ||
-                    SpineUpperAlignmentWeight.Get(stream) != 0.0f ||
-                    ChestAlignmentWeight.Get(stream) != 0.0f)
-                {
-                    AlignSpine(stream, weight);
-                }
+                CacheDeformationTargetPositions(stream);
+                CachePreDeformationPositions(stream);
+                AlignSpine(stream, weight);
                 ApplyAdjustments(stream, weight);
                 InterpolateShoulders(stream, weight);
                 UpdateBoneDirections(stream);
@@ -466,6 +451,32 @@ namespace Oculus.Movement.AnimationRigging
                     AnimationRuntimeUtils.PassThrough(stream, EndBones[i]);
                 }
             }
+        }
+
+        /// <summary>
+        /// Cache the deformation target positions.
+        /// </summary>
+        /// <param name="stream">The animation stream.</param>
+        private void CacheDeformationTargetPositions(AnimationStream stream)
+        {
+            _targetHipsPos = HipsToHeadBoneTargets[HipsIndex].GetPosition(stream);
+            _targetHeadPos = HipsToHeadBoneTargets[^1].GetPosition(stream);
+            _targetLeftFootPos = LeftFootBone.GetPosition(stream);
+            _targetRightFootPos = RightFootBone.GetPosition(stream);
+        }
+
+        /// <summary>
+        /// Cache the pre-deformation positions.
+        /// </summary>
+        /// <param name="stream">The animation stream.</param>
+        private void CachePreDeformationPositions(AnimationStream stream)
+        {
+            _preDeformationLeftUpperArmLocalPos = LeftUpperArmBone.GetLocalPosition(stream);
+            _preDeformationRightUpperArmLocalPos = RightUpperArmBone.GetLocalPosition(stream);
+            _preDeformationLeftLowerArmLocalPos = LeftLowerArmBone.GetLocalPosition(stream);
+            _preDeformationRightLowerArmLocalPos = RightLowerArmBone.GetLocalPosition(stream);
+            _preDeformationLeftHandLocalPos = LeftHandBone.GetLocalPosition(stream);
+            _preDeformationRightHandLocalPos = RightHandBone.GetLocalPosition(stream);
         }
 
         /// <summary>
@@ -520,6 +531,13 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="weight"></param>
         private void AlignSpine(AnimationStream stream, float weight)
         {
+            if (SpineLowerAlignmentWeight.Get(stream) <= float.Epsilon &&
+                SpineUpperAlignmentWeight.Get(stream) <= float.Epsilon &&
+                ChestAlignmentWeight.Get(stream) <= float.Epsilon)
+            {
+                return;
+            }
+
             var spineLowerOffset = Vector3.zero;
             var spineUpperOffset = Vector3.zero;
             var chestOffset = Vector3.zero;
@@ -1024,21 +1042,21 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="weight">The weight of this operation.</param>
         private void InterpolateArms(AnimationStream stream, float weight)
         {
-            var leftLowerArmPos = LeftLowerArmBone.GetPosition(stream);
-            var rightLowerArmPos = RightLowerArmBone.GetPosition(stream);
-            var leftUpperArmPos = LeftUpperArmBone.GetPosition(stream);
-            var rightUpperArmPos = RightUpperArmBone.GetPosition(stream);
+            var leftUpperArmPos = LeftUpperArmBone.GetLocalPosition(stream);
+            var rightUpperArmPos = RightUpperArmBone.GetLocalPosition(stream);
+            var leftLowerArmPos = LeftLowerArmBone.GetLocalPosition(stream);
+            var rightLowerArmPos = RightLowerArmBone.GetLocalPosition(stream);
             var leftArmOffsetWeight = weight * LeftArmOffsetWeight.Get(stream);
             var rightArmOffsetWeight = weight * RightArmOffsetWeight.Get(stream);
 
-            LeftUpperArmBone.SetPosition(stream,
-                Vector3.Lerp(_preDeformationLeftUpperArmPos, leftUpperArmPos, leftArmOffsetWeight));
-            RightUpperArmBone.SetPosition(stream,
-                Vector3.Lerp(_preDeformationRightUpperArmPos, rightUpperArmPos, rightArmOffsetWeight));
-            LeftLowerArmBone.SetPosition(stream,
-                Vector3.Lerp(_preDeformationLeftLowerArmPos, leftLowerArmPos, leftArmOffsetWeight));
-            RightLowerArmBone.SetPosition(stream,
-                Vector3.Lerp(_preDeformationRightLowerArmPos, rightLowerArmPos, rightArmOffsetWeight));
+            LeftUpperArmBone.SetLocalPosition(stream,
+                Vector3.Lerp(_preDeformationLeftUpperArmLocalPos, leftUpperArmPos, leftArmOffsetWeight));
+            RightUpperArmBone.SetLocalPosition(stream,
+                Vector3.Lerp(_preDeformationRightUpperArmLocalPos, rightUpperArmPos, rightArmOffsetWeight));
+            LeftLowerArmBone.SetLocalPosition(stream,
+                Vector3.Lerp(_preDeformationLeftLowerArmLocalPos, leftLowerArmPos, leftArmOffsetWeight));
+            RightLowerArmBone.SetLocalPosition(stream,
+                Vector3.Lerp(_preDeformationRightLowerArmLocalPos, rightLowerArmPos, rightArmOffsetWeight));
         }
 
         /// <summary>
@@ -1049,14 +1067,14 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="weight">The weight of this operation.</param>
         private void InterpolateHands(AnimationStream stream, float weight)
         {
-            var leftHandPos = LeftHandBone.GetPosition(stream);
-            var rightHandPos = RightHandBone.GetPosition(stream);
+            var leftHandPos = LeftHandBone.GetLocalPosition(stream);
+            var rightHandPos = RightHandBone.GetLocalPosition(stream);
             var leftHandOffsetWeight = weight * LeftHandOffsetWeight.Get(stream);
             var rightHandOffsetWeight = weight * RightHandOffsetWeight.Get(stream);
-            LeftHandBone.SetPosition(stream,
-                Vector3.Lerp(_preDeformationLeftHandPos, leftHandPos, leftHandOffsetWeight));
-            RightHandBone.SetPosition(stream,
-                Vector3.Lerp(_preDeformationRightHandPos, rightHandPos, rightHandOffsetWeight));
+            LeftHandBone.SetLocalPosition(stream,
+                Vector3.Lerp(_preDeformationLeftHandLocalPos, leftHandPos, leftHandOffsetWeight));
+            RightHandBone.SetLocalPosition(stream,
+                Vector3.Lerp(_preDeformationRightHandLocalPos, rightHandPos, rightHandOffsetWeight));
         }
 
         /// <summary>
