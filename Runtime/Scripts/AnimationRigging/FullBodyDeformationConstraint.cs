@@ -173,17 +173,17 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The shoulders height reduction weight float property.
         /// </summary>
-        string ShouldersHeightReductionWeightFloatProperty { get; }
+        public string ShouldersHeightReductionWeightFloatProperty { get; }
 
         /// <summary>
         /// The shoulders width reduction weight float property.
         /// </summary>
-        string ShouldersWidthReductionWeightFloatProperty { get; }
+        public string ShouldersWidthReductionWeightFloatProperty { get; }
 
         /// <summary>
-        /// The arms height adjustment weight float property.
+        /// Affect arms by spine correction bool property.
         /// </summary>
-        string ArmsHeightAdjustmentWeightFloatProperty { get; }
+        public string AffectArmsBySpineCorrection { get; }
 
         /// <summary>
         /// The left shoulder weight float property.
@@ -402,8 +402,8 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersWidthReductionWeight));
 
         /// <inheritdoc />
-        string IFullBodyDeformationData.ArmsHeightAdjustmentWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_armsHeightAdjustmentWeight));
+        string IFullBodyDeformationData.AffectArmsBySpineCorrection =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_affectArmsBySpineCorrection));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.LeftShoulderWeightFloatProperty =>
@@ -515,15 +515,15 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for arms height adjustment.
+        /// True if arms should be affected by spine correction.
         /// </summary>
-        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.ArmsHeightAdjustmentWeight)]
-        private float _armsHeightAdjustmentWeight;
-        public float ArmsHeightAdjustmentWeight
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.AffectArmsBySpineCorrection)]
+        private bool _affectArmsBySpineCorrection;
+        public bool AffectArmsBySpineCorrection
         {
-            get => _armsHeightAdjustmentWeight;
-            set => _armsHeightAdjustmentWeight = value;
+            get => _affectArmsBySpineCorrection;
+            set => _affectArmsBySpineCorrection = value;
         }
 
         /// <summary>

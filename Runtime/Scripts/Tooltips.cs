@@ -954,8 +954,8 @@ namespace Oculus.Movement
         public const string ShouldersWidthReductionWeight =
             "The weight for the shoulders width reduction.";
 
-        public const string ArmsHeightAdjustmentWeight =
-            "The weight for the arms height adjustment.";
+        public const string AffectArmsBySpineCorrection =
+            "True if arms should be affected by spine correction.";
 
         public const string LeftShoulderWeight =
             "The weight for the deformation on the left shoulder.";

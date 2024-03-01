@@ -297,11 +297,6 @@ namespace Oculus.Movement.AnimationRigging
         public FloatProperty RightShoulderOffsetWeight;
 
         /// <summary>
-        /// The weight to adjust the height of the arms.
-        /// </summary>
-        public FloatProperty ArmsHeightAdjustmentWeight;
-
-        /// <summary>
         /// The weight for the left arm offset.
         /// </summary>
         public FloatProperty LeftArmOffsetWeight;
@@ -345,6 +340,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The weight for aligning the feet.
         /// </summary>
         public FloatProperty AlignFeetWeight;
+
+        /// <summary>
+        /// True if the arms should be affected by spine correction.
+        /// </summary>
+        public BoolProperty AffectArmsBySpineCorrection;
 
         /// <summary>
         /// The local position of the left shoulder.
@@ -704,14 +704,13 @@ namespace Oculus.Movement.AnimationRigging
                 spineCorrectionType == FullBodyDeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead)
             {
                 var shoulderHeightAdjustment = _requiredSpineOffset.magnitude;
-                if (shoulderHeightAdjustment <= float.Epsilon)
+                if (shoulderHeightAdjustment <= float.Epsilon ||
+                    !AffectArmsBySpineCorrection.Get(stream))
                 {
                     return;
                 }
-                weight *= ArmsHeightAdjustmentWeight.Get(stream);
 
                 var shouldersParentPos = HipsToHeadBones[ShouldersParentIndex].GetPosition(stream);
-
                 if (RightShoulderBone.IsValid(stream))
                 {
                     var rightShoulderPos = RightShoulderBone.GetPosition(stream);
@@ -720,7 +719,6 @@ namespace Oculus.Movement.AnimationRigging
                     RightUpperArmBone.SetPosition(stream, RightUpperArmBone.GetPosition(stream) +
                                                          Vector3.Lerp(Vector3.zero, rightShoulderOffset, weight));
                 }
-
                 if (LeftShoulderBone.IsValid(stream))
                 {
                     var leftShoulderPos = LeftShoulderBone.GetPosition(stream);
@@ -1286,8 +1284,8 @@ namespace Oculus.Movement.AnimationRigging
                 FloatProperty.Bind(animator, component, data.ShouldersHeightReductionWeightFloatProperty);
             job.ShouldersWidthReductionWeight =
                 FloatProperty.Bind(animator, component, data.ShouldersWidthReductionWeightFloatProperty);
-            job.ArmsHeightAdjustmentWeight =
-                FloatProperty.Bind(animator, component, data.ArmsHeightAdjustmentWeightFloatProperty);
+            job.AffectArmsBySpineCorrection =
+                BoolProperty.Bind(animator, component, data.AffectArmsBySpineCorrection);
             job.LeftShoulderOffsetWeight =
                 FloatProperty.Bind(animator, component, data.LeftShoulderWeightFloatProperty);
             job.RightShoulderOffsetWeight =
