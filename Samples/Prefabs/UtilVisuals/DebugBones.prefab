@@ -83,6 +83,15 @@ MonoBehaviour:
     - FirstBone: 8
       SecondBone: 54
       Hide: 0
+    - FirstBone: 54
+      SecondBone: 9
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 11
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 12
+      Hide: 0
     - FirstBone: 9
       SecondBone: 10
       Hide: 0
@@ -199,15 +208,6 @@ MonoBehaviour:
       Hide: 0
     - FirstBone: 53
       SecondBone: 55
-      Hide: 0
-    - FirstBone: 54
-      SecondBone: 11
-      Hide: 0
-    - FirstBone: 54
-      SecondBone: 12
-      Hide: 0
-    - FirstBone: 54
-      SecondBone: 9
       Hide: 0
   _lineRendererPrefab: {fileID: 7812178534108119229, guid: 6d28b0d0a0ff2234cbf60710c8c912dc, type: 3}
   _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}
