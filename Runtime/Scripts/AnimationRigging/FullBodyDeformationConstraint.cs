@@ -171,14 +171,14 @@ namespace Oculus.Movement.AnimationRigging
         public string ChestAlignmentWeightFloatProperty { get; }
 
         /// <summary>
-        /// The shoulders height adjustment weight float property.
+        /// The shoulders height reduction weight float property.
         /// </summary>
-        string ShouldersHeightAdjustmentWeightFloatProperty { get; }
+        string ShouldersHeightReductionWeightFloatProperty { get; }
 
         /// <summary>
-        /// The shoulders width adjustment weight float property.
+        /// The shoulders width reduction weight float property.
         /// </summary>
-        string ShouldersWidthAdjustmentWeightFloatProperty { get; }
+        string ShouldersWidthReductionWeightFloatProperty { get; }
 
         /// <summary>
         /// The arms height adjustment weight float property.
@@ -394,12 +394,12 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_chestAlignmentWeight));
 
         /// <inheritdoc />
-        string IFullBodyDeformationData.ShouldersHeightAdjustmentWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersHeightAdjustmentWeight));
+        string IFullBodyDeformationData.ShouldersHeightReductionWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersHeightReductionWeight));
 
         /// <inheritdoc />
-        string IFullBodyDeformationData.ShouldersWidthAdjustmentWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersWidthAdjustmentWeight));
+        string IFullBodyDeformationData.ShouldersWidthReductionWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersWidthReductionWeight));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.ArmsHeightAdjustmentWeightFloatProperty =>
@@ -491,27 +491,27 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for shoulders height adjustment.
+        /// The weight for shoulders height reduction.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.ShouldersHeightAdjustmentWeight)]
-        private float _shouldersHeightAdjustmentWeight;
-        public float ShouldersHeightAdjustmentWeight
+        [Tooltip(DeformationDataTooltips.ShouldersHeightReductionWeight)]
+        private float _shouldersHeightReductionWeight;
+        public float ShouldersHeightReductionWeight
         {
-            get => _shouldersHeightAdjustmentWeight;
-            set => _shouldersHeightAdjustmentWeight = value;
+            get => _shouldersHeightReductionWeight;
+            set => _shouldersHeightReductionWeight = value;
         }
 
         /// <summary>
-        /// The weight for shoulders width adjustment.
+        /// The weight for shoulders width reduction.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.ShouldersHeightAdjustmentWeight)]
-        private float _shouldersWidthAdjustmentWeight;
-        public float ShouldersWidthAdjustmentWeight
+        [Tooltip(DeformationDataTooltips.ShouldersWidthReductionWeight)]
+        private float _shouldersWidthReductionWeight;
+        public float ShouldersWidthReductionWeight
         {
-            get => _shouldersWidthAdjustmentWeight;
-            set => _shouldersWidthAdjustmentWeight = value;
+            get => _shouldersWidthReductionWeight;
+            set => _shouldersWidthReductionWeight = value;
         }
 
         /// <summary>

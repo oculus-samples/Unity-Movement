@@ -277,14 +277,14 @@ namespace Oculus.Movement.AnimationRigging
         public FloatProperty ChestAlignmentWeight;
 
         /// <summary>
-        /// The weight to adjust the height of the shoulders.
+        /// The weight to reduce the height of the shoulders.
         /// </summary>
-        public FloatProperty ShouldersHeightAdjustmentWeight;
+        public FloatProperty ShouldersHeightReductionWeight;
 
         /// <summary>
-        /// The weight to adjust the width of the shoulders.
+        /// The weight to reduce the width of the shoulders.
         /// </summary>
-        public FloatProperty ShouldersWidthAdjustmentWeight;
+        public FloatProperty ShouldersWidthReductionWeight;
 
         /// <summary>
         /// The weight of the left shoulder offset.
@@ -991,7 +991,7 @@ namespace Oculus.Movement.AnimationRigging
             shoulderParentPos.x = shoulderPos.x;
             shoulderParentPos.z = shoulderPos.z;
 
-            weight *= ShouldersHeightAdjustmentWeight.Get(stream);
+            weight *= ShouldersHeightReductionWeight.Get(stream);
 
             shoulderBone.SetPosition(stream,
                 Vector3.Lerp(shoulderPos, shoulderParentPos, weight));
@@ -1009,7 +1009,7 @@ namespace Oculus.Movement.AnimationRigging
             var shoulderToSpineDir = shoulderPos - shoulderParentPos;
             var shoulderSpinePos = shoulderParentPos + spineDir * Vector3.Dot(shoulderToSpineDir, spineDir);
 
-            weight *= ShouldersWidthAdjustmentWeight.Get(stream);
+            weight *= ShouldersWidthReductionWeight.Get(stream);
 
             shoulderBone.SetPosition(stream,
                 Vector3.Lerp(shoulderPos, shoulderSpinePos, weight));
@@ -1264,10 +1264,10 @@ namespace Oculus.Movement.AnimationRigging
                 FloatProperty.Bind(animator, component, data.SpineUpperAlignmentWeightFloatProperty);
             job.ChestAlignmentWeight =
                 FloatProperty.Bind(animator, component, data.ChestAlignmentWeightFloatProperty);
-            job.ShouldersHeightAdjustmentWeight =
-                FloatProperty.Bind(animator, component, data.ShouldersHeightAdjustmentWeightFloatProperty);
-            job.ShouldersWidthAdjustmentWeight =
-                FloatProperty.Bind(animator, component, data.ShouldersWidthAdjustmentWeightFloatProperty);
+            job.ShouldersHeightReductionWeight =
+                FloatProperty.Bind(animator, component, data.ShouldersHeightReductionWeightFloatProperty);
+            job.ShouldersWidthReductionWeight =
+                FloatProperty.Bind(animator, component, data.ShouldersWidthReductionWeightFloatProperty);
             job.ArmsHeightAdjustmentWeight =
                 FloatProperty.Bind(animator, component, data.ArmsHeightAdjustmentWeightFloatProperty);
             job.LeftShoulderOffsetWeight =

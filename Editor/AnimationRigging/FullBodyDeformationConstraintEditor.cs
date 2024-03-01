@@ -93,8 +93,8 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _spineLowerAlignmentWeightProperty;
         private SerializedProperty _spineUpperAlignmentWeightProperty;
         private SerializedProperty _chestAlignmentWeightProperty;
-        private SerializedProperty _shouldersHeightAdjustmentWeightProperty;
-        private SerializedProperty _shouldersWidthAdjustmentWeightProperty;
+        private SerializedProperty _shouldersHeightReductionWeightProperty;
+        private SerializedProperty _shouldersWidthReductionWeightProperty;
         private SerializedProperty _armsHeightAdjustmentWeightProperty;
         private SerializedProperty _alignFeetWeightProperty;
 
@@ -137,8 +137,8 @@ namespace Oculus.Movement.AnimationRigging
             _spineLowerAlignmentWeightProperty = data.FindPropertyRelative("_spineLowerAlignmentWeight");
             _spineUpperAlignmentWeightProperty = data.FindPropertyRelative("_spineUpperAlignmentWeight");
             _chestAlignmentWeightProperty = data.FindPropertyRelative("_chestAlignmentWeight");
-            _shouldersHeightAdjustmentWeightProperty = data.FindPropertyRelative("_shouldersHeightAdjustmentWeight");
-            _shouldersWidthAdjustmentWeightProperty = data.FindPropertyRelative("_shouldersWidthAdjustmentWeight");
+            _shouldersHeightReductionWeightProperty = data.FindPropertyRelative("_shouldersHeightReductionWeight");
+            _shouldersWidthReductionWeightProperty = data.FindPropertyRelative("_shouldersWidthReductionWeight");
             _armsHeightAdjustmentWeightProperty = data.FindPropertyRelative("_armsHeightAdjustmentWeight");
 
             _leftShoulderWeightProperty = data.FindPropertyRelative("_leftShoulderWeight");
@@ -291,8 +291,6 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.Space(EditorGUI.indentLevel * _indentSpacing);
             GUILayout.Label(new GUIContent("Shoulders"), EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
-            EditorGUILayout.PropertyField(_shouldersHeightAdjustmentWeightProperty);
-            EditorGUILayout.PropertyField(_shouldersWidthAdjustmentWeightProperty);
             AverageWeightSlider(Content.ShouldersWeight,
                 new[] { _leftShoulderWeightProperty, _rightShoulderWeightProperty });
 
@@ -326,6 +324,8 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.Space(EditorGUI.indentLevel * _indentSpacing);
             GUILayout.Label(new GUIContent("Weights"), EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
+            EditorGUILayout.PropertyField(_shouldersHeightReductionWeightProperty);
+            EditorGUILayout.PropertyField(_shouldersWidthReductionWeightProperty);
             EditorGUILayout.PropertyField(_leftShoulderWeightProperty);
             EditorGUILayout.PropertyField(_rightShoulderWeightProperty);
             EditorGUILayout.PropertyField(_leftArmWeightProperty);
