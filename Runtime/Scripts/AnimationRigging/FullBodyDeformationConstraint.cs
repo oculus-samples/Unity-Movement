@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Serialization;
 using static Oculus.Movement.AnimationRigging.DeformationCommon;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
@@ -431,11 +432,11 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         string IFullBodyDeformationData.LeftLegWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_leftLegWeight));
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_alignLeftLegWeight));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.RightLegWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightLegWeight));
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_alignRightLegWeight));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.LeftToesWeightFloatProperty =>
@@ -599,31 +600,33 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for the deformation on the left leg.
+        /// The weight for the alignment on the left leg.
         /// </summary>
+        [FormerlySerializedAs("_leftLegWeight")]
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.LeftLegWeight)]
-        private float _leftLegWeight;
-        public float LeftLegWeight
+        [Tooltip(DeformationDataTooltips.AlignLeftLegWeight)]
+        private float _alignLeftLegWeight;
+        public float AlignLeftLegWeight
         {
-            get => _leftLegWeight;
-            set => _leftLegWeight = value;
+            get => _alignLeftLegWeight;
+            set => _alignLeftLegWeight = value;
         }
 
         /// <summary>
-        /// The weight for the deformation on the right leg.
+        /// The weight for the alignment on the right leg.
         /// </summary>
+        [FormerlySerializedAs("_rightLegWeight")]
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.RightLegWeight)]
-        private float _rightLegWeight;
-        public float RightLegWeight
+        [Tooltip(DeformationDataTooltips.AlignRightLegWeight)]
+        private float _alignRightLegWeight;
+        public float AlignRightLegWeight
         {
-            get => _rightLegWeight;
-            set => _rightLegWeight = value;
+            get => _alignRightLegWeight;
+            set => _alignRightLegWeight = value;
         }
 
         /// <summary>
-        /// The weight for the FullBodyDeformation on the left toe.
+        /// The weight for the deformation on the left toe.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
         [Tooltip(DeformationDataTooltips.LeftToesWeight)]
@@ -635,7 +638,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for the FullBodyDeformation on the right toe.
+        /// The weight for the deformation on the right toe.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
         [Tooltip(DeformationDataTooltips.RightToesWeight)]
@@ -1275,8 +1278,8 @@ namespace Oculus.Movement.AnimationRigging
             _rightArmWeight = 0.0f;
             _leftHandWeight = 0.0f;
             _rightHandWeight = 0.0f;
-            _leftLegWeight = 0.0f;
-            _rightLegWeight = 0.0f;
+            _alignLeftLegWeight = 0.0f;
+            _alignRightLegWeight = 0.0f;
             _leftToesWeight = 0.0f;
             _rightToesWeight = 0.0f;
 

@@ -1077,7 +1077,7 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <summary>
         /// Interpolates the leg positions from the pre-deformation positions to the positions after skeletal
-        /// proportions are enforced. The feet positions can be incorrect after this function
+        /// proportions are enforced. The feet positions can be incorrect after this function.
         /// </summary>
         /// <param name="stream">The animation stream.</param>
         /// <param name="weight">The weight of this operation.</param>

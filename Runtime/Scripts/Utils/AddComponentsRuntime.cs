@@ -509,8 +509,8 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.RightArmWeight = 1.0f;
             deformationConstraint.data.LeftHandWeight = 1.0f;
             deformationConstraint.data.RightHandWeight = 1.0f;
-            deformationConstraint.data.LeftLegWeight = 1.0f;
-            deformationConstraint.data.RightLegWeight = 1.0f;
+            deformationConstraint.data.AlignLeftLegWeight = 1.0f;
+            deformationConstraint.data.AlignRightLegWeight = 1.0f;
             deformationConstraint.data.LeftToesWeight = 1.0f;
             deformationConstraint.data.RightToesWeight = 1.0f;
             deformationConstraint.data.AlignFeetWeight = 0.75f;

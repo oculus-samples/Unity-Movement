@@ -60,8 +60,8 @@ namespace Oculus.Movement.AnimationRigging
 
             public static readonly GUIContent LegsWeight = EditorGUIUtility.TrTextContent
             (
-                "Legs Weight",
-                "The deformation weight for both legs."
+                "Legs Alignment Weight",
+                "The deformation weight for legs alignment."
             );
 
             public static readonly GUIContent FeetAlignmentWeight = EditorGUIUtility.TrTextContent

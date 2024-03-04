@@ -975,11 +975,11 @@ namespace Oculus.Movement
         public const string RightHandWeight =
             "The weight for the deformation on the right hand.";
 
-        public const string LeftLegWeight =
-            "The weight for the deformation on the left leg.";
+        public const string AlignLeftLegWeight =
+            "The weight for the alignment on the left leg.";
 
-        public const string RightLegWeight =
-            "The weight for the deformation on the right leg.";
+        public const string AlignRightLegWeight =
+            "The weight for the alignment on the right leg.";
 
         public const string LeftToesWeight =
             "The weight for the deformation on the left toe.";
