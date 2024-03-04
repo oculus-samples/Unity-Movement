@@ -135,9 +135,14 @@ namespace Oculus.Movement.Utils
                 return;
             }
             // Disable the character, add components, THEN enable it.
-            // Animationg rigging doesn't start properly otherwise.
+            // Animation rigging doesn't start properly otherwise.
             selectedGameObject.SetActive(false);
             var mainParent = selectedGameObject;
+            var previousPositionAndRotation =
+                new AffineTransform(selectedGameObject.transform.position, selectedGameObject.transform.rotation);
+
+            // Bring the object to root so that the auto adjustments calculations are correct.
+            selectedGameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
             // Add the retargeting and body tracking components at root first.
             RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent, isFullBody);
@@ -192,6 +197,8 @@ namespace Oculus.Movement.Utils
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
             AddHandDeformationRetargetingProcessor(retargetingLayer);
 
+            selectedGameObject.transform.SetPositionAndRotation(
+                previousPositionAndRotation.translation, previousPositionAndRotation.rotation);
             if (isFullBody)
             {
                 animatorComp.gameObject.SetActive(true);

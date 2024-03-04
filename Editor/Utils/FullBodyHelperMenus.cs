@@ -45,6 +45,13 @@ namespace Oculus.Movement.Utils
 
             Undo.IncrementCurrentGroup();
 
+            // Store the previous transform data.
+            var previousPositionAndRotation =
+                new AffineTransform(activeGameObject.transform.position, activeGameObject.transform.rotation);
+
+            // Bring the object to root so that the auto adjustments calculations are correct.
+            activeGameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
             // Add the retargeting and body tracking components at root first.
             Animator animatorComp = activeGameObject.GetComponent<Animator>();
             RetargetingLayer retargetingLayer = AddMainRetargetingComponents(animatorComp, activeGameObject);
@@ -99,6 +106,8 @@ namespace Oculus.Movement.Utils
             AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
             HelperMenusCommon.AddHandDeformationRetargetingProcessor(retargetingLayer);
 
+            activeGameObject.transform.SetPositionAndRotation(
+                previousPositionAndRotation.translation, previousPositionAndRotation.rotation);
             Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
         }
 
@@ -384,6 +393,10 @@ namespace Oculus.Movement.Utils
             {
                 foreach (var boneTarget in boneTargets)
                 {
+                    if (boneTarget.Target == null)
+                    {
+                        continue;
+                    }
                     Undo.SetTransformParent(boneTarget.Target, deformationConstraintObject.transform,
                         $"Parent Bone Target {boneTarget.Target.name} to Deformation.");
                     Undo.RegisterCompleteObjectUndo(boneTarget.Target,
