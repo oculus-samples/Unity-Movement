@@ -261,6 +261,7 @@ MonoBehaviour:
   HandType: 1
   _pointerPoseRoot: {fileID: 1725491925}
   m_showState: 3
+  RayHelper: {fileID: 0}
 --- !u!1001 &93580076
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -645,10 +646,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1933170782430618965, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
-      propertyPath: _rigToggleOnFocus
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2561547567721264650, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
       propertyPath: m_Name
       value: HighFidelityFirstPerson
@@ -667,14 +664,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2938494700203207856, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4416254126646396801, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9090389992127542986, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
-      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1453,6 +1442,7 @@ MonoBehaviour:
   HandType: 0
   _pointerPoseRoot: {fileID: 1725491925}
   m_showState: 3
+  RayHelper: {fileID: 0}
 --- !u!4 &1259570857 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5463775779351168343, guid: 566315f3a83d28341a878d894d4feca3, type: 3}
