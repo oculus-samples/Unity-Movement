@@ -147,8 +147,8 @@ namespace Oculus.Movement.AnimationRigging
             _rightArmWeightProperty = data.FindPropertyRelative("_rightArmWeight");
             _leftHandWeightProperty = data.FindPropertyRelative("_leftHandWeight");
             _rightHandWeightProperty = data.FindPropertyRelative("_rightHandWeight");
-            _leftLegWeightProperty = data.FindPropertyRelative("_leftLegWeight");
-            _rightLegWeightProperty = data.FindPropertyRelative("_rightLegWeight");
+            _leftLegWeightProperty = data.FindPropertyRelative("_alignLeftLegWeight");
+            _rightLegWeightProperty = data.FindPropertyRelative("_alignRightLegWeight");
             _leftToesWeightProperty = data.FindPropertyRelative("_leftToesWeight");
             _rightToesWeightProperty = data.FindPropertyRelative("_rightToesWeight");
             _alignFeetWeightProperty = data.FindPropertyRelative("_alignFeetWeight");
