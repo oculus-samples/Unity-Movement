@@ -1,10 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Movement.Tracking;
-using System;
 using UnityEditor;
-using UnityEditor.SceneManagement;
-using UnityEngine;
 
 namespace Oculus.Movement.Utils
 {
@@ -28,17 +24,7 @@ namespace Oculus.Movement.Utils
         {
             var activeGameObject = Selection.activeGameObject;
 
-            try
-            {
-                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
-            }
-            catch (InvalidOperationException e)
-            {
-                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
-                return;
-            }
-
-            SetUpCharacterForCorrectivesFace(activeGameObject);
+            AddComponentsHelper.SetUpCharacterForCorrectivesFace(activeGameObject, true);
         }
 
         [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU +
@@ -47,17 +33,7 @@ namespace Oculus.Movement.Utils
         {
             var activeGameObject = Selection.activeGameObject;
 
-            try
-            {
-                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
-            }
-            catch (InvalidOperationException e)
-            {
-                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
-                return;
-            }
-
-            SetUpCharacterForCorrectivesFace(activeGameObject, false);
+            AddComponentsHelper.SetUpCharacterForCorrectivesFace(activeGameObject, false);
         }
 
         [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU)]
@@ -65,17 +41,7 @@ namespace Oculus.Movement.Utils
         {
             var activeGameObject = Selection.activeGameObject;
 
-            try
-            {
-                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
-            }
-            catch (InvalidOperationException e)
-            {
-                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
-                return;
-            }
-
-            SetUpCharacterForARKitFace(activeGameObject);
+            AddComponentsHelper.SetUpCharacterForARKitFace(activeGameObject, true);
         }
 
         [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU
@@ -84,88 +50,7 @@ namespace Oculus.Movement.Utils
         {
             var activeGameObject = Selection.activeGameObject;
 
-            try
-            {
-                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
-            }
-            catch (InvalidOperationException e)
-            {
-                EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
-                return;
-            }
-
-            SetUpCharacterForARKitFace(activeGameObject, false);
-        }
-
-        private static void SetUpCharacterForCorrectivesFace(GameObject gameObject,
-            bool allowDuplicates = true)
-        {
-            Undo.IncrementCurrentGroup();
-
-            var faceExpressions = gameObject.GetComponentInParent<OVRFaceExpressions>();
-            if (!faceExpressions)
-            {
-                faceExpressions = gameObject.AddComponent<OVRFaceExpressions>();
-                Undo.RegisterCreatedObjectUndo(faceExpressions, "Create OVRFaceExpressions component");
-            }
-
-            var face = gameObject.GetComponent<CorrectivesFace>();
-            if (!face)
-            {
-                face = gameObject.AddComponent<CorrectivesFace>();
-                face.FaceExpressions = faceExpressions;
-                Undo.RegisterCreatedObjectUndo(face, "Create CorrectivesFace component");
-            }
-
-            if (face.BlendshapeModifier == null)
-            {
-                face.BlendshapeModifier = gameObject.GetComponentInParent<BlendshapeModifier>();
-                Undo.RecordObject(face, "Assign to BlendshapeModifier field");
-            }
-
-            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correctives blendshapes");
-            face.AllowDuplicateMappingField = allowDuplicates;
-            face.AutoMapBlendshapes();
-            EditorUtility.SetDirty(face);
-            EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
-
-            Undo.SetCurrentGroupName($"Setup Character for Correctives Tracking");
-        }
-
-        private static void SetUpCharacterForARKitFace(GameObject gameObject,
-            bool allowDuplicates = true)
-        {
-            Undo.IncrementCurrentGroup();
-
-            var faceExpressions = gameObject.GetComponentInParent<OVRFaceExpressions>();
-            if (!faceExpressions)
-            {
-                faceExpressions = gameObject.AddComponent<OVRFaceExpressions>();
-                Undo.RegisterCreatedObjectUndo(faceExpressions, "Create OVRFaceExpressions component");
-            }
-
-            var face = gameObject.GetComponent<ARKitFace>();
-            if (!face)
-            {
-                face = gameObject.AddComponent<ARKitFace>();
-                face.FaceExpressions = faceExpressions;
-                Undo.RegisterCreatedObjectUndo(face, "Create ARKit component");
-            }
-            face.RetargetingTypeField = OVRCustomFace.RetargetingType.Custom;
-
-            if (face.BlendshapeModifier == null)
-            {
-                face.BlendshapeModifier = gameObject.GetComponentInParent<BlendshapeModifier>();
-                Undo.RecordObject(face, "Assign to BlendshapeModifier field");
-            }
-
-            Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map ARKit blendshapes");
-            face.AllowDuplicateMappingField = allowDuplicates;
-            face.AutoMapBlendshapes();
-            EditorUtility.SetDirty(face);
-            EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
-
-            Undo.SetCurrentGroupName($"Setup Character for ARKit Tracking");
+            AddComponentsHelper.SetUpCharacterForARKitFace(activeGameObject, false);
         }
     }
 }

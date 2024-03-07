@@ -3,11 +3,14 @@
 using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
 using Oculus.Movement.AnimationRigging.Deprecated;
+using Oculus.Movement.Tracking;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.SceneManagement;
+
 #endif
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -974,6 +977,199 @@ namespace Oculus.Movement.Utils
             retargetingProcessorCorrectHand.HandIKType = RetargetingProcessorCorrectHand.IKType.CCDIK;
             retargetingProcessorCorrectHand.name = $"Correct{handednessString}Hand";
             retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectHand);
+        }
+
+        /// <summary>
+        /// Sets up character for correctives face tracking.
+        /// </summary>
+        /// <param name="gameObject">GameObject to add to.</param>
+        /// <param name="allowDuplicates">Allow duplicates mapping or not.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
+        public static void SetUpCharacterForCorrectivesFace(GameObject gameObject,
+            bool allowDuplicates = true,
+            bool runtimeInvocation = false)
+        {
+            try
+            {
+                AddComponentsHelper.ValidateGameObjectForFaceMapping(gameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+#if UNITY_EDITOR
+                if (runtimeInvocation)
+                {
+                    Debug.LogWarning($"Face tracking setup error: {e.Message}");
+                }
+                else
+                {
+                    EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
+                }
+#else
+                Debug.LogWarning($"Face tracking setup error: {e.Message}");
+#endif
+                return;
+            }
+
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.IncrementCurrentGroup();
+            }
+#endif
+
+            var faceExpressions = gameObject.GetComponentInParent<OVRFaceExpressions>();
+            if (!faceExpressions)
+            {
+                faceExpressions = gameObject.AddComponent<OVRFaceExpressions>();
+
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RegisterCreatedObjectUndo(faceExpressions, "Create OVRFaceExpressions component");
+                }
+#endif
+            }
+
+            var face = gameObject.GetComponent<CorrectivesFace>();
+            if (!face)
+            {
+                face = gameObject.AddComponent<CorrectivesFace>();
+                face.FaceExpressions = faceExpressions;
+
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RegisterCreatedObjectUndo(face, "Create CorrectivesFace component");
+                }
+#endif
+            }
+
+            if (face.BlendshapeModifier == null)
+            {
+                face.BlendshapeModifier = gameObject.GetComponentInParent<BlendshapeModifier>();
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RecordObject(face, "Assign to BlendshapeModifier field");
+                }
+#endif
+            }
+
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map Correctives blendshapes");
+            }
+#endif
+            face.RetargetingTypeField = OVRCustomFace.RetargetingType.OculusFace;
+            face.AllowDuplicateMappingField = allowDuplicates;
+            face.AutoMapBlendshapes();
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                EditorUtility.SetDirty(face);
+                EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
+
+                Undo.SetCurrentGroupName($"Setup Character for Correctives Tracking");
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Sets up character for ARKit face tracking.
+        /// </summary>
+        /// <param name="gameObject">GameObject to add to.</param>
+        /// <param name="allowDuplicates">Allow duplicates mapping or not.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
+        public static void SetUpCharacterForARKitFace(GameObject gameObject,
+            bool allowDuplicates = true,
+            bool runtimeInvocation = false)
+        {
+            try
+            {
+                AddComponentsHelper.ValidateGameObjectForFaceMapping(gameObject);
+            }
+            catch (InvalidOperationException e)
+            {
+#if UNITY_EDITOR
+                if (runtimeInvocation)
+                {
+                    Debug.LogWarning($"Face tracking setup error: {e.Message}");
+                }
+                else
+                {
+                    EditorUtility.DisplayDialog("Face Tracking setup error.", e.Message, "Ok");
+                }
+#else
+                Debug.LogWarning($"Face tracking setup error: {e.Message}");
+#endif
+                return;
+            }
+
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.IncrementCurrentGroup();
+            }
+#endif
+
+            var faceExpressions = gameObject.GetComponentInParent<OVRFaceExpressions>();
+            if (!faceExpressions)
+            {
+                faceExpressions = gameObject.AddComponent<OVRFaceExpressions>();
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RegisterCreatedObjectUndo(faceExpressions, "Create OVRFaceExpressions component");
+                }
+#endif
+            }
+
+            var face = gameObject.GetComponent<ARKitFace>();
+            if (!face)
+            {
+                face = gameObject.AddComponent<ARKitFace>();
+                face.FaceExpressions = faceExpressions;
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RegisterCreatedObjectUndo(face, "Create ARKit component");
+                }
+#endif
+            }
+
+            if (face.BlendshapeModifier == null)
+            {
+                face.BlendshapeModifier = gameObject.GetComponentInParent<BlendshapeModifier>();
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RecordObject(face, "Assign to BlendshapeModifier field");
+                }
+#endif
+            }
+
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterFullObjectHierarchyUndo(face, "Auto-map ARKit blendshapes");
+            }
+#endif
+
+            face.RetargetingTypeField = OVRCustomFace.RetargetingType.Custom;
+            face.AllowDuplicateMappingField = allowDuplicates;
+            face.AutoMapBlendshapes();
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                EditorUtility.SetDirty(face);
+                EditorSceneManager.MarkSceneDirty(face.gameObject.scene);
+
+                Undo.SetCurrentGroupName($"Setup Character for ARKit Tracking");
+            }
+#endif
         }
 
         /// <summary>
