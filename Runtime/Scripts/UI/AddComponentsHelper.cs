@@ -6,7 +6,9 @@ using Oculus.Movement.AnimationRigging.Deprecated;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
@@ -43,15 +45,18 @@ namespace Oculus.Movement.Utils
         {
             var poseAssetName = isTPose ?
                 _HUMANOID_REFERENCE_T_POSE_ASSET_NAME : _HUMANOID_REFERENCE_POSE_ASSET_NAME;
+#if UNITY_EDITOR
             string[] guids = AssetDatabase.FindAssets(poseAssetName);
             if (guids == null || guids.Length == 0)
             {
                 Debug.LogError($"Asset {poseAssetName} cannot be found.");
                 return null;
             }
-
             var pathToAsset = AssetDatabase.GUIDToAssetPath(guids[0]);
             return AssetDatabase.LoadAssetAtPath<RestPoseObjectHumanoid>(pathToAsset);
+#else
+            return null;
+#endif
         }
 
         /// <summary>
@@ -213,9 +218,12 @@ namespace Oculus.Movement.Utils
         /// Adds components necessary for animation rigging to work.
         /// </summary>
         /// <param name="mainParent">Container for animation rigging components.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         /// <returns>The rig builder and rig components created.</returns>
         public static (RigBuilder, GameObject) AddBasicAnimationRiggingComponents(
-            GameObject mainParent)
+            GameObject mainParent,
+            bool runtimeInvocation = false)
         {
             Rig rigComponent = mainParent.GetComponentInChildren<Rig>();
             if (!rigComponent)
@@ -224,10 +232,12 @@ namespace Oculus.Movement.Utils
                 GameObject rigObject = new GameObject("Rig");
                 rigComponent = rigObject.AddComponent<Rig>();
                 rigComponent.weight = 1.0f;
-                if (Application.isEditor)
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
                 {
                     Undo.RegisterCreatedObjectUndo(rigObject, "Create Rig");
                 }
+#endif
             }
 
             RigBuilder rigBuilder = mainParent.GetComponent<RigBuilder>();
@@ -238,21 +248,27 @@ namespace Oculus.Movement.Utils
                 {
                     new RigLayer(rigComponent, true)
                 };
-                if (Application.isEditor)
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
                 {
                     Undo.RegisterCreatedObjectUndo(rigBuilder, "Create RigBuilder");
                 }
+#endif
             }
 
-            if (Application.isEditor)
+#if UNITY_EDITOR
+            if (runtimeInvocation)
+            {
+                rigComponent.transform.SetParent(mainParent.transform, true);
+            }
+            else
             {
                 Undo.SetTransformParent(rigComponent.transform, mainParent.transform, "Add Rig to Main Parent");
                 Undo.RegisterCompleteObjectUndo(rigComponent, "Rig Component Transform init");
             }
-            else
-            {
-                rigComponent.transform.SetParent(mainParent.transform, true);
-            }
+#else
+            rigComponent.transform.SetParent(mainParent.transform, true);
+#endif
             rigComponent.transform.localPosition = Vector3.zero;
             rigComponent.transform.localRotation = Quaternion.identity;
             rigComponent.transform.localScale = Vector3.one;
@@ -265,10 +281,13 @@ namespace Oculus.Movement.Utils
         /// </summary>
         /// <param name="mainParent">GameObject to add to.</param>
         /// <param name="isFullBody">If full body or not.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         /// <returns>RetargetingLayer that was added.</returns>
         public static RetargetingLayer AddMainRetargetingComponent(
             GameObject mainParent,
-            bool isFullBody)
+            bool isFullBody,
+            bool runtimeInvocation = false)
         {
             RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
 
@@ -276,13 +295,29 @@ namespace Oculus.Movement.Utils
             RetargetingLayer baseRetargetingLayer = mainParent.GetComponent<RetargetingLayer>();
             if (retargetingLayer == null && baseRetargetingLayer != null)
             {
-                Undo.DestroyObjectImmediate(baseRetargetingLayer);
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.DestroyObjectImmediate(baseRetargetingLayer);
+                }
+                else
+                {
+                    GameObject.DestroyImmediate(baseRetargetingLayer);
+                }
+#else
+                GameObject.DestroyImmediate(baseRetargetingLayer);
+#endif
             }
 
             if (!retargetingLayer)
             {
                 retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
-                Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
+                }
+#endif
             }
 
             if (isFullBody)
@@ -320,25 +355,35 @@ namespace Oculus.Movement.Utils
                 {
                     bodySectionToPosition.SetValue(retargetingLayer, new[]
                     {
-                    OVRHumanBodyBonesMappings.BodySection.LeftArm,
-                    OVRHumanBodyBonesMappings.BodySection.RightArm,
-                    OVRHumanBodyBonesMappings.BodySection.LeftHand,
-                    OVRHumanBodyBonesMappings.BodySection.RightHand,
-                    OVRHumanBodyBonesMappings.BodySection.Hips,
-                    OVRHumanBodyBonesMappings.BodySection.Back,
-                    OVRHumanBodyBonesMappings.BodySection.Neck,
-                    OVRHumanBodyBonesMappings.BodySection.Head
-                });
+                        OVRHumanBodyBonesMappings.BodySection.LeftArm,
+                        OVRHumanBodyBonesMappings.BodySection.RightArm,
+                        OVRHumanBodyBonesMappings.BodySection.LeftHand,
+                        OVRHumanBodyBonesMappings.BodySection.RightHand,
+                        OVRHumanBodyBonesMappings.BodySection.Hips,
+                        OVRHumanBodyBonesMappings.BodySection.Back,
+                        OVRHumanBodyBonesMappings.BodySection.Neck,
+                        OVRHumanBodyBonesMappings.BodySection.Head
+                    });
                 }
             }
 
-            EditorUtility.SetDirty(retargetingLayer);
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                EditorUtility.SetDirty(retargetingLayer);
+            }
+#endif
 
             OVRBody bodyComp = mainParent.GetComponent<OVRBody>();
             if (!bodyComp)
             {
                 bodyComp = mainParent.AddComponent<OVRBody>();
-                Undo.RegisterCreatedObjectUndo(bodyComp, "Add OVRBody component");
+#if UNITY_EDITOR
+                if (!runtimeInvocation)
+                {
+                    Undo.RegisterCreatedObjectUndo(bodyComp, "Add OVRBody component");
+                }
+#endif
             }
 
             typeof(RetargetingLayer).GetField(
@@ -351,9 +396,13 @@ namespace Oculus.Movement.Utils
                     OVRPlugin.BodyJointSet.FullBody : OVRPlugin.BodyJointSet.UpperBody);
 
             retargetingLayer.EnableTrackingByProxy = true;
-            PrefabUtility.RecordPrefabInstancePropertyModifications(retargetingLayer);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(bodyComp);
-
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                PrefabUtility.RecordPrefabInstancePropertyModifications(retargetingLayer);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(bodyComp);
+            }
+#endif
             return retargetingLayer;
         }
 
@@ -365,7 +414,9 @@ namespace Oculus.Movement.Utils
         /// <param name="isFullBody">Indicates if full body (or not).</param>
         /// <returns>Array of bone targets added.</returns>
         public static BoneTarget[] AddBoneTargets(
-            GameObject rigObject, Animator animator, bool isFullBody)
+            GameObject rigObject,
+            Animator animator,
+            bool isFullBody)
         {
             var boneTargets = new List<BoneTarget>();
             Transform hipsTarget = AddBoneTarget(rigObject, "HipsTarget",
@@ -441,11 +492,14 @@ namespace Oculus.Movement.Utils
         /// <param name="mainParent">Parent of bone target.</param>
         /// <param name="nameOfTarget">Name of targe to add.</param>
         /// <param name="targetTransform">Target transform to copy.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         /// <returns>Bone target added.</returns>
         private static Transform AddBoneTarget(
             GameObject mainParent,
             string nameOfTarget,
-            Transform targetTransform = null)
+            Transform targetTransform = null,
+            bool runtimeInvocation = false)
         {
             Transform boneTarget =
                 mainParent.transform.FindChildRecursive(nameOfTarget);
@@ -453,14 +507,25 @@ namespace Oculus.Movement.Utils
             {
                 GameObject boneTargetObject =
                     new GameObject(nameOfTarget);
-                Undo.RegisterCreatedObjectUndo(boneTargetObject,
-                    "Create Bone Target " + nameOfTarget);
+#if UNITY_EDITOR
+                if (runtimeInvocation)
+                {
+                    boneTargetObject.transform.SetParent(mainParent.transform);
+                }
+                else
+                {
+                    Undo.RegisterCreatedObjectUndo(boneTargetObject,
+                        "Create Bone Target " + nameOfTarget);
 
-                Undo.SetTransformParent(boneTargetObject.transform,
-                    mainParent.transform,
-                    $"Add Bone Target {nameOfTarget} To Main Parent");
-                Undo.RegisterCompleteObjectUndo(boneTargetObject,
-                    $"Bone Target {nameOfTarget} Transform Init");
+                    Undo.SetTransformParent(boneTargetObject.transform,
+                        mainParent.transform,
+                        $"Add Bone Target {nameOfTarget} To Main Parent");
+                    Undo.RegisterCompleteObjectUndo(boneTargetObject,
+                        $"Bone Target {nameOfTarget} Transform Init");
+                }
+#else
+                boneTargetObject.transform.SetParent(mainParent.transform);
+#endif
                 boneTarget = boneTargetObject.transform;
             }
 
@@ -484,10 +549,15 @@ namespace Oculus.Movement.Utils
         /// </summary>
         /// <param name="rigObject">Rig object that will be the parent of the constraint.</param>
         /// <param name="retargetingLayer">Retargeting layer associated with the constraint.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
+        /// <param name="setAsLastSibling">Allows adding as last sibling under constraints.</param>
         /// <returns>Retargeting constraint under the rig.</returns>
         public static RetargetingAnimationConstraint AddRetargetingConstraint(
             GameObject rigObject,
-            RetargetingLayer retargetingLayer)
+            RetargetingLayer retargetingLayer,
+            bool runtimeInvocation = false,
+            bool setAsLastSibling = false)
         {
             RetargetingAnimationConstraint retargetConstraint =
                 rigObject.GetComponentInChildren<RetargetingAnimationConstraint>(true);
@@ -495,23 +565,40 @@ namespace Oculus.Movement.Utils
             {
                 GameObject retargetingAnimConstraintObj =
                     new GameObject("RetargetingConstraint");
+                retargetingAnimConstraintObj.SetActive(false);
                 retargetConstraint =
                     retargetingAnimConstraintObj.AddComponent<RetargetingAnimationConstraint>();
-                Undo.RegisterCreatedObjectUndo(retargetingAnimConstraintObj, "Create Retargeting Constraint");
-
-                Undo.SetTransformParent(retargetingAnimConstraintObj.transform, rigObject.transform, "Add Retarget Constraint to Rig");
-                Undo.RegisterCompleteObjectUndo(retargetingAnimConstraintObj, "Retarget Constraint Transform Init");
+#if UNITY_EDITOR
+                if (runtimeInvocation)
+                {
+                    retargetingAnimConstraintObj.transform.SetParent(rigObject.transform);
+                }
+                else
+                {
+                    Undo.RegisterCreatedObjectUndo(retargetingAnimConstraintObj, "Create Retargeting Constraint");
+                    Undo.SetTransformParent(retargetingAnimConstraintObj.transform, rigObject.transform, "Add Retarget Constraint to Rig");
+                    Undo.RegisterCompleteObjectUndo(retargetingAnimConstraintObj, "Retarget Constraint Transform Init");
+                }
+#else
+                retargetingAnimConstraintObj.transform.SetParent(rigObject.transform);
+#endif
+                if (setAsLastSibling)
+                {
+                    retargetConstraint.transform.SetAsLastSibling();
+                }
                 retargetConstraint.transform.localPosition = Vector3.zero;
                 retargetConstraint.transform.localRotation = Quaternion.identity;
                 retargetConstraint.transform.localScale = Vector3.one;
-
-                // Keep retargeter disabled until it initializes properly.
-                retargetConstraint.gameObject.SetActive(false);
             }
 
             retargetConstraint.RetargetingLayerComp = retargetingLayer;
             retargetConstraint.data.AllowDynamicAdjustmentsRuntime = true;
-            PrefabUtility.RecordPrefabInstancePropertyModifications(retargetConstraint);
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                PrefabUtility.RecordPrefabInstancePropertyModifications(retargetConstraint);
+            }
+#endif
             return retargetConstraint;
         }
 
@@ -525,7 +612,7 @@ namespace Oculus.Movement.Utils
             {
                 Debug.LogError("Expected valid toes data in the rest pose object for aligning the feet. " +
                                "No foot adjustments will be created.");
-                return System.Array.Empty<JointAdjustment>();
+                return Array.Empty<JointAdjustment>();
             }
 
             var footAdjustments = new List<JointAdjustment>();
@@ -583,9 +670,12 @@ namespace Oculus.Movement.Utils
         /// </summary>
         /// <param name="retargetingLayer">The retargeting layer to add to.</param>
         /// <param name="handedness">The handedness of the processor.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         public static void AddBlendHandRetargetingProcessor(
             RetargetingLayer retargetingLayer,
-            Handedness handedness)
+            Handedness handedness,
+            bool runtimeInvocation = false)
         {
             bool needCorrectHand = true;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
@@ -608,8 +698,13 @@ namespace Oculus.Movement.Utils
             bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
             var blendHand = ScriptableObject.CreateInstance<RetargetingBlendHandProcessor>();
             var handednessString = handedness == Handedness.Left ? "Left" : "Right";
-            Undo.RegisterCreatedObjectUndo(blendHand, $"Create ({handednessString}) blend hand.");
-            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterCreatedObjectUndo(blendHand, $"Create ({handednessString}) blend hand.");
+                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+            }
+#endif
             blendHand.BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             blendHand.IsFullBody = isFullBody;
             if (isFullBody)
@@ -643,16 +738,16 @@ namespace Oculus.Movement.Utils
         /// <param name="rigObject">Rig object.</param>
         public static void DestroyLegacyComponents(GameObject gameObject, GameObject rigObject)
         {
-            AddComponentsHelper.DestroyTargetTransform(rigObject, "LeftHandTarget", true);
-            AddComponentsHelper.DestroyTargetTransform(rigObject, "RightHandTarget", true);
-            AddComponentsHelper.DestroyTargetTransform(rigObject, "LeftElbowTarget", true);
-            AddComponentsHelper.DestroyTargetTransform(rigObject, "RightElbowTarget", true);
-            AddComponentsHelper.DestroyTargetTransform(rigObject, "LeftArmIK", false);
-            AddComponentsHelper.DestroyTargetTransform(rigObject, "RightArmIK", false);
-            AddComponentsHelper.DestroyLegacyComponents<BlendHandConstraints>(gameObject);
-            AddComponentsHelper.DestroyLegacyComponents<RetargetedBoneTargets>(gameObject);
-            AddComponentsHelper.DestroyLegacyComponents<AnimationRigSetup>(gameObject);
-            AddComponentsHelper.DestroyLegacyComponents<FullBodyHandDeformation>(gameObject);
+            DestroyTargetTransform(rigObject, "LeftHandTarget", true);
+            DestroyTargetTransform(rigObject, "RightHandTarget", true);
+            DestroyTargetTransform(rigObject, "LeftElbowTarget", true);
+            DestroyTargetTransform(rigObject, "RightElbowTarget", true);
+            DestroyTargetTransform(rigObject, "LeftArmIK", false);
+            DestroyTargetTransform(rigObject, "RightArmIK", false);
+            DestroyLegacyComponents<BlendHandConstraints>(gameObject);
+            DestroyLegacyComponents<RetargetedBoneTargets>(gameObject);
+            DestroyLegacyComponents<AnimationRigSetup>(gameObject);
+            DestroyLegacyComponents<FullBodyHandDeformation>(gameObject);
         }
 
         /// <summary>
@@ -661,16 +756,32 @@ namespace Oculus.Movement.Utils
         /// <param name="mainParent">Parent of target transform.</param>
         /// <param name="nameOfTarget">Name of target.</param>
         /// <param name="recursiveSearch">Indicates if recursion should be used or not.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         /// <returns>True if destroyed; false if not.</returns>
-        public static bool DestroyTargetTransform(GameObject mainParent, string nameOfTarget,
-            bool recursiveSearch)
+        public static bool DestroyTargetTransform(
+            GameObject mainParent,
+            string nameOfTarget,
+            bool recursiveSearch,
+            bool runtimeInvocation = false)
         {
             Transform targetTransform = recursiveSearch ?
                 mainParent.transform.FindChildRecursive(nameOfTarget) :
                 mainParent.transform.Find(nameOfTarget);
             if (targetTransform != null)
             {
-                Undo.DestroyObjectImmediate(targetTransform);
+#if UNITY_EDITOR
+                if (runtimeInvocation)
+                {
+                    GameObject.DestroyImmediate(targetTransform);
+                }
+                else
+                {
+                    Undo.DestroyObjectImmediate(targetTransform);
+                }
+#else
+                GameObject.DestroyImmediate(targetTransform);
+#endif
                 return true;
             }
             return false;
@@ -680,7 +791,11 @@ namespace Oculus.Movement.Utils
         /// Add the hand deformation retargeting processor.
         /// </summary>
         /// <param name="retargetingLayer"></param>
-        public static void AddHandDeformationRetargetingProcessor(RetargetingLayer retargetingLayer)
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
+        public static void AddHandDeformationRetargetingProcessor(
+            RetargetingLayer retargetingLayer,
+            bool runtimeInvocation = false)
         {
             bool needHandDeformation = true;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
@@ -699,8 +814,13 @@ namespace Oculus.Movement.Utils
             }
 
             var handDeformation = ScriptableObject.CreateInstance<RetargetingHandDeformationProcessor>();
-            Undo.RegisterCreatedObjectUndo(handDeformation, "Create hand deformation.");
-            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterCreatedObjectUndo(handDeformation, "Create hand deformation.");
+                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+            }
+#endif
             handDeformation.name = "HandDeformation";
             handDeformation.CalculateFingerData(retargetingLayer.GetComponent<Animator>());
             retargetingLayer.AddRetargetingProcessor(handDeformation);
@@ -748,15 +868,28 @@ namespace Oculus.Movement.Utils
         /// Destroy legacy components.
         /// </summary>
         /// <param name="gameObject">The object to check for the legacy components.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         /// <typeparam name="T">The legacy component type.</typeparam>
         /// <returns>True if legacy components were destroyed.</returns>
-        public static bool DestroyLegacyComponents<T>(GameObject gameObject)
+        public static bool DestroyLegacyComponents<T>(GameObject gameObject, bool runtimeInvocation = false)
         {
             var componentsFound = gameObject.GetComponents<T>();
 
             foreach (var componentFound in componentsFound)
             {
-                Undo.DestroyObjectImmediate(componentFound as UnityEngine.Object);
+#if UNITY_EDITOR
+                if (runtimeInvocation)
+                {
+                    GameObject.DestroyImmediate(componentFound as UnityEngine.Object);
+                }
+                else
+                {
+                    Undo.DestroyObjectImmediate(componentFound as UnityEngine.Object);
+                }
+#else
+                GameObject.DestroyImmediate(componentFound as UnityEngine.Object);
+#endif
             }
 
             return componentsFound.Length > 0;
@@ -766,7 +899,10 @@ namespace Oculus.Movement.Utils
         /// Adds retargeting processor that corrects hand bones.
         /// </summary>
         /// <param name="retargetingLayer">Retargeting layer to add to.</param>
-        public static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer)
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
+        public static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer,
+            bool runtimeInvocation = false)
         {
             bool needCorrectBones = true;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
@@ -783,8 +919,13 @@ namespace Oculus.Movement.Utils
             }
 
             var retargetingProcessorCorrectBones = ScriptableObject.CreateInstance<RetargetingProcessorCorrectBones>();
-            Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectBones, "Create correct bones retargeting processor.");
-            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectBones, "Create correct bones retargeting processor.");
+                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+            }
+#endif
             retargetingProcessorCorrectBones.name = "CorrectBones";
             retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectBones);
         }
@@ -794,9 +935,12 @@ namespace Oculus.Movement.Utils
         /// </summary>
         /// <param name="retargetingLayer">Retargeting layer to add to.</param>
         /// <param name="handedness">Handedness of hand processor.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         public static void AddCorrectHandRetargetingProcessor(
             RetargetingLayer retargetingLayer,
-            Handedness handedness)
+            Handedness handedness,
+            bool runtimeInvocation = false)
         {
             bool needCorrectHand = true;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
@@ -819,8 +963,13 @@ namespace Oculus.Movement.Utils
             var retargetingProcessorCorrectHand = ScriptableObject.CreateInstance<RetargetingProcessorCorrectHand>();
             var handednessString = handedness == Handedness.Left ?
                 _LEFT_HANDEDNESS_STRING : _RIGHT_HANDEDNESS_STRING;
-            Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand ({handednessString}) retargeting processor.");
-            Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+#if UNITY_EDITOR
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand ({handednessString}) retargeting processor.");
+                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
+            }
+#endif
             retargetingProcessorCorrectHand.Handedness = handedness;
             retargetingProcessorCorrectHand.HandIKType = RetargetingProcessorCorrectHand.IKType.CCDIK;
             retargetingProcessorCorrectHand.name = $"Correct{handednessString}Hand";
@@ -841,6 +990,22 @@ namespace Oculus.Movement.Utils
                 throw new InvalidOperationException(
                     $"Animation Rigging requires an {nameof(Animator)} " +
                     $"component with a Humanoid avatar.");
+            }
+        }
+
+        /// <summary>
+        /// Validates GameObject for face mapping.
+        /// </summary>
+        /// <param name="go">GameObject to check.</param>
+        /// <exception cref="InvalidOperationException">Exception thrown if GameObject fails check.</exception>
+        public static void ValidateGameObjectForFaceMapping(GameObject go)
+        {
+            var renderer = go.GetComponent<SkinnedMeshRenderer>();
+            if (renderer == null || renderer.sharedMesh == null || renderer.sharedMesh.blendShapeCount == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Adding a Face Tracking component requires a {nameof(SkinnedMeshRenderer)} " +
+                    $"that contains blendshapes.");
             }
         }
     }

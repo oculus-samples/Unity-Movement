@@ -30,7 +30,7 @@ namespace Oculus.Movement.Utils
 
             try
             {
-                ValidateGameObjectForFaceMapping(activeGameObject);
+                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -49,7 +49,7 @@ namespace Oculus.Movement.Utils
 
             try
             {
-                ValidateGameObjectForFaceMapping(activeGameObject);
+                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -67,7 +67,7 @@ namespace Oculus.Movement.Utils
 
             try
             {
-                ValidateGameObjectForFaceMapping(activeGameObject);
+                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -86,7 +86,7 @@ namespace Oculus.Movement.Utils
 
             try
             {
-                ValidateGameObjectForFaceMapping(activeGameObject);
+                AddComponentsHelper.ValidateGameObjectForFaceMapping(activeGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -95,22 +95,6 @@ namespace Oculus.Movement.Utils
             }
 
             SetUpCharacterForARKitFace(activeGameObject, false);
-        }
-
-        /// <summary>
-        /// Validates GameObject for face mapping.
-        /// </summary>
-        /// <param name="go">GameObject to check.</param>
-        /// <exception cref="InvalidOperationException">Exception thrown if GameObject fails check.</exception>
-        public static void ValidateGameObjectForFaceMapping(GameObject go)
-        {
-            var renderer = go.GetComponent<SkinnedMeshRenderer>();
-            if (renderer == null || renderer.sharedMesh == null || renderer.sharedMesh.blendShapeCount == 0)
-            {
-                throw new InvalidOperationException(
-                    $"Adding a Face Tracking component requires a {nameof(SkinnedMeshRenderer)} " +
-                    $"that contains blendshapes.");
-            }
         }
 
         private static void SetUpCharacterForCorrectivesFace(GameObject gameObject,

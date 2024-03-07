@@ -118,7 +118,7 @@ namespace Oculus.Movement.UI
                 return;
             }
             GameObject newCharacter = Instantiate(_characterToSpawn);
-            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, false);
+            AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, true);
 
             AdjustSpawnedCharacterTransform(newCharacter, true, _currentSpawnOffset);
             _currentSpawnOffset += _spawnOffset;
