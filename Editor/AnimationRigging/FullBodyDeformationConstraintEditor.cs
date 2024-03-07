@@ -412,6 +412,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
+
             float averageWeight = weights.Sum(property => property.floatValue) / weights.Length;
             EditorGUI.BeginChangeCheck();
             averageWeight = EditorGUILayout.Slider(content, averageWeight, 0.0f, 1.0f);

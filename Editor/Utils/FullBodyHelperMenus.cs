@@ -2,15 +2,12 @@
 
 using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
-using Oculus.Movement.AnimationRigging.Deprecated;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
-using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.Utils
 {
@@ -35,7 +32,7 @@ namespace Oculus.Movement.Utils
 
             try
             {
-                ValidGameObjectForAnimationRigging(activeGameObject);
+                HelperMenusCommon.ValidGameObjectForAnimationRigging(activeGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -54,32 +51,25 @@ namespace Oculus.Movement.Utils
 
             // Add the retargeting and body tracking components at root first.
             Animator animatorComp = activeGameObject.GetComponent<Animator>();
-            RetargetingLayer retargetingLayer = AddMainRetargetingComponents(animatorComp, activeGameObject);
+            RetargetingLayer retargetingLayer =
+                HelperMenusCommon.AddMainRetargetingComponent(activeGameObject, true);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
-            (rigBuilder, rigObject) = AddBasicAnimationRiggingComponents(activeGameObject);
+            (rigBuilder, rigObject) =
+                HelperMenusCommon.AddBasicAnimationRiggingComponents(activeGameObject);
 
             List<MonoBehaviour> constraintMonos = new List<MonoBehaviour>();
             RetargetingAnimationConstraint retargetConstraint =
-                AddRetargetingConstraint(rigObject, retargetingLayer);
+                HelperMenusCommon.AddRetargetingConstraint(rigObject, retargetingLayer);
             retargetingLayer.RetargetingConstraint = retargetConstraint;
             constraintMonos.Add(retargetConstraint);
 
             // Destroy old components
-            DestroyBoneTarget(rigObject, "LeftHandTarget");
-            DestroyBoneTarget(rigObject, "RightHandTarget");
-            DestroyBoneTarget(rigObject, "LeftElbowTarget");
-            DestroyBoneTarget(rigObject, "RightElbowTarget");
-            DestroyTwoBoneIKConstraint(rigObject, "LeftArmIK");
-            DestroyTwoBoneIKConstraint(rigObject, "RightArmIK");
-            HelperMenusCommon.DestroyLegacyComponents<BlendHandConstraintsFullBody>(activeGameObject);
-            HelperMenusCommon.DestroyLegacyComponents<FullBodyRetargetedBoneTargets>(activeGameObject);
-            HelperMenusCommon.DestroyLegacyComponents<AnimationRigSetup>(activeGameObject);
-            HelperMenusCommon.DestroyLegacyComponents<FullBodyHandDeformation>(activeGameObject);
+            HelperMenusCommon.DestroyLegacyComponents(rigObject, activeGameObject);
 
             // Full body deformation.
-            BoneTarget[] boneTargets = AddBoneTargets(rigObject, animatorComp);
+            BoneTarget[] boneTargets = HelperMenusCommon.AddBoneTargets(rigObject, animatorComp, true);
             FullBodyDeformationConstraint deformationConstraint =
                 AddDeformationConstraint(rigObject, animatorComp, boneTargets);
             constraintMonos.Add(deformationConstraint);
@@ -101,254 +91,14 @@ namespace Oculus.Movement.Utils
             // Add retargeting processors to the retargeting layer.
             HelperMenusCommon.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
             HelperMenusCommon.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Right);
-            AddCorrectBonesRetargetingProcessor(retargetingLayer);
-            AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
-            AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
+            HelperMenusCommon.AddCorrectBonesRetargetingProcessor(retargetingLayer);
+            HelperMenusCommon.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
+            HelperMenusCommon.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
             HelperMenusCommon.AddHandDeformationRetargetingProcessor(retargetingLayer);
 
             activeGameObject.transform.SetPositionAndRotation(
                 previousPositionAndRotation.translation, previousPositionAndRotation.rotation);
             Undo.SetCurrentGroupName("Setup Animation Rigging Retargeting");
-        }
-
-        private static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer)
-        {
-            bool needCorrectBones = true;
-            foreach (var processor in retargetingLayer.RetargetingProcessors)
-            {
-                if (processor as RetargetingProcessorCorrectBones != null)
-                {
-                    needCorrectBones = false;
-                }
-            }
-
-            if (needCorrectBones)
-            {
-                var retargetingProcessorCorrectBones = ScriptableObject.CreateInstance<RetargetingProcessorCorrectBones>();
-                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectBones, "Create correct bones retargeting processor.");
-                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
-                retargetingProcessorCorrectBones.name = "CorrectBones";
-                retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectBones);
-            }
-        }
-
-        private static void AddCorrectHandRetargetingProcessor(RetargetingLayer retargetingLayer, Handedness handedness)
-        {
-            bool needCorrectHand = true;
-            foreach (var processor in retargetingLayer.RetargetingProcessors)
-            {
-                var correctHand = processor as RetargetingProcessorCorrectHand;
-                if (correctHand != null)
-                {
-                    if (correctHand.Handedness == handedness)
-                    {
-                        needCorrectHand = false;
-                    }
-                }
-            }
-
-            if (needCorrectHand)
-            {
-                var retargetingProcessorCorrectHand = ScriptableObject.CreateInstance<RetargetingProcessorCorrectHand>();
-                var handednessString = handedness == Handedness.Left ? "Left" : "Right";
-                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand ({handednessString}) retargeting processor.");
-                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
-                retargetingProcessorCorrectHand.Handedness = handedness;
-                retargetingProcessorCorrectHand.HandIKType = RetargetingProcessorCorrectHand.IKType.CCDIK;
-                retargetingProcessorCorrectHand.name = $"Correct{handednessString}Hand";
-                retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectHand);
-            }
-        }
-
-        private static BoneTarget[] AddBoneTargets(GameObject rigObject, Animator animator)
-        {
-            var boneTargets = new List<BoneTarget>();
-            Transform hipsTarget = AddBoneTarget(rigObject, "HipsTarget",
-                animator.GetBoneTransform(HumanBodyBones.Hips));
-            Transform spineLowerTarget = AddBoneTarget(rigObject, "SpineLowerTarget",
-                animator.GetBoneTransform(HumanBodyBones.Spine));
-            Transform spineUpperTarget = AddBoneTarget(rigObject, "SpineUpperTarget",
-                animator.GetBoneTransform(HumanBodyBones.Chest));
-            Transform chestTarget = AddBoneTarget(rigObject, "ChestTarget",
-                animator.GetBoneTransform(HumanBodyBones.UpperChest));
-            Transform neckTarget = AddBoneTarget(rigObject, "NeckTarget",
-                animator.GetBoneTransform(HumanBodyBones.Neck));
-            Transform headTarget = AddBoneTarget(rigObject, "HeadTarget",
-                animator.GetBoneTransform(HumanBodyBones.Head));
-
-            Transform leftFootTarget = AddBoneTarget(rigObject, "LeftFootTarget",
-                animator.GetBoneTransform(HumanBodyBones.LeftFoot));
-            Transform leftToesTarget = AddBoneTarget(rigObject, "LeftToesTarget",
-                animator.GetBoneTransform(HumanBodyBones.LeftToes));
-            Transform rightFootTarget = AddBoneTarget(rigObject, "RightFootTarget",
-                animator.GetBoneTransform(HumanBodyBones.RightFoot));
-            Transform rightToesTarget = AddBoneTarget(rigObject, "RightToesTarget",
-                animator.GetBoneTransform(HumanBodyBones.RightToes));
-
-            Tuple<OVRSkeleton.BoneId, Transform>[] bonesToRetarget =
-            {
-                new(OVRSkeleton.BoneId.FullBody_Hips, hipsTarget),
-                new(OVRSkeleton.BoneId.FullBody_SpineLower, spineLowerTarget),
-                new(OVRSkeleton.BoneId.FullBody_SpineUpper, spineUpperTarget),
-                new(OVRSkeleton.BoneId.FullBody_Chest, chestTarget),
-                new(OVRSkeleton.BoneId.FullBody_Neck, neckTarget),
-                new(OVRSkeleton.BoneId.FullBody_Head, headTarget),
-                new(OVRSkeleton.BoneId.FullBody_LeftFootAnkle, leftFootTarget),
-                new(OVRSkeleton.BoneId.FullBody_LeftFootBall, leftToesTarget),
-                new(OVRSkeleton.BoneId.FullBody_RightFootAnkle, rightFootTarget),
-                new(OVRSkeleton.BoneId.FullBody_RightFootBall, rightToesTarget),
-            };
-
-            foreach (var boneToRetarget in bonesToRetarget)
-            {
-                BoneTarget boneRTTarget = new BoneTarget();
-                boneRTTarget.BoneId = boneToRetarget.Item1;
-                boneRTTarget.Target = boneToRetarget.Item2;
-                boneRTTarget.HumanBodyBone = OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone[boneRTTarget.BoneId];
-                boneTargets.Add(boneRTTarget);
-            }
-            return boneTargets.ToArray();
-        }
-
-        private static RetargetingLayer AddMainRetargetingComponents(Animator animator, GameObject mainParent)
-        {
-            RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
-
-            // Check for old retargeting layer first.
-            RetargetingLayer baseRetargetingLayer = mainParent.GetComponent<RetargetingLayer>();
-            if (retargetingLayer == null && baseRetargetingLayer != null)
-            {
-                Undo.DestroyObjectImmediate(baseRetargetingLayer);
-            }
-
-            if (!retargetingLayer)
-            {
-                retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
-                Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
-            }
-
-            var fullBodySectionToPosition =
-                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
-                    "_fullBodySectionToPosition",
-                    BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if (fullBodySectionToPosition != null)
-            {
-                fullBodySectionToPosition.SetValue(retargetingLayer, new[]
-                {
-                    OVRHumanBodyBonesMappings.BodySection.LeftArm,
-                    OVRHumanBodyBonesMappings.BodySection.RightArm,
-                    OVRHumanBodyBonesMappings.BodySection.LeftHand,
-                    OVRHumanBodyBonesMappings.BodySection.RightHand,
-                    OVRHumanBodyBonesMappings.BodySection.Hips,
-                    OVRHumanBodyBonesMappings.BodySection.Back,
-                    OVRHumanBodyBonesMappings.BodySection.Neck,
-                    OVRHumanBodyBonesMappings.BodySection.Head,
-                    OVRHumanBodyBonesMappings.BodySection.LeftLeg,
-                    OVRHumanBodyBonesMappings.BodySection.LeftFoot,
-                    OVRHumanBodyBonesMappings.BodySection.RightLeg,
-                    OVRHumanBodyBonesMappings.BodySection.RightFoot
-                });
-            }
-
-            var bodySectionToPosition =
-                typeof(OVRUnityHumanoidSkeletonRetargeter).GetField(
-                    "_bodySectionToPosition", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (bodySectionToPosition != null)
-            {
-                bodySectionToPosition.SetValue(retargetingLayer, new[]
-                {
-                    OVRHumanBodyBonesMappings.BodySection.LeftArm,
-                    OVRHumanBodyBonesMappings.BodySection.RightArm,
-                    OVRHumanBodyBonesMappings.BodySection.LeftHand,
-                    OVRHumanBodyBonesMappings.BodySection.RightHand,
-                    OVRHumanBodyBonesMappings.BodySection.Hips,
-                    OVRHumanBodyBonesMappings.BodySection.Back,
-                    OVRHumanBodyBonesMappings.BodySection.Neck,
-                    OVRHumanBodyBonesMappings.BodySection.Head
-                });
-            }
-
-            EditorUtility.SetDirty(retargetingLayer);
-
-            OVRBody bodyComp = mainParent.GetComponent<OVRBody>();
-            if (!bodyComp)
-            {
-                bodyComp = mainParent.AddComponent<OVRBody>();
-                Undo.RegisterCreatedObjectUndo(bodyComp, "Add OVRBody component");
-            }
-
-            typeof(RetargetingLayer).GetField(
-                "_skeletonType", BindingFlags.Instance | BindingFlags.NonPublic)?.SetValue(
-                retargetingLayer, OVRSkeleton.SkeletonType.FullBody);
-            typeof(OVRBody).GetField(
-                "_providedSkeletonType", BindingFlags.Instance | BindingFlags.NonPublic)?.SetValue(
-                bodyComp, OVRPlugin.BodyJointSet.FullBody);
-
-            retargetingLayer.EnableTrackingByProxy = true;
-            PrefabUtility.RecordPrefabInstancePropertyModifications(retargetingLayer);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(bodyComp);
-
-            return retargetingLayer;
-        }
-
-        private static (RigBuilder, GameObject) AddBasicAnimationRiggingComponents(GameObject mainParent)
-        {
-            Rig rigComponent = mainParent.GetComponentInChildren<Rig>();
-            if (!rigComponent)
-            {
-                // Create rig for constraints.
-                GameObject rigObject = new GameObject("Rig");
-                rigComponent = rigObject.AddComponent<Rig>();
-                rigComponent.weight = 1.0f;
-                Undo.RegisterCreatedObjectUndo(rigObject, "Create Rig");
-            }
-
-            RigBuilder rigBuilder = mainParent.GetComponent<RigBuilder>();
-            if (!rigBuilder)
-            {
-                rigBuilder = mainParent.AddComponent<RigBuilder>();
-                rigBuilder.layers = new System.Collections.Generic.List<RigLayer>
-                {
-                    new RigLayer(rigComponent, true)
-                };
-                Undo.RegisterCreatedObjectUndo(rigBuilder, "Create RigBuilder");
-            }
-
-            Undo.SetTransformParent(rigComponent.transform, mainParent.transform, "Add Rig to Main Parent");
-            Undo.RegisterCompleteObjectUndo(rigComponent, "Rig Component Transform init");
-            rigComponent.transform.localPosition = Vector3.zero;
-            rigComponent.transform.localRotation = Quaternion.identity;
-            rigComponent.transform.localScale = Vector3.one;
-
-            return (rigBuilder, rigComponent.gameObject);
-        }
-
-        private static RetargetingAnimationConstraint AddRetargetingConstraint(
-            GameObject rigObject, RetargetingLayer retargetingLayer)
-        {
-            RetargetingAnimationConstraint retargetConstraint =
-                rigObject.GetComponentInChildren<RetargetingAnimationConstraint>(true);
-            if (retargetConstraint == null)
-            {
-                GameObject retargetingAnimConstraintObj =
-                    new GameObject("RetargetingConstraint");
-                retargetConstraint =
-                    retargetingAnimConstraintObj.AddComponent<RetargetingAnimationConstraint>();
-                Undo.RegisterCreatedObjectUndo(retargetingAnimConstraintObj, "Create Retargeting Constraint");
-
-                Undo.SetTransformParent(retargetingAnimConstraintObj.transform, rigObject.transform, "Add Retarget Constraint to Rig");
-                Undo.RegisterCompleteObjectUndo(retargetingAnimConstraintObj, "Retarget Constraint Transform Init");
-                retargetConstraint.transform.localPosition = Vector3.zero;
-                retargetConstraint.transform.localRotation = Quaternion.identity;
-                retargetConstraint.transform.localScale = Vector3.one;
-
-                // keep retargeter disabled until it initializes properly
-                retargetConstraint.gameObject.SetActive(false);
-            }
-            retargetConstraint.RetargetingLayerComp = retargetingLayer;
-            PrefabUtility.RecordPrefabInstancePropertyModifications(retargetConstraint);
-            return retargetConstraint;
         }
 
         private static FullBodyDeformationConstraint AddDeformationConstraint(
@@ -435,74 +185,6 @@ namespace Oculus.Movement.Utils
             PrefabUtility.RecordPrefabInstancePropertyModifications(deformationConstraint);
 
             return deformationConstraint;
-        }
-
-        private static Transform AddBoneTarget(GameObject mainParent,
-            string nameOfTarget, Transform targetTransform = null)
-        {
-            Transform boneTarget =
-                mainParent.transform.FindChildRecursive(nameOfTarget);
-            if (boneTarget == null)
-            {
-                GameObject boneTargetObject =
-                    new GameObject(nameOfTarget);
-                Undo.RegisterCreatedObjectUndo(boneTargetObject, "Create Bone Target " + nameOfTarget);
-
-                Undo.SetTransformParent(boneTargetObject.transform, mainParent.transform,
-                    $"Add Bone Target {nameOfTarget} To Main Parent");
-                Undo.RegisterCompleteObjectUndo(boneTargetObject,
-                    $"Bone Target {nameOfTarget} Transform Init");
-                boneTarget = boneTargetObject.transform;
-            }
-
-            if (targetTransform != null)
-            {
-                boneTarget.position = targetTransform.position;
-                boneTarget.rotation = targetTransform.rotation;
-                boneTarget.localScale = targetTransform.localScale;
-            }
-            else
-            {
-                boneTarget.localPosition = Vector3.zero;
-                boneTarget.localRotation = Quaternion.identity;
-                boneTarget.localScale = Vector3.one;
-            }
-            return boneTarget;
-        }
-
-        private static bool DestroyBoneTarget(GameObject mainParent, string nameOfTarget)
-        {
-            Transform handTarget =
-                mainParent.transform.FindChildRecursive(nameOfTarget);
-            if (handTarget != null)
-            {
-                Undo.DestroyObjectImmediate(handTarget);
-                return true;
-            }
-            return false;
-        }
-
-        private static bool DestroyTwoBoneIKConstraint(GameObject rigObject, string name)
-        {
-            Transform twoBoneIKConstraintObjTransform = rigObject.transform.Find(name);
-            if (twoBoneIKConstraintObjTransform != null)
-            {
-                Undo.DestroyObjectImmediate(twoBoneIKConstraintObjTransform);
-                return true;
-            }
-            return false;
-        }
-
-        private static void ValidGameObjectForAnimationRigging(GameObject go)
-        {
-            var animatorComp = go.GetComponent<Animator>();
-            if (animatorComp == null || animatorComp.avatar == null
-                || !animatorComp.avatar.isHuman)
-            {
-                throw new InvalidOperationException(
-                    $"Animation Rigging requires an {nameof(Animator)} " +
-                    $"component with a Humanoid avatar.");
-            }
         }
     }
 }
