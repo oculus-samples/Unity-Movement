@@ -17,15 +17,14 @@ namespace Oculus.Movement.Utils
     /// </summary>
     internal static class FullBodyHelperMenus
     {
-        private const string _MOVEMENT_SAMPLES_MENU =
-            "GameObject/Movement Samples/";
         private const string _MOVEMENT_SAMPLES_BT_MENU =
             "Body Tracking/";
 
         private const string _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS =
             "Animation Rigging Retargeting (full body) (constraints)";
 
-        [MenuItem(_MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU + _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS)]
+        [MenuItem(HelperMenusCommon._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU +
+            _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS)]
         private static void SetupCharacterForAnimationRiggingRetargetingConstraints()
         {
             var activeGameObject = Selection.activeGameObject;

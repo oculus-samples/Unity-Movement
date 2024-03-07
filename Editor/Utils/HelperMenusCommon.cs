@@ -19,6 +19,12 @@ namespace Oculus.Movement.Utils
     /// </summary>
     public class HelperMenusCommon
     {
+        /// <summary>
+        /// Prefix for movement samples one-click menus.
+        /// </summary>
+        public const string _MOVEMENT_SAMPLES_MENU =
+            "GameObject/Movement Samples/";
+
         private const string _HUMANOID_REFERENCE_POSE_ASSET_NAME = "BodyTrackingHumanoidReferencePose";
         private const string _HUMANOID_REFERENCE_T_POSE_ASSET_NAME = "BodyTrackingHumanoidReferenceTPose";
         private const float _tPoseArmDirectionMatchThreshold = 0.95f;
