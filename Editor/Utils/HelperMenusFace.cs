@@ -22,7 +22,7 @@ namespace Oculus.Movement.Utils
         private const string _NO_DUPLICATES_SUFFIX =
             " (duplicate mapping off)";
 
-        [MenuItem(HelperMenusCommon._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU +
+        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU +
             _CORRECTIVES_FACE_MENU)]
         private static void SetupCharacterForCorrectivesFace()
         {
@@ -41,7 +41,7 @@ namespace Oculus.Movement.Utils
             SetUpCharacterForCorrectivesFace(activeGameObject);
         }
 
-        [MenuItem(HelperMenusCommon._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU +
+        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU +
             _CORRECTIVES_FACE_MENU + _NO_DUPLICATES_SUFFIX)]
         private static void SetupCharacterForCorrectivesFaceNoDuplicates()
         {
@@ -60,7 +60,7 @@ namespace Oculus.Movement.Utils
             SetUpCharacterForCorrectivesFace(activeGameObject, false);
         }
 
-        [MenuItem(HelperMenusCommon._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU)]
+        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU)]
         private static void SetupCharacterForARKitFace()
         {
             var activeGameObject = Selection.activeGameObject;
@@ -78,7 +78,7 @@ namespace Oculus.Movement.Utils
             SetUpCharacterForARKitFace(activeGameObject);
         }
 
-        [MenuItem(HelperMenusCommon._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU
+        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU
             + _NO_DUPLICATES_SUFFIX)]
         private static void SetupCharacterForARKitFaceNoDuplicates()
         {

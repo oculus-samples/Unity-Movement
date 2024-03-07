@@ -12,7 +12,7 @@ using UnityEngine.Animations.Rigging;
 using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
-namespace Oculus.Movement.Utils
+namespace Oculus.Movement.Utils.Legacy
 {
     /// <summary>
     /// Has common menu functions.
@@ -222,7 +222,10 @@ namespace Oculus.Movement.Utils
                 GameObject rigObject = new GameObject("Rig");
                 rigComponent = rigObject.AddComponent<Rig>();
                 rigComponent.weight = 1.0f;
-                Undo.RegisterCreatedObjectUndo(rigObject, "Create Rig");
+                if (Application.isEditor)
+                {
+                    Undo.RegisterCreatedObjectUndo(rigObject, "Create Rig");
+                }
             }
 
             RigBuilder rigBuilder = mainParent.GetComponent<RigBuilder>();
@@ -233,11 +236,21 @@ namespace Oculus.Movement.Utils
                 {
                     new RigLayer(rigComponent, true)
                 };
-                Undo.RegisterCreatedObjectUndo(rigBuilder, "Create RigBuilder");
+                if (Application.isEditor)
+                {
+                    Undo.RegisterCreatedObjectUndo(rigBuilder, "Create RigBuilder");
+                }
             }
 
-            Undo.SetTransformParent(rigComponent.transform, mainParent.transform, "Add Rig to Main Parent");
-            Undo.RegisterCompleteObjectUndo(rigComponent, "Rig Component Transform init");
+            if (Application.isEditor)
+            {
+                Undo.SetTransformParent(rigComponent.transform, mainParent.transform, "Add Rig to Main Parent");
+                Undo.RegisterCompleteObjectUndo(rigComponent, "Rig Component Transform init");
+            }
+            else
+            {
+                rigComponent.transform.SetParent(mainParent.transform, true);
+            }
             rigComponent.transform.localPosition = Vector3.zero;
             rigComponent.transform.localRotation = Quaternion.identity;
             rigComponent.transform.localScale = Vector3.one;

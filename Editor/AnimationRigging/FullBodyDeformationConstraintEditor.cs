@@ -245,7 +245,7 @@ namespace Oculus.Movement.AnimationRigging
                 constraintData.AssignAnimator(animator);
             }
             // Determine if this character is in T-pose or A-pose.
-            var isTPose = HelperMenusCommon.CheckIfTPose(animator);
+            var isTPose = AddComponentsHelper.CheckIfTPose(animator);
 
             constraintData.InitializeStartingScale();
             constraintData.ClearTransformData();
@@ -256,7 +256,7 @@ namespace Oculus.Movement.AnimationRigging
             constraintData.SetUpHipsAndHeadBones();
             constraintData.SetUpBonePairs();
             constraintData.SetUpBoneTargets(constraint.transform);
-            constraintData.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject(isTPose));
+            constraintData.SetUpAdjustments(AddComponentsHelper.GetRestPoseObject(isTPose));
             constraint.data = constraintData;
             EditorUtility.SetDirty(target);
             PrefabUtility.RecordPrefabInstancePropertyModifications(target);

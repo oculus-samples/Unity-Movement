@@ -23,7 +23,7 @@ namespace Oculus.Movement.AnimationRigging
                 if (retargetingLayer != null)
                 {
                     var animator = retargetingLayer.GetComponent<Animator>();
-                    HelperMenusCommon.AddJointAdjustments(animator, retargetingLayer);
+                    AddComponentsHelper.AddJointAdjustments(animator, retargetingLayer);
                     EditorUtility.SetDirty(retargetingLayer);
                 }
             }

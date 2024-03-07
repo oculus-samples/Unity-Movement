@@ -2,7 +2,6 @@
 
 using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
-using Oculus.Movement.AnimationRigging.Deprecated;
 using Oculus.Movement.Tracking;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -147,9 +146,9 @@ namespace Oculus.Movement.Utils
             // Add the retargeting and body tracking components at root first.
             RetargetingLayer retargetingLayer = AddMainRetargetingComponents(mainParent, isFullBody);
 
-            GameObject rigObject;
-            RigBuilder rigBuilder;
-            (rigBuilder, rigObject) = AddBasicAnimationRiggingComponents(mainParent);
+            GameObject rigObject = null;
+            RigBuilder rigBuilder = null;
+            (rigBuilder, rigObject) = AddComponentsHelper.AddBasicAnimationRiggingComponents(mainParent);
             // disable rig builder. in case we need to set up any constraints, we might need to enable
             // the animator. but we don't want the rig to evaluate any constraints, so keep the rig disabled
             // until the character has been set up.
@@ -274,35 +273,6 @@ namespace Oculus.Movement.Utils
                 bodyComp, isFullBody ? OVRPlugin.BodyJointSet.FullBody : OVRPlugin.BodyJointSet.UpperBody);
 
             return retargetingLayer;
-        }
-
-        private static (RigBuilder, GameObject) AddBasicAnimationRiggingComponents(GameObject mainParent)
-        {
-            Rig rigComponent = mainParent.GetComponentInChildren<Rig>();
-            if (!rigComponent)
-            {
-                // Create rig for constraints.
-                GameObject rigObject = new GameObject("Rig");
-                rigComponent = rigObject.AddComponent<Rig>();
-                rigComponent.weight = 1.0f;
-            }
-
-            RigBuilder rigBuilder = mainParent.GetComponent<RigBuilder>();
-            if (!rigBuilder)
-            {
-                rigBuilder = mainParent.AddComponent<RigBuilder>();
-                rigBuilder.layers = new List<RigLayer>
-                {
-                    new RigLayer(rigComponent, true)
-                };
-            }
-
-            rigComponent.transform.SetParent(mainParent.transform, true);
-            rigComponent.transform.localPosition = Vector3.zero;
-            rigComponent.transform.localRotation = Quaternion.identity;
-            rigComponent.transform.localScale = Vector3.one;
-
-            return (rigBuilder, rigComponent.gameObject);
         }
 
         private static RetargetingAnimationConstraint AddRetargetingConstraint(

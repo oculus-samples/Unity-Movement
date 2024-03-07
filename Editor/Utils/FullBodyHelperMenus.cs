@@ -23,7 +23,7 @@ namespace Oculus.Movement.Utils
         private const string _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS =
             "Animation Rigging Retargeting (full body) (constraints)";
 
-        [MenuItem(HelperMenusCommon._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU +
+        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU +
             _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS)]
         private static void SetupCharacterForAnimationRiggingRetargetingConstraints()
         {
@@ -31,7 +31,7 @@ namespace Oculus.Movement.Utils
 
             try
             {
-                HelperMenusCommon.ValidGameObjectForAnimationRigging(activeGameObject);
+                AddComponentsHelper.ValidGameObjectForAnimationRigging(activeGameObject);
             }
             catch (InvalidOperationException e)
             {
@@ -51,30 +51,30 @@ namespace Oculus.Movement.Utils
             // Add the retargeting and body tracking components at root first.
             Animator animatorComp = activeGameObject.GetComponent<Animator>();
             RetargetingLayer retargetingLayer =
-                HelperMenusCommon.AddMainRetargetingComponent(activeGameObject, true);
+                AddComponentsHelper.AddMainRetargetingComponent(activeGameObject, true);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
             (rigBuilder, rigObject) =
-                HelperMenusCommon.AddBasicAnimationRiggingComponents(activeGameObject);
+                AddComponentsHelper.AddBasicAnimationRiggingComponents(activeGameObject);
 
             List<MonoBehaviour> constraintMonos = new List<MonoBehaviour>();
             RetargetingAnimationConstraint retargetConstraint =
-                HelperMenusCommon.AddRetargetingConstraint(rigObject, retargetingLayer);
+                AddComponentsHelper.AddRetargetingConstraint(rigObject, retargetingLayer);
             retargetingLayer.RetargetingConstraint = retargetConstraint;
             constraintMonos.Add(retargetConstraint);
 
             // Destroy old components
-            HelperMenusCommon.DestroyLegacyComponents(rigObject, activeGameObject);
+            AddComponentsHelper.DestroyLegacyComponents(rigObject, activeGameObject);
 
             // Full body deformation.
-            BoneTarget[] boneTargets = HelperMenusCommon.AddBoneTargets(rigObject, animatorComp, true);
+            BoneTarget[] boneTargets = AddComponentsHelper.AddBoneTargets(rigObject, animatorComp, true);
             FullBodyDeformationConstraint deformationConstraint =
                 AddDeformationConstraint(rigObject, animatorComp, boneTargets);
             constraintMonos.Add(deformationConstraint);
 
             // Setup retargeted bone targets.
-            HelperMenusCommon.SetupExternalBoneTargets(retargetingLayer, true, boneTargets);
+            AddComponentsHelper.SetupExternalBoneTargets(retargetingLayer, true, boneTargets);
 
             // Disable root motion.
             animatorComp.applyRootMotion = false;
@@ -82,18 +82,18 @@ namespace Oculus.Movement.Utils
             EditorUtility.SetDirty(animatorComp);
 
             // Add retargeting animation rig to tie everything together.
-            HelperMenusCommon.AddJointAdjustments(animatorComp, retargetingLayer);
-            HelperMenusCommon.AddRetargetingAnimationRig(
+            AddComponentsHelper.AddJointAdjustments(animatorComp, retargetingLayer);
+            AddComponentsHelper.AddRetargetingAnimationRig(
                 retargetingLayer, rigBuilder, constraintMonos.ToArray());
             EditorUtility.SetDirty(retargetingLayer);
 
             // Add retargeting processors to the retargeting layer.
-            HelperMenusCommon.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
-            HelperMenusCommon.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Right);
-            HelperMenusCommon.AddCorrectBonesRetargetingProcessor(retargetingLayer);
-            HelperMenusCommon.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
-            HelperMenusCommon.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
-            HelperMenusCommon.AddHandDeformationRetargetingProcessor(retargetingLayer);
+            AddComponentsHelper.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
+            AddComponentsHelper.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Right);
+            AddComponentsHelper.AddCorrectBonesRetargetingProcessor(retargetingLayer);
+            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
+            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
+            AddComponentsHelper.AddHandDeformationRetargetingProcessor(retargetingLayer);
 
             activeGameObject.transform.SetPositionAndRotation(
                 previousPositionAndRotation.translation, previousPositionAndRotation.rotation);
@@ -178,7 +178,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SetUpHipsAndHeadBones();
             deformationConstraint.data.SetUpBonePairs();
             deformationConstraint.data.SetUpBoneTargets(deformationConstraint.transform);
-            deformationConstraint.data.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject(HelperMenusCommon.CheckIfTPose(animator)));
+            deformationConstraint.data.SetUpAdjustments(AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator)));
             deformationConstraint.data.InitializeStartingScale();
 
             PrefabUtility.RecordPrefabInstancePropertyModifications(deformationConstraint);
