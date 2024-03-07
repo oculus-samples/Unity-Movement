@@ -129,28 +129,15 @@ namespace Oculus.Movement.Utils
         {
             var adjustments = new List<JointAdjustment>();
             var deformationData = constraint.data as IFullBodyDeformationData;
-            var isMissingUpperChestBone = animator.GetBoneTransform(HumanBodyBones.UpperChest) == null;
             var boneAdjustmentData = deformationData.BoneAdjustments;
             foreach (var boneAdjustment in boneAdjustmentData)
             {
                 var rotationTweak = boneAdjustment.Adjustment;
-                if (isMissingUpperChestBone && boneAdjustment.Bone == HumanBodyBones.Chest)
+                if (boneAdjustment.Bone == HumanBodyBones.UpperChest ||
+                    boneAdjustment.Bone == HumanBodyBones.LeftShoulder ||
+                    boneAdjustment.Bone == HumanBodyBones.RightShoulder)
                 {
-                    // If the spine to chest bone isn't aligned, then inverse the rotation as we want
-                    // to apply the adjustment relative to the character's spine direction.
-                    var currentBoneDir = (animator.GetBoneTransform(HumanBodyBones.Chest).position -
-                                         animator.GetBoneTransform(HumanBodyBones.Spine).position).normalized;
-                    var previousBoneDir = (animator.GetBoneTransform(HumanBodyBones.Chest).position -
-                                          animator.GetBoneTransform(HumanBodyBones.Hips).position).normalized;
-                    var boneDirDotComparison = Vector3.Dot(previousBoneDir, currentBoneDir);
-                    if (boneDirDotComparison < 1.0f - Mathf.Epsilon)
-                    {
-                        rotationTweak = Quaternion.Inverse(rotationTweak);
-                    }
-                }
-                if (boneAdjustment.Bone == HumanBodyBones.UpperChest)
-                {
-                    // Reducing the rotation adjustment on the upper chest yields a better result visually.
+                    // Reducing the rotation adjustment on the upper chest and shoulders yields a better result visually.
                     rotationTweak =
                         Quaternion.Slerp(Quaternion.identity, rotationTweak, 0.5f);
                 }

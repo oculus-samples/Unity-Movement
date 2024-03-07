@@ -1166,7 +1166,6 @@ namespace Oculus.Movement.AnimationRigging
             // Combine calculated adjustments.
             var boneAdjustments = new List<BoneAdjustmentData>();
             boneAdjustments.AddRange(spineBoneAdjustments);
-            boneAdjustments.AddRange(shoulderBoneAdjustments);
 
             // Calculate an adjustment alignment if needed, using the desired right and forward from the
             // rest pose humanoid, which is Vector3.right and Vector3.forward.
@@ -1182,6 +1181,7 @@ namespace Oculus.Movement.AnimationRigging
                     Quaternion.Euler(adjustmentAlignment * adjustmentPoint);
                 boneAdjustments[i] = adjustment;
             }
+            boneAdjustments.AddRange(shoulderBoneAdjustments);
             _boneAdjustmentData = boneAdjustments.ToArray();
         }
 

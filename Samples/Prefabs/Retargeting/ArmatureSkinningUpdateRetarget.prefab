@@ -675,17 +675,17 @@ MonoBehaviour:
     _spineLowerAlignmentWeight: 1
     _spineUpperAlignmentWeight: 1
     _chestAlignmentWeight: 0
-    _shouldersHeightAdjustmentWeight: 0
-    _shouldersWidthAdjustmentWeight: 0
-    _armsHeightAdjustmentWeight: 0
+    _shouldersHeightReductionWeight: 0
+    _shouldersWidthReductionWeight: 0
+    _affectArmsBySpineCorrection: 0
     _leftShoulderWeight: 1
     _rightShoulderWeight: 1
     _leftArmWeight: 1
     _rightArmWeight: 1
     _leftHandWeight: 1
     _rightHandWeight: 1
-    _leftLegWeight: 1
-    _rightLegWeight: 1
+    _alignLeftLegWeight: 1
+    _alignRightLegWeight: 1
     _leftToesWeight: 1
     _rightToesWeight: 1
     _alignFeetWeight: 0.75
@@ -1489,7 +1489,7 @@ MonoBehaviour:
     PositionChange: {x: 0, y: 0, z: 0}
     RotationChange: {x: 0, y: 0, z: 0, w: 1}
     RotationTweaks:
-    - {x: 0.14328793, y: -0.0089229, z: 0.061508276, w: 0.9877275}
+    - {x: 0.07186479, y: -0.0044752015, z: 0.030848932, w: 0.9969272}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
@@ -1498,7 +1498,7 @@ MonoBehaviour:
     PositionChange: {x: 0, y: 0, z: 0}
     RotationChange: {x: 0, y: 0, z: 0, w: 1}
     RotationTweaks:
-    - {x: 0.14328793, y: -0.0089229, z: 0.061508276, w: 0.9877275}
+    - {x: 0.07186479, y: -0.0044752015, z: 0.030848932, w: 0.9969272}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
