@@ -2,7 +2,6 @@
 
 using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
-using Oculus.Movement.AnimationRigging.Deprecated;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -13,10 +12,10 @@ using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
 namespace Oculus.Movement.Utils
 {
     /// <summary>
-    /// Provides useful menus to help one set up tracking technologies
+    /// Provides useful menus to help one set up body tracking technologies
     /// on characters.
     /// </summary>
-    internal static class FullBodyHelperMenus
+    internal static class HelperMenusBody
     {
         private const string _MOVEMENT_SAMPLES_BT_MENU =
             "Body Tracking/";
@@ -24,9 +23,24 @@ namespace Oculus.Movement.Utils
         private const string _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS =
             "Animation Rigging Retargeting (full body) (constraints)";
 
+        private const string _ANIM_RIGGING_RETARGETING_MENU_CONSTRAINTS =
+            "Animation Rigging Retargeting (upper body) (constraints)";
+
         [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU +
-            _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS)]
-        private static void SetupCharacterForAnimationRiggingRetargetingConstraints()
+                  _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS)]
+        private static void SetupFullBodyCharacterForAnimationRiggingRetargetingConstraints()
+        {
+            SetupCharacterForAnimationRiggingRetargetingConstraints(true);
+        }
+
+        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU +
+                  _ANIM_RIGGING_RETARGETING_MENU_CONSTRAINTS)]
+        private static void SetupUpperBodyCharacterForAnimationRiggingRetargetingConstraints()
+        {
+            SetupCharacterForAnimationRiggingRetargetingConstraints(false);
+        }
+
+        private static void SetupCharacterForAnimationRiggingRetargetingConstraints(bool isFullBody)
         {
             var activeGameObject = Selection.activeGameObject;
 
@@ -52,7 +66,7 @@ namespace Oculus.Movement.Utils
             // Add the retargeting and body tracking components at root first.
             Animator animatorComp = activeGameObject.GetComponent<Animator>();
             RetargetingLayer retargetingLayer =
-                AddComponentsHelper.AddMainRetargetingComponent(activeGameObject, true);
+                AddComponentsHelper.AddMainRetargetingComponent(activeGameObject, isFullBody);
 
             GameObject rigObject;
             RigBuilder rigBuilder;
@@ -69,13 +83,13 @@ namespace Oculus.Movement.Utils
             AddComponentsHelper.DestroyLegacyComponents(rigObject, activeGameObject);
 
             // Full body deformation.
-            BoneTarget[] boneTargets = AddComponentsHelper.AddBoneTargets(rigObject, animatorComp, true);
+            BoneTarget[] boneTargets = AddComponentsHelper.AddBoneTargets(rigObject, animatorComp, isFullBody);
             FullBodyDeformationConstraint deformationConstraint =
-                AddDeformationConstraint(rigObject, animatorComp, boneTargets);
+                AddDeformationConstraint(rigObject, animatorComp, boneTargets, isFullBody);
             constraintMonos.Add(deformationConstraint);
 
             // Setup retargeted bone targets.
-            AddComponentsHelper.SetupExternalBoneTargets(retargetingLayer, true, boneTargets);
+            AddComponentsHelper.SetupExternalBoneTargets(retargetingLayer, isFullBody, boneTargets);
 
             // Disable root motion.
             animatorComp.applyRootMotion = false;
@@ -102,16 +116,10 @@ namespace Oculus.Movement.Utils
         }
 
         private static FullBodyDeformationConstraint AddDeformationConstraint(
-            GameObject rigObject, Animator animator, BoneTarget[] boneTargets)
+            GameObject rigObject, Animator animator, BoneTarget[] boneTargets, bool isFullBody)
         {
             FullBodyDeformationConstraint deformationConstraint =
                 rigObject.GetComponentInChildren<FullBodyDeformationConstraint>();
-            DeformationConstraint baseDeformationConstraint =
-                rigObject.GetComponentInChildren<DeformationConstraint>();
-            if (deformationConstraint == null && baseDeformationConstraint != null)
-            {
-                Undo.DestroyObjectImmediate(baseDeformationConstraint.gameObject);
-            }
             GameObject deformationConstraintObject = null;
             if (deformationConstraint == null)
             {
@@ -154,8 +162,11 @@ namespace Oculus.Movement.Utils
                 }
             }
 
-            deformationConstraint.data.SpineTranslationCorrectionTypeField
-                = FullBodyDeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead;
+            deformationConstraint.data.DeformationBodyTypeField = isFullBody ?
+                FullBodyDeformationData.DeformationBodyType.FullBody :
+                FullBodyDeformationData.DeformationBodyType.UpperBody;
+            deformationConstraint.data.SpineTranslationCorrectionTypeField =
+                FullBodyDeformationData.SpineTranslationCorrectionType.AccurateHipsAndHead;
             deformationConstraint.data.SpineLowerAlignmentWeight = 0.5f;
             deformationConstraint.data.SpineUpperAlignmentWeight = 1.0f;
             deformationConstraint.data.ChestAlignmentWeight = 0.0f;
