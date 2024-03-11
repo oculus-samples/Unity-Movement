@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
-using static Oculus.Movement.AnimationRigging.DeformationCommon;
+using static Oculus.Movement.AnimationRigging.Deprecated.DeformationCommon;
 
-namespace Oculus.Movement.AnimationRigging
+namespace Oculus.Movement.AnimationRigging.Deprecated
 {
     /// <summary>
     /// Interface for deformation data.

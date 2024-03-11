@@ -2,7 +2,7 @@
 
 using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
-using Oculus.Movement.Tracking;
+using Oculus.Movement.AnimationRigging.Deprecated;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using System;

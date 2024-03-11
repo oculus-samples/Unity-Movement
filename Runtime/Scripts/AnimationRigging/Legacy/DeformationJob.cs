@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 
-namespace Oculus.Movement.AnimationRigging
+namespace Oculus.Movement.AnimationRigging.Deprecated
 {
     /// <summary>
     /// The deformation job.

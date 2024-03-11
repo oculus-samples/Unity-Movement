@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Serialization;
-using static Oculus.Movement.AnimationRigging.DeformationCommon;
+using static Oculus.Movement.AnimationRigging.Deprecated.DeformationCommon;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging

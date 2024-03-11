@@ -3,7 +3,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Oculus.Movement.AnimationRigging
+namespace Oculus.Movement.AnimationRigging.Deprecated
 {
     /// <summary>
     /// Custom editor for the deformation constraint.
