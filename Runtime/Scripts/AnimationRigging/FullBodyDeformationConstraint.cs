@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Serialization;
-using static Oculus.Movement.AnimationRigging.Deprecated.DeformationCommon;
+using static Oculus.Movement.AnimationRigging.DeformationUtilities;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
@@ -1139,50 +1139,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void SetUpAdjustments(RestPoseObjectHumanoid restPoseObject)
         {
-            // Calculate spine adjustments.
-            var shoulderParentAdjustmentBone = GetValidShoulderParentBone(_animator);
-            var shoulderParentAdjustment = Quaternion.identity;
-            var spineBoneAdjustments = GetSpineJointAdjustments(_animator, restPoseObject);
-
-            // If the chest bone is missing, invert the spine rotation as the
-            // fallback rotation is the previous rotation.
-            if (_animator.GetBoneTransform(HumanBodyBones.Chest) == null)
-            {
-                spineBoneAdjustments[1].Adjustment = Quaternion.Inverse(spineBoneAdjustments[1].Adjustment);
-            }
-            foreach (var spineBoneAdjustment in spineBoneAdjustments)
-            {
-                if (spineBoneAdjustment.Bone == shoulderParentAdjustmentBone)
-                {
-                    shoulderParentAdjustment = spineBoneAdjustment.Adjustment;
-                    break;
-                }
-            }
-
-            // Calculate adjustments for the shoulders (or upper arms, if shoulders are unavailable).
-            var shoulderBoneAdjustments =
-                GetShoulderAdjustments(_animator, restPoseObject, shoulderParentAdjustment);
-
-            // Combine calculated adjustments.
-            var boneAdjustments = new List<BoneAdjustmentData>();
-            boneAdjustments.AddRange(spineBoneAdjustments);
-
-            // Calculate an adjustment alignment if needed, using the desired right and forward from the
-            // rest pose humanoid, which is Vector3.right and Vector3.forward.
-            var adjustmentAlignment =
-                GetHipsRightForwardAlignmentForAdjustments(_animator, Vector3.right, Vector3.forward);
-            for (int i = 0; i < boneAdjustments.Count; i++)
-            {
-                var adjustment = boneAdjustments[i];
-                // We use euler angles here as we want to rotate the adjustment point with the alignment rotation,
-                // rather than combine the rotations.
-                var adjustmentPoint = adjustment.Adjustment.eulerAngles;
-                adjustment.Adjustment =
-                    Quaternion.Euler(adjustmentAlignment * adjustmentPoint);
-                boneAdjustments[i] = adjustment;
-            }
-            boneAdjustments.AddRange(shoulderBoneAdjustments);
-            _boneAdjustmentData = boneAdjustments.ToArray();
+            _boneAdjustmentData = GetDeformationBoneAdjustments(_animator, restPoseObject);
         }
 
         /// <inheritdoc />
