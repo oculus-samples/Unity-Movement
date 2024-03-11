@@ -11,7 +11,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Custom editor for the full body deformation constraint.
     /// </summary>
-    [CustomEditor(typeof(FullBodyDeformationConstraint))]
+    [CustomEditor(typeof(FullBodyDeformationConstraint)), CanEditMultipleObjects]
     public class FullBodyDeformationConstraintEditor : Editor
     {
         private static class Content
@@ -86,6 +86,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private SerializedProperty _weightProperty;
 
+        private SerializedProperty _deformationBodyTypeProperty;
         private SerializedProperty _animatorProperty;
         private SerializedProperty _customSkeletonProperty;
 
@@ -124,12 +125,14 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _hipsToFootDistanceProperty;
 
         private readonly int _indentSpacing = 10;
+        private bool _isFullBody;
 
         private void OnEnable()
         {
             _weightProperty = serializedObject.FindProperty("m_Weight");
             var data = serializedObject.FindProperty("m_Data");
 
+            _deformationBodyTypeProperty = data.FindPropertyRelative("_deformationBodyType");
             _animatorProperty = data.FindPropertyRelative("_animator");
             _customSkeletonProperty = data.FindPropertyRelative("_customSkeleton");
 
@@ -173,7 +176,10 @@ namespace Oculus.Movement.AnimationRigging
         {
             serializedObject.Update();
 
+            _isFullBody = (FullBodyDeformationData.DeformationBodyType)_deformationBodyTypeProperty.intValue ==
+                          FullBodyDeformationData.DeformationBodyType.FullBody;
             EditorGUILayout.PropertyField(_weightProperty, Content.Weight);
+            EditorGUILayout.PropertyField(_deformationBodyTypeProperty);
             EditorGUILayout.Space();
 
             _referencesFoldout.Value =
@@ -305,6 +311,11 @@ namespace Oculus.Movement.AnimationRigging
             AverageWeightSlider(Content.HandsWeight,
                 new[] { _leftHandWeightProperty, _rightHandWeightProperty });
 
+            if (!_isFullBody)
+            {
+                return;
+            }
+
             EditorGUILayout.Space();
             GUILayout.BeginHorizontal();
             GUILayout.Space(EditorGUI.indentLevel * _indentSpacing);
@@ -332,10 +343,13 @@ namespace Oculus.Movement.AnimationRigging
             EditorGUILayout.PropertyField(_rightArmWeightProperty);
             EditorGUILayout.PropertyField(_leftHandWeightProperty);
             EditorGUILayout.PropertyField(_rightHandWeightProperty);
-            EditorGUILayout.PropertyField(_leftLegWeightProperty);
-            EditorGUILayout.PropertyField(_rightLegWeightProperty);
-            EditorGUILayout.PropertyField(_leftToesWeightProperty);
-            EditorGUILayout.PropertyField(_rightToesWeightProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_leftLegWeightProperty);
+                EditorGUILayout.PropertyField(_rightLegWeightProperty);
+                EditorGUILayout.PropertyField(_leftToesWeightProperty);
+                EditorGUILayout.PropertyField(_rightToesWeightProperty);
+            }
 
             EditorGUILayout.Space();
             GUILayout.BeginHorizontal();
@@ -346,14 +360,23 @@ namespace Oculus.Movement.AnimationRigging
             DisplayBoneAdjustmentArray("Bone Adjustment Data", _boneAdjustmentDataProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBonesProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBoneTargetsProperty);
-            EditorGUILayout.PropertyField(_feetToToesBoneTargetsProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_feetToToesBoneTargetsProperty);
+            }
             EditorGUILayout.PropertyField(_leftArmDataProperty);
             EditorGUILayout.PropertyField(_rightArmDataProperty);
-            EditorGUILayout.PropertyField(_leftLegDataProperty);
-            EditorGUILayout.PropertyField(_rightLegDataProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_leftLegDataProperty);
+                EditorGUILayout.PropertyField(_rightLegDataProperty);
+            }
             EditorGUILayout.PropertyField(_startingScaleProperty);
             EditorGUILayout.PropertyField(_hipsToHeadDistanceProperty);
-            EditorGUILayout.PropertyField(_hipsToFootDistanceProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_hipsToFootDistanceProperty);
+            }
         }
 
         private void DisplayBonePairArray(string propertyName, SerializedProperty property)

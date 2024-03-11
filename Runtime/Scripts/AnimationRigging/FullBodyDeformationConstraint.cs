@@ -82,6 +82,11 @@ namespace Oculus.Movement.AnimationRigging
     public interface IFullBodyDeformationData
     {
         /// <summary>
+        /// The deformation body type for the character.
+        /// </summary>
+        public int BodyType { get; }
+
+        /// <summary>
         /// The OVRCustomSkeleton component for the character.
         /// </summary>
         public OVRCustomSkeleton ConstraintCustomSkeleton { get; }
@@ -150,6 +155,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The starting scale of the character, taken from the animator transform.
         /// </summary>
         public Vector3 StartingScale { get; }
+
+        /// <summary>
+        /// The deformation body type int property.
+        /// </summary>
+        public string DeformationBodyTypeIntProperty { get; }
 
         /// <summary>
         /// The spine correction type int property.
@@ -318,6 +328,17 @@ namespace Oculus.Movement.AnimationRigging
     public struct FullBodyDeformationData : IAnimationJobData, IFullBodyDeformationData
     {
         /// <summary>
+        /// The deformation body type.
+        /// </summary>
+        public enum DeformationBodyType
+        {
+            /// <summary>The body type used for deformation is the full body.</summary>
+            FullBody,
+            /// <summary>The body type used for deformation is the upper body.</summary>
+            UpperBody
+        }
+
+        /// <summary>
         /// The spine translation correction type.
         /// </summary>
         public enum SpineTranslationCorrectionType
@@ -331,6 +352,9 @@ namespace Oculus.Movement.AnimationRigging
             /// <summary>Accurately place the hips and head bone when applying spine translation correction.</summary>
             AccurateHipsAndHead = 3,
         }
+
+        /// <inheritdoc />
+        int IFullBodyDeformationData.BodyType => _deformationBodyType;
 
         /// <inheritdoc />
         OVRCustomSkeleton IFullBodyDeformationData.ConstraintCustomSkeleton => _customSkeleton;
@@ -377,6 +401,10 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         Vector3 IFullBodyDeformationData.StartingScale => _startingScale;
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.DeformationBodyTypeIntProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_deformationBodyType));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.SpineCorrectionTypeIntProperty =>
@@ -454,6 +482,16 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         float IFullBodyDeformationData.HipsToFootDistance => _hipsToFootDistance;
+
+        /// <inheritdoc cref="IFullBodyDeformationData.BodyType"/>
+        [SyncSceneToStream, SerializeField, IntAsEnumAttribute(typeof(DeformationBodyType))]
+        [Tooltip(DeformationDataTooltips.DeformationBodyType)]
+        private int _deformationBodyType;
+        public DeformationBodyType DeformationBodyTypeField
+        {
+            get => (DeformationBodyType)_deformationBodyType;
+            set => _deformationBodyType = (int)value;
+        }
 
         /// <summary>
         /// The weight for the spine lower alignment.
@@ -1194,32 +1232,36 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (_animator == null && _customSkeleton == null)
             {
-                Debug.LogError("Animator or skeleton not set up.");
+                Debug.LogError($"Animator or skeleton not set up.");
                 return false;
             }
 
+            var targetName = _animator != null ? _animator.name : _customSkeleton.name;
             if (_bonePairData == null || _bonePairData.Length == 0)
             {
-                Debug.LogError("Bone pair data not set up.");
+                Debug.LogError($"Bone pair data not set up on {targetName}.");
                 return false;
             }
 
             if (_hipsToHeadBones == null || _hipsToHeadBones.Length == 0)
             {
-                Debug.LogError("Hips to head bones not set up.");
+                Debug.LogError($"Hips to head bones not set up on {targetName}.");
                 return false;
             }
 
             if (!_leftArmData.IsInitialized || !_rightArmData.IsInitialized)
             {
-                Debug.LogError("Arm data not set up.");
+                Debug.LogError($"Arm data not set up on {targetName}.");
                 return false;
             }
 
-            if (!_leftLegData.IsInitialized || !_rightLegData.IsInitialized)
+            if ((DeformationBodyType)_deformationBodyType == DeformationBodyType.FullBody)
             {
-                Debug.LogError("Leg data not set up.");
-                return false;
+                if (!_leftLegData.IsInitialized || !_rightLegData.IsInitialized)
+                {
+                    Debug.LogError($"Leg data not set up on {targetName}.");
+                    return false;
+                }
             }
 
             return true;

@@ -933,6 +933,9 @@ namespace Oculus.Movement
 
     public static class DeformationDataTooltips
     {
+        public const string DeformationBodyType =
+            "The deformation body type for the character.";
+
         public const string CustomSkeleton =
             "The OVRCustomSkeleton component for the character.";
 

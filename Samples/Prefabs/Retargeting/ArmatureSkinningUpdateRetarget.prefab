@@ -672,6 +672,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
+    _deformationBodyType: 0
     _spineLowerAlignmentWeight: 1
     _spineUpperAlignmentWeight: 1
     _chestAlignmentWeight: 0
@@ -839,22 +840,22 @@ MonoBehaviour:
       LimbProportion: 0.46967828
     _boneAdjustmentData:
     - Bone: 0
-      Adjustment: {x: 0.49502963, y: 0, z: 0, w: 0.8688761}
+      Adjustment: {x: 0.4950297, y: 0, z: 0, w: 0.86887604}
       ChildBone1: 7
       ChildBone2: 1
       ChildBone3: 2
     - Bone: 7
-      Adjustment: {x: -0.049799785, y: 0, z: 0, w: 0.9987592}
+      Adjustment: {x: 0.04979973, y: 0, z: 0, w: -0.9987592}
       ChildBone1: 8
       ChildBone2: 55
       ChildBone3: 55
     - Bone: 8
-      Adjustment: {x: 0.116232045, y: 0, z: 0, w: 0.9932221}
+      Adjustment: {x: 0.116232045, y: 0, z: 0, w: 0.99322206}
       ChildBone1: 54
       ChildBone2: 55
       ChildBone3: 55
     - Bone: 54
-      Adjustment: {x: -0.13111039, y: 0, z: 0, w: 0.9913678}
+      Adjustment: {x: 0.13111062, y: 0, z: 0, w: -0.99136776}
       ChildBone1: 9
       ChildBone2: 11
       ChildBone3: 12
