@@ -1165,13 +1165,20 @@ namespace Oculus.Movement.AnimationRigging
             hipsToHeadBoneTargets.Add(headTarget);
 
             _hipsToHeadBoneTargets = hipsToHeadBoneTargets.ToArray();
-            _feetToToesBoneTargets = new[]
+            if (DeformationBodyTypeField == DeformationBodyType.FullBody)
             {
-                setupParent.FindChildRecursive("LeftFoot"),
-                setupParent.FindChildRecursive("LeftToes"),
-                setupParent.FindChildRecursive("RightFoot"),
-                setupParent.FindChildRecursive("RightToes")
-            };
+                _feetToToesBoneTargets = new[]
+                {
+                    setupParent.FindChildRecursive("LeftFoot"),
+                    setupParent.FindChildRecursive("LeftToes"),
+                    setupParent.FindChildRecursive("RightFoot"),
+                    setupParent.FindChildRecursive("RightToes")
+                };
+            }
+            else
+            {
+                _feetToToesBoneTargets = Array.Empty<Transform>();
+            }
         }
 
         /// <inheritdoc />
