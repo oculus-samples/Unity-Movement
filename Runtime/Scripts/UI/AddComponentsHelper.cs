@@ -314,38 +314,41 @@ namespace Oculus.Movement.Utils
         /// <param name="rigObject">Rig object serving as parent for bone targets.</param>
         /// <param name="animator">Animator to obtain target bone.</param>
         /// <param name="isFullBody">Indicates if full body (or not).</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         /// <returns>Array of bone targets added.</returns>
         public static BoneTarget[] AddBoneTargets(
             GameObject rigObject,
             Animator animator,
-            bool isFullBody)
+            bool isFullBody,
+            bool runtimeInvocation)
         {
             var boneTargets = new List<BoneTarget>();
             Transform hipsTarget = AddBoneTarget(rigObject, "HipsTarget",
-                animator.GetBoneTransform(HumanBodyBones.Hips));
+                animator.GetBoneTransform(HumanBodyBones.Hips), runtimeInvocation);
             Transform spineLowerTarget = AddBoneTarget(rigObject, "SpineLowerTarget",
-                animator.GetBoneTransform(HumanBodyBones.Spine));
+                animator.GetBoneTransform(HumanBodyBones.Spine), runtimeInvocation);
             Transform spineUpperTarget = AddBoneTarget(rigObject, "SpineUpperTarget",
-                animator.GetBoneTransform(HumanBodyBones.Chest));
+                animator.GetBoneTransform(HumanBodyBones.Chest), runtimeInvocation);
             Transform chestTarget = AddBoneTarget(rigObject, "ChestTarget",
-                animator.GetBoneTransform(HumanBodyBones.UpperChest));
+                animator.GetBoneTransform(HumanBodyBones.UpperChest), runtimeInvocation);
             Transform neckTarget = AddBoneTarget(rigObject, "NeckTarget",
-                animator.GetBoneTransform(HumanBodyBones.Neck));
+                animator.GetBoneTransform(HumanBodyBones.Neck), runtimeInvocation);
             Transform headTarget = AddBoneTarget(rigObject, "HeadTarget",
-                animator.GetBoneTransform(HumanBodyBones.Head));
+                animator.GetBoneTransform(HumanBodyBones.Head), runtimeInvocation);
 
             Tuple<OVRSkeleton.BoneId, Transform>[] bonesToRetarget = null;
 
             if (isFullBody)
             {
                 Transform leftFootTarget = AddBoneTarget(rigObject, "LeftFootTarget",
-                    animator.GetBoneTransform(HumanBodyBones.LeftFoot));
+                    animator.GetBoneTransform(HumanBodyBones.LeftFoot), runtimeInvocation);
                 Transform leftToesTarget = AddBoneTarget(rigObject, "LeftToesTarget",
-                    animator.GetBoneTransform(HumanBodyBones.LeftToes));
+                    animator.GetBoneTransform(HumanBodyBones.LeftToes), runtimeInvocation);
                 Transform rightFootTarget = AddBoneTarget(rigObject, "RightFootTarget",
-                    animator.GetBoneTransform(HumanBodyBones.RightFoot));
+                    animator.GetBoneTransform(HumanBodyBones.RightFoot), runtimeInvocation);
                 Transform rightToesTarget = AddBoneTarget(rigObject, "RightToesTarget",
-                    animator.GetBoneTransform(HumanBodyBones.RightToes));
+                    animator.GetBoneTransform(HumanBodyBones.RightToes), runtimeInvocation);
                 bonesToRetarget = new Tuple<OVRSkeleton.BoneId, Transform>[]
                 {
                     new(OVRSkeleton.BoneId.FullBody_Hips, hipsTarget),
