@@ -709,5 +709,35 @@ namespace Oculus.Movement.AnimationRigging
         {
             return animator.GetBoneTransform(primary) != null ? primary : fallback;
         }
+
+        /// <summary>
+        /// When offseting a joint, limit it by stretch and squash amounts.
+        /// </summary>
+        /// <param name="jointTargetPos">Target joint position.</param>
+        /// <param name="currentJointPosition">Current joint position.</param>
+        /// <param name="squashStretchReferencePosition">Reference position to measure squash or stretch against.</param>
+        /// <param name="stretchLimit">Stretch limit.</param>
+        /// <param name="squashLimit">Squash limit.</param>
+        /// <returns>Restricted joint position.</returns>
+        public static Vector3 GetJointPositionSquashStretch(
+            Vector3 jointTargetPos,
+            Vector3 currentJointPosition,
+            Vector3 squashStretchReferencePosition,
+            float stretchLimit,
+            float squashLimit)
+        {
+            var referenceToTarget = jointTargetPos - squashStretchReferencePosition;
+            var referenceToCurrent = currentJointPosition - squashStretchReferencePosition;
+            var referenceDistanceNew = referenceToTarget.magnitude;
+            var referenceDistanceCurrent = referenceToCurrent.magnitude;
+
+            bool stretchedFromReference = referenceDistanceNew > referenceDistanceCurrent;
+
+            var finalJointPosition = Vector3.MoveTowards(
+                currentJointPosition, jointTargetPos,
+                stretchedFromReference ? stretchLimit : squashLimit);
+
+            return finalJointPosition;
+        }
     }
 }

@@ -328,6 +328,16 @@ namespace Oculus.Movement.AnimationRigging
         public FloatProperty RightHandOffsetWeight;
 
         /// <summary>
+        /// The limit for squashing characters.
+        /// </summary>
+        public FloatProperty SquashLimit;
+
+        /// <summary>
+        /// The limit for stretching characters.
+        /// </summary>
+        public FloatProperty StretchLimit;
+
+        /// <summary>
         /// The weight for the left leg offset.
         /// </summary>
         public FloatProperty LeftLegOffsetWeight;
@@ -563,7 +573,7 @@ namespace Oculus.Movement.AnimationRigging
         /// Apply bone adjustments.
         /// </summary>
         /// <param name="stream">The animation stream.</param>
-        /// <param name="weight">The weight.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void ApplyAdjustments(AnimationStream stream, float weight)
         {
             var spineAdjustmentWeight = weight;
@@ -607,8 +617,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Align the spine positions with the tracked spine positions,
         /// adding an offset on spine bones to align with the hips for a straight spine.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void AlignSpine(AnimationStream stream, float weight)
         {
             if (SpineLowerAlignmentWeight.Get(stream) <= float.Epsilon &&
@@ -693,8 +703,8 @@ namespace Oculus.Movement.AnimationRigging
         /// Optionally interpolate from the current position to the original local position of the shoulders,
         /// as the tracked positions may be mismatched.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void InterpolateShoulders(AnimationStream stream, float weight)
         {
             if (LeftShoulderBone.IsValid(stream))
@@ -731,7 +741,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Update the bone directions between each bone pair.
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="stream">The animation stream.</param>
         private void UpdateBoneDirections(AnimationStream stream)
         {
             for (int i = 0; i < BoneDirections.Length; i++)
@@ -748,7 +758,7 @@ namespace Oculus.Movement.AnimationRigging
         /// Calculates deformation offsets.
         /// </summary>
         /// <param name="stream">The animation stream.</param>
-        /// <param name="weight">The weight.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void CalculateOffsets(AnimationStream stream, float weight)
         {
             // Zero out offsets.
@@ -761,9 +771,21 @@ namespace Oculus.Movement.AnimationRigging
             {
                 var leftLegOffsetWeight = weight * LeftLegOffsetWeight.Get(stream);
                 var rightLegOffsetWeight = weight * RightLegOffsetWeight.Get(stream);
-                _leftFootOffset = ApplyScaleAndWeight(_leftFootTargetPos - LeftFootBone.GetPosition(stream),
+
+                var constrainedLeftFootTargetPos = DeformationUtilities.GetJointPositionSquashStretch(
+                    _leftFootTargetPos, LeftFootBone.GetPosition(stream),
+                    HipsToHeadBones[HipsIndex].GetPosition(stream),
+                    StretchLimit.Get(stream), SquashLimit.Get(stream));
+                _leftFootOffset = ApplyScaleAndWeight(
+                    constrainedLeftFootTargetPos - LeftFootBone.GetPosition(stream),
                     leftLegOffsetWeight);
-                _rightFootOffset = ApplyScaleAndWeight(_rightFootTargetPos - RightFootBone.GetPosition(stream),
+
+                var constrainedRightFootTargetPos = DeformationUtilities.GetJointPositionSquashStretch(
+                    _rightFootTargetPos, RightFootBone.GetPosition(stream),
+                    HipsToHeadBones[HipsIndex].GetPosition(stream),
+                    StretchLimit.Get(stream), SquashLimit.Get(stream));
+                _rightFootOffset = ApplyScaleAndWeight(
+                    constrainedRightFootTargetPos - RightFootBone.GetPosition(stream),
                     rightLegOffsetWeight);
             }
 
@@ -774,8 +796,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Applies spine correction, depending on the type picked.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void ApplySpineCorrection(AnimationStream stream, float weight)
         {
             // First, adjust the positions of the body based on the correction type.
@@ -789,7 +811,11 @@ namespace Oculus.Movement.AnimationRigging
 
             if (spineCorrectionType == SpineTranslationCorrectionType.AccurateHead)
             {
-                ApplyAccurateHeadSpineCorrection(stream, weight);
+                var constrainedTargetHeadPos = DeformationUtilities.GetJointPositionSquashStretch(
+                    _targetHeadPos, HipsToHeadBones[HeadIndex].GetPosition(stream),
+                    HipsToHeadBones[HipsIndex].GetPosition(stream),
+                    StretchLimit.Get(stream), SquashLimit.Get(stream));
+                ApplyAccurateHeadSpineCorrection(stream, weight, constrainedTargetHeadPos);
             }
 
             if (spineCorrectionType == SpineTranslationCorrectionType.AccurateHips ||
@@ -800,7 +826,11 @@ namespace Oculus.Movement.AnimationRigging
 
             if (spineCorrectionType == SpineTranslationCorrectionType.AccurateHipsAndHead)
             {
-                ApplyAccurateHipsAndHeadSpineCorrection(stream, weight);
+                var constrainedTargetHeadPos = DeformationUtilities.GetJointPositionSquashStretch(
+                    _targetHeadPos, HipsToHeadBones[HeadIndex].GetPosition(stream),
+                    HipsToHeadBones[HipsIndex].GetPosition(stream),
+                    StretchLimit.Get(stream), SquashLimit.Get(stream));
+                ApplyAccurateHipsAndHeadSpineCorrection(stream, weight, constrainedTargetHeadPos);
             }
 
             // Update upper arm bones based on the corrections applied to the spine from the shoulders.
@@ -837,8 +867,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Adjust the hips by the foot offset, then adjust the legs afterwards.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void ApplyNoSpineCorrection(AnimationStream stream, float weight)
         {
             if (!_isFullBody)
@@ -859,19 +889,23 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Keep the head accurate, adjusting the proportions of the full body.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
-        private void ApplyAccurateHeadSpineCorrection(AnimationStream stream, float weight)
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
+        /// <param name="constrainedTargetHeadPos">Constrained target head position.</param>
+        private void ApplyAccurateHeadSpineCorrection(
+            AnimationStream stream,
+            float weight,
+            Vector3 constrainedTargetHeadPos)
         {
             if (!_isFullBody)
             {
-                CalculateUpperBodyTargetPositions(stream, weight, true);
-                ApplyUpperBodyTargetPositions(stream, HipsIndex);
+                CalculateUpperBodyTargetPositions(stream, weight, true, constrainedTargetHeadPos);
+                ApplyUpperBodyTargetPositions(stream, HipsIndex, constrainedTargetHeadPos);
                 return;
             }
 
             // Upper body.
-            CalculateUpperBodyTargetPositions(stream, weight, false);
+            CalculateUpperBodyTargetPositions(stream, weight, false, constrainedTargetHeadPos);
 
             // Lower body.
             var leftUpperLegOffset = UpperBodyOffsets[HipsIndex] - _hipsGroundingOffset;
@@ -904,15 +938,15 @@ namespace Oculus.Movement.AnimationRigging
             _rightFootTargetPos = targetRightFootPos;
 
             // Set bone positions.
-            ApplyUpperBodyTargetPositions(stream, HipsIndex);
+            ApplyUpperBodyTargetPositions(stream, HipsIndex, constrainedTargetHeadPos);
             ApplyLowerBodyTargetPositions(stream, false);
         }
 
         /// <summary>
         /// Keep the hips accurate, adjusting the proportions of the lower body.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void ApplyAccurateHipsSpineCorrection(AnimationStream stream, float weight)
         {
             if (!_isFullBody)
@@ -948,35 +982,46 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Keep the hips and head accurate, adjusting the proportions of the upper body.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
-        private void ApplyAccurateHipsAndHeadSpineCorrection(AnimationStream stream, float weight)
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
+        /// <param name="constrainedTargetHeadPos">Constrained target head position.</param>
+        private void ApplyAccurateHipsAndHeadSpineCorrection(
+            AnimationStream stream,
+            float weight,
+            Vector3 constrainedTargetHeadPos)
         {
-            CalculateUpperBodyTargetPositions(stream, weight, true);
+            CalculateUpperBodyTargetPositions(stream, weight, true, constrainedTargetHeadPos);
             HipsBone.SetPosition(stream, _targetHipsPos);
-            ApplyUpperBodyTargetPositions(stream, SpineLowerIndex);
+            ApplyUpperBodyTargetPositions(stream, SpineLowerIndex, constrainedTargetHeadPos);
         }
 
         /// <summary>
         /// Calculate the upper body target positions.
         /// </summary>
         /// <param name="stream">The animation stream.</param>
-        /// <param name="weight">The weight.</param>
+        /// <param name="limit">The limit.</param>
         /// <param name="useLimbProportion">True if the limb proportions should be used.</param>
-        private void CalculateUpperBodyTargetPositions(AnimationStream stream, float weight, bool useLimbProportion)
+        /// <param name="constrainedTargetHeadPosition">Target head, constrained.</param>
+        private void CalculateUpperBodyTargetPositions(
+            AnimationStream stream,
+            float limit,
+            bool useLimbProportion,
+            Vector3 constrainedTargetHeadPosition)
         {
             // Calculate the offset between the current head and the tracked head to be undone by the hips
             // and the rest of the spine.
-            var headOffset = _targetHeadPos - HeadBone.GetPosition(stream);
+            var headOffset = constrainedTargetHeadPosition - HeadBone.GetPosition(stream);
             _requiredSpineOffset = headOffset;
 
             var hipsProportion = useLimbProportion ?
                 BoneAnimData[HipsIndex].LimbProportion :
                 BoneAnimData[HipsIndex].HeightProportion;
+            // Since this constraint needs to work on flat hierarchy characters (like OVRCustomSkeleton),
+            // we need to positions in world space.
             UpperBodyOffsets[HipsIndex] = headOffset * (hipsProportion +
                                                        (useLimbProportion ? 0.0f : LowerBodyProportion));
             UpperBodyTargetPositions[HipsIndex] = HipsBone.GetPosition(stream) +
-                                                  Vector3.Lerp(Vector3.zero, UpperBodyOffsets[HipsIndex], weight);
+                                                  Vector3.Lerp(Vector3.zero, UpperBodyOffsets[HipsIndex], limit);
             for (int i = SpineLowerIndex; i <= HeadIndex; i++)
             {
                 var bone = HipsToHeadBones[i];
@@ -984,7 +1029,7 @@ namespace Oculus.Movement.AnimationRigging
                     BoneAnimData[i].LimbProportion : BoneAnimData[i].HeightProportion;
                 UpperBodyOffsets[i] = UpperBodyOffsets[i - 1] + headOffset * proportion;
                 UpperBodyTargetPositions[i] = bone.GetPosition(stream) +
-                                              Vector3.Lerp(Vector3.zero, UpperBodyOffsets[i], weight);
+                                              Vector3.Lerp(Vector3.zero, UpperBodyOffsets[i], limit);
             }
         }
 
@@ -993,7 +1038,11 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <param name="stream">The animation stream.</param>
         /// <param name="startSpineIndex">The starting spine index to set the positions from.</param>
-        private void ApplyUpperBodyTargetPositions(AnimationStream stream, int startSpineIndex)
+        /// <param name="constrainedTargetHeadPos">Target head, constrained.</param>
+        private void ApplyUpperBodyTargetPositions(
+            AnimationStream stream,
+            int startSpineIndex,
+            Vector3 constrainedTargetHeadPos)
         {
             for (int i = startSpineIndex; i <= HeadIndex; i++)
             {
@@ -1001,7 +1050,7 @@ namespace Oculus.Movement.AnimationRigging
                 bone.SetPosition(stream, UpperBodyTargetPositions[i]);
                 HipsToHeadBones[i] = bone;
             }
-            HeadBone.SetPosition(stream, _targetHeadPos);
+            HeadBone.SetPosition(stream, constrainedTargetHeadPos);
         }
 
         /// <summary>
@@ -1127,8 +1176,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Apply shoulders corrections.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="weight"></param>
+        /// <param name="stream">The animation stream.</param>
+        /// <param name="weight">Constraint weight.</param>
         private void ApplyShouldersCorrection(AnimationStream stream, float weight)
         {
             // Adjust the y value of the shoulders.
@@ -1443,6 +1492,10 @@ namespace Oculus.Movement.AnimationRigging
             job.LeftToesOffsetWeight = FloatProperty.Bind(animator, component, data.LeftToesWeightFloatProperty);
             job.RightToesOffsetWeight = FloatProperty.Bind(animator, component, data.RightToesWeightFloatProperty);
             job.AlignFeetWeight = FloatProperty.Bind(animator, component, data.AlignFeetWeightFloatProperty);
+            job.SquashLimit =
+                FloatProperty.Bind(animator, component, data.SquashLimitFloatProperty);
+            job.StretchLimit =
+                FloatProperty.Bind(animator, component, data.StretchLimitFloatProperty);
 
             job.HipsIndex = (int)HumanBodyBones.Hips;
             job.SpineLowerIndex = job.HipsIndex + 1;

@@ -685,6 +685,8 @@ MonoBehaviour:
     _rightArmWeight: 1
     _leftHandWeight: 1
     _rightHandWeight: 1
+    _squashLimit: 2
+    _stretchLimit: 2
     _alignLeftLegWeight: 1
     _alignRightLegWeight: 1
     _leftToesWeight: 1

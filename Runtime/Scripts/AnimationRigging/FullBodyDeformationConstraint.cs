@@ -227,6 +227,20 @@ namespace Oculus.Movement.AnimationRigging
         public string RightHandWeightFloatProperty { get; }
 
         /// <summary>
+        /// Restricts how much the character should be squashed.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
+        /// </summary>
+        public string SquashLimitFloatProperty { get; }
+
+        /// <summary>
+        /// Restricts how much the character should be stretched.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
+        /// </summary>
+        public string StretchLimitFloatProperty { get; }
+
+        /// <summary>
         /// The left leg weight float property.
         /// </summary>
         public string LeftLegWeightFloatProperty { get; }
@@ -459,6 +473,14 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightHandWeight));
 
         /// <inheritdoc />
+        string IFullBodyDeformationData.SquashLimitFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_squashLimit));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.StretchLimitFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_stretchLimit));
+
+        /// <inheritdoc />
         string IFullBodyDeformationData.LeftLegWeightFloatProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_alignLeftLegWeight));
 
@@ -635,6 +657,34 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _rightHandWeight;
             set => _rightHandWeight = value;
+        }
+
+        /// <summary>
+        /// Restricts how much the character should be squashed.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(float.Epsilon, 2.0f)]
+        [Tooltip(DeformationDataTooltips.SquashLimit)]
+        private float _squashLimit;
+        public float SquashLimit
+        {
+            get => _squashLimit;
+            set => _squashLimit = value;
+        }
+
+        /// <summary>
+        /// Restricts how much the character should be stretched.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(float.Epsilon, 2.0f)]
+        [Tooltip(DeformationDataTooltips.StretchLimit)]
+        private float _stretchLimit;
+        public float StretchLimit
+        {
+            get => _stretchLimit;
+            set => _stretchLimit = value;
         }
 
         /// <summary>
@@ -1271,6 +1321,18 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
 
+            if (_squashLimit < float.Epsilon)
+            {
+                Debug.LogError("Please set squash limit!");
+                return false;
+            }
+
+            if (_stretchLimit < float.Epsilon)
+            {
+                Debug.LogError("Please set stretch limit!");
+                return false;
+            }
+
             return true;
         }
 
@@ -1284,6 +1346,8 @@ namespace Oculus.Movement.AnimationRigging
             _rightArmWeight = 0.0f;
             _leftHandWeight = 0.0f;
             _rightHandWeight = 0.0f;
+            _squashLimit = 2.0f;
+            _stretchLimit = 2.0f;
             _alignLeftLegWeight = 0.0f;
             _alignRightLegWeight = 0.0f;
             _leftToesWeight = 0.0f;

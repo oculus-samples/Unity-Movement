@@ -978,6 +978,14 @@ namespace Oculus.Movement
         public const string RightHandWeight =
             "The weight for the deformation on the right hand.";
 
+        public const string SquashLimit =
+            "Prevents character from squashing too much. " +
+            "WARNING: reducing this reduces perceived body tracking accuracy.";
+
+        public const string StretchLimit =
+            "Prevents character from stretching too much. " +
+            "WARNING: reducing this reduces perceived body tracking accuracy.";
+
         public const string AlignLeftLegWeight =
             "The weight for the alignment on the left leg.";
 
