@@ -1,0 +1,672 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class BlendshapeModifier
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class BlendshapeModifier
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.Tracking.BlendshapeModifier">
+  
+  
+  <h1 id="Oculus_Movement_Tracking_BlendshapeModifier" data-uid="Oculus.Movement.Tracking.BlendshapeModifier" class="text-break">Class BlendshapeModifier
+  </h1>
+  <div class="markdown level0 summary"><p>Calculates the modified blendshape weight for a facial expression.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
+    <div class="level1"><span class="xref">BlendshapeModifier</span></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.Tracking.html">Oculus.Movement.Tracking</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_Tracking_BlendshapeModifier_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class BlendshapeModifier : MonoBehaviour</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier__applyGlobalClampingNonMapped" data-uid="Oculus.Movement.Tracking.BlendshapeModifier._applyGlobalClampingNonMapped">_applyGlobalClampingNonMapped</h4>
+  <div class="markdown level1 summary"><p>Apply global clamping to non-mapped values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool _applyGlobalClampingNonMapped</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier__defaultBlendshapeModifierPreset" data-uid="Oculus.Movement.Tracking.BlendshapeModifier._defaultBlendshapeModifierPreset">_defaultBlendshapeModifierPreset</h4>
+  <div class="markdown level1 summary"><p>Optional text asset containing the array of face expression modifier data to be used.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected TextAsset _defaultBlendshapeModifierPreset</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TextAsset</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier__faceExpressionModifiers" data-uid="Oculus.Movement.Tracking.BlendshapeModifier._faceExpressionModifiers">_faceExpressionModifiers</h4>
+  <div class="markdown level1 summary"><p>The array of facial expression modifier data to be used.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected BlendshapeModifier.FaceExpressionModifier[] _faceExpressionModifiers</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Tracking.BlendshapeModifier.FaceExpressionModifier.html">BlendshapeModifier.FaceExpressionModifier</a>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier__globalClampMax" data-uid="Oculus.Movement.Tracking.BlendshapeModifier._globalClampMax">_globalClampMax</h4>
+  <div class="markdown level1 summary"><p>Global blendshape clamp max.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected float _globalClampMax</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier__globalClampMin" data-uid="Oculus.Movement.Tracking.BlendshapeModifier._globalClampMin">_globalClampMin</h4>
+  <div class="markdown level1 summary"><p>Global blendshape clamp min.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected float _globalClampMin</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier__globalMultiplier" data-uid="Oculus.Movement.Tracking.BlendshapeModifier._globalMultiplier">_globalMultiplier</h4>
+  <div class="markdown level1 summary"><p>Global blendshape multiplier.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected float _globalMultiplier</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_FaceExpressionModifierMap_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.FaceExpressionModifierMap*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_FaceExpressionModifierMap" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.FaceExpressionModifierMap">FaceExpressionModifierMap</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyDictionary&lt;OVRFaceExpressions.FaceExpression, BlendshapeModifier.FaceExpressionModifier&gt; FaceExpressionModifierMap { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">IReadOnlyDictionary</span>&lt;<span class="xref">OVRFaceExpressions.FaceExpression</span>, <a class="xref" href="Oculus.Movement.Tracking.BlendshapeModifier.FaceExpressionModifier.html">BlendshapeModifier.FaceExpressionModifier</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_Modifiers_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.Modifiers*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_Modifiers" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.Modifiers">Modifiers</h4>
+  <div class="markdown level1 summary"><p>The array of facial expression modifier data to be used.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyCollection&lt;BlendshapeModifier.FaceExpressionModifier&gt; Modifiers { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">IReadOnlyCollection</span>&lt;<a class="xref" href="Oculus.Movement.Tracking.BlendshapeModifier.FaceExpressionModifier.html">BlendshapeModifier.FaceExpressionModifier</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_GetMaxValue_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetMaxValue*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_GetMaxValue_OVRFaceExpressions_FaceExpression_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetMaxValue(OVRFaceExpressions.FaceExpression)">GetMaxValue(OVRFaceExpressions.FaceExpression)</h4>
+  <div class="markdown level1 summary"><p>Returns the maximum clamped value for a facial expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GetMaxValue(OVRFaceExpressions.FaceExpression faceExpression)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRFaceExpressions.FaceExpression</span></td>
+        <td><span class="parametername">faceExpression</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td><p>Maximum clamped value for a facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_GetMinValue_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetMinValue*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_GetMinValue_OVRFaceExpressions_FaceExpression_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetMinValue(OVRFaceExpressions.FaceExpression)">GetMinValue(OVRFaceExpressions.FaceExpression)</h4>
+  <div class="markdown level1 summary"><p>Returns the minimum clamped value for a facial expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GetMinValue(OVRFaceExpressions.FaceExpression faceExpression)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRFaceExpressions.FaceExpression</span></td>
+        <td><span class="parametername">faceExpression</span></td>
+        <td><p>The facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td><p>Minimum clamped value for a facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_GetModifiedWeight_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetModifiedWeight*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_GetModifiedWeight_OVRFaceExpressions_FaceExpression_System_Single_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetModifiedWeight(OVRFaceExpressions.FaceExpression,System.Single)">GetModifiedWeight(OVRFaceExpressions.FaceExpression, Single)</h4>
+  <div class="markdown level1 summary"><p>Returns the modified weight for a facial expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GetModifiedWeight(OVRFaceExpressions.FaceExpression faceExpression, float currentWeight)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRFaceExpressions.FaceExpression</span></td>
+        <td><span class="parametername">faceExpression</span></td>
+        <td><p>The facial expression.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td><span class="parametername">currentWeight</span></td>
+        <td><p>The unmodified weight of the facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_GetMultiplierValue_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetMultiplierValue*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_GetMultiplierValue_OVRFaceExpressions_FaceExpression_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.GetMultiplierValue(OVRFaceExpressions.FaceExpression)">GetMultiplierValue(OVRFaceExpressions.FaceExpression)</h4>
+  <div class="markdown level1 summary"><p>Returns the multiplier value for a facial expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float GetMultiplierValue(OVRFaceExpressions.FaceExpression faceExpression)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRFaceExpressions.FaceExpression</span></td>
+        <td><span class="parametername">faceExpression</span></td>
+        <td><p>The facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td><p>Multiplier modifier for a facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_LoadPreset_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.LoadPreset*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_LoadPreset_System_String_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.LoadPreset(System.String)">LoadPreset(String)</h4>
+  <div class="markdown level1 summary"><p>Loads the facial expression modifiers from text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void LoadPreset(string presetJson)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">presetJson</span></td>
+        <td><p>The json containing the serialized facial expression modifiers.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_SavePreset_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.SavePreset*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_SavePreset" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.SavePreset">SavePreset()</h4>
+  <div class="markdown level1 summary"><p>Saves the current facial expression modifiers to a timestamped json file.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SavePreset()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_UpdateMaxValue_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.UpdateMaxValue*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_UpdateMaxValue_OVRFaceExpressions_FaceExpression_System_Single_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.UpdateMaxValue(OVRFaceExpressions.FaceExpression,System.Single)">UpdateMaxValue(OVRFaceExpressions.FaceExpression, Single)</h4>
+  <div class="markdown level1 summary"><p>Update the maximum clamped value for a facial expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UpdateMaxValue(OVRFaceExpressions.FaceExpression faceExpression, float val)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRFaceExpressions.FaceExpression</span></td>
+        <td><span class="parametername">faceExpression</span></td>
+        <td><p>The facial expression.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td><span class="parametername">val</span></td>
+        <td><p>The updated maximum value for the facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_UpdateMinValue_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.UpdateMinValue*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_UpdateMinValue_OVRFaceExpressions_FaceExpression_System_Single_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.UpdateMinValue(OVRFaceExpressions.FaceExpression,System.Single)">UpdateMinValue(OVRFaceExpressions.FaceExpression, Single)</h4>
+  <div class="markdown level1 summary"><p>Update the minimum clamped value for a facial expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UpdateMinValue(OVRFaceExpressions.FaceExpression faceExpression, float val)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRFaceExpressions.FaceExpression</span></td>
+        <td><span class="parametername">faceExpression</span></td>
+        <td><p>The facial expression.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td><span class="parametername">val</span></td>
+        <td><p>The updated minimum value for the facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Tracking_BlendshapeModifier_UpdateMultiplierValue_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.UpdateMultiplierValue*"></a>
+  <h4 id="Oculus_Movement_Tracking_BlendshapeModifier_UpdateMultiplierValue_OVRFaceExpressions_FaceExpression_System_Single_" data-uid="Oculus.Movement.Tracking.BlendshapeModifier.UpdateMultiplierValue(OVRFaceExpressions.FaceExpression,System.Single)">UpdateMultiplierValue(OVRFaceExpressions.FaceExpression, Single)</h4>
+  <div class="markdown level1 summary"><p>Update the multiplier value for a facial expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UpdateMultiplierValue(OVRFaceExpressions.FaceExpression faceExpression, float val)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRFaceExpressions.FaceExpression</span></td>
+        <td><span class="parametername">faceExpression</span></td>
+        <td><p>The facial expression.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></td>
+        <td><span class="parametername">val</span></td>
+        <td><p>The updated multiplier value for the facial expression.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
