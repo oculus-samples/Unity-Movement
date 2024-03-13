@@ -1,3 +1,37 @@
+# [4.4.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.3.0...v4.4.0) (2024-03-13)
+
+
+### Bug Fixes
+
+* **Editor:** Add FullBodyOVRSkeletonBoneVisualizerBoneTupleDrawer to display full body tuples ([eb4e7cd](https://github.com/oculus-samples/Unity-Movement/commit/eb4e7cdf4f8dff5b3b7c496f74d2a29edc2cfac1))
+* **Editor:** Fix one-click upper body retargeting setup ([4e40556](https://github.com/oculus-samples/Unity-Movement/commit/4e4055632cec5576c0ed3e12958386b7c23956f1))
+* **Editor:** Fix serialized legs weights display on new characters ([294c70e](https://github.com/oculus-samples/Unity-Movement/commit/294c70e784ac6617f2e8f499da323bb0b9830e9c))
+* **Runtime:** Address foot target orientation for grounding (hip pinning) ([0aabd0d](https://github.com/oculus-samples/Unity-Movement/commit/0aabd0d19f582f0da484dceffe188adfe19c21aa))
+* **Runtime:** Fix one-click setup for retargeted characters when the root isn't zero ([868aa83](https://github.com/oculus-samples/Unity-Movement/commit/868aa834fed79a2ddadeb1204699207d99ba0f45))
+* **Runtime:** Handle root motion edge case with 2022/2023 ([7bf9a7f](https://github.com/oculus-samples/Unity-Movement/commit/7bf9a7f620f34caaa5ac931583a3fb9800ef21eb))
+* **Runtime:** Improve auto adjustments axis calculation ([5ed2139](https://github.com/oculus-samples/Unity-Movement/commit/5ed2139aa2ea50fbb66ba7551fa002ad2f7df7bb))
+* **Runtime:** RetargetingHandProcessor uses absolute scale for hand world position ([1d546d3](https://github.com/oculus-samples/Unity-Movement/commit/1d546d37a5ff8533d860b947eeae6681029d9e01))
+* **Runtime:** Update auto adjustments for skeletons with a different rest pose right ([30da68f](https://github.com/oculus-samples/Unity-Movement/commit/30da68fc6e920f51aa19d18924383825eae78d24))
+* **Runtime:** Update bone visualizer to better reflect the bone mapping ([6a88513](https://github.com/oculus-samples/Unity-Movement/commit/6a885134c390d1ef2e78c94ba7c441eb4d776ce7))
+
+
+### Features
+
+* **Editor:** Update auto adjustments calculation ([24ad9d0](https://github.com/oculus-samples/Unity-Movement/commit/24ad9d082d17661471f3a9fbbd79d6c01ffcceae))
+* **Runtime:** Account for missing bones when calculating adjustments ([5e8263d](https://github.com/oculus-samples/Unity-Movement/commit/5e8263de6f11f5acef37d23b9b2dafe6fb0c3c63))
+* **Runtime:** Add BlendHandConstraintProcessor ([90e1dd3](https://github.com/oculus-samples/Unity-Movement/commit/90e1dd3ff6953e2fc2fad12523a55320ed30bf12))
+* **Runtime:** Add ExternalBoneTargets ([0bc2fc0](https://github.com/oculus-samples/Unity-Movement/commit/0bc2fc06c7731e14e6ce9b6c27d3a6fa95a8cce7))
+* **Runtime:** Add RetargetingAnimationRig ([0739a30](https://github.com/oculus-samples/Unity-Movement/commit/0739a30647a2d2a292937f1a1263957300669c5a))
+* **Runtime:** Add RetargetingHandDeformationProcessor ([9bd4596](https://github.com/oculus-samples/Unity-Movement/commit/9bd4596f2a35bb36f8fc1686a4d599f73c2b2b91))
+* **Runtime:** Add upper body option to FullBodyDeformationConstraint ([aa84fb9](https://github.com/oculus-samples/Unity-Movement/commit/aa84fb9f0d36b63d88f53302e70790080fb94604))
+* **runtime:** Incorporate BlendHandConstraintProcessor ([a78affd](https://github.com/oculus-samples/Unity-Movement/commit/a78affd4c9f96a5bd871e19c8cd69c79863b5731))
+* **Runtime:** Incorporate ExternalBoneTargets ([d72bb8f](https://github.com/oculus-samples/Unity-Movement/commit/d72bb8f92c6b44e418dc754c7a90f26915747c37))
+* **Runtime:** Integrate RetargetingAnimationRig ([11a9c19](https://github.com/oculus-samples/Unity-Movement/commit/11a9c1957abf6435bd9de42caa57831fb2d1cc38))
+* **Runtime:** Integrate RetargetingHandDeformationProcessor ([3b05073](https://github.com/oculus-samples/Unity-Movement/commit/3b05073909c84fcfc9ee90a369b6611059eb3d6a))
+* **Runtime:** Limit deformation's squash and stretch ([2999663](https://github.com/oculus-samples/Unity-Movement/commit/2999663e680d930007891db294fbd6e2a8efeb3b))
+* **Runtime:** Update full body deformation arm weight behaviour ([e586f7c](https://github.com/oculus-samples/Unity-Movement/commit/e586f7cc943e25c1c097575a55adb2da85696664))
+* **Runtime:** Update upper body deformation for OVRCustomSkeleton ([456c9ec](https://github.com/oculus-samples/Unity-Movement/commit/456c9ec59887d614cfd7cd403a3cee15f3f19217))
+
 # [4.3.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.2.1...v4.3.0) (2024-02-15)
 
 
