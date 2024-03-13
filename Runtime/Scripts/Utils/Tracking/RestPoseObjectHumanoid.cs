@@ -159,7 +159,8 @@ namespace Oculus.Movement.Utils
             }
 
             return CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-                otherAnimator, jointPair.Item1, jointPair.Item2);
+                otherAnimator, jointPair.Item1, jointPair.Item2,
+                jointPair.Item1, jointPair.Item2);
         }
 
         /// <summary>
@@ -172,9 +173,14 @@ namespace Oculus.Movement.Utils
         /// angle comparison.</param>
         /// <param name="otherHumanBodyBone">Other HumanBodyBones joint to be referenced for the
         /// angle comparison.</param>
+        /// <param name="targetHumanBodyBone">HumanBodyBones joint of the target to be referenced for the
+        /// angle comparison.</param>
+        /// <param name="targetOtherHumanBodyBone">Other HumanBodyBones joint of the target to be referenced for the
+        /// angle comparison.</param>
         /// <returns>Rotation difference.</returns>
         public Quaternion CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-            Animator otherAnimator, HumanBodyBones humanBodyBone, HumanBodyBones otherHumanBodyBone)
+            Animator otherAnimator, HumanBodyBones humanBodyBone, HumanBodyBones otherHumanBodyBone,
+            HumanBodyBones targetHumanBodyBone, HumanBodyBones targetOtherHumanBodyBone)
         {
             if (!RiggingUtilities.IsHumanoidAnimator(otherAnimator))
             {
@@ -182,8 +188,8 @@ namespace Oculus.Movement.Utils
                 return Quaternion.identity;
             }
 
-            Transform startJointOther = otherAnimator.GetBoneTransform(humanBodyBone),
-                endJointOther = otherAnimator.GetBoneTransform(otherHumanBodyBone);
+            Transform startJointOther = otherAnimator.GetBoneTransform(targetHumanBodyBone),
+                endJointOther = otherAnimator.GetBoneTransform(targetOtherHumanBodyBone);
             if (startJointOther == null || endJointOther == null)
             {
                 Debug.LogError("Other animator has at least one null joint pair: " +

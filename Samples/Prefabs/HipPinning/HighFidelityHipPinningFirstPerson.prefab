@@ -600,7 +600,7 @@ MonoBehaviour:
     _footTarget: {fileID: 4358668238228419541}
     _leg: {fileID: 2359356313597749183}
     _foot: {fileID: 6171397758821561763}
-    _footRotationOffset: {x: 0, y: 165, z: 0}
+    _footRotationOffset: {x: 0, y: -0.25881904, z: 0, w: 0.9659258}
     _stepCurve:
       serializedVersion: 2
       m_Curve:
@@ -781,12 +781,12 @@ MonoBehaviour:
   m_Data:
     _customSkeleton: {fileID: 729980574542687627}
     _animator: {fileID: 0}
-    _spineTranslationCorrectionType: 1
+    _spineTranslationCorrectionType: 3
     _spineLowerAlignmentWeight: 0
     _spineUpperAlignmentWeight: 0
     _chestAlignmentWeight: 0
-    _leftShoulderWeight: 0
-    _rightShoulderWeight: 0
+    _leftShoulderWeight: 1
+    _rightShoulderWeight: 1
     _leftArmWeight: 0
     _rightArmWeight: 0
     _leftHandWeight: 0
@@ -1009,7 +1009,7 @@ MonoBehaviour:
     _footTarget: {fileID: 1326272731640492124}
     _leg: {fileID: 8065065785454080346}
     _foot: {fileID: 4154210162335435616}
-    _footRotationOffset: {x: 0, y: 205, z: 0}
+    _footRotationOffset: {x: 0, y: 0.25881904, z: 0, w: 0.9659258}
     _stepCurve:
       serializedVersion: 2
       m_Curve:

@@ -79,7 +79,7 @@ namespace Oculus.Movement.AnimationRigging
         public Quaternion LegRotOffset;
 
         /// <inheritdoc cref="IGroundingData.FootRotationOffset"/>
-        public Quaternion FootRotationOffset;
+        public NativeArray<Quaternion> FootRotationOffset;
 
         /// <inheritdoc cref="IGroundingData.StepHeight"/>
         public float StepHeight;
@@ -126,9 +126,9 @@ namespace Oculus.Movement.AnimationRigging
                     _prevFootPos = FootTarget.GetPosition(stream);
                 }
 
-                // Foot rotation.
-                var lookRot = Quaternion.LookRotation(HipsTarget.GetLocalPosition(stream) - KneeTarget.GetLocalPosition(stream)) *
-                                        FootRotationOffset;
+                // The foot target must be based on the vector from the hips to the knee.
+                var lookRot = Quaternion.LookRotation(KneeTarget.GetPosition(stream) - HipsTarget.GetPosition(stream));
+                lookRot *= FootRotationOffset[0];
                 FootTarget.SetRotation(stream,
                     Quaternion.Slerp(FootTarget.GetRotation(stream), lookRot, weight));
             }
@@ -174,7 +174,9 @@ namespace Oculus.Movement.AnimationRigging
             job.DeltaTime = new NativeArray<float>(1, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
 
-            job.FootRotationOffset = Quaternion.Euler(data.FootRotationOffset);
+            job.FootRotationOffset = new NativeArray<Quaternion>(1, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.FootRotationOffset[0] = data.FootRotationOffset;
             job.StepHeight = data.StepHeight;
             job.StepHeightScaleDist = data.StepHeightScaleDist;
             job.LegPosOffset = data.LegPosOffset;
@@ -228,6 +230,7 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             job.DeltaTime[0] = data.ShouldUpdate ? Time.unscaledDeltaTime : 0.0f;
+            job.FootRotationOffset[0] = data.FootRotationOffset;
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())
@@ -245,6 +248,7 @@ namespace Oculus.Movement.AnimationRigging
             job.IsGrounding.Dispose();
             job.IsMovable.Dispose();
             job.DeltaTime.Dispose();
+            job.FootRotationOffset.Dispose();
         }
     }
 }

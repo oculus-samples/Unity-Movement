@@ -252,16 +252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _autoAddTo: {fileID: 2324633634594971607}
-  _skeletonProcessors:
-  - label: Blend Hands Right
-    Enabled: 0
-    Processor: {fileID: 7486900986326145928}
-  - label: Blend Hands Left
-    Enabled: 0
-    Processor: {fileID: 2444161089806565791}
-  - label: Retargeted Bone Targets
-    Enabled: 1
-    Processor: {fileID: 2519393238448185555}
+  _skeletonProcessors: []
 --- !u!114 &2324633634594971607 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7866900989153904485, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
@@ -271,28 +262,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 31e3b6438933e1945a67ef8d4db811bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2444161089806565791 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7819795630976784685, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
-  m_PrefabInstance: {fileID: 5579424741284206770}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1443914921768874357}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2519393238448185555 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8041379379990558817, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
-  m_PrefabInstance: {fileID: 5579424741284206770}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1443914921768874357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e99c227ec21d72d45b36011069f2b263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &5356593900378066967 stripped
@@ -311,14 +280,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 720078951, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
   m_PrefabInstance: {fileID: 5579424741284206770}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7486900986326145928 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3064921622629090106, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
-  m_PrefabInstance: {fileID: 5579424741284206770}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1443914921768874357}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8359a52c8182ca247b2064624e74dffb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

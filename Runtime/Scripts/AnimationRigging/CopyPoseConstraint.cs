@@ -35,33 +35,22 @@ namespace Oculus.Movement.AnimationRigging
     [System.Serializable]
     public struct CopyPoseData : IAnimationJobData, ICopyPoseData
     {
-        /// <inheritdoc cref="_animator"/>
-        public Animator ConstraintAnimator
-        {
-            get => _animator;
-            set => _animator = value;
-        }
         /// <inheritdoc />
         public RetargetingLayer RetargetingLayerComp
         {
             get => _retargetingLayer;
             set => _retargetingLayer = value;
         }
+
         /// <inheritdoc />
         public bool CopyPoseToOriginal
         {
             get => _copyPoseToOriginal;
             set => _copyPoseToOriginal = value;
         }
+
         /// <inheritdoc />
         public Transform[] AnimatorBones => _animatorBones;
-
-        /// <summary>
-        /// The Animator component for the character.
-        /// </summary>
-        [SerializeField]
-        [Tooltip(CopyPoseDataTooltips.Animator)]
-        private Animator _animator;
 
         /// <inheritdoc cref="ICopyPoseData.RetargetingLayerComp"/>
         [SerializeField]
@@ -81,17 +70,18 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public void Setup()
         {
+            var animator = _retargetingLayer.GetComponent<Animator>();
             var animatorBones = new List<Transform>();
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
             {
-                animatorBones.Add(_animator.GetBoneTransform(i));
+                animatorBones.Add(animator.GetBoneTransform(i));
             }
             _animatorBones = animatorBones.ToArray();
         }
 
         bool IAnimationJobData.IsValid()
         {
-            if (_retargetingLayer == null || _animator == null)
+            if (_retargetingLayer == null)
             {
                 return false;
             }
@@ -100,7 +90,6 @@ namespace Oculus.Movement.AnimationRigging
 
         void IAnimationJobData.SetDefaultValues()
         {
-            _animator = null;
             _retargetingLayer = null;
             _copyPoseToOriginal = false;
             _animatorBones = null;

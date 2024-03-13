@@ -12,7 +12,7 @@ namespace Oculus.Movement.Utils
     /// </summary>
     [DefaultExecutionOrder(230)]
     public class FullBodyOVRSkeletonBoneVisualizer
-        : BoneVisualizer<OVRHumanBodyBonesMappings.BodyTrackingBoneId>
+        : BoneVisualizer<OVRHumanBodyBonesMappings.FullBodyTrackingBoneId>
     {
         /// <summary>
         /// OVRSkeleton component to visualize bones for.

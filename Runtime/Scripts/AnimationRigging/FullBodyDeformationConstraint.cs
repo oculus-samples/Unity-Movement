@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
-using static Oculus.Movement.AnimationRigging.DeformationCommon;
+using UnityEngine.Serialization;
+using static Oculus.Movement.AnimationRigging.DeformationUtilities;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
@@ -81,6 +82,11 @@ namespace Oculus.Movement.AnimationRigging
     public interface IFullBodyDeformationData
     {
         /// <summary>
+        /// The deformation body type for the character.
+        /// </summary>
+        public int BodyType { get; }
+
+        /// <summary>
         /// The OVRCustomSkeleton component for the character.
         /// </summary>
         public OVRCustomSkeleton ConstraintCustomSkeleton { get; }
@@ -104,6 +110,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The array of transform targets from the hips to the head bones.
         /// </summary>
         public Transform[] HipsToHeadBoneTargets { get; }
+
+        /// <summary>
+        /// The array of transform targets from the feet to the toes bones.
+        /// </summary>
+        public Transform[] FeetToToesBoneTargets { get; }
 
         /// <summary>
         /// The position info for the bone pairs used for FullBodyDeformation.
@@ -146,6 +157,11 @@ namespace Oculus.Movement.AnimationRigging
         public Vector3 StartingScale { get; }
 
         /// <summary>
+        /// The deformation body type int property.
+        /// </summary>
+        public string DeformationBodyTypeIntProperty { get; }
+
+        /// <summary>
         /// The spine correction type int property.
         /// </summary>
         public string SpineCorrectionTypeIntProperty { get; }
@@ -166,19 +182,19 @@ namespace Oculus.Movement.AnimationRigging
         public string ChestAlignmentWeightFloatProperty { get; }
 
         /// <summary>
-        /// The shoulders height adjustment weight float property.
+        /// The shoulders height reduction weight float property.
         /// </summary>
-        string ShouldersHeightAdjustmentWeightFloatProperty { get; }
+        public string ShouldersHeightReductionWeightFloatProperty { get; }
 
         /// <summary>
-        /// The shoulders width adjustment weight float property.
+        /// The shoulders width reduction weight float property.
         /// </summary>
-        string ShouldersWidthAdjustmentWeightFloatProperty { get; }
+        public string ShouldersWidthReductionWeightFloatProperty { get; }
 
         /// <summary>
-        /// The arms height adjustment weight float property.
+        /// Affect arms by spine correction bool property.
         /// </summary>
-        string ArmsHeightAdjustmentWeightFloatProperty { get; }
+        public string AffectArmsBySpineCorrection { get; }
 
         /// <summary>
         /// The left shoulder weight float property.
@@ -209,6 +225,20 @@ namespace Oculus.Movement.AnimationRigging
         /// The right hand weight float property.
         /// </summary>
         public string RightHandWeightFloatProperty { get; }
+
+        /// <summary>
+        /// Restricts how much the character should be squashed.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
+        /// </summary>
+        public string SquashLimitFloatProperty { get; }
+
+        /// <summary>
+        /// Restricts how much the character should be stretched.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
+        /// </summary>
+        public string StretchLimitFloatProperty { get; }
 
         /// <summary>
         /// The left leg weight float property.
@@ -312,6 +342,17 @@ namespace Oculus.Movement.AnimationRigging
     public struct FullBodyDeformationData : IAnimationJobData, IFullBodyDeformationData
     {
         /// <summary>
+        /// The deformation body type.
+        /// </summary>
+        public enum DeformationBodyType
+        {
+            /// <summary>The body type used for deformation is the full body.</summary>
+            FullBody,
+            /// <summary>The body type used for deformation is the upper body.</summary>
+            UpperBody
+        }
+
+        /// <summary>
         /// The spine translation correction type.
         /// </summary>
         public enum SpineTranslationCorrectionType
@@ -325,6 +366,9 @@ namespace Oculus.Movement.AnimationRigging
             /// <summary>Accurately place the hips and head bone when applying spine translation correction.</summary>
             AccurateHipsAndHead = 3,
         }
+
+        /// <inheritdoc />
+        int IFullBodyDeformationData.BodyType => _deformationBodyType;
 
         /// <inheritdoc />
         OVRCustomSkeleton IFullBodyDeformationData.ConstraintCustomSkeleton => _customSkeleton;
@@ -349,6 +393,9 @@ namespace Oculus.Movement.AnimationRigging
         Transform[] IFullBodyDeformationData.HipsToHeadBoneTargets => _hipsToHeadBoneTargets;
 
         /// <inheritdoc />
+        Transform[] IFullBodyDeformationData.FeetToToesBoneTargets => _feetToToesBoneTargets;
+
+        /// <inheritdoc />
         BonePairData[] IFullBodyDeformationData.BonePairs => _bonePairData;
 
         /// <inheritdoc />
@@ -370,6 +417,10 @@ namespace Oculus.Movement.AnimationRigging
         Vector3 IFullBodyDeformationData.StartingScale => _startingScale;
 
         /// <inheritdoc />
+        string IFullBodyDeformationData.DeformationBodyTypeIntProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_deformationBodyType));
+
+        /// <inheritdoc />
         string IFullBodyDeformationData.SpineCorrectionTypeIntProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_spineTranslationCorrectionType));
 
@@ -386,16 +437,16 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_chestAlignmentWeight));
 
         /// <inheritdoc />
-        string IFullBodyDeformationData.ShouldersHeightAdjustmentWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersHeightAdjustmentWeight));
+        string IFullBodyDeformationData.ShouldersHeightReductionWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersHeightReductionWeight));
 
         /// <inheritdoc />
-        string IFullBodyDeformationData.ShouldersWidthAdjustmentWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersWidthAdjustmentWeight));
+        string IFullBodyDeformationData.ShouldersWidthReductionWeightFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shouldersWidthReductionWeight));
 
         /// <inheritdoc />
-        string IFullBodyDeformationData.ArmsHeightAdjustmentWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_armsHeightAdjustmentWeight));
+        string IFullBodyDeformationData.AffectArmsBySpineCorrection =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_affectArmsBySpineCorrection));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.LeftShoulderWeightFloatProperty =>
@@ -422,12 +473,20 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightHandWeight));
 
         /// <inheritdoc />
+        string IFullBodyDeformationData.SquashLimitFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_squashLimit));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.StretchLimitFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_stretchLimit));
+
+        /// <inheritdoc />
         string IFullBodyDeformationData.LeftLegWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_leftLegWeight));
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_alignLeftLegWeight));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.RightLegWeightFloatProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightLegWeight));
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_alignRightLegWeight));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.LeftToesWeightFloatProperty =>
@@ -445,6 +504,16 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         float IFullBodyDeformationData.HipsToFootDistance => _hipsToFootDistance;
+
+        /// <inheritdoc cref="IFullBodyDeformationData.BodyType"/>
+        [SyncSceneToStream, SerializeField, IntAsEnumAttribute(typeof(DeformationBodyType))]
+        [Tooltip(DeformationDataTooltips.DeformationBodyType)]
+        private int _deformationBodyType;
+        public DeformationBodyType DeformationBodyTypeField
+        {
+            get => (DeformationBodyType)_deformationBodyType;
+            set => _deformationBodyType = (int)value;
+        }
 
         /// <summary>
         /// The weight for the spine lower alignment.
@@ -483,39 +552,39 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for shoulders height adjustment.
+        /// The weight for shoulders height reduction.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.ShouldersHeightAdjustmentWeight)]
-        private float _shouldersHeightAdjustmentWeight;
-        public float ShouldersHeightAdjustmentWeight
+        [Tooltip(DeformationDataTooltips.ShouldersHeightReductionWeight)]
+        private float _shouldersHeightReductionWeight;
+        public float ShouldersHeightReductionWeight
         {
-            get => _shouldersHeightAdjustmentWeight;
-            set => _shouldersHeightAdjustmentWeight = value;
+            get => _shouldersHeightReductionWeight;
+            set => _shouldersHeightReductionWeight = value;
         }
 
         /// <summary>
-        /// The weight for shoulders width adjustment.
+        /// The weight for shoulders width reduction.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.ShouldersHeightAdjustmentWeight)]
-        private float _shouldersWidthAdjustmentWeight;
-        public float ShouldersWidthAdjustmentWeight
+        [Tooltip(DeformationDataTooltips.ShouldersWidthReductionWeight)]
+        private float _shouldersWidthReductionWeight;
+        public float ShouldersWidthReductionWeight
         {
-            get => _shouldersWidthAdjustmentWeight;
-            set => _shouldersWidthAdjustmentWeight = value;
+            get => _shouldersWidthReductionWeight;
+            set => _shouldersWidthReductionWeight = value;
         }
 
         /// <summary>
-        /// The weight for arms height adjustment.
+        /// True if arms should be affected by spine correction.
         /// </summary>
-        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.ArmsHeightAdjustmentWeight)]
-        private float _armsHeightAdjustmentWeight;
-        public float ArmsHeightAdjustmentWeight
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.AffectArmsBySpineCorrection)]
+        private bool _affectArmsBySpineCorrection;
+        public bool AffectArmsBySpineCorrection
         {
-            get => _armsHeightAdjustmentWeight;
-            set => _armsHeightAdjustmentWeight = value;
+            get => _affectArmsBySpineCorrection;
+            set => _affectArmsBySpineCorrection = value;
         }
 
         /// <summary>
@@ -591,31 +660,61 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for the deformation on the left leg.
+        /// Restricts how much the character should be squashed.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
         /// </summary>
-        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.LeftLegWeight)]
-        private float _leftLegWeight;
-        public float LeftLegWeight
+        [SyncSceneToStream, SerializeField, Range(float.Epsilon, 2.0f)]
+        [Tooltip(DeformationDataTooltips.SquashLimit)]
+        private float _squashLimit;
+        public float SquashLimit
         {
-            get => _leftLegWeight;
-            set => _leftLegWeight = value;
+            get => _squashLimit;
+            set => _squashLimit = value;
         }
 
         /// <summary>
-        /// The weight for the deformation on the right leg.
+        /// Restricts how much the character should be stretched.
+        /// WARNING: restricting too much will prevent the character
+        /// from tracking the body accurately.
         /// </summary>
-        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
-        [Tooltip(DeformationDataTooltips.RightLegWeight)]
-        private float _rightLegWeight;
-        public float RightLegWeight
+        [SyncSceneToStream, SerializeField, Range(float.Epsilon, 2.0f)]
+        [Tooltip(DeformationDataTooltips.StretchLimit)]
+        private float _stretchLimit;
+        public float StretchLimit
         {
-            get => _rightLegWeight;
-            set => _rightLegWeight = value;
+            get => _stretchLimit;
+            set => _stretchLimit = value;
         }
 
         /// <summary>
-        /// The weight for the FullBodyDeformation on the left toe.
+        /// The weight for the alignment on the left leg.
+        /// </summary>
+        [FormerlySerializedAs("_leftLegWeight")]
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.AlignLeftLegWeight)]
+        private float _alignLeftLegWeight;
+        public float AlignLeftLegWeight
+        {
+            get => _alignLeftLegWeight;
+            set => _alignLeftLegWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for the alignment on the right leg.
+        /// </summary>
+        [FormerlySerializedAs("_rightLegWeight")]
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.AlignRightLegWeight)]
+        private float _alignRightLegWeight;
+        public float AlignRightLegWeight
+        {
+            get => _alignRightLegWeight;
+            set => _alignRightLegWeight = value;
+        }
+
+        /// <summary>
+        /// The weight for the deformation on the left toe.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
         [Tooltip(DeformationDataTooltips.LeftToesWeight)]
@@ -627,7 +726,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The weight for the FullBodyDeformation on the right toe.
+        /// The weight for the deformation on the right toe.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
         [Tooltip(DeformationDataTooltips.RightToesWeight)]
@@ -683,6 +782,13 @@ namespace Oculus.Movement.AnimationRigging
         [SyncSceneToStream, SerializeField]
         [Tooltip(DeformationDataTooltips.HipsToHeadBoneTargets)]
         private Transform[] _hipsToHeadBoneTargets;
+
+        /// <summary>
+        /// Array of transform bone targets from feet to toes.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.FeetToToesBoneTargets)]
+        private Transform[] _feetToToesBoneTargets;
 
         /// <summary>
         /// Left arm data.
@@ -808,15 +914,16 @@ namespace Oculus.Movement.AnimationRigging
         public void SetUpLeftArmData()
         {
             var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftShoulder);
+            var upperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper);
             var lowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmLower);
             var handBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftHandWrist);
             _leftArmData = new ArmPosData()
             {
                 ShoulderBone = shoulder,
-                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_LeftArmUpper),
+                UpperArmBone = upperArmBone,
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
-                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero,
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
@@ -826,15 +933,16 @@ namespace Oculus.Movement.AnimationRigging
         public void SetUpRightArmData()
         {
             var shoulder = FindBoneTransform(OVRSkeleton.BoneId.Body_RightShoulder);
+            var upperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper);
             var lowerArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmLower);
             var handBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightHandWrist);
             _rightArmData = new ArmPosData()
             {
                 ShoulderBone = shoulder,
-                UpperArmBone = FindBoneTransform(OVRSkeleton.BoneId.Body_RightArmUpper),
+                UpperArmBone = upperArmBone,
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
-                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : Vector3.zero,
+                ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
@@ -1091,46 +1199,42 @@ namespace Oculus.Movement.AnimationRigging
                 hipsTarget, spineLowerTarget
             };
 
-            // Add optional bones, based on the length of the original array.
-            if (_hipsToHeadBones.Length > 4)
+            // Add optional bones, based on the valid animator.
+            if (_animator.GetBoneTransform(HumanBodyBones.Chest) != null)
             {
                 hipsToHeadBoneTargets.Add(spineUpperTarget);
             }
-            if (_hipsToHeadBones.Length > 5)
+            if (_animator.GetBoneTransform(HumanBodyBones.UpperChest) != null)
             {
                 hipsToHeadBoneTargets.Add(chestTarget);
             }
-            hipsToHeadBoneTargets.Add(neckTarget);
+            if (_animator.GetBoneTransform(HumanBodyBones.Neck) != null)
+            {
+                hipsToHeadBoneTargets.Add(neckTarget);
+            }
             hipsToHeadBoneTargets.Add(headTarget);
 
             _hipsToHeadBoneTargets = hipsToHeadBoneTargets.ToArray();
+            if (DeformationBodyTypeField == DeformationBodyType.FullBody)
+            {
+                _feetToToesBoneTargets = new[]
+                {
+                    setupParent.FindChildRecursive("LeftFoot"),
+                    setupParent.FindChildRecursive("LeftToes"),
+                    setupParent.FindChildRecursive("RightFoot"),
+                    setupParent.FindChildRecursive("RightToes")
+                };
+            }
+            else
+            {
+                _feetToToesBoneTargets = Array.Empty<Transform>();
+            }
         }
 
         /// <inheritdoc />
         public void SetUpAdjustments(RestPoseObjectHumanoid restPoseObject)
         {
-            // Calculate spine adjustments.
-            var shoulderParentAdjustmentBone = GetValidShoulderParentBone(_animator);
-            var shoulderParentAdjustment = Quaternion.identity;
-            var spineBoneAdjustments = GetSpineJointAdjustments(_animator, restPoseObject);
-            foreach (var spineBoneAdjustment in spineBoneAdjustments)
-            {
-                if (spineBoneAdjustment.Bone == shoulderParentAdjustmentBone)
-                {
-                    shoulderParentAdjustment = spineBoneAdjustment.Adjustment;
-                    break;
-                }
-            }
-
-            // Calculate adjustments for the shoulders (or upper arms, if shoulders are unavailable).
-            var shoulderBoneAdjustments =
-                GetShoulderAdjustments(_animator, restPoseObject, shoulderParentAdjustment);
-
-            // Combine calculated adjustments.
-            var boneAdjustments = new List<BoneAdjustmentData>();
-            boneAdjustments.AddRange(spineBoneAdjustments);
-            boneAdjustments.AddRange(shoulderBoneAdjustments);
-            _boneAdjustmentData = boneAdjustments.ToArray();
+            _boneAdjustmentData = GetDeformationBoneAdjustments(_animator, restPoseObject);
         }
 
         /// <inheritdoc />
@@ -1185,31 +1289,47 @@ namespace Oculus.Movement.AnimationRigging
         {
             if (_animator == null && _customSkeleton == null)
             {
-                Debug.LogError("Animator or skeleton not set up.");
+                Debug.LogError($"Animator or skeleton not set up.");
                 return false;
             }
 
+            var targetName = _animator != null ? _animator.name : _customSkeleton.name;
             if (_bonePairData == null || _bonePairData.Length == 0)
             {
-                Debug.LogError("Bone pair data not set up.");
+                Debug.LogError($"Bone pair data not set up on {targetName}.");
                 return false;
             }
 
             if (_hipsToHeadBones == null || _hipsToHeadBones.Length == 0)
             {
-                Debug.LogError("Hips to head bones not set up.");
+                Debug.LogError($"Hips to head bones not set up on {targetName}.");
                 return false;
             }
 
             if (!_leftArmData.IsInitialized || !_rightArmData.IsInitialized)
             {
-                Debug.LogError("Arm data not set up.");
+                Debug.LogError($"Arm data not set up on {targetName}.");
                 return false;
             }
 
-            if (!_leftLegData.IsInitialized || !_rightLegData.IsInitialized)
+            if ((DeformationBodyType)_deformationBodyType == DeformationBodyType.FullBody)
             {
-                Debug.LogError("Leg data not set up.");
+                if (!_leftLegData.IsInitialized || !_rightLegData.IsInitialized)
+                {
+                    Debug.LogError($"Leg data not set up on {targetName}.");
+                    return false;
+                }
+            }
+
+            if (_squashLimit < float.Epsilon)
+            {
+                Debug.LogError("Please set squash limit!");
+                return false;
+            }
+
+            if (_stretchLimit < float.Epsilon)
+            {
+                Debug.LogError("Please set stretch limit!");
                 return false;
             }
 
@@ -1226,8 +1346,10 @@ namespace Oculus.Movement.AnimationRigging
             _rightArmWeight = 0.0f;
             _leftHandWeight = 0.0f;
             _rightHandWeight = 0.0f;
-            _leftLegWeight = 0.0f;
-            _rightLegWeight = 0.0f;
+            _squashLimit = 2.0f;
+            _stretchLimit = 2.0f;
+            _alignLeftLegWeight = 0.0f;
+            _alignRightLegWeight = 0.0f;
             _leftToesWeight = 0.0f;
             _rightToesWeight = 0.0f;
 

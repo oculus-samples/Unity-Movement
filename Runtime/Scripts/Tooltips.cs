@@ -933,6 +933,9 @@ namespace Oculus.Movement
 
     public static class DeformationDataTooltips
     {
+        public const string DeformationBodyType =
+            "The deformation body type for the character.";
+
         public const string CustomSkeleton =
             "The OVRCustomSkeleton component for the character.";
 
@@ -948,14 +951,14 @@ namespace Oculus.Movement
         public const string ChestAlignmentWeight =
             "The weight for the chest alignment.";
 
-        public const string ShouldersHeightAdjustmentWeight =
-            "The weight for the shoulders height adjustment.";
+        public const string ShouldersHeightReductionWeight =
+            "The weight for the shoulders height reduction.";
 
-        public const string ShouldersWidthAdjustmentWeight =
-            "The weight for the shoulders width adjustment.";
+        public const string ShouldersWidthReductionWeight =
+            "The weight for the shoulders width reduction.";
 
-        public const string ArmsHeightAdjustmentWeight =
-            "The weight for the arms height adjustment.";
+        public const string AffectArmsBySpineCorrection =
+            "True if arms should be affected by spine correction.";
 
         public const string LeftShoulderWeight =
             "The weight for the deformation on the left shoulder.";
@@ -975,11 +978,19 @@ namespace Oculus.Movement
         public const string RightHandWeight =
             "The weight for the deformation on the right hand.";
 
-        public const string LeftLegWeight =
-            "The weight for the deformation on the left leg.";
+        public const string SquashLimit =
+            "Prevents character from squashing too much. " +
+            "WARNING: reducing this reduces perceived body tracking accuracy.";
 
-        public const string RightLegWeight =
-            "The weight for the deformation on the right leg.";
+        public const string StretchLimit =
+            "Prevents character from stretching too much. " +
+            "WARNING: reducing this reduces perceived body tracking accuracy.";
+
+        public const string AlignLeftLegWeight =
+            "The weight for the alignment on the left leg.";
+
+        public const string AlignRightLegWeight =
+            "The weight for the alignment on the right leg.";
 
         public const string LeftToesWeight =
             "The weight for the deformation on the left toe.";
@@ -995,6 +1006,9 @@ namespace Oculus.Movement
 
         public const string HipsToHeadBoneTargets =
             "Array of transform bone targets from hips to head.";
+
+        public const string FeetToToesBoneTargets =
+            "Array of transform bone targets from feet to toes.";
 
         public const string LeftArmData =
             "Left arm data.";
@@ -1345,6 +1359,12 @@ namespace Oculus.Movement
 
         public const string RetargetingProcessors =
             "List of retargeting processors, which run in late update after retargeting and animation rigging.";
+
+        public const string RetargetingAnimationRig =
+            "Retargeting animation rig to be updated based on body tracking.";
+
+        public const string ExternalBoneTargets =
+            "External bone targets to be updated based on body tracking.";
     }
 
     public static class LateMirroredObjectTooltips
@@ -1832,5 +1852,46 @@ namespace Oculus.Movement
     {
         public const string BonePoseDataArray =
             "A flat array containing all bone pose data.";
+    }
+
+    public static class RetargetingBlendHandProcessorTooltips
+    {
+        public const string MinDistance =
+            "Distance where weight is set to 1.0.";
+
+        public const string MaxDistance =
+            "Distance where weight is set to 0.0.";
+
+        public const string BlendCurve =
+            "Multiplier that influences weight interpolation based on distance.";
+
+        public const string FullBodyBoneIdToTest =
+            "(Full Body) Bone ID, usually the wrist. Can be modified depending on the skeleton used.";
+
+        public const string BoneIdToTest =
+            "Bone ID, usually the wrist. Can be modified depending on the skeleton used.";
+
+        public const string IsFullBody =
+            "Specifies if this is full body or not.";
+    }
+
+    public static class ExternalBoneTargetsTooltips
+    {
+        public static class BoneTargetTooltips
+        {
+            public const string BoneId =
+                "The OVRSkeleton.BoneId that must be tracked.";
+            public const string HumanBodyBone =
+                "The human body bone representation of this bone.";
+            public const string Target =
+                "The target transform to update with body tracking bone data.";
+        }
+
+        public const string BoneTargets =
+            "The array of bone targets.";
+        public const string IsFullBody =
+            "Is it full body (or not).";
+        public const string Enabled =
+            "Enables or disables functionality.";
     }
 }

@@ -152,13 +152,13 @@ MonoBehaviour:
     - StartBone: {fileID: 3912735870831686328}
       EndBone: {fileID: 3544633643260244702}
       Distance: 0.19169338
-      HeightProportion: 0
-      LimbProportion: 0
+      HeightProportion: 0.2976425
+      LimbProportion: 0.2976425
     - StartBone: {fileID: 3912735870831686328}
       EndBone: {fileID: 7560647181254474819}
       Distance: 0.19169505
-      HeightProportion: 0
-      LimbProportion: 0
+      HeightProportion: 0.2976451
+      LimbProportion: 0.2976451
     - StartBone: {fileID: 3544633643260244702}
       EndBone: {fileID: 1405689208918275001}
       Distance: 0.16743496
@@ -694,6 +694,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2015256377725734567, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2136921240105483057, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.009527459
@@ -905,143 +909,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 9121803696401781268, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}
   m_PrefabInstance: {fileID: 1434491218122775287}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1280450767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7890163646267885795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 642f072a06af00f42b49882dbbda8521, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _skeleton: {fileID: 1280450773}
-  _animator: {fileID: 585457876304057424}
-  _rigBuilder: {fileID: 1280450771}
-  _ovrSkeletonConstraints:
-  - {fileID: 1412995357}
-  - {fileID: 388136804}
-  _rebindAnimator: 1
-  _reEnableRig: 1
-  _rigToggleOnFocus: 0
-  _retargetingLayer: {fileID: 1280450773}
-  _checkSkeletalUpdatesByProxy: 1
---- !u!114 &1280450768
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7890163646267885795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8679dc9cec9324429dd9c3909e6cac3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _constraints: []
-  _retargetingLayer: {fileID: 1280450773}
-  _boneIdToTest: 45
-  _headTransform: {fileID: 4562970236519078923}
-  _autoAddTo: {fileID: 1280450773}
-  _constraintsMinDistance: 0.2
-  _constraintsMaxDistance: 0.5
-  _blendCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _maxWeight: 1
---- !u!114 &1280450769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7890163646267885795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8679dc9cec9324429dd9c3909e6cac3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _constraints: []
-  _retargetingLayer: {fileID: 1280450773}
-  _boneIdToTest: 19
-  _headTransform: {fileID: 4562970236519078923}
-  _autoAddTo: {fileID: 1280450773}
-  _constraintsMinDistance: 0.2
-  _constraintsMaxDistance: 0.5
-  _blendCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _maxWeight: 1
---- !u!114 &1280450770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7890163646267885795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e00344307bbe4d949bfcf8eddb0caf22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _autoAddTo: {fileID: 1280450773}
-  _retargetedBoneTargets:
-  - HumanBodyBone: 0
-    Target: {fileID: 1653966953}
-  - HumanBodyBone: 7
-    Target: {fileID: 41237797}
-  - HumanBodyBone: 8
-    Target: {fileID: 1805178966}
-  - HumanBodyBone: 54
-    Target: {fileID: 948545905}
-  - HumanBodyBone: 9
-    Target: {fileID: 677977384}
-  - HumanBodyBone: 10
-    Target: {fileID: 1977851119}
 --- !u!114 &1280450771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1106,10 +973,35 @@ MonoBehaviour:
   _enableTrackingByProxy: 1
   _retargetingAnimationConstraint: {fileID: 1412995357}
   _retargetingProcessors:
+  - {fileID: 11400000, guid: f068850461cccf746a2c0350bf914b3c, type: 2}
+  - {fileID: 11400000, guid: 147277ff4a4bc0149a2fd10476ba4581, type: 2}
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
   - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
   - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}
-  _jointRotationTweaks: []
+  _retargetingAnimationRig:
+    _rebindAnimator: 1
+    _reEnableRig: 1
+    _rigToggleOnFocus: 0
+    _rigBuilder: {fileID: 1280450771}
+    _ovrSkeletonConstraints:
+    - {fileID: 1412995357}
+    - {fileID: 388136804}
+  _externalBoneTargets:
+    _boneTargets:
+    - HumanBodyBone: 0
+      Target: {fileID: 1653966953}
+    - HumanBodyBone: 7
+      Target: {fileID: 41237797}
+    - HumanBodyBone: 8
+      Target: {fileID: 1805178966}
+    - HumanBodyBone: 54
+      Target: {fileID: 948545905}
+    - HumanBodyBone: 9
+      Target: {fileID: 677977384}
+    - HumanBodyBone: 10
+      Target: {fileID: 1977851119}
+    _fullBody: 0
+    _enabled: 1
 --- !u!4 &8023271195216576026 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8984739037707363565, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}

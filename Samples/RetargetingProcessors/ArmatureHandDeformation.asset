@@ -1,0 +1,198 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 887c0a87d46a8a340a75ccbbdfcf0a9d, type: 3}
+  m_Name: ArmatureHandDeformation
+  m_EditorClassIdentifier: 
+  Weight: 1
+  _startingScale: {x: 1, y: 1, z: 1}
+  _fingerBonePairs:
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 24
+    _distance: 0.037202135
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 24
+    EndBone: 25
+    _distance: 0.027841354
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 25
+    EndBone: 26
+    _distance: 0.045123253
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 27
+    _distance: 0.095930085
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 27
+    EndBone: 28
+    _distance: 0.04209801
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 28
+    EndBone: 29
+    _distance: 0.025139278
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 30
+    _distance: 0.087118745
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 30
+    EndBone: 31
+    _distance: 0.05127931
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 31
+    EndBone: 32
+    _distance: 0.028284302
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 33
+    _distance: 0.08307676
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 33
+    EndBone: 34
+    _distance: 0.043630447
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 34
+    EndBone: 35
+    _distance: 0.02711555
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 36
+    _distance: 0.078698196
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 36
+    EndBone: 37
+    _distance: 0.032272566
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 37
+    EndBone: 38
+    _distance: 0.020224374
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 24
+    _distance: 0.037202135
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 24
+    EndBone: 25
+    _distance: 0.027841354
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 25
+    EndBone: 26
+    _distance: 0.045123253
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 27
+    _distance: 0.095930085
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 27
+    EndBone: 28
+    _distance: 0.04209801
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 28
+    EndBone: 29
+    _distance: 0.025139278
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 30
+    _distance: 0.087118745
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 30
+    EndBone: 31
+    _distance: 0.05127931
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 31
+    EndBone: 32
+    _distance: 0.028284302
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 33
+    _distance: 0.08307676
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 33
+    EndBone: 34
+    _distance: 0.043630447
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 34
+    EndBone: 35
+    _distance: 0.02711555
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 17
+    EndBone: 36
+    _distance: 0.078698196
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 36
+    EndBone: 37
+    _distance: 0.032272566
+  - BoneAdjustment:
+      translation: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 0}
+    StartBone: 37
+    EndBone: 38
+    _distance: 0.020224374
+  _calculateFingerData: 0

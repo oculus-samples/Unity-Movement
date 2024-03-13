@@ -157,6 +157,32 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Retargeting animation rig to be updated based on body tracking.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.RetargetingAnimationRig)]
+        protected RetargetingAnimationRig _retargetingAnimationRig;
+        /// <inheritdoc cref="_retargetingAnimationRig"/>
+        public RetargetingAnimationRig RetargetingAnimationRigInst
+        {
+            get => _retargetingAnimationRig;
+            set => _retargetingAnimationRig = value;
+        }
+
+        /// <summary>
+        /// External bone targets to be updated based on body tracking.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.ExternalBoneTargets)]
+        protected ExternalBoneTargets _externalBoneTargets;
+        /// <inheritdoc cref="_externalBoneTargets"/>
+        public ExternalBoneTargets ExternalBoneTargetsInst
+        {
+            get => _externalBoneTargets;
+            set => _externalBoneTargets = value;
+        }
+
+        /// <summary>
         /// Pre-compute these values each time the editor changes for the purposes
         /// of efficiency.
         /// </summary>
@@ -169,6 +195,9 @@ namespace Oculus.Movement.AnimationRigging
         private ProxyTransformLogic _proxyTransformLogic = new ProxyTransformLogic();
         private bool _isFocusedWhileInBuild = true;
 
+        /// <summary>
+        /// Check for required components.
+        /// </summary>
         protected override void Awake()
         {
             base.Awake();
@@ -210,9 +239,9 @@ namespace Oculus.Movement.AnimationRigging
                 ConstructDefaultPoseInformation();
                 ConstructBoneAdjustmentInformation();
                 CacheJointConstraints();
-
                 ValidateHumanoid();
 
+                _retargetingAnimationRig.ValidateRig(this);
                 foreach (var retargetingProcessor in _retargetingProcessors)
                 {
                     retargetingProcessor.SetupRetargetingProcessor(this);
@@ -305,6 +334,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
+            _retargetingAnimationRig.OnApplicationFocus(this, hasFocus);
             _isFocusedWhileInBuild = hasFocus;
         }
 
@@ -315,10 +345,13 @@ namespace Oculus.Movement.AnimationRigging
             _skeletonPostProcessing?.Invoke(this);
             RecomputeSkeletalOffsetsIfNecessary();
 
+            _externalBoneTargets.ProcessSkeleton(this);
+
             if (_enableTrackingByProxy)
             {
-                _proxyTransformLogic.UpdateState(Bones, this.transform);
+                _proxyTransformLogic.UpdateState(Bones, transform);
             }
+            _retargetingAnimationRig.UpdateRig(this);
         }
 
         /// <summary>
@@ -344,6 +377,14 @@ namespace Oculus.Movement.AnimationRigging
 
             // Apply constraints on character after fixing positions.
             RunConstraints();
+        }
+
+        protected virtual void OnDrawGizmos()
+        {
+            foreach (var retargetingProcessor in _retargetingProcessors)
+            {
+                retargetingProcessor.DrawGizmos();
+            }
         }
 
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)

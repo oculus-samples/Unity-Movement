@@ -46,12 +46,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _whenToRender: 2
-  _visualizationGuideType: 0
+  _visualizationGuideType: 1
   _maskToVisualize: {fileID: 31900000, guid: 8267e3d56146c7e43bd0296dc7f86558, type: 2}
   _customBoneVisualData:
     BoneTuples:
     - FirstBone: 0
       SecondBone: 7
+      Hide: 0
+    - FirstBone: 0
+      SecondBone: 1
+      Hide: 0
+    - FirstBone: 0
+      SecondBone: 2
       Hide: 0
     - FirstBone: 1
       SecondBone: 3
@@ -76,6 +82,15 @@ MonoBehaviour:
       Hide: 0
     - FirstBone: 8
       SecondBone: 54
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 9
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 11
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 12
       Hide: 0
     - FirstBone: 9
       SecondBone: 10
@@ -103,15 +118,6 @@ MonoBehaviour:
       Hide: 0
     - FirstBone: 18
       SecondBone: 45
-      Hide: 0
-    - FirstBone: 10
-      SecondBone: 21
-      Hide: 0
-    - FirstBone: 10
-      SecondBone: 22
-      Hide: 0
-    - FirstBone: 10
-      SecondBone: 23
       Hide: 0
     - FirstBone: 24
       SecondBone: 25
@@ -202,9 +208,6 @@ MonoBehaviour:
       Hide: 0
     - FirstBone: 53
       SecondBone: 55
-      Hide: 0
-    - FirstBone: 54
-      SecondBone: 9
       Hide: 0
   _lineRendererPrefab: {fileID: 7812178534108119229, guid: 6d28b0d0a0ff2234cbf60710c8c912dc, type: 3}
   _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}

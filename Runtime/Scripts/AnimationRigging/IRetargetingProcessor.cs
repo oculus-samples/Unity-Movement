@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Oculus.Movement.AnimationRigging
 {
+    /// <summary>
+    /// Interface for retargeting processors.
+    /// </summary>
     public interface IRetargetingProcessor
     {
         /// <summary>
@@ -25,5 +28,10 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="retargetingLayer">The retargeting layer.</param>
         /// <param name="ovrBones">The tracked OVR bones.</param>
         public void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones);
+
+        /// <summary>
+        /// Allow drawing debugging gizmos.
+        /// </summary>
+        public void DrawGizmos();
     }
 }

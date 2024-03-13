@@ -11,7 +11,7 @@ namespace Oculus.Movement.AnimationRigging
     /// <summary>
     /// Custom editor for the full body deformation constraint.
     /// </summary>
-    [CustomEditor(typeof(FullBodyDeformationConstraint))]
+    [CustomEditor(typeof(FullBodyDeformationConstraint)), CanEditMultipleObjects]
     public class FullBodyDeformationConstraintEditor : Editor
     {
         private static class Content
@@ -60,8 +60,8 @@ namespace Oculus.Movement.AnimationRigging
 
             public static readonly GUIContent LegsWeight = EditorGUIUtility.TrTextContent
             (
-                "Legs Weight",
-                "The deformation weight for both legs."
+                "Legs Alignment Weight",
+                "The deformation weight for legs alignment."
             );
 
             public static readonly GUIContent FeetAlignmentWeight = EditorGUIUtility.TrTextContent
@@ -86,6 +86,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private SerializedProperty _weightProperty;
 
+        private SerializedProperty _deformationBodyTypeProperty;
         private SerializedProperty _animatorProperty;
         private SerializedProperty _customSkeletonProperty;
 
@@ -93,9 +94,9 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _spineLowerAlignmentWeightProperty;
         private SerializedProperty _spineUpperAlignmentWeightProperty;
         private SerializedProperty _chestAlignmentWeightProperty;
-        private SerializedProperty _shouldersHeightAdjustmentWeightProperty;
-        private SerializedProperty _shouldersWidthAdjustmentWeightProperty;
-        private SerializedProperty _armsHeightAdjustmentWeightProperty;
+        private SerializedProperty _shouldersHeightReductionWeightProperty;
+        private SerializedProperty _shouldersWidthReductionWeightProperty;
+        private SerializedProperty _affectArmsBySpineCorrectionProperty;
         private SerializedProperty _alignFeetWeightProperty;
 
         private SerializedProperty _leftShoulderWeightProperty;
@@ -108,9 +109,12 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _rightLegWeightProperty;
         private SerializedProperty _leftToesWeightProperty;
         private SerializedProperty _rightToesWeightProperty;
+        private SerializedProperty _squashProperty;
+        private SerializedProperty _stretchProperty;
 
         private SerializedProperty _hipsToHeadBonesProperty;
         private SerializedProperty _hipsToHeadBoneTargetsProperty;
+        private SerializedProperty _feetToToesBoneTargetsProperty;
         private SerializedProperty _leftArmDataProperty;
         private SerializedProperty _rightArmDataProperty;
         private SerializedProperty _leftLegDataProperty;
@@ -123,12 +127,14 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _hipsToFootDistanceProperty;
 
         private readonly int _indentSpacing = 10;
+        private bool _isFullBody;
 
         private void OnEnable()
         {
             _weightProperty = serializedObject.FindProperty("m_Weight");
             var data = serializedObject.FindProperty("m_Data");
 
+            _deformationBodyTypeProperty = data.FindPropertyRelative("_deformationBodyType");
             _animatorProperty = data.FindPropertyRelative("_animator");
             _customSkeletonProperty = data.FindPropertyRelative("_customSkeleton");
 
@@ -136,9 +142,9 @@ namespace Oculus.Movement.AnimationRigging
             _spineLowerAlignmentWeightProperty = data.FindPropertyRelative("_spineLowerAlignmentWeight");
             _spineUpperAlignmentWeightProperty = data.FindPropertyRelative("_spineUpperAlignmentWeight");
             _chestAlignmentWeightProperty = data.FindPropertyRelative("_chestAlignmentWeight");
-            _shouldersHeightAdjustmentWeightProperty = data.FindPropertyRelative("_shouldersHeightAdjustmentWeight");
-            _shouldersWidthAdjustmentWeightProperty = data.FindPropertyRelative("_shouldersWidthAdjustmentWeight");
-            _armsHeightAdjustmentWeightProperty = data.FindPropertyRelative("_armsHeightAdjustmentWeight");
+            _shouldersHeightReductionWeightProperty = data.FindPropertyRelative("_shouldersHeightReductionWeight");
+            _shouldersWidthReductionWeightProperty = data.FindPropertyRelative("_shouldersWidthReductionWeight");
+            _affectArmsBySpineCorrectionProperty = data.FindPropertyRelative("_affectArmsBySpineCorrection");
 
             _leftShoulderWeightProperty = data.FindPropertyRelative("_leftShoulderWeight");
             _rightShoulderWeightProperty = data.FindPropertyRelative("_rightShoulderWeight");
@@ -146,14 +152,17 @@ namespace Oculus.Movement.AnimationRigging
             _rightArmWeightProperty = data.FindPropertyRelative("_rightArmWeight");
             _leftHandWeightProperty = data.FindPropertyRelative("_leftHandWeight");
             _rightHandWeightProperty = data.FindPropertyRelative("_rightHandWeight");
-            _leftLegWeightProperty = data.FindPropertyRelative("_leftLegWeight");
-            _rightLegWeightProperty = data.FindPropertyRelative("_rightLegWeight");
+            _leftLegWeightProperty = data.FindPropertyRelative("_alignLeftLegWeight");
+            _rightLegWeightProperty = data.FindPropertyRelative("_alignRightLegWeight");
             _leftToesWeightProperty = data.FindPropertyRelative("_leftToesWeight");
             _rightToesWeightProperty = data.FindPropertyRelative("_rightToesWeight");
             _alignFeetWeightProperty = data.FindPropertyRelative("_alignFeetWeight");
+            _squashProperty = data.FindPropertyRelative("_squashLimit");
+            _stretchProperty = data.FindPropertyRelative("_stretchLimit");
 
             _hipsToHeadBonesProperty = data.FindPropertyRelative("_hipsToHeadBones");
             _hipsToHeadBoneTargetsProperty = data.FindPropertyRelative("_hipsToHeadBoneTargets");
+            _feetToToesBoneTargetsProperty = data.FindPropertyRelative("_feetToToesBoneTargets");
             _leftArmDataProperty = data.FindPropertyRelative("_leftArmData");
             _rightArmDataProperty = data.FindPropertyRelative("_rightArmData");
             _leftLegDataProperty = data.FindPropertyRelative("_leftLegData");
@@ -171,7 +180,10 @@ namespace Oculus.Movement.AnimationRigging
         {
             serializedObject.Update();
 
+            _isFullBody = (FullBodyDeformationData.DeformationBodyType)_deformationBodyTypeProperty.intValue ==
+                          FullBodyDeformationData.DeformationBodyType.FullBody;
             EditorGUILayout.PropertyField(_weightProperty, Content.Weight);
+            EditorGUILayout.PropertyField(_deformationBodyTypeProperty);
             EditorGUILayout.Space();
 
             _referencesFoldout.Value =
@@ -243,7 +255,7 @@ namespace Oculus.Movement.AnimationRigging
                 constraintData.AssignAnimator(animator);
             }
             // Determine if this character is in T-pose or A-pose.
-            var isTPose = HelperMenusCommon.CheckIfTPose(animator);
+            var isTPose = AddComponentsHelper.CheckIfTPose(animator);
 
             constraintData.InitializeStartingScale();
             constraintData.ClearTransformData();
@@ -254,7 +266,7 @@ namespace Oculus.Movement.AnimationRigging
             constraintData.SetUpHipsAndHeadBones();
             constraintData.SetUpBonePairs();
             constraintData.SetUpBoneTargets(constraint.transform);
-            constraintData.SetUpAdjustments(HelperMenusCommon.GetRestPoseObject(isTPose));
+            constraintData.SetUpAdjustments(AddComponentsHelper.GetRestPoseObject(isTPose));
             constraint.data = constraintData;
             EditorUtility.SetDirty(target);
             PrefabUtility.RecordPrefabInstancePropertyModifications(target);
@@ -289,8 +301,6 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.Space(EditorGUI.indentLevel * _indentSpacing);
             GUILayout.Label(new GUIContent("Shoulders"), EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
-            EditorGUILayout.PropertyField(_shouldersHeightAdjustmentWeightProperty);
-            EditorGUILayout.PropertyField(_shouldersWidthAdjustmentWeightProperty);
             AverageWeightSlider(Content.ShouldersWeight,
                 new[] { _leftShoulderWeightProperty, _rightShoulderWeightProperty });
 
@@ -299,11 +309,16 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.Space(EditorGUI.indentLevel * _indentSpacing);
             GUILayout.Label(new GUIContent("Arms"), EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
-            EditorGUILayout.PropertyField(_armsHeightAdjustmentWeightProperty);
+            EditorGUILayout.PropertyField(_affectArmsBySpineCorrectionProperty);
             AverageWeightSlider(Content.ArmsWeight,
                 new[] { _leftArmWeightProperty, _rightArmWeightProperty });
             AverageWeightSlider(Content.HandsWeight,
                 new[] { _leftHandWeightProperty, _rightHandWeightProperty });
+
+            if (!_isFullBody)
+            {
+                return;
+            }
 
             EditorGUILayout.Space();
             GUILayout.BeginHorizontal();
@@ -324,16 +339,23 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.Space(EditorGUI.indentLevel * _indentSpacing);
             GUILayout.Label(new GUIContent("Weights"), EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
+            EditorGUILayout.PropertyField(_shouldersHeightReductionWeightProperty);
+            EditorGUILayout.PropertyField(_shouldersWidthReductionWeightProperty);
             EditorGUILayout.PropertyField(_leftShoulderWeightProperty);
             EditorGUILayout.PropertyField(_rightShoulderWeightProperty);
             EditorGUILayout.PropertyField(_leftArmWeightProperty);
             EditorGUILayout.PropertyField(_rightArmWeightProperty);
             EditorGUILayout.PropertyField(_leftHandWeightProperty);
             EditorGUILayout.PropertyField(_rightHandWeightProperty);
-            EditorGUILayout.PropertyField(_leftLegWeightProperty);
-            EditorGUILayout.PropertyField(_rightLegWeightProperty);
-            EditorGUILayout.PropertyField(_leftToesWeightProperty);
-            EditorGUILayout.PropertyField(_rightToesWeightProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_leftLegWeightProperty);
+                EditorGUILayout.PropertyField(_rightLegWeightProperty);
+                EditorGUILayout.PropertyField(_leftToesWeightProperty);
+                EditorGUILayout.PropertyField(_rightToesWeightProperty);
+            }
+            EditorGUILayout.PropertyField(_squashProperty);
+            EditorGUILayout.PropertyField(_stretchProperty);
 
             EditorGUILayout.Space();
             GUILayout.BeginHorizontal();
@@ -344,13 +366,23 @@ namespace Oculus.Movement.AnimationRigging
             DisplayBoneAdjustmentArray("Bone Adjustment Data", _boneAdjustmentDataProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBonesProperty);
             EditorGUILayout.PropertyField(_hipsToHeadBoneTargetsProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_feetToToesBoneTargetsProperty);
+            }
             EditorGUILayout.PropertyField(_leftArmDataProperty);
             EditorGUILayout.PropertyField(_rightArmDataProperty);
-            EditorGUILayout.PropertyField(_leftLegDataProperty);
-            EditorGUILayout.PropertyField(_rightLegDataProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_leftLegDataProperty);
+                EditorGUILayout.PropertyField(_rightLegDataProperty);
+            }
             EditorGUILayout.PropertyField(_startingScaleProperty);
             EditorGUILayout.PropertyField(_hipsToHeadDistanceProperty);
-            EditorGUILayout.PropertyField(_hipsToFootDistanceProperty);
+            if (_isFullBody)
+            {
+                EditorGUILayout.PropertyField(_hipsToFootDistanceProperty);
+            }
         }
 
         private void DisplayBonePairArray(string propertyName, SerializedProperty property)
@@ -409,6 +441,7 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
+
             float averageWeight = weights.Sum(property => property.floatValue) / weights.Length;
             EditorGUI.BeginChangeCheck();
             averageWeight = EditorGUILayout.Slider(content, averageWeight, 0.0f, 1.0f);
