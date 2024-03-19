@@ -29,14 +29,28 @@ namespace Oculus.Movement.AnimationRigging
         /// Allow correcting shoulder transforms in LateUpdate. This can produce more
         /// accurate shoulders, for instance.
         /// </summary>
-        [Tooltip(RetargetingLayerTooltips.ShoulderCorrectionWeightLateUpdate)]
         [SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(RetargetingLayerTooltips.ShoulderCorrectionWeightLateUpdate)]
         private float _shoulderCorrectionWeightLateUpdate = 1.0f;
         /// <inheritdoc cref="_shoulderCorrectionWeightLateUpdate"/>
         public float ShoulderCorrectionWeightLateUpdate
         {
             get => _shoulderCorrectionWeightLateUpdate;
             set => _shoulderCorrectionWeightLateUpdate = value;
+        }
+
+        /// <summary>
+        /// Finger position correction weight. For some characters, we might want to correct
+        /// all bones but reduce the positional accuracy of the fingers to maintain the
+        /// character's original hand shape.
+        /// </summary>
+        [SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(RetargetingLayerTooltips.FingerPositionCorrectionWeight)]
+        private float _fingerPositionCorrectionWeight = 1.0f;
+        public float FingerPositionCorrectionWeight
+        {
+            get => _fingerPositionCorrectionWeight;
+            set => _fingerPositionCorrectionWeight = value;
         }
 
         /// <inheritdoc />
@@ -137,6 +151,13 @@ namespace Oculus.Movement.AnimationRigging
                 if (isHandJoint)
                 {
                     constraintsPositionOffset = Vector3.zero;
+                }
+
+                // Dial back finger position correction if required.
+                if (bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.LeftHand ||
+                    bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.RightHand)
+                {
+                    rtWeight *= _fingerPositionCorrectionWeight;
                 }
 
                 // Remove muscle space restrictions for the shoulders.

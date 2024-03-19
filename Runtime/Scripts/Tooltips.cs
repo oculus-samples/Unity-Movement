@@ -1365,6 +1365,9 @@ namespace Oculus.Movement
 
         public const string ExternalBoneTargets =
             "External bone targets to be updated based on body tracking.";
+
+        public const string FingerPositionCorrectionWeight =
+            "Finger position correction weight.";
     }
 
     public static class LateMirroredObjectTooltips
