@@ -153,12 +153,10 @@ namespace Oculus.Movement.AnimationRigging
                     constraintsPositionOffset = Vector3.zero;
                 }
 
-                // Dial back finger position correction if required.
-                if (bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.LeftHand ||
-                    bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.RightHand)
-                {
-                    rtWeight *= _fingerPositionCorrectionWeight;
-                }
+                // Used to dial back finger position correction, if required.
+                bool isAFingerJoint =
+                    bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.LeftHand ||
+                    bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.RightHand;
 
                 // Remove muscle space restrictions for the shoulders.
                 if (isShoulderJoint)
@@ -181,7 +179,8 @@ namespace Oculus.Movement.AnimationRigging
                     {
                         targetJoint.position =
                             Vector3.Lerp(currentTargetPosition,
-                                currentOVRBonePosition + constraintsPositionOffset, rtWeight);
+                                currentOVRBonePosition + constraintsPositionOffset,
+                                isAFingerJoint ? rtWeight * _fingerPositionCorrectionWeight : rtWeight);
                     }
                 }
                 else
@@ -190,18 +189,19 @@ namespace Oculus.Movement.AnimationRigging
                     {
                         if (!adjustment.DisableRotationTransform)
                         {
-                            targetJoint.rotation = Quaternion.Slerp(targetJoint.rotation,
-                                    ovrBones[i].Transform.rotation * targetCorrectionQuaternion, rtWeight);
-                        }
+                            var finalRotation = ovrBones[i].Transform.rotation * targetCorrectionQuaternion;
+                            finalRotation *= adjustment.RotationChange * adjustment.PrecomputedRotationTweaks;
 
-                        targetJoint.rotation *= adjustment.RotationChange * adjustment.PrecomputedRotationTweaks;
+                            targetJoint.rotation = Quaternion.Slerp(targetJoint.rotation, finalRotation, rtWeight);
+                        }
                     }
 
                     if (CorrectPositionsLateUpdate && !adjustment.DisablePositionTransform)
                     {
                         targetJoint.position =
                             Vector3.Lerp(currentTargetPosition,
-                                currentOVRBonePosition + constraintsPositionOffset + adjustment.PositionChange, rtWeight);
+                                currentOVRBonePosition + constraintsPositionOffset + adjustment.PositionChange,
+                                isAFingerJoint ? rtWeight * _fingerPositionCorrectionWeight : rtWeight);
                     }
                 }
             }
@@ -227,13 +227,12 @@ namespace Oculus.Movement.AnimationRigging
                 translation = childJoint != null ? childJoint.position : Vector3.zero
             };
             var targetWeight = adjustment != null && adjustment.DisableRotationTransform ?
-                0.0f : ShoulderCorrectionWeightLateUpdate;
+                0.0f : ShoulderCorrectionWeightLateUpdate * Weight;
             var rotationChange = adjustment?.PrecomputedRotationTweaks ?? Quaternion.identity;
             targetJoint.rotation =
                 Quaternion.Slerp(targetJoint.rotation,
-                    boneRotation * correctionQuaternion,
-                    targetWeight) *
-                    rotationChange;
+                    boneRotation * correctionQuaternion * rotationChange,
+                    targetWeight);
 
             if (childJoint != null)
             {
