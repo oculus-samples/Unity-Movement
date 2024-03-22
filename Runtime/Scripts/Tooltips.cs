@@ -1876,6 +1876,9 @@ namespace Oculus.Movement
 
         public const string IsFullBody =
             "Specifies if this is full body or not.";
+
+        public const string HeadView =
+            "The type of head that should be used to blend hands.";
     }
 
     public static class ExternalBoneTargetsTooltips
