@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System;
+using UnityEditor.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace Oculus.Movement.BodyTrackingForFitness
@@ -84,12 +85,16 @@ namespace Oculus.Movement.BodyTrackingForFitness
             _instance = new EditorTransformAwareness();
             EditorApplication.update -= OnUpdate;
             EditorApplication.update += OnUpdate;
+            EditorSceneManager.sceneOpened -= OnScene;
+            EditorSceneManager.sceneOpened += OnScene;
             Selection.selectionChanged -= OnSelectionChanged;
             Selection.selectionChanged += OnSelectionChanged;
             EditorApplication.delayCall += _instance.AddActiveTransformsToActiveListener;
         }
 
         private static void OnUpdate() => _instance.Update();
+        private static void OnScene(UnityEngine.SceneManagement.Scene scene, OpenSceneMode mode) =>
+            RefreshSystem();
         private static void OnSelectionChanged() => _instance.AddActiveTransformsToActiveListener();
 
         private void Update()

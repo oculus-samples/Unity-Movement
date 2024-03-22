@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Body.PoseDetection;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Oculus.Movement.BodyTrackingForFitness
@@ -50,13 +51,16 @@ namespace Oculus.Movement.BodyTrackingForFitness
             _instance = new EditorBodyPoseLineSkeleton();
             SceneView.duringSceneGui -= OnGui;
             SceneView.duringSceneGui += OnGui;
+            EditorSceneManager.sceneOpened -= OnScene;
+            EditorSceneManager.sceneOpened += OnScene;
             ObjectChangeEvents.changesPublished -= OnChange;
             ObjectChangeEvents.changesPublished += OnChange;
             EditorApplication.delayCall += _instance.BecomeAwareOfInitialIBodyPoseObjects;
         }
 
         private static void OnGui(SceneView sceneView) => _instance.DrawIBodyPoseObjects(sceneView);
-
+        private static void OnScene(UnityEngine.SceneManagement.Scene scene, OpenSceneMode mode) =>
+            RefreshSystem();
         private static void OnChange(ref ObjectChangeEventStream stream) =>
             _instance.UpdateChangedIBodyPoseObjects(ref stream);
 
