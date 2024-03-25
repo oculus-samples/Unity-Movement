@@ -188,17 +188,22 @@ namespace Oculus.Movement.BodyTrackingForFitness
             for (int i = 0; i < stream.length; ++i)
             {
                 ObjectChangeKind kind = stream.GetEventType(i);
+                Object obj = null;
                 switch (kind)
                 {
                     case ObjectChangeKind.ChangeGameObjectStructure:
+                        stream.GetChangeGameObjectStructureEvent(i,
+                            out ChangeGameObjectStructureEventArgs structArgs);
+                        obj = EditorUtility.InstanceIDToObject(structArgs.instanceId);
+                        break;
                     case ObjectChangeKind.ChangeAssetObjectProperties:
+                        stream.GetChangeAssetObjectPropertiesEvent(i,
+                            out ChangeAssetObjectPropertiesEventArgs propArgs);
+                        obj = EditorUtility.InstanceIDToObject(propArgs.instanceId);
                         break;
                     default:
                         continue;
                 }
-                stream.GetChangeGameObjectStructureEvent(i,
-                    out ChangeGameObjectStructureEventArgs args);
-                Object obj = EditorUtility.InstanceIDToObject(args.instanceId);
                 AddBodyPoseTransformsFromThisObject(obj as GameObject);
             }
         }
