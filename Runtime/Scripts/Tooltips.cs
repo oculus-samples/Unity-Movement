@@ -900,7 +900,7 @@ namespace Oculus.Movement
     {
         public static class IconPositionInformation
         {
-            public const string LocalPosition = "Position to set.";
+            public const string ButtonTransform = "Button transform.";
             public const string SceneName = "Scene name to check for.";
         }
 
