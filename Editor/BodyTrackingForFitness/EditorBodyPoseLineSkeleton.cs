@@ -243,7 +243,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
 
         private static void DrawIBodyPoseGizmos(IBodyPose self)
         {
-            if (self is Behaviour behaviour && (behaviour == null || !behaviour.enabled))
+            if (self is Behaviour behaviour && (behaviour == null || !behaviour.enabled ||
+                                                !behaviour.gameObject.activeInHierarchy))
             {
                 return;
             }
