@@ -1686,8 +1686,8 @@ namespace Oculus.Movement
         public const string CameraRig =
             "The Camera Rig";
 
-        public const string JoystickEvents =
-            "Callbacks to trigger on certain joystic input events";
+        public const string MovementEvents =
+            "Callbacks to trigger on certain movement input events";
     }
 
     public static class ReappearAfterFallTooltips

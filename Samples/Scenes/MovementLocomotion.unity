@@ -261,7 +261,7 @@ MonoBehaviour:
   _rotationPerSecond: 180
   _speed: 3
   _cameraRig: {fileID: 2075359722}
-  _joystickEvents:
+  _movementEvents:
     OnDirectionChange:
       m_PersistentCalls:
         m_Calls:
