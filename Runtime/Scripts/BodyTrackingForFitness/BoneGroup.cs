@@ -225,6 +225,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
             BodyJointId.Body_SpineMiddle,
             BodyJointId.Body_SpineUpper,
             BodyJointId.Body_SpineUpper,
+            BodyJointId.Body_Chest,
             BodyJointId.Body_Neck,
             BodyJointId.Body_Head,
             BodyJointId.Body_LeftShoulder,
