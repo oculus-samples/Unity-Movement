@@ -494,7 +494,7 @@ namespace Oculus.Movement.AnimationRigging
                     InterpolateHands(stream, weight);
                     ApplyAccurateFeet(stream, weight);
                     AlignFeet(stream, weight);
-                    InterpolateToesY(stream, weight);
+                    InterpolateAllToes(stream, weight);
                 }
                 else
                 {
@@ -1284,34 +1284,39 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Interpolates the toes Y position from the pre-deformation positions to the original local positions after
-        /// skeletal proportions are enforced.
+        /// Influence the toe positions based on what their original
+        /// local positions were. This should be run after the character's
+        /// proportions are enforced.
         /// </summary>
         /// <param name="stream">The animation stream.</param>
         /// <param name="weight">The weight of this operation.</param>
-        private void InterpolateToesY(AnimationStream stream, float weight)
+        private void InterpolateAllToes(AnimationStream stream, float weight)
         {
-            var leftToesOffsetWeight = weight * LeftToesOffsetWeight.Get(stream);
-            var rightToesOffsetWeight = weight * RightToesOffsetWeight.Get(stream);
-
-            // Modify only the y component of the toes.
-            if (LeftToesBone.IsValid(stream))
+            if (LeftToesBone.IsValid(stream) && LeftFootBone.IsValid(stream))
             {
-                var leftToesOffsetVector = ApplyScaleAndWeight(
-                    Vector3.up * (LeftToesOriginalLocalPos.y - LeftToesBone.GetLocalPosition(stream).y),
-                    leftToesOffsetWeight);
-                var targetLeftToesPos = LeftToesBone.GetPosition(stream) + leftToesOffsetVector;
-                LeftToesBone.SetPosition(stream, targetLeftToesPos);
+                InterpolateToes(stream, LeftToesBone, LeftToesOriginalLocalPos,
+                    weight * LeftToesOffsetWeight.Get(stream));
             }
 
-            if (RightToesBone.IsValid(stream))
+            if (RightToesBone.IsValid(stream) && RightFootBone.IsValid(stream))
             {
-                var rightToesOffsetVector = ApplyScaleAndWeight(
-                    Vector3.up * (RightToesOriginalLocalPos.y - RightToesBone.GetLocalPosition(stream).y),
-                    rightToesOffsetWeight);
-                var targetRightToesPos = RightToesBone.GetPosition(stream) + rightToesOffsetVector;
-                RightToesBone.SetPosition(stream, targetRightToesPos);
+                InterpolateToes(stream, RightToesBone, RightToesOriginalLocalPos,
+                    weight * RightToesOffsetWeight.Get(stream));
             }
+        }
+
+        private void InterpolateToes(AnimationStream stream,
+            ReadWriteTransformHandle toesBone,
+            Vector3 toesOriginalLocalPos,
+            float toesOffsetWeight)
+        {
+            var offsetToOriginalToesLocal = toesOriginalLocalPos - toesBone.GetLocalPosition(stream);
+            // We need to interpolate the offset, and scale it as well. THEN add it to compute
+            // the final position.
+            var scaledAndWeightLocalOffset = ApplyScaleAndWeight(
+                offsetToOriginalToesLocal, toesOffsetWeight);
+            var adjustedToesLocalPos = toesBone.GetLocalPosition(stream) + scaledAndWeightLocalOffset;
+            toesBone.SetLocalPosition(stream, adjustedToesLocalPos);
         }
 
         private Vector3 ApplyScaleAndWeight(Vector3 target, float weight)
