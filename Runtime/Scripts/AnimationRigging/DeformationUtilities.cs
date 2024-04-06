@@ -47,6 +47,11 @@ namespace Oculus.Movement.AnimationRigging
             /// The proportion of this bone relative to its limb.
             /// </summary>
             public float LimbProportion;
+
+            /// <summary>
+            /// Start to end vector of original character, in local space of end bone.
+            /// </summary>
+            public Vector3 EndBoneLocalOffsetFromStart;
         }
 
         /// <summary>
@@ -513,10 +518,12 @@ namespace Oculus.Movement.AnimationRigging
                 var spineHumanBodyBone = spineHumanBodyBones[i];
                 if (animator.GetBoneTransform(spineHumanBodyBone) != null)
                 {
+                    // Find children going UP the spine.
                     var spineChildBone = FindChildHumanBodyBones(animator, spineHumanBodyBone);
-                    var mappingChildBone = OVRHumanBodyBonesMappings.BoneToJointPair[spineHumanBodyBone].Item2;
+                    var ovrMappingChildBone = OVRHumanBodyBonesMappings.BoneToJointPair[spineHumanBodyBone].Item2;
                     var adjustment = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-                        animator, spineHumanBodyBone, mappingChildBone,
+                        animator,
+                        spineHumanBodyBone, ovrMappingChildBone,
                         spineHumanBodyBone, spineChildBone);
                     var adjustmentData = new BoneAdjustmentData
                     {

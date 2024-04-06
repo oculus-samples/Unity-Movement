@@ -171,16 +171,16 @@ namespace Oculus.Movement.Utils
         /// <param name="otherAnimator">Animator to compare against.</param>
         /// <param name="humanBodyBone">HumanBodyBones joint to be referenced for the
         /// angle comparison.</param>
-        /// <param name="otherHumanBodyBone">Other HumanBodyBones joint to be referenced for the
+        /// <param name="followingHumanBodyBone">Following HumanBodyBones joint to be referenced for the
         /// angle comparison.</param>
         /// <param name="targetHumanBodyBone">HumanBodyBones joint of the target to be referenced for the
         /// angle comparison.</param>
-        /// <param name="targetOtherHumanBodyBone">Other HumanBodyBones joint of the target to be referenced for the
+        /// <param name="followingOtherHumanBodyBone">Following HumanBodyBones joint of the target to be referenced for the
         /// angle comparison.</param>
         /// <returns>Rotation difference.</returns>
         public Quaternion CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-            Animator otherAnimator, HumanBodyBones humanBodyBone, HumanBodyBones otherHumanBodyBone,
-            HumanBodyBones targetHumanBodyBone, HumanBodyBones targetOtherHumanBodyBone)
+            Animator otherAnimator, HumanBodyBones humanBodyBone, HumanBodyBones followingHumanBodyBone,
+            HumanBodyBones targetHumanBodyBone, HumanBodyBones followingOtherHumanBodyBone)
         {
             if (!RiggingUtilities.IsHumanoidAnimator(otherAnimator))
             {
@@ -189,22 +189,22 @@ namespace Oculus.Movement.Utils
             }
 
             Transform startJointOther = otherAnimator.GetBoneTransform(targetHumanBodyBone),
-                endJointOther = otherAnimator.GetBoneTransform(targetOtherHumanBodyBone);
+                endJointOther = otherAnimator.GetBoneTransform(followingOtherHumanBodyBone);
             if (startJointOther == null || endJointOther == null)
             {
                 Debug.LogError("Other animator has at least one null joint pair: " +
                     $"{startJointOther}, {endJointOther}. Are the joints properly mapped for " +
-                    $"{humanBodyBone}-{otherHumanBodyBone}?");
+                    $"{targetHumanBodyBone}-{followingHumanBodyBone}?");
                 return Quaternion.identity;
             }
 
             var startJointReferenceData = GetBonePoseData(humanBodyBone);
-            var endJointReferenceData = GetBonePoseData(otherHumanBodyBone);
+            var endJointReferenceData = GetBonePoseData(followingHumanBodyBone);
             if (startJointReferenceData == null || endJointReferenceData == null)
             {
                 Debug.LogError("Reference has at least one null joint pair: " +
                     $"{startJointReferenceData}, {endJointReferenceData}. Are the joints properly mapped for " +
-                    $"{humanBodyBone}-{otherHumanBodyBone}?");
+                    $"{humanBodyBone}-{followingHumanBodyBone}?");
                 return Quaternion.identity;
             }
 

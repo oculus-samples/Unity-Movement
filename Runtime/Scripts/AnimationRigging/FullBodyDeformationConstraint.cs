@@ -276,6 +276,20 @@ namespace Oculus.Movement.AnimationRigging
         public float HipsToFootDistance { get; }
 
         /// <summary>
+        /// Attempts to match the original spine positions.
+        /// Excludes heads and head.
+        /// WARNING! EXPERIMENTAL!: increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        public string OriginalSpinePositionsWeightProperty { get; }
+
+        /// <summary>
+        /// Control how many bones to straighten.
+        /// WARNING! EXPERIMENTAL!
+        /// </summary>
+        public string StraightSpineBoneCountIntProperty { get; }
+
+        /// <summary>
         /// Sets up hips and head bones.
         /// </summary>
         public void SetUpHipsAndHeadBones();
@@ -504,6 +518,14 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         float IFullBodyDeformationData.HipsToFootDistance => _hipsToFootDistance;
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.OriginalSpinePositionsWeightProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpinePositionsWeight));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.StraightSpineBoneCountIntProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_straightSpineBoneCount));
 
         /// <inheritdoc cref="IFullBodyDeformationData.BodyType"/>
         [SyncSceneToStream, SerializeField, IntAsEnumAttribute(typeof(DeformationBodyType))]
@@ -747,6 +769,34 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _alignFeetWeight;
             set => _alignFeetWeight = value;
+        }
+
+        /// <summary>
+        /// Attempts to match the original spine positions.
+        /// Excludes heads and head.
+        /// WARNING: increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.OriginalSpinePositionsWeight)]
+        private float _originalSpinePositionsWeight;
+        public float OriginalSpinePositionsWeight
+        {
+            get => _originalSpinePositionsWeight;
+            set => _originalSpinePositionsWeight = value;
+        }
+
+        /// <summary>
+        /// Number of spine bones to fix when straightening spine.
+        /// Usually hips, spine, chest, upper chest, and neck.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0, 5)]
+        [Tooltip(DeformationDataTooltips.StraightSpineBoneCount)]
+        private int _straightSpineBoneCount;
+        public int StraightSpineBoneCount
+        {
+            get => _straightSpineBoneCount;
+            set => _straightSpineBoneCount = value;
         }
 
         /// <inheritdoc cref="IFullBodyDeformationData.SpineCorrectionType"/>
@@ -1029,6 +1079,7 @@ namespace Oculus.Movement.AnimationRigging
                 };
                 bonePairs.Add(bonePair);
             }
+            _straightSpineBoneCount = _hipsToHeadBones.Length - 1;
 
             // Check for optional bones and update accordingly.
             var chestBone = FindBoneTransform(OVRSkeleton.BoneId.FullBody_Chest);
@@ -1182,6 +1233,12 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             _bonePairData = bonePairs.ToArray();
+            for (int i = 0; i < _bonePairData.Length; i++)
+            {
+                _bonePairData[i].EndBoneLocalOffsetFromStart =
+                    Quaternion.Inverse(_bonePairData[i].EndBone.rotation) *
+                    (_bonePairData[i].EndBone.position - _bonePairData[i].StartBone.position);
+            }
         }
 
         /// <inheritdoc />
@@ -1352,6 +1409,8 @@ namespace Oculus.Movement.AnimationRigging
             _alignRightLegWeight = 0.0f;
             _leftToesWeight = 0.0f;
             _rightToesWeight = 0.0f;
+            _originalSpinePositionsWeight = 0.0f;
+            _straightSpineBoneCount = 0;
 
             _startingScale = Vector3.one;
             _bonePairData = null;

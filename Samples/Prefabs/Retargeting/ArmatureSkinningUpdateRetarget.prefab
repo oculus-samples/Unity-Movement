@@ -692,6 +692,8 @@ MonoBehaviour:
     _leftToesWeight: 1
     _rightToesWeight: 1
     _alignFeetWeight: 0.75
+    _originalSpinePositionsWeight: 0
+    _straightSpineBoneCount: 5
     _spineTranslationCorrectionType: 3
     _customSkeleton: {fileID: 0}
     _animator: {fileID: 4325497552437736820}
@@ -750,96 +752,115 @@ MonoBehaviour:
       Distance: 0.058242228
       HeightProportion: 0.038177162
       LimbProportion: 0.09043276
+      EndBoneLocalOffsetFromStart: {x: 0, y: 0.058229387, z: 0.0012229551}
     - StartBone: {fileID: 4136407814712997250}
       EndBone: {fileID: 4150047613444537597}
       Distance: 0.10340428
       HeightProportion: 0.06778041
       LimbProportion: 0.16055593
+      EndBoneLocalOffsetFromStart: {x: 0, y: 0.10340428, z: 0}
     - StartBone: {fileID: 4150047613444537597}
       EndBone: {fileID: 167868239173931932}
       Distance: 0.10340428
       HeightProportion: 0.06778041
       LimbProportion: 0.16055593
+      EndBoneLocalOffsetFromStart: {x: 0, y: 0.10340428, z: 0}
     - StartBone: {fileID: 167868239173931932}
       EndBone: {fileID: 8568777009844315901}
       Distance: 0.25151414
       HeightProportion: 0.16486485
       LimbProportion: 0.39052624
+      EndBoneLocalOffsetFromStart: {x: 0, y: 0.24734007, z: -0.0456317}
     - StartBone: {fileID: 8568777009844315901}
       EndBone: {fileID: 813562241272511791}
       Distance: 0.12747405
       HeightProportion: 0.08355789
       LimbProportion: 0.19792908
+      EndBoneLocalOffsetFromStart: {x: 0, y: 0.12653506, z: 0.015443858}
     - StartBone: {fileID: 167868239173931932}
       EndBone: {fileID: 372011279931233274}
       Distance: 0.19169338
       HeightProportion: 0.12565297
       LimbProportion: 0.2976425
+      EndBoneLocalOffsetFromStart: {x: 0.013773995, y: 0.19101824, z: -0.008286309}
     - StartBone: {fileID: 167868239173931932}
       EndBone: {fileID: 6698092073795100007}
       Distance: 0.19169505
       HeightProportion: 0.12565407
       LimbProportion: 0.2976451
+      EndBoneLocalOffsetFromStart: {x: -0.013774138, y: -0.19101992, z: 0.00828632}
     - StartBone: {fileID: 372011279931233274}
       EndBone: {fileID: 2853792523736699549}
       Distance: 0.16743502
       HeightProportion: 0
       LimbProportion: 0
+      EndBoneLocalOffsetFromStart: {x: -0.011776077, y: 0.16288424, z: -0.036939707}
     - StartBone: {fileID: 6698092073795100007}
       EndBone: {fileID: 1235701047022314321}
       Distance: 0.16743432
       HeightProportion: 0
       LimbProportion: 0
+      EndBoneLocalOffsetFromStart: {x: 0.011776252, y: -0.1628835, z: 0.036939707}
     - StartBone: {fileID: 2853792523736699549}
       EndBone: {fileID: 4776154206678009637}
       Distance: 0.28508064
       HeightProportion: 0
       LimbProportion: 0
+      EndBoneLocalOffsetFromStart: {x: -0.011656548, y: 0.28459772, z: -0.011801509}
     - StartBone: {fileID: 1235701047022314321}
       EndBone: {fileID: 3796135998893025026}
       Distance: 0.285085
       HeightProportion: 0
       LimbProportion: 0
+      EndBoneLocalOffsetFromStart: {x: 0.011656752, y: -0.28460205, z: 0.011801722}
     - StartBone: {fileID: 4776154206678009637}
       EndBone: {fileID: 8362296397940282678}
       Distance: 0.24036232
       HeightProportion: 0
       LimbProportion: 0
+      EndBoneLocalOffsetFromStart: {x: 0.011744534, y: 0.23919523, z: 0.02053691}
     - StartBone: {fileID: 3796135998893025026}
       EndBone: {fileID: 2494227819838822627}
       Distance: 0.24036369
       HeightProportion: 0
       LimbProportion: 0
+      EndBoneLocalOffsetFromStart: {x: -0.011744763, y: -0.23919661, z: -0.020536948}
     - StartBone: {fileID: 24668466978050337}
       EndBone: {fileID: 7606388188277981105}
       Distance: 0.10199556
       HeightProportion: 0.066857
       LimbProportion: 0.115701735
+      EndBoneLocalOffsetFromStart: {x: -0.08415103, y: 0.056540232, z: 0.011175891}
     - StartBone: {fileID: 24668466978050337}
       EndBone: {fileID: 7049401827258888227}
       Distance: 0.10199563
       HeightProportion: 0.066857055
       LimbProportion: 0.115701824
+      EndBoneLocalOffsetFromStart: {x: 0.08415104, y: -0.056540348, z: -0.011175896}
     - StartBone: {fileID: 7606388188277981105}
       EndBone: {fileID: 6575490107108777790}
       Distance: 0.41334438
       HeightProportion: 0.27094287
       LimbProportion: 0.46888965
+      EndBoneLocalOffsetFromStart: {x: -0.000000004481216, y: 0.4123863, z: -0.028129207}
     - StartBone: {fileID: 7049401827258888227}
       EndBone: {fileID: 1058771097002273047}
       Distance: 0.41334414
       HeightProportion: 0.2709427
       LimbProportion: 0.4688894
+      EndBoneLocalOffsetFromStart: {x: 0.00000045969858, y: -0.4123859, z: 0.02812922}
     - StartBone: {fileID: 6575490107108777790}
       EndBone: {fileID: 4466782864633229390}
       Distance: 0.4140398
       HeightProportion: 0.2713987
       LimbProportion: 0.46967852
+      EndBoneLocalOffsetFromStart: {x: -0.017653048, y: 0.41266704, z: 0.028691953}
     - StartBone: {fileID: 1058771097002273047}
       EndBone: {fileID: 2413530998563704695}
       Distance: 0.41403958
       HeightProportion: 0.27139854
       LimbProportion: 0.46967828
+      EndBoneLocalOffsetFromStart: {x: 0.017652303, y: -0.41266686, z: -0.028692055}
     _boneAdjustmentData:
     - Bone: 0
       Adjustment: {x: 0.4950297, y: 0, z: 0, w: 0.86887604}
