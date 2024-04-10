@@ -1235,9 +1235,11 @@ namespace Oculus.Movement.AnimationRigging
             _bonePairData = bonePairs.ToArray();
             for (int i = 0; i < _bonePairData.Length; i++)
             {
-                _bonePairData[i].EndBoneLocalOffsetFromStart =
-                    Quaternion.Inverse(_bonePairData[i].EndBone.rotation) *
+                var startToEndVector =
                     (_bonePairData[i].EndBone.position - _bonePairData[i].StartBone.position);
+                var endBoneWorldToLocal = _bonePairData[i].EndBone.worldToLocalMatrix;
+                _bonePairData[i].EndBoneLocalOffsetFromStart =
+                    endBoneWorldToLocal.MultiplyVector(startToEndVector);
             }
         }
 
