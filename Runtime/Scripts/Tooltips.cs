@@ -1005,8 +1005,12 @@ namespace Oculus.Movement
             "Attempts to match the original spine positions. WARNING:" +
             "increasing this value might cause inaccuracy wrt to body tracking.";
 
-        public const string StraightSpineBoneCount =
-            "Number of spine bones to fix when straightening spine.";
+        public const string OriginalSpineBoneCount =
+            "Number of spine bones to fix when matching the original spine.";
+
+        public const string OriginalSpineUseHipsToHeadToScale =
+            "When using the original spine bone positions to influence " +
+            "the current ones, scale them based on the current hips to head.";
 
         public const string HipsToHeadBones =
             "Array of transform bones from hips to head.";

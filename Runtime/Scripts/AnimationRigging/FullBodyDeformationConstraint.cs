@@ -287,7 +287,14 @@ namespace Oculus.Movement.AnimationRigging
         /// Control how many bones to straighten.
         /// WARNING! EXPERIMENTAL!
         /// </summary>
-        public string StraightSpineBoneCountIntProperty { get; }
+        public string OriginalSpineBoneCountIntProperty { get; }
+
+        /// <summary>
+        /// Indicates if the original spine positions should scale based on
+        /// the hips to head distance (proportionally).
+        /// WARNING! EXPERIMENTAL!
+        /// </summary>
+        public string OriginalSpineUseHipsToHeadScaleBoolProperty { get; }
 
         /// <summary>
         /// Sets up hips and head bones.
@@ -524,8 +531,12 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpinePositionsWeight));
 
         /// <inheritdoc />
-        string IFullBodyDeformationData.StraightSpineBoneCountIntProperty =>
-            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_straightSpineBoneCount));
+        string IFullBodyDeformationData.OriginalSpineBoneCountIntProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpineBoneCount));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.OriginalSpineUseHipsToHeadScaleBoolProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpineUseHipsToHeadToScale));
 
         /// <inheritdoc cref="IFullBodyDeformationData.BodyType"/>
         [SyncSceneToStream, SerializeField, IntAsEnumAttribute(typeof(DeformationBodyType))]
@@ -787,16 +798,30 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Number of spine bones to fix when straightening spine.
+        /// Number of spine bones to fix when matching the original spine.
         /// Usually hips, spine, chest, upper chest, and neck.
         /// </summary>
         [SyncSceneToStream, SerializeField, Range(0, 5)]
-        [Tooltip(DeformationDataTooltips.StraightSpineBoneCount)]
-        private int _straightSpineBoneCount;
-        public int StraightSpineBoneCount
+        [FormerlySerializedAs("_straightSpineBoneCount")]
+        [Tooltip(DeformationDataTooltips.OriginalSpineBoneCount)]
+        private int _originalSpineBoneCount;
+        public int OriginalSpineBoneCount
         {
-            get => _straightSpineBoneCount;
-            set => _straightSpineBoneCount = value;
+            get => _originalSpineBoneCount;
+            set => _originalSpineBoneCount = value;
+        }
+
+        /// <summary>
+        /// When using the original spine bone positions to influence
+        /// the current ones, scale them based on the current hips to head.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.OriginalSpineUseHipsToHeadToScale)]
+        private bool _originalSpineUseHipsToHeadToScale;
+        public bool OriginalSpineUseHipsToHeadToScale
+        {
+            get => _originalSpineUseHipsToHeadToScale;
+            set => _originalSpineUseHipsToHeadToScale = value;
         }
 
         /// <inheritdoc cref="IFullBodyDeformationData.SpineCorrectionType"/>
@@ -1079,7 +1104,7 @@ namespace Oculus.Movement.AnimationRigging
                 };
                 bonePairs.Add(bonePair);
             }
-            _straightSpineBoneCount = _hipsToHeadBones.Length - 1;
+            _originalSpineBoneCount = _hipsToHeadBones.Length - 1;
 
             // Check for optional bones and update accordingly.
             var chestBone = FindBoneTransform(OVRSkeleton.BoneId.FullBody_Chest);
@@ -1412,7 +1437,8 @@ namespace Oculus.Movement.AnimationRigging
             _leftToesWeight = 0.0f;
             _rightToesWeight = 0.0f;
             _originalSpinePositionsWeight = 0.0f;
-            _straightSpineBoneCount = 0;
+            _originalSpineBoneCount = 0;
+            _originalSpineUseHipsToHeadToScale = false;
 
             _startingScale = Vector3.one;
             _bonePairData = null;

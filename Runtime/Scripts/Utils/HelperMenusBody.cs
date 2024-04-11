@@ -260,7 +260,8 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SquashLimit = 2.0f;
             deformationConstraint.data.StretchLimit = 2.0f;
             deformationConstraint.data.OriginalSpinePositionsWeight = 0.0f;
-            deformationConstraint.data.StraightSpineBoneCount = 0;
+            deformationConstraint.data.OriginalSpineBoneCount = 0;
+            deformationConstraint.data.OriginalSpineUseHipsToHeadToScale = false;
 
             deformationConstraint.data.AssignAnimator(animator);
             deformationConstraint.data.SetUpLeftArmData();

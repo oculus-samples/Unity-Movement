@@ -375,7 +375,12 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Number of bones to fix when straightening the spine.
         /// </summary>
-        public IntProperty StraightSpineBoneCount;
+        public IntProperty OriginalSpineBoneCount;
+
+        /// <summary>
+        /// Use the current hips to head to scale original spine positions.
+        /// </summary>
+        public BoolProperty OriginalSpineUseHipsToHeadToScale;
 
         /// <summary>
         /// True if the arms should be affected by spine correction.
@@ -416,6 +421,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The lower body proportion.
         /// </summary>
         public float LowerBodyProportion;
+
+        /// <summary>
+        /// Hips to head distance on original character.
+        /// </summary>
+        public float OriginalHipsToHeadDistance;
 
         private Vector3 _targetHipsPos;
         private Vector3 _targetHeadPos;
@@ -731,17 +741,25 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             originalSpinePositionsWeight *= weight;
+            bool scaleBasedOnCurrentHeadToHips = OriginalSpineUseHipsToHeadToScale.Get(stream);
 
             // make sure the requested bone count does not exceed the head index
-            int requestedBoneCount = StraightSpineBoneCount.Get(stream);
+            int requestedBoneCount = OriginalSpineBoneCount.Get(stream);
             int numBonesToCorrect = (HeadIndex - 1) < requestedBoneCount ?
                 HeadIndex - 1 : requestedBoneCount;
+            float currentToOriginalSpineScale = ComputeCurrentToOriginalSpineScale(stream);
+
             for (int i = HipsIndex; i < numBonesToCorrect; i++)
             {
                 var boneToAffect = EndBones[i];
                 // we need the offset from the bone before to tell us where our
                 // current spine bone should be
                 var boneOffset = EndBoneOffsetsLocal[i];
+
+                if (scaleBasedOnCurrentHeadToHips)
+                {
+                    boneOffset *= currentToOriginalSpineScale;
+                }
 
                 AffectBoneByFixedLocalPosition(
                     stream,
@@ -751,6 +769,19 @@ namespace Oculus.Movement.AnimationRigging
 
                 EndBones[i] = boneToAffect;
             }
+        }
+
+        private float ComputeCurrentToOriginalSpineScale(AnimationStream stream)
+        {
+            // accumulate the distance from hips to head
+            float currentTotalHipsToHeadDistance = 0.0f;
+            for (int i = HipsIndex; i < HeadIndex; i++)
+            {
+                var spineVector = EndBones[i].GetPosition(stream) - StartBones[i].GetPosition(stream);
+                currentTotalHipsToHeadDistance += spineVector.magnitude;
+            }
+            return Mathf.Abs(OriginalHipsToHeadDistance) > Mathf.Epsilon ?
+                currentTotalHipsToHeadDistance / OriginalHipsToHeadDistance : 0.0f;
         }
 
         private void AffectBoneByFixedLocalPosition(
@@ -1480,6 +1511,7 @@ namespace Oculus.Movement.AnimationRigging
                 NativeArrayOptions.UninitializedMemory);
             job.ScaleFactor = new NativeArray<Vector3>(1, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
+            job.OriginalHipsToHeadDistance = data.HipsToHeadDistance;
 
             var upperBodyProportion = 0.0f;
             for (int i = 0; i < data.HipsToHeadBones.Length; i++)
@@ -1570,8 +1602,10 @@ namespace Oculus.Movement.AnimationRigging
                 FloatProperty.Bind(animator, component, data.RightShoulderWeightFloatProperty);
             job.OriginalSpinePositionsWeight =
                 FloatProperty.Bind(animator, component, data.OriginalSpinePositionsWeightProperty);
-            job.StraightSpineBoneCount =
-                IntProperty.Bind(animator, component, data.StraightSpineBoneCountIntProperty);
+            job.OriginalSpineBoneCount =
+                IntProperty.Bind(animator, component, data.OriginalSpineBoneCountIntProperty);
+            job.OriginalSpineUseHipsToHeadToScale =
+                BoolProperty.Bind(animator, component, data.OriginalSpineUseHipsToHeadScaleBoolProperty);
             job.LeftArmOffsetWeight = FloatProperty.Bind(animator, component, data.LeftArmWeightFloatProperty);
             job.RightArmOffsetWeight = FloatProperty.Bind(animator, component, data.RightArmWeightFloatProperty);
             job.LeftHandOffsetWeight = FloatProperty.Bind(animator, component, data.LeftHandWeightFloatProperty);
@@ -1626,6 +1660,7 @@ namespace Oculus.Movement.AnimationRigging
                 : data.ConstraintAnimator.transform.lossyScale;
             job.ScaleFactor[0] =
                 RiggingUtilities.DivideVector3(currentScale, data.StartingScale);
+
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())
