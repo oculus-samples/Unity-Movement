@@ -183,6 +183,25 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Retargeted bone mappings to be updated based on valid bones in the humanoid.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.RetargetedBoneMappings)]
+        protected RetargetedBoneMappings _retargetedBoneMappings;
+        /// <inheritdoc cref="_retargetedBoneMappings"/>
+        public RetargetedBoneMappings RetargetedBoneMappingsInst
+        {
+            get => _retargetedBoneMappings;
+            set => _retargetedBoneMappings = value;
+        }
+
+        /// <summary>
+        /// Exposes a button used to update bone pair mappings based on the humanoid.
+        /// </summary>
+        [SerializeField, InspectorButton("UpdateBonePairMappings")]
+        private bool _updateBoneMappingsData;
+
+        /// <summary>
         /// Pre-compute these values each time the editor changes for the purposes
         /// of efficiency.
         /// </summary>
@@ -201,6 +220,11 @@ namespace Oculus.Movement.AnimationRigging
         protected override void Awake()
         {
             base.Awake();
+
+            if (_retargetedBoneMappings.ConvertBonePairsToDictionaries())
+            {
+                BodyBoneMappingsInterface = _retargetedBoneMappings;
+            }
 
             Assert.IsNotNull(_retargetingAnimationConstraint,
                 "Please assign the retargeting constraint to RetargetingLayer.");
@@ -251,6 +275,14 @@ namespace Oculus.Movement.AnimationRigging
             {
                 Debug.LogWarning(e);
             }
+        }
+
+        /// <summary>
+        /// Update bone pair mappings for the retargeted humanoid.
+        /// </summary>
+        public void UpdateBonePairMappings()
+        {
+            _retargetedBoneMappings.UpdateBonePairMappings(this);
         }
 
         private void ConstructDefaultPoseInformation()

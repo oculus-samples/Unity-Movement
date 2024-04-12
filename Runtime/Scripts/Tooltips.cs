@@ -1377,6 +1377,9 @@ namespace Oculus.Movement
         public const string ExternalBoneTargets =
             "External bone targets to be updated based on body tracking.";
 
+        public const string RetargetedBoneMappings =
+            "Retargeted bone mappings to be updated based on valid bones in the humanoid.";
+
         public const string FingerPositionCorrectionWeight =
             "Finger position correction weight.";
     }
@@ -1910,5 +1913,14 @@ namespace Oculus.Movement
             "Is it full body (or not).";
         public const string Enabled =
             "Enables or disables functionality.";
+    }
+    
+    public static class RetargetedBoneMappingsTooltips
+    {
+        public const string HumanBodyBonePairs =
+        "HumanBodyBone pairs for this humanoid.";
+        
+        public const string HumanBodyBoneToBoneId =
+            "HumanBodyBone to BodyJointId mapping for this humanoid.";
     }
 }

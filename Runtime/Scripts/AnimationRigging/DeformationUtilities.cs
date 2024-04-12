@@ -215,7 +215,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Ordered HumanBodyBones for the spine, arms, and legs.
+        /// Ordered HumanBodyBones for the spine, arms, legs, and hands.
         /// </summary>
         private static readonly HumanBodyBones[] _humanBodyBonesOrder =
         {
@@ -240,7 +240,38 @@ namespace Oculus.Movement.AnimationRigging
             HumanBodyBones.RightUpperLeg,
             HumanBodyBones.RightLowerLeg,
             HumanBodyBones.RightFoot,
-            HumanBodyBones.RightToes
+            HumanBodyBones.RightToes,
+            // Finger bones.
+            HumanBodyBones.LeftThumbProximal,
+            HumanBodyBones.LeftThumbIntermediate,
+            HumanBodyBones.LeftThumbDistal,
+            HumanBodyBones.LeftIndexProximal,
+            HumanBodyBones.LeftIndexIntermediate,
+            HumanBodyBones.LeftIndexDistal,
+            HumanBodyBones.LeftMiddleProximal,
+            HumanBodyBones.LeftMiddleIntermediate,
+            HumanBodyBones.LeftMiddleDistal,
+            HumanBodyBones.LeftRingProximal,
+            HumanBodyBones.LeftRingIntermediate,
+            HumanBodyBones.LeftRingDistal,
+            HumanBodyBones.LeftLittleProximal,
+            HumanBodyBones.LeftLittleIntermediate,
+            HumanBodyBones.LeftLittleDistal,
+            HumanBodyBones.RightThumbProximal,
+            HumanBodyBones.RightThumbIntermediate,
+            HumanBodyBones.RightThumbDistal,
+            HumanBodyBones.RightIndexProximal,
+            HumanBodyBones.RightIndexIntermediate,
+            HumanBodyBones.RightIndexDistal,
+            HumanBodyBones.RightMiddleProximal,
+            HumanBodyBones.RightMiddleIntermediate,
+            HumanBodyBones.RightMiddleDistal,
+            HumanBodyBones.RightRingProximal,
+            HumanBodyBones.RightRingIntermediate,
+            HumanBodyBones.RightRingDistal,
+            HumanBodyBones.RightLittleProximal,
+            HumanBodyBones.RightLittleIntermediate,
+            HumanBodyBones.RightLittleDistal,
         };
 
         /// <summary>
@@ -250,6 +281,15 @@ namespace Oculus.Movement.AnimationRigging
         {
             {
                 HumanBodyBones.Head, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftEye, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightEye, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.Jaw, HumanBodyBones.LastBone
             },
             {
                 HumanBodyBones.LeftToes, HumanBodyBones.LastBone
@@ -262,6 +302,36 @@ namespace Oculus.Movement.AnimationRigging
             },
             {
                 HumanBodyBones.RightHand, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftThumbDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftIndexDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftMiddleDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftRingDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftLittleDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightThumbDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightIndexDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightMiddleDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightRingDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightLittleDistal, HumanBodyBones.LastBone
             }
         };
 
@@ -641,7 +711,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="target">The target HumanBodyBones to find the child HumanBodyBone.</param>
         /// <param name="childIndex">The optional childIndex, if the target HumanBodyBone has multiple children.</param>
         /// <returns>HumanBodyBones corresponding to the child index of the target HumanBodyBones.</returns>
-        private static HumanBodyBones FindChildHumanBodyBones(Animator animator, HumanBodyBones target, int childIndex = 0)
+        public static HumanBodyBones FindChildHumanBodyBones(Animator animator, HumanBodyBones target, int childIndex = 0)
         {
             // Handle hips.
             if (target == HumanBodyBones.Hips)

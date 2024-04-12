@@ -298,6 +298,7 @@ namespace Oculus.Movement.Utils
                     OVRPlugin.BodyJointSet.FullBody : OVRPlugin.BodyJointSet.UpperBody);
 
             retargetingLayer.EnableTrackingByProxy = true;
+            retargetingLayer.UpdateBonePairMappings();
 #if UNITY_EDITOR
             if (!runtimeInvocation)
             {
