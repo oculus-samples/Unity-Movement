@@ -83,6 +83,15 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     childBone = HumanBodyBones.RightMiddleProximal;
                 }
+
+                // If the child bone isn't a valid bone, use the parent bone.
+                // This is required so that a valid mapping exists for all HumanBodyBones, even for
+                // the bones that are not being retargeted for the OVRHumanBodyBonesMappingsInterface,
+                // preventing warnings in retargeting for missing HumanBodyBones mappings.
+                if (childBone == HumanBodyBones.LastBone)
+                {
+                    childBone = bone;
+                }
                 humanBodyBonePairs.Add(childBone);
             }
             _humanBodyBonePairs = humanBodyBonePairs.ToArray();
@@ -109,22 +118,20 @@ namespace Oculus.Movement.AnimationRigging
                 return false;
             }
 
-            var excludedBones = new[] { HumanBodyBones.LeftEye, HumanBodyBones.RightEye, HumanBodyBones.Jaw };
             _boneToJointPair = new Dictionary<HumanBodyBones, Tuple<HumanBodyBones, HumanBodyBones>>();
             _fullBodyBoneIdToHumanBodyBone = new Dictionary<OVRSkeleton.BoneId, HumanBodyBones>();
             for (var bone = HumanBodyBones.Hips; bone < HumanBodyBones.LastBone; bone++)
             {
-                if (Array.IndexOf(excludedBones, bone) != -1)
-                {
-                    continue;
-                }
-
                 var boneIndex = (int)bone;
                 var childBone = _humanBodyBonePairs[boneIndex];
-                var targetBoneId = (OVRSkeleton.BoneId)_humanBodyBoneToBoneId[boneIndex];
+                var targetBone = _humanBodyBoneToBoneId[boneIndex];
+                var targetBoneId = (OVRSkeleton.BoneId)targetBone;
                 
                 _boneToJointPair.Add(bone, new Tuple<HumanBodyBones, HumanBodyBones>(bone, childBone));
-                _fullBodyBoneIdToHumanBodyBone.Add(targetBoneId, bone);
+                if (targetBone != FullBodyTrackingBoneId.Remove)
+                {
+                    _fullBodyBoneIdToHumanBodyBone.Add(targetBoneId, bone);
+                }
             }
 
             // Update bone to bone mapping
