@@ -171,7 +171,7 @@ namespace Oculus.Movement.AnimationRigging.Utils
             GameObject.Destroy(proxyParent.gameObject);
         }
 
-        // <summary>
+        /// <summary>
         /// Sometimes source transforms change even though the IDs are the same,
         /// and proxies are only recreated if the bone IDs of the sources change.
         /// Make sure they are set properly.

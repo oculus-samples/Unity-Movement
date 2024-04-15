@@ -1562,7 +1562,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
   - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
   - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}
-  - {fileID: 11400000, guid: 8eb3b8157e16d26409685b880d73b84e, type: 2}
   _retargetingAnimationRig:
     _rebindAnimator: 1
     _reEnableRig: 1

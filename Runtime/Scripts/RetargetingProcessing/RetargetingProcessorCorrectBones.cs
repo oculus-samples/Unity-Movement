@@ -110,7 +110,7 @@ namespace Oculus.Movement.AnimationRigging
                 var targetCorrectionQuaternion = (Quaternion)nullableTargetCorrectionQuaternion;
 
                 // Make sure body part passes mask, and bone's position should be updated.
-                var bodyPart = BoneMappingsExtension.HumanBoneToAvatarBodyPart[humanBodyBone];
+                var bodyPart = BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)humanBodyBone];
                 var targetJoint = retargetingLayer.GetOriginalJoint(humanBodyBone);
                 if (retargetingLayer.CustomPositionsToCorrectLateUpdateMask != null &&
                     !retargetingLayer.CustomPositionsToCorrectLateUpdateMask.GetHumanoidBodyPartActive(bodyPart))
@@ -123,16 +123,16 @@ namespace Oculus.Movement.AnimationRigging
                     continue;
                 }
 
-                // Make sure the joint position is valid before fixing it.
+                // If this is the first target position, check its validity.
+                // If it's valid, assume that the remaining positions are valid as well.
                 var currentTargetPosition = targetJoint.position;
-                if (!RiggingUtilities.IsFiniteVector3(currentTargetPosition))
+                if (i == 0 && !RiggingUtilities.IsFiniteVector3(currentTargetPosition))
                 {
-                    continue;
+                    return;
                 }
 
                 var rtWeight = Weight * retargetingLayer.RetargetingConstraint.weight;
-                var bodySectionOfJoint =
-                    OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+                var bodySectionOfJoint = retargetingLayer.GetHumanBodyBoneToBodySection(humanBodyBone);
                 bool isLeftHandFingersOrWrist =
                     bodySectionOfJoint == OVRUnityHumanoidSkeletonRetargeter.OVRHumanBodyBonesMappings.BodySection.LeftHand ||
                     humanBodyBone == HumanBodyBones.LeftHand;

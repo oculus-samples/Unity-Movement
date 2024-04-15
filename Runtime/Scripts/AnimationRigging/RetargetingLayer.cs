@@ -53,12 +53,6 @@ namespace Oculus.Movement.AnimationRigging
             public Vector3 GetPositionOffset()
             {
                 var targetPositionOffset = FinalPosition - OriginalPosition;
-                // The recorded positions will not be finite when we regenerate data for the rig.
-                if (!RiggingUtilities.IsFiniteVector3(FinalPosition) ||
-                    !RiggingUtilities.IsFiniteVector3(OriginalPosition))
-                {
-                    return Vector3.zero;
-                }
                 return targetPositionOffset;
             }
         }
@@ -214,6 +208,11 @@ namespace Oculus.Movement.AnimationRigging
         private ProxyTransformLogic _proxyTransformLogic = new ProxyTransformLogic();
         private bool _isFocusedWhileInBuild = true;
 
+        // Cached array versions of dictionaries used in OVRUnityHumanoidSkeletonRetargeter
+        private HumanBodyBones[] _customBoneIdToHumanBodyBoneArray;
+        private OVRSkeletonMetadata.BoneData[] _targetSkeletonDataBodyToBoneDataArray;
+        private OVRHumanBodyBonesMappings.BodySection[] _boneToBodySectionArray;
+
         /// <summary>
         /// Check for required components.
         /// </summary>
@@ -263,6 +262,7 @@ namespace Oculus.Movement.AnimationRigging
                 ConstructDefaultPoseInformation();
                 ConstructBoneAdjustmentInformation();
                 CacheJointConstraints();
+                CacheBoneMapping();
                 ValidateHumanoid();
 
                 _retargetingAnimationRig.ValidateRig(this);
@@ -323,6 +323,26 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
             _jointConstraints = jointConstraints.ToArray();
+        }
+
+        private void CacheBoneMapping()
+        {
+            _targetSkeletonDataBodyToBoneDataArray = new OVRSkeletonMetadata.BoneData[(int)HumanBodyBones.LastBone];
+            _customBoneIdToHumanBodyBoneArray = new HumanBodyBones[(int)BoneId.Max];
+            for (int i = 0; i < _customBoneIdToHumanBodyBoneArray.Length; i++)
+            {
+                _customBoneIdToHumanBodyBoneArray[i] = BodyBoneMappingsInterface.GetFullBodyBoneIdToHumanBodyBone.
+                    GetValueOrDefault((BoneId)i, HumanBodyBones.LastBone);
+            }
+
+            _boneToBodySectionArray =
+                new OVRHumanBodyBonesMappings.BodySection[OVRHumanBodyBonesMappings.BoneToBodySection.Count];
+            for (int i = 0; i < _boneToBodySectionArray.Length; i++)
+            {
+                _boneToBodySectionArray[i] =
+                    OVRHumanBodyBonesMappings.BoneToBodySection.GetValueOrDefault((HumanBodyBones)i,
+                        OVRHumanBodyBonesMappings.BodySection.Head);
+            }
         }
 
         private void ValidateHumanoid()
@@ -387,6 +407,13 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Empty fixed update to avoid updating OVRSkeleton during fixed update.
+        /// </summary>
+        private void FixedUpdate()
+        {
+        }
+
+        /// <summary>
         /// Allows fixing joints via the retargeting processors. The avatar does not allow
         /// precise finger positions even with translate DoF checked.
         /// </summary>
@@ -397,6 +424,7 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
+            UpdateBoneDataToArray();
             foreach (var retargetingProcessor in _retargetingProcessors)
             {
                 retargetingProcessor.PrepareRetargetingProcessor(this, Bones);
@@ -419,10 +447,18 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
+        protected virtual void UpdateBoneDataToArray()
+        {
+            for (int i = 0; i < TargetSkeletonData.BodyToBoneData.Count; i++)
+            {
+                _targetSkeletonDataBodyToBoneDataArray[i] =
+                    TargetSkeletonData.BodyToBoneData.GetValueOrDefault((HumanBodyBones)i, null);
+            }
+        }
+
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
         {
-            var bodySectionOfJoint =
-                OVRHumanBodyBonesMappings.BoneToBodySection[humanBodyBone];
+            var bodySectionOfJoint =_boneToBodySectionArray[(int)humanBodyBone];
             return IsBodySectionInArray(bodySectionOfJoint,
                 _skeletonType == SkeletonType.FullBody ? FullBodySectionToPosition : BodySectionToPosition);
         }
@@ -547,7 +583,7 @@ namespace Oculus.Movement.AnimationRigging
                 if (avatarMask != null)
                 {
                     jointFailsMask = !avatarMask.GetHumanoidBodyPartActive(
-                        BoneMappingsExtension.HumanBoneToAvatarBodyPart[targetHumanBodyBone]);
+                        BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)targetHumanBodyBone]);
                 }
 
                 if (adjustment == null)
@@ -672,15 +708,22 @@ namespace Oculus.Movement.AnimationRigging
         /// <returns>The human body bone for a custom bone id. Returns null if it doesn't exist.</returns>
         public HumanBodyBones? GetCustomBoneIdToHumanBodyBone(BoneId boneId)
         {
-            if (CustomBoneIdToHumanBodyBone == null)
-            {
-                return null;
-            }
-            if (!CustomBoneIdToHumanBodyBone.TryGetValue(boneId, out var humanBodyBone))
+            var humanBodyBone = _customBoneIdToHumanBodyBoneArray[(int)boneId];
+            if (humanBodyBone == HumanBodyBones.LastBone)
             {
                 return null;
             }
             return humanBodyBone;
+        }
+
+        /// <summary>
+        /// Returns the human body bone to body section pairing.
+        /// </summary>
+        /// <param name="humanBodyBone">The human body bone to check for.</param>
+        /// <returns>The body section for a human body bone.</returns>
+        public OVRHumanBodyBonesMappings.BodySection GetHumanBodyBoneToBodySection(HumanBodyBones humanBodyBone)
+        {
+            return _boneToBodySectionArray[(int)humanBodyBone];
         }
 
         /// <summary>
@@ -690,7 +733,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <returns>The correction quaternion for a human body bone. Returns null if it doesn't exist.</returns>
         public Quaternion? GetCorrectionQuaternion(HumanBodyBones humanBodyBone)
         {
-            if (!TargetSkeletonData.BodyToBoneData.TryGetValue(humanBodyBone, out var targetData))
+            var targetData = _targetSkeletonDataBodyToBoneDataArray[(int)humanBodyBone];
+            if (targetData == null)
             {
                 return null;
             }
@@ -708,7 +752,8 @@ namespace Oculus.Movement.AnimationRigging
         /// <returns>The original joint for a human body bone.</returns>
         public Transform GetOriginalJoint(HumanBodyBones humanBodyBone)
         {
-            if (!TargetSkeletonData.BodyToBoneData.TryGetValue(humanBodyBone, out var targetData))
+            var targetData = _targetSkeletonDataBodyToBoneDataArray[(int)humanBodyBone];
+            if (targetData == null)
             {
                 return null;
             }

@@ -179,9 +179,9 @@ namespace Oculus.Movement.AnimationRigging
                 }
 
                 if ((Handedness == Handedness.Left &&
-                     BoneMappingsExtension.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.LeftArm) ||
+                     BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i] == AvatarMaskBodyPart.LeftArm) ||
                     (Handedness == Handedness.Right &&
-                     BoneMappingsExtension.HumanBoneToAvatarBodyPart[i] == AvatarMaskBodyPart.RightArm))
+                     BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i] == AvatarMaskBodyPart.RightArm))
                 {
                     armBones.Add(boneTransform);
                 }
