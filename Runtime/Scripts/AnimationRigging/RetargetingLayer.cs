@@ -195,14 +195,6 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, InspectorButton("UpdateBonePairMappings")]
         private bool _updateBoneMappingsData;
 
-        /// <summary>
-        /// Pre-compute these values each time the editor changes for the purposes
-        /// of efficiency.
-        /// </summary>
-        private Dictionary<HumanBodyBones, Quaternion> _humanBoneToAccumulatedRotationTweaks =
-            new Dictionary<HumanBodyBones, Quaternion>();
-        private List<HumanBodyBones> _bonesToRemove = new List<HumanBodyBones>();
-
         private Pose[] _defaultPoses;
         private IJointConstraint[] _jointConstraints;
         private ProxyTransformLogic _proxyTransformLogic = new ProxyTransformLogic();
@@ -212,6 +204,8 @@ namespace Oculus.Movement.AnimationRigging
         private HumanBodyBones[] _customBoneIdToHumanBodyBoneArray;
         private OVRSkeletonMetadata.BoneData[] _targetSkeletonDataBodyToBoneDataArray;
         private OVRHumanBodyBonesMappings.BodySection[] _boneToBodySectionArray;
+        private Dictionary<HumanBodyBones, OVRUnityHumanoidSkeletonRetargeter.OVRSkeletonMetadata.BoneData>
+            _lastReferencedtargetBoneData = null;
 
         /// <summary>
         /// Check for required components.
@@ -328,6 +322,11 @@ namespace Oculus.Movement.AnimationRigging
         private void CacheBoneMapping()
         {
             _targetSkeletonDataBodyToBoneDataArray = new OVRSkeletonMetadata.BoneData[(int)HumanBodyBones.LastBone];
+            for (var boneIndex = HumanBodyBones.Hips; boneIndex < HumanBodyBones.LastBone; boneIndex++)
+            {
+                _targetSkeletonDataBodyToBoneDataArray[(int)boneIndex] = null;
+            }
+
             _customBoneIdToHumanBodyBoneArray = new HumanBodyBones[(int)BoneId.Max];
             for (int i = 0; i < _customBoneIdToHumanBodyBoneArray.Length; i++)
             {
@@ -397,6 +396,8 @@ namespace Oculus.Movement.AnimationRigging
             _skeletonPostProcessing?.Invoke(this);
             RecomputeSkeletalOffsetsIfNecessary();
 
+            UpdateBoneDataToArray();
+
             _externalBoneTargets.ProcessSkeleton(this);
 
             if (_enableTrackingByProxy)
@@ -424,7 +425,6 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
-            UpdateBoneDataToArray();
             foreach (var retargetingProcessor in _retargetingProcessors)
             {
                 retargetingProcessor.PrepareRetargetingProcessor(this, Bones);
@@ -449,11 +449,17 @@ namespace Oculus.Movement.AnimationRigging
 
         protected virtual void UpdateBoneDataToArray()
         {
-            for (int i = 0; i < TargetSkeletonData.BodyToBoneData.Count; i++)
+            // Update only if the source updated too.
+            if (_lastReferencedtargetBoneData == TargetSkeletonData.BodyToBoneData)
             {
-                _targetSkeletonDataBodyToBoneDataArray[i] =
-                    TargetSkeletonData.BodyToBoneData.GetValueOrDefault((HumanBodyBones)i, null);
+                return;
             }
+            for (var boneIndex = HumanBodyBones.Hips; boneIndex < HumanBodyBones.LastBone; boneIndex++)
+            {
+                _targetSkeletonDataBodyToBoneDataArray[(int)boneIndex] =
+                    TargetSkeletonData.BodyToBoneData.GetValueOrDefault(boneIndex, null);
+            }
+            _lastReferencedtargetBoneData = TargetSkeletonData.BodyToBoneData;
         }
 
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
@@ -496,7 +502,6 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-            var targetBoneDataMap = TargetSkeletonData.BodyToBoneData;
             for (int i = 0; i < numBones; i++)
             {
                 var currentBone = skeletalBones[i];
@@ -504,7 +509,7 @@ namespace Oculus.Movement.AnimationRigging
                 OVRSkeletonMetadata.BoneData targetBoneData;
 
                 (targetBoneData, targetHumanBodyBone) =
-                    GetTargetBoneDataFromOVRBone(skeletalBones[i], targetBoneDataMap);
+                    GetTargetBoneDataFromOVRBone(skeletalBones[i]);
                 if (targetBoneData == null)
                 {
                     continue;
@@ -541,7 +546,6 @@ namespace Oculus.Movement.AnimationRigging
         {
             var skeletalBones = Bones;
             int numBones = skeletalBones.Count;
-            var targetBoneDataMap = TargetSkeletonData.BodyToBoneData;
             int arrayId = 0;
             for (int i = 0; i < numBones; i++)
             {
@@ -550,7 +554,7 @@ namespace Oculus.Movement.AnimationRigging
 
                 var currBone = skeletalBones[i];
                 (targetBoneData, targetHumanBodyBone) =
-                    GetTargetBoneDataFromOVRBone(currBone, targetBoneDataMap);
+                    GetTargetBoneDataFromOVRBone(currBone);
                 if (targetBoneData == null)
                 {
                     continue;
@@ -638,16 +642,15 @@ namespace Oculus.Movement.AnimationRigging
             rotationAdjustments[arrayId] = adjustment.RotationChange * adjustment.PrecomputedRotationTweaks;
         }
 
-        private (OVRSkeletonMetadata.BoneData, HumanBodyBones) GetTargetBoneDataFromOVRBone(OVRBone ovrBone,
-            Dictionary<HumanBodyBones, OVRSkeletonMetadata.BoneData> targetBodyToBoneData, bool print = false)
+        private (OVRSkeletonMetadata.BoneData, HumanBodyBones) GetTargetBoneDataFromOVRBone(OVRBone ovrBone)
         {
-            var skelBoneId = ovrBone.Id;
-            if (!CustomBoneIdToHumanBodyBone.TryGetValue(skelBoneId, out var humanBodyBone))
+            var humanBodyBone = _customBoneIdToHumanBodyBoneArray[(int)ovrBone.Id];
+            if (humanBodyBone == HumanBodyBones.LastBone)
             {
                 return (null, HumanBodyBones.LastBone);
             }
-
-            if (!targetBodyToBoneData.TryGetValue(humanBodyBone, out var targetData))
+            var targetData = _targetSkeletonDataBodyToBoneDataArray[(int)humanBodyBone];
+            if (targetData == null)
             {
                 return (null, HumanBodyBones.LastBone);
             }
