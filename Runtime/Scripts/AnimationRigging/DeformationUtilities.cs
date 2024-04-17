@@ -3,8 +3,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Oculus.Interaction.Input;
 using Oculus.Movement.Utils;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
@@ -393,19 +395,61 @@ namespace Oculus.Movement.AnimationRigging
             // Calculate an adjustment alignment if needed, using the desired right and forward from the
             // rest pose humanoid, which is Vector3.right and Vector3.forward.
             var adjustmentAlignment =
-                GetHipsRightForwardAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
+                GetHipsAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
+
+            // Flatten out the spine adjustments, as the adjustment should only be along one axis by
+            // previewing the hips adjustment, and taking the largest value.
+            var adjustmentAxis = GetHipsAdjustmentAxis(adjustmentAlignment,
+                boneAdjustments[0].Adjustment.eulerAngles);
+
             for (int i = 0; i < boneAdjustments.Count; i++)
             {
                 var adjustment = boneAdjustments[i];
                 // We use euler angles here as we want to rotate the adjustment point with the alignment rotation,
                 // rather than combine the rotations.
                 var adjustmentPoint = adjustment.Adjustment.eulerAngles;
-                adjustment.Adjustment =
-                    Quaternion.Euler(adjustmentAlignment * adjustmentPoint);
+                var adjustmentResult = adjustmentAlignment * adjustmentPoint;
+                switch (adjustmentAxis)
+                {
+                    case Axis.X:
+                        adjustmentResult = Vector3.right * adjustmentResult.x;
+                        break;
+                    case Axis.Y:
+                        adjustmentResult = Vector3.up * adjustmentResult.y;
+                        break;
+                    case Axis.Z:
+                        adjustmentResult = Vector3.forward * adjustmentResult.z;
+                        break;
+                }
+                adjustment.Adjustment = Quaternion.Euler(adjustmentResult);
                 boneAdjustments[i] = adjustment;
             }
+
             boneAdjustments.AddRange(shoulderBoneAdjustments);
             return boneAdjustments.ToArray();
+        }
+
+        private static Axis GetHipsAdjustmentAxis(Quaternion adjustmentAlignment, Vector3 hipsAdjustmentEulerAngles)
+        {
+            var hipsPreviewAdjustmentEuler =
+                Quaternion.Euler(adjustmentAlignment * hipsAdjustmentEulerAngles).eulerAngles;
+            var worldAdjustmentX = Mathf.Abs(hipsPreviewAdjustmentEuler.x > 180 ?
+                hipsPreviewAdjustmentEuler.x - 360 : hipsPreviewAdjustmentEuler.x);
+            var worldAdjustmentY = Mathf.Abs(hipsPreviewAdjustmentEuler.y > 180 ?
+                hipsPreviewAdjustmentEuler.y - 360 : hipsPreviewAdjustmentEuler.y);
+            var worldAdjustmentZ = Mathf.Abs(hipsPreviewAdjustmentEuler.z > 180 ?
+                hipsPreviewAdjustmentEuler.z - 360 : hipsPreviewAdjustmentEuler.z);
+            var largestWorldAdjustment =
+                Mathf.Max(worldAdjustmentX, Mathf.Max(worldAdjustmentY, worldAdjustmentZ));
+            if (Mathf.Approximately(largestWorldAdjustment, worldAdjustmentZ))
+            {
+                return Axis.Z;
+            }
+            if (Mathf.Approximately(largestWorldAdjustment, worldAdjustmentY))
+            {
+                return Axis.Y;
+            }
+            return Axis.X;
         }
 
         /// <summary>
@@ -419,15 +463,7 @@ namespace Oculus.Movement.AnimationRigging
             FullBodyDeformationConstraint constraint = null)
         {
             var adjustments = new List<JointAdjustment>();
-            BoneAdjustmentData[] boneAdjustmentData;
-            if (constraint != null)
-            {
-                boneAdjustmentData = (constraint.data as IFullBodyDeformationData).BoneAdjustments;
-            }
-            else
-            {
-                boneAdjustmentData = GetDeformationBoneAdjustments(animator, restPoseObject);
-            }
+            var boneAdjustmentData = GetDeformationBoneAdjustments(animator, restPoseObject);
             foreach (var boneAdjustment in boneAdjustmentData)
             {
                 var rotationTweak = boneAdjustment.Adjustment;
@@ -484,7 +520,7 @@ namespace Oculus.Movement.AnimationRigging
             var legDotProduct = Vector3.Dot(leftLeg.forward, rightLeg.forward);
             var shouldMirrorLegs = legDotProduct < 0.0f;
             var adjustmentAlignment =
-                GetHipsRightForwardAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
+                GetHipsAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
 
             var leftFootAdjustment =
                 GetFootJointAdjustment(animator, restPoseObject, HumanBodyBones.LeftFoot, HumanBodyBones.LeftToes,
@@ -556,7 +592,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="alignmentRightDirection">The alignment right direction.</param>
         /// <param name="alignmentForwardDirection">The alignment forward direction.</param>
         /// <returns>Rotation to align the hips right with the alignment right direction.</returns>
-        private static Quaternion GetHipsRightForwardAlignmentForAdjustments(Animator animator,
+        private static Quaternion GetHipsAlignmentForAdjustments(Animator animator,
             Vector3 alignmentRightDirection,
             Vector3 alignmentForwardDirection)
         {
