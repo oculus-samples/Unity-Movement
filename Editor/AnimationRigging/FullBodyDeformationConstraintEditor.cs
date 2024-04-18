@@ -298,6 +298,7 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.Label(new GUIContent("Body"), EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
             EditorGUILayout.PropertyField(_spineTranslationCorrectionTypeProperty);
+            EditorGUILayout.PropertyField(_originalSpinePositionsWeight);
             EditorGUILayout.PropertyField(_spineLowerAlignmentWeightProperty);
             EditorGUILayout.PropertyField(_spineUpperAlignmentWeightProperty);
             EditorGUILayout.PropertyField(_chestAlignmentWeightProperty);
@@ -362,7 +363,6 @@ namespace Oculus.Movement.AnimationRigging
             }
             EditorGUILayout.PropertyField(_squashProperty);
             EditorGUILayout.PropertyField(_stretchProperty);
-            EditorGUILayout.PropertyField(_originalSpinePositionsWeight);
             EditorGUILayout.PropertyField(_originalSpineBoneCount);
             EditorGUILayout.PropertyField(_originalSpineUseHipsToHeadToScale);
 
