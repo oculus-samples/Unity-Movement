@@ -15,11 +15,22 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public override void OnInspectorGUI()
         {
+            var retargetingLayer = serializedObject.targetObject as RetargetingLayer;
+            var animatorComponent = retargetingLayer.GetComponent<Animator>();
+
+            if (!IsAnimatorProperlyConfigured(animatorComponent))
+            {
+                GUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox("Requires Animator component with a humanoid " +
+                    "avatar, and Translation DoF enabled in avatar's Muscles & Settings.", MessageType.Error);
+                GUILayout.EndVertical();
+            }
+
             base.OnInspectorGUI();
 
             if (GUILayout.Button("Calculate Adjustments"))
             {
-                var retargetingLayer = serializedObject.targetObject as RetargetingLayer;
+
                 if (retargetingLayer != null)
                 {
                     var animator = retargetingLayer.GetComponent<Animator>();
@@ -31,6 +42,13 @@ namespace Oculus.Movement.AnimationRigging
             serializedObject.Update();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        internal static bool IsAnimatorProperlyConfigured(Animator animatorComponent)
+        {
+            return animatorComponent != null && animatorComponent.avatar != null &&
+                animatorComponent.avatar.isHuman &&
+                animatorComponent.avatar.humanDescription.hasTranslationDoF;
         }
     }
 }

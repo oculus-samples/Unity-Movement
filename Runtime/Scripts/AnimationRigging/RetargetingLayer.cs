@@ -240,7 +240,9 @@ namespace Oculus.Movement.AnimationRigging
             if (!animatorComp.avatar.humanDescription.hasTranslationDoF)
             {
                 Debug.LogError("Translation DoF is not enabled on your avatar, this " +
-                    "will prevent proper positional retargeting of its joints.");
+                    "will prevent proper positional retargeting of its joints. Enable this " +
+                    $"at {animatorComp.avatar} -> Configure Avatar -> Muscles " +
+                    $"& Settings -> Translation DoF", animatorComp.avatar);
             }
         }
 
