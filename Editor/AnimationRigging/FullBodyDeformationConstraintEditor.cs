@@ -101,6 +101,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private SerializedProperty _leftShoulderWeightProperty;
         private SerializedProperty _rightShoulderWeightProperty;
+        private SerializedProperty _shoulderRollWeightProperty;
         private SerializedProperty _leftArmWeightProperty;
         private SerializedProperty _rightArmWeightProperty;
         private SerializedProperty _leftHandWeightProperty;
@@ -151,6 +152,7 @@ namespace Oculus.Movement.AnimationRigging
 
             _leftShoulderWeightProperty = data.FindPropertyRelative("_leftShoulderWeight");
             _rightShoulderWeightProperty = data.FindPropertyRelative("_rightShoulderWeight");
+            _shoulderRollWeightProperty = data.FindPropertyRelative("_shoulderRollWeight");
             _leftArmWeightProperty = data.FindPropertyRelative("_leftArmWeight");
             _rightArmWeightProperty = data.FindPropertyRelative("_rightArmWeight");
             _leftHandWeightProperty = data.FindPropertyRelative("_leftHandWeight");
@@ -310,6 +312,7 @@ namespace Oculus.Movement.AnimationRigging
             GUILayout.EndHorizontal();
             AverageWeightSlider(Content.ShouldersWeight,
                 new[] { _leftShoulderWeightProperty, _rightShoulderWeightProperty });
+            EditorGUILayout.PropertyField(_shoulderRollWeightProperty);
 
             EditorGUILayout.Space();
             GUILayout.BeginHorizontal();

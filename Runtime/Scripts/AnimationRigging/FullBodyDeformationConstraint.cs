@@ -266,6 +266,11 @@ namespace Oculus.Movement.AnimationRigging
         public string AlignFeetWeightFloatProperty { get; }
 
         /// <summary>
+        ///
+        /// </summary>
+        public string ShoulderRollFloatProperty { get; }
+
+        /// <summary>
         /// The distance between the hips and head bones.
         /// </summary>
         public float HipsToHeadDistance { get; }
@@ -517,8 +522,13 @@ namespace Oculus.Movement.AnimationRigging
         string IFullBodyDeformationData.RightToesWeightFloatProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightToesWeight));
 
+        /// <inheritdoc />
         string IFullBodyDeformationData.AlignFeetWeightFloatProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_alignFeetWeight));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.ShoulderRollFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shoulderRollWeight));
 
         /// <inheritdoc />
         float IFullBodyDeformationData.HipsToHeadDistance => _hipsToHeadDistance;
@@ -618,6 +628,17 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _affectArmsBySpineCorrection;
             set => _affectArmsBySpineCorrection = value;
+        }
+
+        /// <summary>
+        /// The weight for the deformation shoulder roll.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        private float _shoulderRollWeight;
+        public float ShoulderRollWeight
+        {
+            get => _shoulderRollWeight;
+            set => _shoulderRollWeight = value;
         }
 
         /// <summary>
@@ -999,6 +1020,7 @@ namespace Oculus.Movement.AnimationRigging
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
                 ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
+                ShoulderLocalRot = shoulder != null ? shoulder.localRotation : upperArmBone.localRotation,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
@@ -1018,6 +1040,7 @@ namespace Oculus.Movement.AnimationRigging
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
                 ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
+                ShoulderLocalRot = shoulder != null ? shoulder.localRotation : upperArmBone.localRotation,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };

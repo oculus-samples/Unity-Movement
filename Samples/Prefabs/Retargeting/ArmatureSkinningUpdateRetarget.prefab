@@ -679,6 +679,7 @@ MonoBehaviour:
     _shouldersHeightReductionWeight: 0
     _shouldersWidthReductionWeight: 0
     _affectArmsBySpineCorrection: 0
+    _shoulderRollWeight: 1
     _leftShoulderWeight: 1
     _rightShoulderWeight: 1
     _leftArmWeight: 1
@@ -723,6 +724,7 @@ MonoBehaviour:
       LowerArmBone: {fileID: 4776154206678009637}
       HandBone: {fileID: 8362296397940282678}
       ShoulderLocalPos: {x: -0.0009571358, y: 0.19149224, z: -0.0087277945}
+      ShoulderLocalRot: {x: -0.004949423, y: -0.1135221, z: 0.043275435, w: 0.99258024}
       LowerArmToHandAxis: {x: -0.00000063156983, y: 1, z: 0.00000006974391}
     _rightArmData:
       ShoulderBone: {fileID: 6698092073795100007}
@@ -730,6 +732,7 @@ MonoBehaviour:
       LowerArmBone: {fileID: 3796135998893025026}
       HandBone: {fileID: 2494227819838822627}
       ShoulderLocalPos: {x: 0.0009571358, y: 0.19149381, z: -0.008727803}
+      ShoulderLocalRot: {x: 0.99258024, y: -0.043275435, z: -0.1135221, w: 0.004949424}
       LowerArmToHandAxis: {x: 0.00000006586886, y: -1, z: -0.00000003874639}
     _leftLegData:
       HipsBone: {fileID: 24668466978050337}

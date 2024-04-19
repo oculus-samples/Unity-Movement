@@ -373,6 +373,11 @@ namespace Oculus.Movement.AnimationRigging
         public FloatProperty OriginalSpinePositionsWeight;
 
         /// <summary>
+        /// Shoulder roll weight.
+        /// </summary>
+        public FloatProperty ShoulderRollWeight;
+
+        /// <summary>
         /// Number of bones to fix when straightening the spine.
         /// </summary>
         public IntProperty OriginalSpineBoneCount;
@@ -483,6 +488,9 @@ namespace Oculus.Movement.AnimationRigging
 
         /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
+
+        public Quaternion RightShoulderOriginalLocalRot { get; set; }
+        public Quaternion LeftShoulderOriginalLocalRot { get; set; }
 
         /// <inheritdoc />
         public void ProcessRootMotion(AnimationStream stream)
@@ -833,7 +841,7 @@ namespace Oculus.Movement.AnimationRigging
             }
             else
             {
-                var rightUpperArmPos = LeftUpperArmBone.GetLocalPosition(stream);
+                var rightUpperArmPos = RightUpperArmBone.GetLocalPosition(stream);
                 var rightUpperArmOffset = Vector3.Lerp(Vector3.zero,
                     RightShoulderOriginalLocalPos - rightUpperArmPos, weight * RightShoulderOffsetWeight.Get(stream));
                 RightUpperArmBone.SetLocalPosition(stream, rightUpperArmPos + rightUpperArmOffset);
@@ -1289,6 +1297,9 @@ namespace Oculus.Movement.AnimationRigging
             // Adjust the width of the shoulders.
             UpdateShoulderWidth(stream, weight, _leftShoulderEndBoneAnimIndex);
             UpdateShoulderWidth(stream, weight, _rightShoulderEndBoneAnimIndex);
+
+            // Rotate shoulders, but keep upper arm rotations.
+            UpdateShoulderRoll(stream, weight);
         }
 
         private void UpdateShoulderY(AnimationStream stream, float weight, int index)
@@ -1322,6 +1333,34 @@ namespace Oculus.Movement.AnimationRigging
             shoulderBone.SetPosition(stream,
                 Vector3.Lerp(shoulderPos, shoulderSpinePos, weight));
             EndBones[index] = shoulderBone;
+        }
+
+        private void UpdateShoulderRoll(AnimationStream stream, float weight)
+        {
+            var shoulderRollWeight = weight * ShoulderRollWeight.Get(stream);
+            if (LeftShoulderBone.IsValid(stream) && RightShoulderBone.IsValid(stream))
+            {
+                var leftShoulderRotation = LeftShoulderBone.GetLocalRotation(stream);
+                var rightShoulderRotation = RightShoulderBone.GetLocalRotation(stream);
+                var leftUpperArmRotation = LeftUpperArmBone.GetRotation(stream);
+                var rightUpperArmRotation = RightUpperArmBone.GetRotation(stream);
+                var leftTargetShoulderRotation = LeftShoulderOriginalLocalRot;
+                var rightTargetShoulderRotation = RightShoulderOriginalLocalRot;
+                LeftShoulderBone.SetLocalRotation(stream,
+                    Quaternion.Slerp(
+                        leftShoulderRotation, leftTargetShoulderRotation, shoulderRollWeight));
+                RightShoulderBone.SetLocalRotation(stream,
+                    Quaternion.Slerp(
+                        rightShoulderRotation, rightTargetShoulderRotation, shoulderRollWeight));
+                LeftUpperArmBone.SetRotation(stream, leftUpperArmRotation);
+                RightUpperArmBone.SetRotation(stream, rightUpperArmRotation);
+            }
+            else
+            {
+                // If shoulder bones aren't valid, use the upper arm bone rotations.
+                LeftUpperArmBone.SetLocalRotation(stream, LeftShoulderOriginalLocalRot);
+                RightUpperArmBone.SetLocalRotation(stream, RightShoulderOriginalLocalRot);
+            }
         }
 
         /// <summary>
@@ -1600,6 +1639,8 @@ namespace Oculus.Movement.AnimationRigging
                 FloatProperty.Bind(animator, component, data.LeftShoulderWeightFloatProperty);
             job.RightShoulderOffsetWeight =
                 FloatProperty.Bind(animator, component, data.RightShoulderWeightFloatProperty);
+            job.ShoulderRollWeight =
+                FloatProperty.Bind(animator, component, data.ShoulderRollFloatProperty);
             job.OriginalSpinePositionsWeight =
                 FloatProperty.Bind(animator, component, data.OriginalSpinePositionsWeightProperty);
             job.OriginalSpineBoneCount =
@@ -1641,6 +1682,8 @@ namespace Oculus.Movement.AnimationRigging
             job.RightToesOriginalLocalPos = data.RightLeg.ToesLocalPos;
             job.LeftShoulderOriginalLocalPos = data.LeftArm.ShoulderLocalPos;
             job.RightShoulderOriginalLocalPos = data.RightArm.ShoulderLocalPos;
+            job.LeftShoulderOriginalLocalRot = data.LeftArm.ShoulderLocalRot;
+            job.RightShoulderOriginalLocalRot = data.RightArm.ShoulderLocalRot;
             job.LeftFootLocalRot = data.LeftLeg.FootLocalRot;
             job.RightFootLocalRot = data.RightLeg.FootLocalRot;
 

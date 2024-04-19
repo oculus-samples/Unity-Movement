@@ -252,6 +252,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SpineLowerAlignmentWeight = 0.5f;
             deformationConstraint.data.SpineUpperAlignmentWeight = 1.0f;
             deformationConstraint.data.ChestAlignmentWeight = 0.0f;
+            deformationConstraint.data.ShoulderRollWeight = 1.0f;
             deformationConstraint.data.LeftShoulderWeight = 1.0f;
             deformationConstraint.data.RightShoulderWeight = 1.0f;
             deformationConstraint.data.LeftArmWeight = 1.0f;

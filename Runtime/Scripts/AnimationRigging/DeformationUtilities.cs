@@ -126,6 +126,11 @@ namespace Oculus.Movement.AnimationRigging
             public Vector3 ShoulderLocalPos;
 
             /// <summary>
+            /// The local rotation of the shoulder.
+            /// </summary>
+            public Quaternion ShoulderLocalRot;
+
+            /// <summary>
             /// The axis of the lower arm to the hand.
             /// </summary>
             public Vector3 LowerArmToHandAxis;
