@@ -1,3 +1,69 @@
+# [5.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.4.0...v5.0.0) (2024-04-19)
+
+
+### Bug Fixes
+
+* **Editor:** refresh bones on object change ([5b9493b](https://github.com/oculus-samples/Unity-Movement/commit/5b9493bc934864c539ce594cf0141f2d976624a5))
+* **Editor:** refresh bones on scene change ([c9d0398](https://github.com/oculus-samples/Unity-Movement/commit/c9d03985c15a888aaed3c50641b15d97c4d480cb))
+* **Editor:** Update spine adjustments calculation to affect only one axis ([8bc9397](https://github.com/oculus-samples/Unity-Movement/commit/8bc93977f85417988bbd6a660ae48f4c9415cf45))
+* **Runtime:** Add explicit dependency to burst in the Movement package ([34025a0](https://github.com/oculus-samples/Unity-Movement/commit/34025a04456face1b2821e282869df5a27345b86))
+* **Runtime:** Fix deformation's toes interpolation ([5c0e126](https://github.com/oculus-samples/Unity-Movement/commit/5c0e126efb18c71bb6f80b00a20a66d98ffb60ee))
+* **Runtime:** Fix edge case with AnimatorBoneVisualizer's TryGetBoneTransforms ([336ea4f](https://github.com/oculus-samples/Unity-Movement/commit/336ea4f17f7adf89f476372582746b1f7faa065d))
+* **Runtime:** Fix warnings for unused retargeted bone mappings ([c1ba908](https://github.com/oculus-samples/Unity-Movement/commit/c1ba908a7937c5ce24f92677ba5893269f4fb3f0))
+* **Runtime:** Optimize performance of retargeting ([7beeb41](https://github.com/oculus-samples/Unity-Movement/commit/7beeb4121041352fe8afbe44be3ec7254a7034b9))
+* **Runtime:** RetargetingProcessorCorrectBones interpolates using adjustments, fix finger position weight usage ([f51ea12](https://github.com/oculus-samples/Unity-Movement/commit/f51ea12afc6c0c0ef323f1143012dabf605faf02)), closes [#1](https://github.com/oculus-samples/Unity-Movement/issues/1) [#2](https://github.com/oculus-samples/Unity-Movement/issues/2)
+* **Runtime:** Use correct world-to-local transformation for start to end vector ([f41a622](https://github.com/oculus-samples/Unity-Movement/commit/f41a622e4038381c297918fb8f6209b23d0a99ce))
+* **Samples:** added chest to all bones listing ([e957e08](https://github.com/oculus-samples/Unity-Movement/commit/e957e080a651fbe86e276e41f8694a37f8368d97))
+* **Samples:** added controllers forfitness to control UI ([adf1582](https://github.com/oculus-samples/Unity-Movement/commit/adf1582e2dfaf943de811f0cce7374fc0ec81cba))
+* **Samples:** Fix icon positioning of menu outline ([c121fb9](https://github.com/oculus-samples/Unity-Movement/commit/c121fb9e7354306b370afd53d7288a03c9e465bb))
+* **Samples:** hide skeleton lines when object disables ([1d82ea1](https://github.com/oculus-samples/Unity-Movement/commit/1d82ea1b8a6dd49b0ebdc3d0dde75a8393dab76e))
+* **Samples:** renamed movement events ([a273892](https://github.com/oculus-samples/Unity-Movement/commit/a2738926f55f1ae0e936045cb7f1f7a110351756))
+
+
+### Documentation
+
+* **Samples:** Update README to new SDK version ([ae7bc2e](https://github.com/oculus-samples/Unity-Movement/commit/ae7bc2e965c7b9bfe89dd8ab484f0962b764bbac))
+
+
+### Features
+
+* **Editor:** Update one-click retargeting with new parameters ([a827e6f](https://github.com/oculus-samples/Unity-Movement/commit/a827e6f775383a0ec11fb18292da916ff0506edc))
+* **Runtime:** Add support for automated custom bone mappings in retargeting ([df044c1](https://github.com/oculus-samples/Unity-Movement/commit/df044c112edc3919f72efee896f5112772f8a92e))
+* **Runtime:** Add the shoulder roll property for deformation ([1e4dfa0](https://github.com/oculus-samples/Unity-Movement/commit/1e4dfa05a681b33d1006cbfebe251412a4022e3e))
+* **runtime:** BodyTrackingForFitness sample ([0bfa946](https://github.com/oculus-samples/Unity-Movement/commit/0bfa946b07bb4513d6c16a5f76a516d879e39f84))
+* **Runtime:** Deformation allows straightening spine ([5901e5a](https://github.com/oculus-samples/Unity-Movement/commit/5901e5a0984b93e30c88a1b8cceae12ab42ef7ec))
+* **Runtime:** Finger position correction weight ([d49cb39](https://github.com/oculus-samples/Unity-Movement/commit/d49cb39743517826b58734c892207777c9fbbdb4))
+* **Runtime:** Optimize more, and clean up ([7d530fa](https://github.com/oculus-samples/Unity-Movement/commit/7d530facb8d857ba692e1b4d694f33d7b40ea0d9))
+* **Runtime:** Original spine offsets should be proportional ([90b248a](https://github.com/oculus-samples/Unity-Movement/commit/90b248a4dc369f9f2668d6986c8ee23531c9b438))
+* **Runtime:** Update retargeting blend hand processor for tracked head options ([24778ba](https://github.com/oculus-samples/Unity-Movement/commit/24778ba4e8139dd21e9df9f647ac823d53584252))
+* **Samples:** Show hands or controllers with disembodied character ([1ae5cdc](https://github.com/oculus-samples/Unity-Movement/commit/1ae5cdc78964633f41361d14676cd76015eb4098))
+
+
+### BREAKING CHANGES
+
+* **Runtime:** Updated bone mappings requires V63 SDK.
+
+V63 SDK introduces the OVRHumanBodyBonesMappingsInterface, which can be used to create custom bone pair mappings for retargeting. This feature adds support for that capability, adding the ability to set the bone mappings based on which optional bones are present on the Unity humanoid.
+
+The automatic mapping maps the HumanBodyBones.Chest bone to the OVRSkeleton.SpineMiddle bone, for a better result with the spine retargeting on most characters. However, if there is a missing UpperChest bone, the OVRSkeleton.SpineUpper bone will be mapped instead. These mappings can be modified in the inspector under Retargeted Bone Mappings.
+
+Reviewed By: sohailshafiiWk
+
+Differential Revision: D55996107
+
+fbshipit-source-id: af32288b922282f595bd653852f051b6171738a1
+* **Samples:** using v62 instead of v60
+
+Updated references to the correct SDK version.
+Updated instructions for adding a Camera Rig.
+Added troubleshooting note about attempting to run scenes form the Packages folder (they may need to be copied to /Assets).
+
+Reviewed By: sohailshafiiWk
+
+Differential Revision: D55378812
+
+fbshipit-source-id: b1cdf4c2a039f278e976c3f7f80ab21bb0d03542
+
 # [4.4.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.3.0...v4.4.0) (2024-03-13)
 
 
