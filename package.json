@@ -10,6 +10,7 @@
   "description": "Meta Movement",
   "dependencies": {
     "com.unity.textmeshpro": "3.0.6",
-    "com.unity.animation.rigging": "1.2.1"
+    "com.unity.animation.rigging": "1.2.1",
+    "com.unity.burst": "1.4.1"
   }
 }
