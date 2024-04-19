@@ -62,7 +62,15 @@ namespace Oculus.Movement.Utils
                 firstJoint = secondJoint = null;
                 return false;
             }
-            secondJoint = (tupleItem.SecondBone == HumanBodyBones.LastBone)
+            bool secondBoneInvalid = tupleItem.SecondBone == HumanBodyBones.LastBone;
+            // While this is rare, it's possible that second bone can be invalid and the first
+            // child would have no children (used as a backup in this case).
+            if (secondBoneInvalid && firstJoint.childCount == 0)
+            {
+                firstJoint = secondJoint = null;
+                return false;
+            }
+            secondJoint = secondBoneInvalid
                 ? firstJoint.GetChild(0)
                 : _animatorComp.GetBoneTransform(tupleItem.SecondBone);
             return true;

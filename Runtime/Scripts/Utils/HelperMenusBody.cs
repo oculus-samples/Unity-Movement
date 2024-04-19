@@ -30,10 +30,17 @@ namespace Oculus.Movement.Utils
                   _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS)]
         private static void SetupFullBodyCharacterForAnimationRiggingRetargetingConstraints()
         {
-            var activeGameObject = UnityEditor.Selection.activeGameObject;
-            var animator = activeGameObject.GetComponent<Animator>();
-            var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
-            SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, true);
+            var currentSelection = 0.0f;
+            var selectionCount = UnityEditor.Selection.gameObjects.Length;
+            foreach (var activeGameObject in UnityEditor.Selection.gameObjects)
+            {
+                currentSelection += 1.0f;
+                UnityEditor.EditorUtility.DisplayProgressBar(
+                    "Retargeting", $"Adding {_ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS}...", currentSelection / selectionCount);
+                var animator = activeGameObject.GetComponent<Animator>();
+                var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
+                SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, true);
+            }
         }
 
         [UnityEditor.MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_BT_MENU +
@@ -113,7 +120,7 @@ namespace Oculus.Movement.Utils
             constraintMonos.Add(retargetConstraint);
 
             // Destroy old components
-            AddComponentsHelper.DestroyLegacyComponents(rigObject, activeGameObject);
+            AddComponentsHelper.DestroyLegacyComponents(activeGameObject, rigObject);
 
             // Add retargeting animation rig to tie everything together.
             AddComponentsHelper.AddRetargetingAnimationRig(
@@ -131,7 +138,6 @@ namespace Oculus.Movement.Utils
             AddComponentsHelper.AddCorrectBonesRetargetingProcessor(retargetingLayer);
             AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
             AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
-            AddComponentsHelper.AddHandDeformationRetargetingProcessor(retargetingLayer);
 
             // Body deformation.
             if (addConstraints)
@@ -246,6 +252,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.SpineLowerAlignmentWeight = 0.5f;
             deformationConstraint.data.SpineUpperAlignmentWeight = 1.0f;
             deformationConstraint.data.ChestAlignmentWeight = 0.0f;
+            deformationConstraint.data.ShoulderRollWeight = 1.0f;
             deformationConstraint.data.LeftShoulderWeight = 1.0f;
             deformationConstraint.data.RightShoulderWeight = 1.0f;
             deformationConstraint.data.LeftArmWeight = 1.0f;
@@ -259,6 +266,9 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.AlignFeetWeight = 0.75f;
             deformationConstraint.data.SquashLimit = 2.0f;
             deformationConstraint.data.StretchLimit = 2.0f;
+            deformationConstraint.data.OriginalSpinePositionsWeight = 0.5f;
+            deformationConstraint.data.OriginalSpineBoneCount = 0;
+            deformationConstraint.data.OriginalSpineUseHipsToHeadToScale = true;
 
             deformationConstraint.data.AssignAnimator(animator);
             deformationConstraint.data.SetUpLeftArmData();

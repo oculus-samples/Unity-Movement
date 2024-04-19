@@ -233,6 +233,11 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<Vector3> BoneDirections;
 
         /// <summary>
+        /// Original bone directions of the character.
+        /// </summary>
+        public NativeArray<Vector3> EndBoneOffsetsLocal;
+
+        /// <summary>
         /// The array containing 1 element for the current scale ratio.
         /// </summary>
         public NativeArray<Vector3> ScaleFactor;
@@ -363,6 +368,26 @@ namespace Oculus.Movement.AnimationRigging
         public FloatProperty AlignFeetWeight;
 
         /// <summary>
+        /// Original spine positions weight.
+        /// </summary>
+        public FloatProperty OriginalSpinePositionsWeight;
+
+        /// <summary>
+        /// Shoulder roll weight.
+        /// </summary>
+        public FloatProperty ShoulderRollWeight;
+
+        /// <summary>
+        /// Number of bones to fix when straightening the spine.
+        /// </summary>
+        public IntProperty OriginalSpineBoneCount;
+
+        /// <summary>
+        /// Use the current hips to head to scale original spine positions.
+        /// </summary>
+        public BoolProperty OriginalSpineUseHipsToHeadToScale;
+
+        /// <summary>
         /// True if the arms should be affected by spine correction.
         /// </summary>
         public BoolProperty AffectArmsBySpineCorrection;
@@ -402,6 +427,11 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public float LowerBodyProportion;
 
+        /// <summary>
+        /// Hips to head distance on original character.
+        /// </summary>
+        public float OriginalHipsToHeadDistance;
+
         private Vector3 _targetHipsPos;
         private Vector3 _targetHeadPos;
         private Vector3 _preDeformationLeftUpperArmLocalPos;
@@ -416,8 +446,8 @@ namespace Oculus.Movement.AnimationRigging
         private Vector3 _hipsGroundingOffset;
         private Vector3 _requiredSpineOffset;
 
-        private int _leftShoulderBoneAnimIndex => HipsToHeadBones.Length - 1;
-        private int _rightShoulderBoneAnimIndex => _leftShoulderBoneAnimIndex + 1;
+        private int _leftShoulderEndBoneAnimIndex => HipsToHeadBones.Length - 1;
+        private int _rightShoulderEndBoneAnimIndex => _leftShoulderEndBoneAnimIndex + 1;
         private int _leftUpperLegBoneAnimIndex => BoneAnimData.Length - 6;
         private int _rightUpperLegBoneAnimIndex => _leftUpperLegBoneAnimIndex + 1;
         private int _leftLowerLegBoneAnimIndex => _leftUpperLegBoneAnimIndex + 2;
@@ -459,6 +489,9 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public FloatProperty jobWeight { get; set; }
 
+        public Quaternion RightShoulderOriginalLocalRot { get; set; }
+        public Quaternion LeftShoulderOriginalLocalRot { get; set; }
+
         /// <inheritdoc />
         public void ProcessRootMotion(AnimationStream stream)
         {
@@ -489,12 +522,13 @@ namespace Oculus.Movement.AnimationRigging
                     CalculateOffsets(stream, weight);
                     InterpolateLegs(stream, weight);
                     ApplySpineCorrection(stream, weight);
+                    ApplyOriginalSpineOffsets(stream, weight);
                     ApplyShouldersCorrection(stream, weight);
                     InterpolateArms(stream, weight);
                     InterpolateHands(stream, weight);
                     ApplyAccurateFeet(stream, weight);
                     AlignFeet(stream, weight);
-                    InterpolateToesY(stream, weight);
+                    InterpolateAllToes(stream, weight);
                 }
                 else
                 {
@@ -507,6 +541,7 @@ namespace Oculus.Movement.AnimationRigging
                     EnforceOriginalSkeletalProportions(stream, weight);
                     CalculateOffsets(stream, weight);
                     ApplySpineCorrection(stream, weight);
+                    ApplyOriginalSpineOffsets(stream, weight);
                     ApplyShouldersCorrection(stream, weight);
                     InterpolateArms(stream, weight);
                     InterpolateHands(stream, weight);
@@ -700,6 +735,81 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Tries to align the spine bones with the original character's bone directions.
+        /// We still need to maintain the original hip rotation, and that the head bone is
+        /// not touched since we don't to lose head tracking accuracy.
+        /// </summary>
+        /// <param name="stream">Animation stream.</param>
+        /// <param name="weight">Weight.</param>
+        private void ApplyOriginalSpineOffsets(AnimationStream stream, float weight)
+        {
+            float originalSpinePositionsWeight = OriginalSpinePositionsWeight.Get(stream);
+            if (originalSpinePositionsWeight <= float.Epsilon)
+            {
+                return;
+            }
+            originalSpinePositionsWeight *= weight;
+            bool scaleBasedOnCurrentHeadToHips = OriginalSpineUseHipsToHeadToScale.Get(stream);
+
+            // make sure the requested bone count does not exceed the head index
+            int requestedBoneCount = OriginalSpineBoneCount.Get(stream);
+            int numBonesToCorrect = (HeadIndex - 1) < requestedBoneCount ?
+                HeadIndex - 1 : requestedBoneCount;
+            float currentToOriginalSpineScale = ComputeCurrentToOriginalSpineScale(stream);
+
+            for (int i = HipsIndex; i < numBonesToCorrect; i++)
+            {
+                var boneToAffect = EndBones[i];
+                // we need the offset from the bone before to tell us where our
+                // current spine bone should be
+                var boneOffset = EndBoneOffsetsLocal[i];
+
+                if (scaleBasedOnCurrentHeadToHips)
+                {
+                    boneOffset *= currentToOriginalSpineScale;
+                }
+
+                AffectBoneByFixedLocalPosition(
+                    stream,
+                    boneToAffect,
+                    boneOffset,
+                    originalSpinePositionsWeight);
+
+                EndBones[i] = boneToAffect;
+            }
+        }
+
+        private float ComputeCurrentToOriginalSpineScale(AnimationStream stream)
+        {
+            // accumulate the distance from hips to head
+            float currentTotalHipsToHeadDistance = 0.0f;
+            for (int i = HipsIndex; i < HeadIndex; i++)
+            {
+                var spineVector = EndBones[i].GetPosition(stream) - StartBones[i].GetPosition(stream);
+                currentTotalHipsToHeadDistance += spineVector.magnitude;
+            }
+            return Mathf.Abs(OriginalHipsToHeadDistance) > Mathf.Epsilon ?
+                currentTotalHipsToHeadDistance / OriginalHipsToHeadDistance : 0.0f;
+        }
+
+        private void AffectBoneByFixedLocalPosition(
+            AnimationStream stream,
+            ReadWriteTransformHandle boneToAffect,
+            Vector3 boneFixedLocalPosition,
+            float originalSpinePositionsWeight)
+        {
+            if (!boneToAffect.IsValid(stream))
+            {
+                return;
+            }
+
+            var boneOriginalLocalPos = boneToAffect.GetLocalPosition(stream);
+            var lerpPosition = Vector3.Lerp(boneOriginalLocalPos,
+                boneFixedLocalPosition, originalSpinePositionsWeight);
+            boneToAffect.SetLocalPosition(stream, lerpPosition);
+        }
+
+        /// <summary>
         /// Optionally interpolate from the current position to the original local position of the shoulders,
         /// as the tracked positions may be mismatched.
         /// </summary>
@@ -731,7 +841,7 @@ namespace Oculus.Movement.AnimationRigging
             }
             else
             {
-                var rightUpperArmPos = LeftUpperArmBone.GetLocalPosition(stream);
+                var rightUpperArmPos = RightUpperArmBone.GetLocalPosition(stream);
                 var rightUpperArmOffset = Vector3.Lerp(Vector3.zero,
                     RightShoulderOriginalLocalPos - rightUpperArmPos, weight * RightShoulderOffsetWeight.Get(stream));
                 RightUpperArmBone.SetLocalPosition(stream, rightUpperArmPos + rightUpperArmOffset);
@@ -849,7 +959,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     var rightShoulderPos = RightShoulderBone.GetPosition(stream);
                     var rightShoulderOffset = (shouldersParentPos - rightShoulderPos).normalized *
-                                              shoulderHeightAdjustment * BoneAnimData[_rightShoulderBoneAnimIndex].LimbProportion;
+                                              shoulderHeightAdjustment * BoneAnimData[_rightShoulderEndBoneAnimIndex].LimbProportion;
                     RightUpperArmBone.SetPosition(stream, RightUpperArmBone.GetPosition(stream) +
                                                          Vector3.Lerp(Vector3.zero, rightShoulderOffset, weight));
                 }
@@ -857,7 +967,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     var leftShoulderPos = LeftShoulderBone.GetPosition(stream);
                     var leftShoulderOffset = (shouldersParentPos - leftShoulderPos).normalized *
-                                             shoulderHeightAdjustment * BoneAnimData[_leftShoulderBoneAnimIndex].LimbProportion;
+                                             shoulderHeightAdjustment * BoneAnimData[_leftShoulderEndBoneAnimIndex].LimbProportion;
                     LeftUpperArmBone.SetPosition(stream, LeftUpperArmBone.GetPosition(stream) +
                                                          Vector3.Lerp(Vector3.zero, leftShoulderOffset, weight));
                 }
@@ -1181,12 +1291,15 @@ namespace Oculus.Movement.AnimationRigging
         private void ApplyShouldersCorrection(AnimationStream stream, float weight)
         {
             // Adjust the y value of the shoulders.
-            UpdateShoulderY(stream, weight, _leftShoulderBoneAnimIndex);
-            UpdateShoulderY(stream, weight, _rightShoulderBoneAnimIndex);
+            UpdateShoulderY(stream, weight, _leftShoulderEndBoneAnimIndex);
+            UpdateShoulderY(stream, weight, _rightShoulderEndBoneAnimIndex);
 
             // Adjust the width of the shoulders.
-            UpdateShoulderWidth(stream, weight, _leftShoulderBoneAnimIndex);
-            UpdateShoulderWidth(stream, weight, _rightShoulderBoneAnimIndex);
+            UpdateShoulderWidth(stream, weight, _leftShoulderEndBoneAnimIndex);
+            UpdateShoulderWidth(stream, weight, _rightShoulderEndBoneAnimIndex);
+
+            // Rotate shoulders, but keep upper arm rotations.
+            UpdateShoulderRoll(stream, weight);
         }
 
         private void UpdateShoulderY(AnimationStream stream, float weight, int index)
@@ -1220,6 +1333,34 @@ namespace Oculus.Movement.AnimationRigging
             shoulderBone.SetPosition(stream,
                 Vector3.Lerp(shoulderPos, shoulderSpinePos, weight));
             EndBones[index] = shoulderBone;
+        }
+
+        private void UpdateShoulderRoll(AnimationStream stream, float weight)
+        {
+            var shoulderRollWeight = weight * ShoulderRollWeight.Get(stream);
+            if (LeftShoulderBone.IsValid(stream) && RightShoulderBone.IsValid(stream))
+            {
+                var leftShoulderRotation = LeftShoulderBone.GetLocalRotation(stream);
+                var rightShoulderRotation = RightShoulderBone.GetLocalRotation(stream);
+                var leftUpperArmRotation = LeftUpperArmBone.GetRotation(stream);
+                var rightUpperArmRotation = RightUpperArmBone.GetRotation(stream);
+                var leftTargetShoulderRotation = LeftShoulderOriginalLocalRot;
+                var rightTargetShoulderRotation = RightShoulderOriginalLocalRot;
+                LeftShoulderBone.SetLocalRotation(stream,
+                    Quaternion.Slerp(
+                        leftShoulderRotation, leftTargetShoulderRotation, shoulderRollWeight));
+                RightShoulderBone.SetLocalRotation(stream,
+                    Quaternion.Slerp(
+                        rightShoulderRotation, rightTargetShoulderRotation, shoulderRollWeight));
+                LeftUpperArmBone.SetRotation(stream, leftUpperArmRotation);
+                RightUpperArmBone.SetRotation(stream, rightUpperArmRotation);
+            }
+            else
+            {
+                // If shoulder bones aren't valid, use the upper arm bone rotations.
+                LeftUpperArmBone.SetLocalRotation(stream, LeftShoulderOriginalLocalRot);
+                RightUpperArmBone.SetLocalRotation(stream, RightShoulderOriginalLocalRot);
+            }
         }
 
         /// <summary>
@@ -1284,34 +1425,39 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Interpolates the toes Y position from the pre-deformation positions to the original local positions after
-        /// skeletal proportions are enforced.
+        /// Influence the toe positions based on what their original
+        /// local positions were. This should be run after the character's
+        /// proportions are enforced.
         /// </summary>
         /// <param name="stream">The animation stream.</param>
         /// <param name="weight">The weight of this operation.</param>
-        private void InterpolateToesY(AnimationStream stream, float weight)
+        private void InterpolateAllToes(AnimationStream stream, float weight)
         {
-            var leftToesOffsetWeight = weight * LeftToesOffsetWeight.Get(stream);
-            var rightToesOffsetWeight = weight * RightToesOffsetWeight.Get(stream);
-
-            // Modify only the y component of the toes.
-            if (LeftToesBone.IsValid(stream))
+            if (LeftToesBone.IsValid(stream) && LeftFootBone.IsValid(stream))
             {
-                var leftToesOffsetVector = ApplyScaleAndWeight(
-                    Vector3.up * (LeftToesOriginalLocalPos.y - LeftToesBone.GetLocalPosition(stream).y),
-                    leftToesOffsetWeight);
-                var targetLeftToesPos = LeftToesBone.GetPosition(stream) + leftToesOffsetVector;
-                LeftToesBone.SetPosition(stream, targetLeftToesPos);
+                InterpolateToes(stream, LeftToesBone, LeftToesOriginalLocalPos,
+                    weight * LeftToesOffsetWeight.Get(stream));
             }
 
-            if (RightToesBone.IsValid(stream))
+            if (RightToesBone.IsValid(stream) && RightFootBone.IsValid(stream))
             {
-                var rightToesOffsetVector = ApplyScaleAndWeight(
-                    Vector3.up * (RightToesOriginalLocalPos.y - RightToesBone.GetLocalPosition(stream).y),
-                    rightToesOffsetWeight);
-                var targetRightToesPos = RightToesBone.GetPosition(stream) + rightToesOffsetVector;
-                RightToesBone.SetPosition(stream, targetRightToesPos);
+                InterpolateToes(stream, RightToesBone, RightToesOriginalLocalPos,
+                    weight * RightToesOffsetWeight.Get(stream));
             }
+        }
+
+        private void InterpolateToes(AnimationStream stream,
+            ReadWriteTransformHandle toesBone,
+            Vector3 toesOriginalLocalPos,
+            float toesOffsetWeight)
+        {
+            var offsetToOriginalToesLocal = toesOriginalLocalPos - toesBone.GetLocalPosition(stream);
+            // We need to interpolate the offset, and scale it as well. THEN add it to compute
+            // the final position.
+            var scaledAndWeightLocalOffset = ApplyScaleAndWeight(
+                offsetToOriginalToesLocal, toesOffsetWeight);
+            var adjustedToesLocalPos = toesBone.GetLocalPosition(stream) + scaledAndWeightLocalOffset;
+            toesBone.SetLocalPosition(stream, adjustedToesLocalPos);
         }
 
         private Vector3 ApplyScaleAndWeight(Vector3 target, float weight)
@@ -1400,8 +1546,11 @@ namespace Oculus.Movement.AnimationRigging
                 NativeArrayOptions.UninitializedMemory);
             job.BoneDirections = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
+            job.EndBoneOffsetsLocal = new NativeArray<Vector3>(data.BonePairs.Length, Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
             job.ScaleFactor = new NativeArray<Vector3>(1, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
+            job.OriginalHipsToHeadDistance = data.HipsToHeadDistance;
 
             var upperBodyProportion = 0.0f;
             for (int i = 0; i < data.HipsToHeadBones.Length; i++)
@@ -1434,6 +1583,13 @@ namespace Oculus.Movement.AnimationRigging
                 job.StartBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].StartBone);
                 job.EndBones[i] = ReadWriteTransformHandle.Bind(animator, data.BonePairs[i].EndBone);
                 job.BoneAnimData[i] = boneAnimData;
+
+                job.EndBoneOffsetsLocal[i] = data.BonePairs[i].EndBoneLocalOffsetFromStart;
+                if (job.EndBoneOffsetsLocal[i].magnitude < Mathf.Epsilon)
+                {
+                    Debug.LogWarning("End bone offsets invalid for deformation job, please run" +
+                        " bone calculation.");
+                }
             }
 
             for (int i = 0; i < data.BoneAdjustments.Length; i++)
@@ -1483,6 +1639,14 @@ namespace Oculus.Movement.AnimationRigging
                 FloatProperty.Bind(animator, component, data.LeftShoulderWeightFloatProperty);
             job.RightShoulderOffsetWeight =
                 FloatProperty.Bind(animator, component, data.RightShoulderWeightFloatProperty);
+            job.ShoulderRollWeight =
+                FloatProperty.Bind(animator, component, data.ShoulderRollFloatProperty);
+            job.OriginalSpinePositionsWeight =
+                FloatProperty.Bind(animator, component, data.OriginalSpinePositionsWeightProperty);
+            job.OriginalSpineBoneCount =
+                IntProperty.Bind(animator, component, data.OriginalSpineBoneCountIntProperty);
+            job.OriginalSpineUseHipsToHeadToScale =
+                BoolProperty.Bind(animator, component, data.OriginalSpineUseHipsToHeadScaleBoolProperty);
             job.LeftArmOffsetWeight = FloatProperty.Bind(animator, component, data.LeftArmWeightFloatProperty);
             job.RightArmOffsetWeight = FloatProperty.Bind(animator, component, data.RightArmWeightFloatProperty);
             job.LeftHandOffsetWeight = FloatProperty.Bind(animator, component, data.LeftHandWeightFloatProperty);
@@ -1518,6 +1682,8 @@ namespace Oculus.Movement.AnimationRigging
             job.RightToesOriginalLocalPos = data.RightLeg.ToesLocalPos;
             job.LeftShoulderOriginalLocalPos = data.LeftArm.ShoulderLocalPos;
             job.RightShoulderOriginalLocalPos = data.RightArm.ShoulderLocalPos;
+            job.LeftShoulderOriginalLocalRot = data.LeftArm.ShoulderLocalRot;
+            job.RightShoulderOriginalLocalRot = data.RightArm.ShoulderLocalRot;
             job.LeftFootLocalRot = data.LeftLeg.FootLocalRot;
             job.RightFootLocalRot = data.RightLeg.FootLocalRot;
 
@@ -1537,6 +1703,7 @@ namespace Oculus.Movement.AnimationRigging
                 : data.ConstraintAnimator.transform.lossyScale;
             job.ScaleFactor[0] =
                 RiggingUtilities.DivideVector3(currentScale, data.StartingScale);
+
             base.Update(job, ref data);
 
             if (!data.IsBoneTransformsDataValid())
@@ -1559,6 +1726,7 @@ namespace Oculus.Movement.AnimationRigging
             job.UpperBodyTargetPositions.Dispose();
             job.LowerBodyTargetPositions.Dispose();
             job.BoneDirections.Dispose();
+            job.EndBoneOffsetsLocal.Dispose();
             job.ScaleFactor.Dispose();
         }
     }

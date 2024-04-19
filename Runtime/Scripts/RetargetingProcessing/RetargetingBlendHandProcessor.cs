@@ -16,6 +16,15 @@ namespace Oculus.Movement.AnimationRigging
     public sealed class RetargetingBlendHandProcessor : RetargetingProcessor
     {
         /// <summary>
+        /// Enum used to determine which type of head should be used to blend hands.
+        /// </summary>
+        public enum HeadView
+        {
+            BodyTracking,
+            OVRCameraRig
+        }
+
+        /// <summary>
         /// Distance where weight is set to 1.0.
         /// </summary>
         [SerializeField]
@@ -85,6 +94,19 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// The type of head that should be used to blend hands.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingBlendHandProcessorTooltips.HeadView)]
+        private HeadView _headView;
+        /// <inheritdoc cref="_headView"/>
+        public HeadView HeadViewType
+        {
+            get => _headView;
+            set => _headView = value;
+        }
+
+        /// <summary>
         /// Specifies if this is full body or not.
         /// </summary>
         [SerializeField]
@@ -100,6 +122,7 @@ namespace Oculus.Movement.AnimationRigging
         private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
         private Transform _cachedTransform;
         private Transform _cachedHeadTransform;
+        private Transform _ovrCameraRigHead;
         private float _cachedWeight;
 
         /// <inheritdoc />
@@ -147,6 +170,20 @@ namespace Oculus.Movement.AnimationRigging
                         Debug.LogWarning($"{this.GetType()} should be before {correctHandProcessor} in processor " +
                             $"stack as it needs to affect it.");
                     }
+                }
+            }
+
+            if (OVRManager.instance)
+            {
+                var ovrCameraRig = OVRManager.instance.gameObject.GetComponent<OVRCameraRig>();
+                if (ovrCameraRig != null)
+                {
+                    _ovrCameraRigHead = ovrCameraRig.centerEyeAnchor;
+                }
+                else if (_headView == HeadView.OVRCameraRig)
+                {
+                    Debug.LogError($"OVRCameraRig is missing for " +
+                                   $"{retargetingLayer.gameObject.name}'s blend hand processor.");
                 }
             }
         }
@@ -209,7 +246,7 @@ namespace Oculus.Movement.AnimationRigging
             Gizmos.color = new Color(_cachedWeight, _cachedWeight, _cachedWeight);
             Gizmos.DrawRay(_cachedHeadTransform.position, viewOriginToPointVector);
 
-            Gizmos.color = Color.white;
+            Gizmos.color = _headView == HeadView.BodyTracking ? Color.white : Color.blue;
             Gizmos.DrawRay(_cachedHeadTransform.transform.position, 0.7f * viewVector);
         }
 
@@ -217,13 +254,22 @@ namespace Oculus.Movement.AnimationRigging
         {
             var bones = skeleton.Bones;
             var boneToTest = bones[GetBoneIndex()].Transform;
+            var headBoneId = IsFullBody ? (int)OVRSkeleton.BoneId.FullBody_Head : (int)OVRSkeleton.BoneId.Body_Head;
             _cachedTransform = boneToTest;
-            _cachedHeadTransform = skeleton.GetAnimatorTargetSkeleton().GetBoneTransform(HumanBodyBones.Head);
+            if (_headView == HeadView.BodyTracking)
+            {
+                _cachedHeadTransform = bones[headBoneId].Transform;
+            }
+            else if (_headView == HeadView.OVRCameraRig)
+            {
+                _cachedHeadTransform = _ovrCameraRigHead;
+            }
             var boneDistanceToViewVector = GetDistanceToViewVector(boneToTest.position);
 
             _cachedWeight = 0.0f;
-            var scaledMaxDistance = _maxDistance * skeleton.transform.lossyScale.x;
-            var scaledMinDistance = _minDistance * skeleton.transform.lossyScale.x;
+            var lossyScale = skeleton.transform.lossyScale;
+            var scaledMaxDistance = _maxDistance * lossyScale.x;
+            var scaledMinDistance = _minDistance * lossyScale.x;
             // If the hand is close enough to the view vector, start to increase the
             // weight.
             if (boneDistanceToViewVector <= scaledMaxDistance)
@@ -275,6 +321,11 @@ namespace Oculus.Movement.AnimationRigging
 
         private Vector3 GetViewVector()
         {
+            if (_headView == HeadView.BodyTracking)
+            {
+                // The local up is what points forward for the OVRSkeleton head.
+                return _cachedHeadTransform.up;
+            }
             return _cachedHeadTransform.forward;
         }
 

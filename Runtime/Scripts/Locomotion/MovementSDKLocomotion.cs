@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Oculus.Movement.Locomotion
 {
@@ -24,7 +25,7 @@ namespace Oculus.Movement.Locomotion
         public class UnityEvent_Vector2 : UnityEvent<Vector2> { }
 
         /// <summary>
-        /// Callcbacks to trigger on certain joystic input events
+        /// Callbacks to trigger on certain joystick input events
         /// </summary>
         [System.Serializable]
         public class JoystickEvents
@@ -99,11 +100,12 @@ namespace Oculus.Movement.Locomotion
         private OVRCameraRig _cameraRig;
 
         /// <summary>
-        /// Callbacks to trigger on certain joystic input events
+        /// Callbacks to trigger on certain movement input events
         /// </summary>
-        [Tooltip(MovementSDKLocomotionTooltips.JoystickEvents)]
+        [FormerlySerializedAs("_joystickEvents")]
+        [Tooltip(MovementSDKLocomotionTooltips.MovementEvents)]
         [SerializeField]
-        private JoystickEvents _joystickEvents = new JoystickEvents();
+        private JoystickEvents _movementEvents = new JoystickEvents();
 
         /// <summary>
         /// Keeps track of whether input is being received. If not, zero out the input vector.
@@ -297,17 +299,17 @@ namespace Oculus.Movement.Locomotion
             {
                 if (_joystickInput == Vector2.zero)
                 {
-                    _joystickEvents.OnUserInputChange.Invoke(Vector2.zero);
-                    _joystickEvents.OnStopMove.Invoke();
+                    _movementEvents.OnUserInputChange.Invoke(Vector2.zero);
+                    _movementEvents.OnStopMove.Invoke();
                 }
                 else
                 {
-                    _joystickEvents.OnUserInputChange.Invoke(userInput);
+                    _movementEvents.OnUserInputChange.Invoke(userInput);
                     Quaternion newDirection = Quaternion.LookRotation(_locomotionDirection, Vector3.up);
-                    _joystickEvents.OnDirectionChange.Invoke(newDirection);
+                    _movementEvents.OnDirectionChange.Invoke(newDirection);
                     if (_lastLocomotionDirection == Vector3.zero)
                     {
-                        _joystickEvents.OnStartMove.Invoke();
+                        _movementEvents.OnStartMove.Invoke();
                     }
                 }
                 _lastLocomotionDirection = _locomotionDirection;
@@ -375,7 +377,7 @@ namespace Oculus.Movement.Locomotion
                 Vector3 centerPoint = _collider.bounds.center;
                 Transform _transform = transform;
                 _transform.RotateAround(centerPoint, Vector3.up, amountToRotate);
-                _joystickEvents.OnDirectionChange.Invoke(_transform.rotation);
+                _movementEvents.OnDirectionChange.Invoke(_transform.rotation);
             }
         }
     }

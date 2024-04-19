@@ -85,6 +85,68 @@ namespace Oculus.Movement.AnimationRigging
             };
 
         /// <summary>
+        /// Maps HumanBodyBones to avatar mask body part. Includes legs as well.
+        /// </summary>
+        public static readonly AvatarMaskBodyPart[] HumanBoneToAvatarBodyPartArray = new AvatarMaskBodyPart[]
+            {
+                AvatarMaskBodyPart.Body, // Hips
+                AvatarMaskBodyPart.LeftLeg, // LeftUpperLeg
+                AvatarMaskBodyPart.RightLeg, // RightUpperLeg
+                AvatarMaskBodyPart.LeftLeg, // LeftLowerLeg
+                AvatarMaskBodyPart.RightLeg, // RightLowerLeg
+                AvatarMaskBodyPart.LeftLeg, // LeftFoot
+                AvatarMaskBodyPart.RightLeg, // RightFoot
+                AvatarMaskBodyPart.Body, // Spine
+                AvatarMaskBodyPart.Body, // Chest
+                AvatarMaskBodyPart.Head, // Neck
+                AvatarMaskBodyPart.Head, // Head
+                AvatarMaskBodyPart.LeftArm, // LeftShoulder
+                AvatarMaskBodyPart.RightArm, // RightShoulder
+                AvatarMaskBodyPart.LeftArm, // LeftUpperArm
+                AvatarMaskBodyPart.RightArm, // RightUpperArm
+                AvatarMaskBodyPart.LeftArm, // LeftLowerArm
+                AvatarMaskBodyPart.RightArm, // RightLowerArm
+                AvatarMaskBodyPart.LeftArm, // LeftHand
+                AvatarMaskBodyPart.RightArm, // RightHand
+                AvatarMaskBodyPart.LeftLeg, // LeftToes
+                AvatarMaskBodyPart.RightLeg, // RightToes
+                AvatarMaskBodyPart.Head, // LeftEye
+                AvatarMaskBodyPart.Head, // RightEye
+                AvatarMaskBodyPart.Head, // Jaw
+                AvatarMaskBodyPart.LeftArm, // Left Hand Fingers
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.LeftArm,
+                AvatarMaskBodyPart.RightArm, // Right Hand Fingers
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.RightArm,
+                AvatarMaskBodyPart.Body, // UpperChest
+            };
+
+        /// <summary>
         /// Maps OVRSkeletonBoneId to avatar mask body part.
         /// </summary>
         public static readonly Dictionary<OVRSkeleton.BoneId, AvatarMaskBodyPart>

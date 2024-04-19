@@ -3,8 +3,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Oculus.Interaction.Input;
 using Oculus.Movement.Utils;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
@@ -47,6 +49,11 @@ namespace Oculus.Movement.AnimationRigging
             /// The proportion of this bone relative to its limb.
             /// </summary>
             public float LimbProportion;
+
+            /// <summary>
+            /// Start to end vector of original character, in local space of end bone.
+            /// </summary>
+            public Vector3 EndBoneLocalOffsetFromStart;
         }
 
         /// <summary>
@@ -117,6 +124,11 @@ namespace Oculus.Movement.AnimationRigging
             /// The local position of the shoulder.
             /// </summary>
             public Vector3 ShoulderLocalPos;
+
+            /// <summary>
+            /// The local rotation of the shoulder.
+            /// </summary>
+            public Quaternion ShoulderLocalRot;
 
             /// <summary>
             /// The axis of the lower arm to the hand.
@@ -210,7 +222,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Ordered HumanBodyBones for the spine, arms, and legs.
+        /// Ordered HumanBodyBones for the spine, arms, legs, and hands.
         /// </summary>
         private static readonly HumanBodyBones[] _humanBodyBonesOrder =
         {
@@ -235,7 +247,38 @@ namespace Oculus.Movement.AnimationRigging
             HumanBodyBones.RightUpperLeg,
             HumanBodyBones.RightLowerLeg,
             HumanBodyBones.RightFoot,
-            HumanBodyBones.RightToes
+            HumanBodyBones.RightToes,
+            // Finger bones.
+            HumanBodyBones.LeftThumbProximal,
+            HumanBodyBones.LeftThumbIntermediate,
+            HumanBodyBones.LeftThumbDistal,
+            HumanBodyBones.LeftIndexProximal,
+            HumanBodyBones.LeftIndexIntermediate,
+            HumanBodyBones.LeftIndexDistal,
+            HumanBodyBones.LeftMiddleProximal,
+            HumanBodyBones.LeftMiddleIntermediate,
+            HumanBodyBones.LeftMiddleDistal,
+            HumanBodyBones.LeftRingProximal,
+            HumanBodyBones.LeftRingIntermediate,
+            HumanBodyBones.LeftRingDistal,
+            HumanBodyBones.LeftLittleProximal,
+            HumanBodyBones.LeftLittleIntermediate,
+            HumanBodyBones.LeftLittleDistal,
+            HumanBodyBones.RightThumbProximal,
+            HumanBodyBones.RightThumbIntermediate,
+            HumanBodyBones.RightThumbDistal,
+            HumanBodyBones.RightIndexProximal,
+            HumanBodyBones.RightIndexIntermediate,
+            HumanBodyBones.RightIndexDistal,
+            HumanBodyBones.RightMiddleProximal,
+            HumanBodyBones.RightMiddleIntermediate,
+            HumanBodyBones.RightMiddleDistal,
+            HumanBodyBones.RightRingProximal,
+            HumanBodyBones.RightRingIntermediate,
+            HumanBodyBones.RightRingDistal,
+            HumanBodyBones.RightLittleProximal,
+            HumanBodyBones.RightLittleIntermediate,
+            HumanBodyBones.RightLittleDistal,
         };
 
         /// <summary>
@@ -245,6 +288,15 @@ namespace Oculus.Movement.AnimationRigging
         {
             {
                 HumanBodyBones.Head, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftEye, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightEye, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.Jaw, HumanBodyBones.LastBone
             },
             {
                 HumanBodyBones.LeftToes, HumanBodyBones.LastBone
@@ -257,6 +309,36 @@ namespace Oculus.Movement.AnimationRigging
             },
             {
                 HumanBodyBones.RightHand, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftThumbDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftIndexDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftMiddleDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftRingDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.LeftLittleDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightThumbDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightIndexDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightMiddleDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightRingDistal, HumanBodyBones.LastBone
+            },
+            {
+                HumanBodyBones.RightLittleDistal, HumanBodyBones.LastBone
             }
         };
 
@@ -318,19 +400,61 @@ namespace Oculus.Movement.AnimationRigging
             // Calculate an adjustment alignment if needed, using the desired right and forward from the
             // rest pose humanoid, which is Vector3.right and Vector3.forward.
             var adjustmentAlignment =
-                GetHipsRightForwardAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
+                GetHipsAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
+
+            // Flatten out the spine adjustments, as the adjustment should only be along one axis by
+            // previewing the hips adjustment, and taking the largest value.
+            var adjustmentAxis = GetHipsAdjustmentAxis(adjustmentAlignment,
+                boneAdjustments[0].Adjustment.eulerAngles);
+
             for (int i = 0; i < boneAdjustments.Count; i++)
             {
                 var adjustment = boneAdjustments[i];
                 // We use euler angles here as we want to rotate the adjustment point with the alignment rotation,
                 // rather than combine the rotations.
                 var adjustmentPoint = adjustment.Adjustment.eulerAngles;
-                adjustment.Adjustment =
-                    Quaternion.Euler(adjustmentAlignment * adjustmentPoint);
+                var adjustmentResult = adjustmentAlignment * adjustmentPoint;
+                switch (adjustmentAxis)
+                {
+                    case Axis.X:
+                        adjustmentResult = Vector3.right * adjustmentResult.x;
+                        break;
+                    case Axis.Y:
+                        adjustmentResult = Vector3.up * adjustmentResult.y;
+                        break;
+                    case Axis.Z:
+                        adjustmentResult = Vector3.forward * adjustmentResult.z;
+                        break;
+                }
+                adjustment.Adjustment = Quaternion.Euler(adjustmentResult);
                 boneAdjustments[i] = adjustment;
             }
+
             boneAdjustments.AddRange(shoulderBoneAdjustments);
             return boneAdjustments.ToArray();
+        }
+
+        private static Axis GetHipsAdjustmentAxis(Quaternion adjustmentAlignment, Vector3 hipsAdjustmentEulerAngles)
+        {
+            var hipsPreviewAdjustmentEuler =
+                Quaternion.Euler(adjustmentAlignment * hipsAdjustmentEulerAngles).eulerAngles;
+            var worldAdjustmentX = Mathf.Abs(hipsPreviewAdjustmentEuler.x > 180 ?
+                hipsPreviewAdjustmentEuler.x - 360 : hipsPreviewAdjustmentEuler.x);
+            var worldAdjustmentY = Mathf.Abs(hipsPreviewAdjustmentEuler.y > 180 ?
+                hipsPreviewAdjustmentEuler.y - 360 : hipsPreviewAdjustmentEuler.y);
+            var worldAdjustmentZ = Mathf.Abs(hipsPreviewAdjustmentEuler.z > 180 ?
+                hipsPreviewAdjustmentEuler.z - 360 : hipsPreviewAdjustmentEuler.z);
+            var largestWorldAdjustment =
+                Mathf.Max(worldAdjustmentX, Mathf.Max(worldAdjustmentY, worldAdjustmentZ));
+            if (Mathf.Approximately(largestWorldAdjustment, worldAdjustmentZ))
+            {
+                return Axis.Z;
+            }
+            if (Mathf.Approximately(largestWorldAdjustment, worldAdjustmentY))
+            {
+                return Axis.Y;
+            }
+            return Axis.X;
         }
 
         /// <summary>
@@ -344,15 +468,7 @@ namespace Oculus.Movement.AnimationRigging
             FullBodyDeformationConstraint constraint = null)
         {
             var adjustments = new List<JointAdjustment>();
-            BoneAdjustmentData[] boneAdjustmentData;
-            if (constraint != null)
-            {
-                boneAdjustmentData = (constraint.data as IFullBodyDeformationData).BoneAdjustments;
-            }
-            else
-            {
-                boneAdjustmentData = GetDeformationBoneAdjustments(animator, restPoseObject);
-            }
+            var boneAdjustmentData = GetDeformationBoneAdjustments(animator, restPoseObject);
             foreach (var boneAdjustment in boneAdjustmentData)
             {
                 var rotationTweak = boneAdjustment.Adjustment;
@@ -409,7 +525,7 @@ namespace Oculus.Movement.AnimationRigging
             var legDotProduct = Vector3.Dot(leftLeg.forward, rightLeg.forward);
             var shouldMirrorLegs = legDotProduct < 0.0f;
             var adjustmentAlignment =
-                GetHipsRightForwardAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
+                GetHipsAlignmentForAdjustments(animator, Vector3.right, Vector3.forward);
 
             var leftFootAdjustment =
                 GetFootJointAdjustment(animator, restPoseObject, HumanBodyBones.LeftFoot, HumanBodyBones.LeftToes,
@@ -481,7 +597,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="alignmentRightDirection">The alignment right direction.</param>
         /// <param name="alignmentForwardDirection">The alignment forward direction.</param>
         /// <returns>Rotation to align the hips right with the alignment right direction.</returns>
-        private static Quaternion GetHipsRightForwardAlignmentForAdjustments(Animator animator,
+        private static Quaternion GetHipsAlignmentForAdjustments(Animator animator,
             Vector3 alignmentRightDirection,
             Vector3 alignmentForwardDirection)
         {
@@ -513,10 +629,12 @@ namespace Oculus.Movement.AnimationRigging
                 var spineHumanBodyBone = spineHumanBodyBones[i];
                 if (animator.GetBoneTransform(spineHumanBodyBone) != null)
                 {
+                    // Find children going UP the spine.
                     var spineChildBone = FindChildHumanBodyBones(animator, spineHumanBodyBone);
-                    var mappingChildBone = OVRHumanBodyBonesMappings.BoneToJointPair[spineHumanBodyBone].Item2;
+                    var ovrMappingChildBone = OVRHumanBodyBonesMappings.BoneToJointPair[spineHumanBodyBone].Item2;
                     var adjustment = restPoseObject.CalculateRotationDifferenceFromRestPoseToAnimatorBonePair(
-                        animator, spineHumanBodyBone, mappingChildBone,
+                        animator,
+                        spineHumanBodyBone, ovrMappingChildBone,
                         spineHumanBodyBone, spineChildBone);
                     var adjustmentData = new BoneAdjustmentData
                     {
@@ -634,7 +752,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="target">The target HumanBodyBones to find the child HumanBodyBone.</param>
         /// <param name="childIndex">The optional childIndex, if the target HumanBodyBone has multiple children.</param>
         /// <returns>HumanBodyBones corresponding to the child index of the target HumanBodyBones.</returns>
-        private static HumanBodyBones FindChildHumanBodyBones(Animator animator, HumanBodyBones target, int childIndex = 0)
+        public static HumanBodyBones FindChildHumanBodyBones(Animator animator, HumanBodyBones target, int childIndex = 0)
         {
             // Handle hips.
             if (target == HumanBodyBones.Hips)

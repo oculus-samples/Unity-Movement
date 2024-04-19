@@ -97,6 +97,9 @@ namespace Oculus.Movement.AnimationRigging
             {
                 retargetedBoneTarget.BoneId = humanBodyBoneToOVRBoneId[retargetedBoneTarget.HumanBodyBone];
             }
+
+            // Sort by bone id.
+            _boneTargets = _boneTargets.OrderBy(x => x.BoneId).ToArray();
             _initialized = true;
         }
 
@@ -110,22 +113,23 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
+
             Initialize();
-            IList<OVRBone> bones = skeleton.Bones;
+            var retargetedBoneTargetIndex = 0;
+            var bones = skeleton.Bones;
             for (var i = 0; i < bones.Count; i++)
             {
-                foreach (var retargetedBoneTarget in _boneTargets)
+                var retargetedBoneTarget = _boneTargets[retargetedBoneTargetIndex];
+                if (bones[i].Id == retargetedBoneTarget.BoneId)
                 {
-                    if (bones[i].Id == retargetedBoneTarget.BoneId)
+                    retargetedBoneTargetIndex++;
+                    var targetBone = bones[i].Transform;
+                    if (targetBone == null)
                     {
-                        var targetBone = bones[i].Transform;
-                        if (targetBone == null)
-                        {
-                            continue;
-                        }
-                        retargetedBoneTarget.Target.SetPositionAndRotation(
-                            targetBone.position, targetBone.rotation);
+                        continue;
                     }
+                    retargetedBoneTarget.Target.SetPositionAndRotation(
+                        targetBone.position, targetBone.rotation);
                 }
             }
         }

@@ -10,10 +10,10 @@ using System.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
-
 #endif
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using Object = UnityEngine.Object;
 using static Oculus.Movement.AnimationRigging.ExternalBoneTargets;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
@@ -298,6 +298,7 @@ namespace Oculus.Movement.Utils
                     OVRPlugin.BodyJointSet.FullBody : OVRPlugin.BodyJointSet.UpperBody);
 
             retargetingLayer.EnableTrackingByProxy = true;
+            retargetingLayer.UpdateBonePairMappings();
 #if UNITY_EDITOR
             if (!runtimeInvocation)
             {
@@ -591,6 +592,7 @@ namespace Oculus.Movement.Utils
             DestroyLegacyComponents<RetargetedBoneTargets>(gameObject);
             DestroyLegacyComponents<AnimationRigSetup>(gameObject);
             DestroyLegacyComponents<FullBodyHandDeformation>(gameObject);
+            DestroyLegacyProcessor<RetargetingHandDeformationProcessor>(gameObject);
         }
 
         /// <summary>
@@ -724,18 +726,48 @@ namespace Oculus.Movement.Utils
 #if UNITY_EDITOR
                 if (runtimeInvocation)
                 {
-                    GameObject.DestroyImmediate(componentFound as UnityEngine.Object);
+                    GameObject.DestroyImmediate(componentFound as Object);
                 }
                 else
                 {
-                    Undo.DestroyObjectImmediate(componentFound as UnityEngine.Object);
+                    Undo.DestroyObjectImmediate(componentFound as Object);
                 }
 #else
-                GameObject.DestroyImmediate(componentFound as UnityEngine.Object);
+                GameObject.DestroyImmediate(componentFound as Object);
 #endif
             }
 
             return componentsFound.Length > 0;
+        }
+
+        /// <summary>
+        /// Destroy legacy processors.
+        /// </summary>
+        /// <param name="gameObject">The object to check for the legacy processors.</param>
+        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
+        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
+        /// <typeparam name="T">The legacy processor type.</typeparam>
+        /// <returns>True if legacy processors were destroyed.</returns>
+        public static bool DestroyLegacyProcessor<T>(GameObject gameObject, bool runtimeInvocation = false) where T : class
+        {
+            var retargetingLayer = gameObject.GetComponent<RetargetingLayer>();
+            var processors = retargetingLayer.RetargetingProcessors;
+            List<RetargetingProcessor> processorsFound = new List<RetargetingProcessor>();
+            for (int i = 0; i < processors.Count; i++)
+            {
+                var processor = processors[i];
+                if (processors[i] is T)
+                {
+                    processorsFound.Add(processor);
+                }
+            }
+
+            foreach (var processor in processorsFound)
+            {
+                retargetingLayer.RetargetingProcessors.Remove(processor);
+            }
+
+            return processorsFound.Count > 0;
         }
 
         /// <summary>
@@ -770,6 +802,7 @@ namespace Oculus.Movement.Utils
             }
 #endif
             retargetingProcessorCorrectBones.name = "CorrectBones";
+            retargetingProcessorCorrectBones.FingerPositionCorrectionWeight = 0.0f;
             retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectBones);
         }
 

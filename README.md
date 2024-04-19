@@ -6,7 +6,7 @@ The Unity-Movement package is released under the [Oculus License](https://github
 
 ### Requirements
 - Unity 2021.3.26f1 (2021 LTS) or newer installed. For Unity 2022, use 2022.3.11f1 (2022 LTS) or newer. For Unity 2023, use 2023.1.17f1 or newer (Unity 2023.1.x). Unity 2023.2+ however will not currently work due to the fact TMPro has been deprecated.
-- v60.0 or newer of the Meta XR SDK. You will need the Meta XR Core SDK and the Meta XR Interaction SDK OVR Integration packages found [on this page](https://assetstore.unity.com/publishers/25353).
+- v63.0 or newer of the Meta XR SDK. You will need the Meta XR Core SDK and the [Meta XR Interaction SDK OVR Integration](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-ovr-integration-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
 - A project set up with these [configuration settings](https://developer.oculus.com/documentation/unity/unity-conf-settings/)
 
 ## Getting Started
@@ -24,8 +24,8 @@ The sample scenes are located under the **Samples/Scenes** folder.
 If the new scene or an existing scene doesn’t have a GameObject with the OVRCameraRig component, follow the steps:
 1. From the Hierarchy tab, look for a Main Camera GameObject.
 2. If the Main Camera GameObject is present, right-click Main Camera and click Delete.
-3. In the Project tab, expand the Assets > Oculus > VR > Prefab folder and drag and drop the OVRCameraRig prefab into the scene. You can also drag and drop it into the Hierarchy tab.
-4. On the Inspector tab, go to OVR Manager > Quest Features.
+3. Using the top level file menus, navigate to **Oculus->Tools->Building Blocks**. Select the (+) icon on the lower right of the Camera Rig option.
+4. Select the Camera Rig object in the Hierarchy, and in the Inspector tab, go to OVR Manager > Quest Features.
 5. In the General tab, there are options to enable body, face, and eye tracking support. Select Supported or Required for the type of tracking support you wish to add.
 6. Under OVRManager's "Permission Requests On Startup" section, enable  Body, Face and Eye Tracking.
 7. Ensure that OVRManager's "Tracking Origin Type" is set to "Floor Level".
@@ -37,7 +37,7 @@ Layer index 10, layer index 11, and the HiddenMesh layer must be present in the 
 Some Project Settings can be validated via **Movement->Check Project Settings**. For a more thorough check, please use **Oculus->Tools->Project Setup Tool**.
 
 ## Rendering Quality
-Navigate to your Project Settings (Edit->Project Settings...) and click on
+Navigate to your Project Settings (**Edit->Project Settings...**) and click on
 the "Quality" section. If your project uses URP,
 then some of these settings might be part the rendering pipeline asset currently
 in use. The pipeline picked will be shown in the Quality menu.
@@ -60,10 +60,10 @@ Make sure that the color space is set to Linear.
 
 ## Build Settings
 
-In order for the SceneSelectMenu buttons to work, add the scenes located in the **Samples/Scenes** folder of the package.
+In order for the SceneSelectMenu buttons to work, add the scenes located in **Packages/Meta Movement/Samples/Scenes** folder.
 
 ## Samples
-The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/Scenes** folder to the project's Assets folder.
+The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/Scenes** folder to the project's Assets folder. To view those scenes in the editor or make edits, you may need to make copies of those scenes in the **Assets** folder.
 
 For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
 

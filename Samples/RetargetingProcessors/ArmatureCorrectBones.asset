@@ -15,5 +15,4 @@ MonoBehaviour:
   Weight: 1
   _correctPositionsLateUpdate: 1
   _shoulderCorrectionWeightLateUpdate: 0
-  _leftHandCorrectionWeightLateUpdate: 1
-  _rightHandCorrectionWeightLateUpdate: 1
+  _fingerPositionCorrectionWeight: 0

@@ -900,7 +900,7 @@ namespace Oculus.Movement
     {
         public static class IconPositionInformation
         {
-            public const string LocalPosition = "Position to set.";
+            public const string ButtonTransform = "Button transform.";
             public const string SceneName = "Scene name to check for.";
         }
 
@@ -1000,6 +1000,17 @@ namespace Oculus.Movement
 
         public const string AlignFeetWeight =
             "Weight used for feet alignment.";
+
+        public const string OriginalSpinePositionsWeight =
+            "Attempts to match the original spine positions. WARNING:" +
+            "increasing this value might cause inaccuracy wrt to body tracking.";
+
+        public const string OriginalSpineBoneCount =
+            "Number of spine bones to fix when matching the original spine.";
+
+        public const string OriginalSpineUseHipsToHeadToScale =
+            "When using the original spine bone positions to influence " +
+            "the current ones, scale them based on the current hips to head.";
 
         public const string HipsToHeadBones =
             "Array of transform bones from hips to head.";
@@ -1365,6 +1376,12 @@ namespace Oculus.Movement
 
         public const string ExternalBoneTargets =
             "External bone targets to be updated based on body tracking.";
+
+        public const string RetargetedBoneMappings =
+            "Retargeted bone mappings to be updated based on valid bones in the humanoid.";
+
+        public const string FingerPositionCorrectionWeight =
+            "Finger position correction weight.";
     }
 
     public static class LateMirroredObjectTooltips
@@ -1683,8 +1700,8 @@ namespace Oculus.Movement
         public const string CameraRig =
             "The Camera Rig";
 
-        public const string JoystickEvents =
-            "Callbacks to trigger on certain joystic input events";
+        public const string MovementEvents =
+            "Callbacks to trigger on certain movement input events";
     }
 
     public static class ReappearAfterFallTooltips
@@ -1873,6 +1890,9 @@ namespace Oculus.Movement
 
         public const string IsFullBody =
             "Specifies if this is full body or not.";
+
+        public const string HeadView =
+            "The type of head that should be used to blend hands.";
     }
 
     public static class ExternalBoneTargetsTooltips
@@ -1893,5 +1913,14 @@ namespace Oculus.Movement
             "Is it full body (or not).";
         public const string Enabled =
             "Enables or disables functionality.";
+    }
+    
+    public static class RetargetedBoneMappingsTooltips
+    {
+        public const string HumanBodyBonePairs =
+        "HumanBodyBone pairs for this humanoid.";
+        
+        public const string HumanBodyBoneToBoneId =
+            "HumanBodyBone to BodyJointId mapping for this humanoid.";
     }
 }

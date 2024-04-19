@@ -13,22 +13,31 @@ namespace Oculus.Movement.UI
     public class SceneSelectIcon : MonoBehaviour
     {
         /// <summary>
-        /// Information about the icon position.
+        /// Information about the icon used to select button.
         /// </summary>
         [Serializable]
         protected class IconPositionInformation
         {
             /// <summary>
-            /// Local position to set.
+            /// Button to highlight.
             /// </summary>
-            [Tooltip(SceneSelectIconTooltips.IconPositionInformation.LocalPosition)]
-            public Vector3 LocalPosition;
+            [Tooltip(SceneSelectIconTooltips.IconPositionInformation.ButtonTransform)]
+            public Transform ButtonTransform;
 
             /// <summary>
             /// Scene name to check for.
             /// </summary>
             [Tooltip(SceneSelectIconTooltips.IconPositionInformation.SceneName)]
             public string SceneName;
+
+            /// <summary>
+            /// Valids fields on class using asserts.
+            /// </summary>
+            public void Validate()
+            {
+                Assert.IsNotNull(ButtonTransform);
+                Assert.IsFalse(String.IsNullOrEmpty(SceneName));
+            }
         }
 
         /// <summary>
@@ -45,20 +54,36 @@ namespace Oculus.Movement.UI
         [Tooltip(SceneSelectIconTooltips.IconTransform)]
         protected Transform _iconTransform;
 
+        /// <summary>
+        /// Offset the icon so that it is centered around the image of each button,
+        /// and enforce a z-value to stay above buttons. These values are based
+        /// on trial and error.
+        /// </summary>
+        private float _iconYOffset = 0.0171f;
+        private float _iconZValue = -0.04f;
+
         private void Awake()
         {
             Assert.IsTrue(_iconInformationArray != null &&
                 _iconInformationArray.Length > 0);
+            foreach (var iconInfo in _iconInformationArray)
+            {
+                iconInfo.Validate();
+            }
         }
 
         private void Start()
         {
             bool scenePosSet = false;
-            foreach(var iconPosInfo in _iconInformationArray)
+            foreach (var iconPosInfo in _iconInformationArray)
             {
                 if (iconPosInfo.SceneName == SceneManager.GetActiveScene().name)
                 {
-                    _iconTransform.localPosition = iconPosInfo.LocalPosition;
+                    var buttonTransformLocalPosition = iconPosInfo.ButtonTransform.localPosition;
+                    _iconTransform.localPosition =
+                        new Vector3(buttonTransformLocalPosition.x,
+                            buttonTransformLocalPosition.y + _iconYOffset,
+                            _iconZValue);
                     scenePosSet = true;
                     break;
                 }

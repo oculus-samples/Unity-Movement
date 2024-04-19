@@ -266,6 +266,11 @@ namespace Oculus.Movement.AnimationRigging
         public string AlignFeetWeightFloatProperty { get; }
 
         /// <summary>
+        ///
+        /// </summary>
+        public string ShoulderRollFloatProperty { get; }
+
+        /// <summary>
         /// The distance between the hips and head bones.
         /// </summary>
         public float HipsToHeadDistance { get; }
@@ -274,6 +279,27 @@ namespace Oculus.Movement.AnimationRigging
         /// The distance between the hips and foot bones.
         /// </summary>
         public float HipsToFootDistance { get; }
+
+        /// <summary>
+        /// Attempts to match the original spine positions.
+        /// Excludes heads and head.
+        /// WARNING! EXPERIMENTAL!: increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        public string OriginalSpinePositionsWeightProperty { get; }
+
+        /// <summary>
+        /// Control how many bones to straighten.
+        /// WARNING! EXPERIMENTAL!
+        /// </summary>
+        public string OriginalSpineBoneCountIntProperty { get; }
+
+        /// <summary>
+        /// Indicates if the original spine positions should scale based on
+        /// the hips to head distance (proportionally).
+        /// WARNING! EXPERIMENTAL!
+        /// </summary>
+        public string OriginalSpineUseHipsToHeadScaleBoolProperty { get; }
 
         /// <summary>
         /// Sets up hips and head bones.
@@ -496,14 +522,31 @@ namespace Oculus.Movement.AnimationRigging
         string IFullBodyDeformationData.RightToesWeightFloatProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_rightToesWeight));
 
+        /// <inheritdoc />
         string IFullBodyDeformationData.AlignFeetWeightFloatProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_alignFeetWeight));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.ShoulderRollFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_shoulderRollWeight));
 
         /// <inheritdoc />
         float IFullBodyDeformationData.HipsToHeadDistance => _hipsToHeadDistance;
 
         /// <inheritdoc />
         float IFullBodyDeformationData.HipsToFootDistance => _hipsToFootDistance;
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.OriginalSpinePositionsWeightProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpinePositionsWeight));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.OriginalSpineBoneCountIntProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpineBoneCount));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.OriginalSpineUseHipsToHeadScaleBoolProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpineUseHipsToHeadToScale));
 
         /// <inheritdoc cref="IFullBodyDeformationData.BodyType"/>
         [SyncSceneToStream, SerializeField, IntAsEnumAttribute(typeof(DeformationBodyType))]
@@ -585,6 +628,17 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _affectArmsBySpineCorrection;
             set => _affectArmsBySpineCorrection = value;
+        }
+
+        /// <summary>
+        /// The weight for the deformation shoulder roll.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        private float _shoulderRollWeight;
+        public float ShoulderRollWeight
+        {
+            get => _shoulderRollWeight;
+            set => _shoulderRollWeight = value;
         }
 
         /// <summary>
@@ -747,6 +801,48 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _alignFeetWeight;
             set => _alignFeetWeight = value;
+        }
+
+        /// <summary>
+        /// Attempts to match the original spine positions.
+        /// Excludes heads and head.
+        /// WARNING: increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [Tooltip(DeformationDataTooltips.OriginalSpinePositionsWeight)]
+        private float _originalSpinePositionsWeight;
+        public float OriginalSpinePositionsWeight
+        {
+            get => _originalSpinePositionsWeight;
+            set => _originalSpinePositionsWeight = value;
+        }
+
+        /// <summary>
+        /// Number of spine bones to fix when matching the original spine.
+        /// Usually hips, spine, chest, upper chest, and neck.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0, 5)]
+        [FormerlySerializedAs("_straightSpineBoneCount")]
+        [Tooltip(DeformationDataTooltips.OriginalSpineBoneCount)]
+        private int _originalSpineBoneCount;
+        public int OriginalSpineBoneCount
+        {
+            get => _originalSpineBoneCount;
+            set => _originalSpineBoneCount = value;
+        }
+
+        /// <summary>
+        /// When using the original spine bone positions to influence
+        /// the current ones, scale them based on the current hips to head.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.OriginalSpineUseHipsToHeadToScale)]
+        private bool _originalSpineUseHipsToHeadToScale;
+        public bool OriginalSpineUseHipsToHeadToScale
+        {
+            get => _originalSpineUseHipsToHeadToScale;
+            set => _originalSpineUseHipsToHeadToScale = value;
         }
 
         /// <inheritdoc cref="IFullBodyDeformationData.SpineCorrectionType"/>
@@ -924,6 +1020,7 @@ namespace Oculus.Movement.AnimationRigging
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
                 ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
+                ShoulderLocalRot = shoulder != null ? shoulder.localRotation : upperArmBone.localRotation,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
@@ -943,6 +1040,7 @@ namespace Oculus.Movement.AnimationRigging
                 LowerArmBone = lowerArmBone,
                 HandBone = handBone,
                 ShoulderLocalPos = shoulder != null ? shoulder.localPosition : upperArmBone.localPosition,
+                ShoulderLocalRot = shoulder != null ? shoulder.localRotation : upperArmBone.localRotation,
                 LowerArmToHandAxis =
                     lowerArmBone.InverseTransformDirection(handBone.position - lowerArmBone.position).normalized
             };
@@ -1029,6 +1127,7 @@ namespace Oculus.Movement.AnimationRigging
                 };
                 bonePairs.Add(bonePair);
             }
+            _originalSpineBoneCount = _hipsToHeadBones.Length - 1;
 
             // Check for optional bones and update accordingly.
             var chestBone = FindBoneTransform(OVRSkeleton.BoneId.FullBody_Chest);
@@ -1182,6 +1281,14 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             _bonePairData = bonePairs.ToArray();
+            for (int i = 0; i < _bonePairData.Length; i++)
+            {
+                var startToEndVector =
+                    (_bonePairData[i].EndBone.position - _bonePairData[i].StartBone.position);
+                var endBoneWorldToLocal = _bonePairData[i].EndBone.worldToLocalMatrix;
+                _bonePairData[i].EndBoneLocalOffsetFromStart =
+                    endBoneWorldToLocal.MultiplyVector(startToEndVector);
+            }
         }
 
         /// <inheritdoc />
@@ -1352,6 +1459,9 @@ namespace Oculus.Movement.AnimationRigging
             _alignRightLegWeight = 0.0f;
             _leftToesWeight = 0.0f;
             _rightToesWeight = 0.0f;
+            _originalSpinePositionsWeight = 0.0f;
+            _originalSpineBoneCount = 0;
+            _originalSpineUseHipsToHeadToScale = false;
 
             _startingScale = Vector3.one;
             _bonePairData = null;

@@ -176,7 +176,7 @@ namespace Oculus.Movement.AnimationRigging
 
                 if (playbackType == PlaybackAnimationData.AnimationPlaybackType.None ||
                     (data.AnimationMask != null &&
-                     !data.AnimationMask.GetHumanoidBodyPartActive(BoneMappingsExtension.HumanBoneToAvatarBodyPart[i])))
+                     !data.AnimationMask.GetHumanoidBodyPartActive(BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i])))
                 {
                     job.BonePositionDeltas[index] = Vector3.zero;
                     job.BoneRotationDeltas[index] = Quaternion.identity;
