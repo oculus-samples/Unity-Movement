@@ -72,3 +72,6 @@ For more information about the samples, read [Aura Sample](https://developer.ocu
 ## Documentation
 The documentation for this package can be found [here](https://developer.oculus.com/documentation/unity/move-overview/).
 The API reference for this package can be found [here](https://oculus-samples.github.io/Unity-Movement/).
+
+## License
+Unity-Movement is subject to the [Oculus SDK License Agreement](https://developer.oculus.com/licenses/oculussdk/), as found in the LICENSE file.
