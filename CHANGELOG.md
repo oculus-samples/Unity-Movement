@@ -1,3 +1,11 @@
+## [5.0.1](https://github.com/oculus-samples/Unity-Movement/compare/v5.0.0...v5.0.1) (2024-04-22)
+
+
+### Bug Fixes
+
+* **Editor:** Update retargeting one-click for multiple upper body objects ([f2c1dc2](https://github.com/oculus-samples/Unity-Movement/commit/f2c1dc268360a66f116f594a6f52c198aae4353a))
+* **Samples:** Disable normals on animation clips that copy from other avatar ([b2d497e](https://github.com/oculus-samples/Unity-Movement/commit/b2d497eb677db774c8c75ec7c003a04fd4b82492))
+
 # [5.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v4.4.0...v5.0.0) (2024-04-19)
 
 
