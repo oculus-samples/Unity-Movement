@@ -30,13 +30,8 @@ namespace Oculus.Movement.Utils
                   _ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS)]
         private static void SetupFullBodyCharacterForAnimationRiggingRetargetingConstraints()
         {
-            var currentSelection = 0.0f;
-            var selectionCount = UnityEditor.Selection.gameObjects.Length;
             foreach (var activeGameObject in UnityEditor.Selection.gameObjects)
             {
-                currentSelection += 1.0f;
-                UnityEditor.EditorUtility.DisplayProgressBar(
-                    "Retargeting", $"Adding {_ANIM_RIGGING_RETARGETING_FULL_BODY_MENU_CONSTRAINTS}...", currentSelection / selectionCount);
                 var animator = activeGameObject.GetComponent<Animator>();
                 var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
                 SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, true);
@@ -47,10 +42,12 @@ namespace Oculus.Movement.Utils
                               _ANIM_RIGGING_RETARGETING_MENU_CONSTRAINTS)]
         private static void SetupUpperBodyCharacterForAnimationRiggingRetargetingConstraints()
         {
-            var activeGameObject = UnityEditor.Selection.activeGameObject;
-            var animator = activeGameObject.GetComponent<Animator>();
-            var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
-            SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, false);
+            foreach (var activeGameObject in UnityEditor.Selection.gameObjects)
+            {
+                var animator = activeGameObject.GetComponent<Animator>();
+                var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
+                SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, false);
+            }
         }
 #endif
 
