@@ -445,7 +445,10 @@ namespace Oculus.Movement.AnimationRigging
         {
             foreach (var retargetingProcessor in _retargetingProcessors)
             {
-                retargetingProcessor.DrawGizmos();
+                if (retargetingProcessor != null)
+                {
+                    retargetingProcessor.DrawGizmos();
+                }
             }
         }
 
