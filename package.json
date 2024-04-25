@@ -1,14 +1,47 @@
 {
   "name": "com.meta.movement",
   "displayName": "Meta Movement",
-  "version": "1.0.1",
+  "version": "1.0.0",
+  "description": "Contains sample scenes, prefabs, scripts, and art assets for Movement SDK.",
   "unity": "2021.3",
+  "unityRelease": "26f1",
+  "samples":[
+    {
+      "displayName": "Face Tracking Scenes",
+      "description": "Scenes that demonstrate the face tracking capabilities of the Movement SDK",
+      "path": "Samples/Scenes/FaceTrackingSamples"
+    },
+    {
+      "displayName": "Body Tracking Scenes",
+      "description": "Scenes that demonstrate the body tracking capabilities of the Movement SDK",
+      "path": "Samples/Scenes/BodyTrackingSamples"
+    },
+    {
+      "displayName": "Advanced Scenes",
+      "description": "Scenes that demonstrate how the Movement SDK samples can be extended",
+      "path": "Samples/Scenes/AdvancedSamples"
+    }
+  ],
+  "author": {
+    "name": "Meta Platforms, Inc.",
+    "url": "https://developer.oculus.com/"
+  },
+  "documentationUrl": "https://developer.oculus.com/documentation/unity/move-overview/",
+  "licensesUrl": "https://developer.oculus.com/licenses/oculussdk",
+  "licenseMessage": "By adding or using this package you agree to the terms and conditions of the Meta Platforms Technologies SDK License Agreement: https://developer.oculus.com/licenses/oculussdk",
   "keywords": [
     "Meta",
-    "Movement"
+    "Oculus",
+    "OVR",
+    "SDK",
+    "Quest",
+    "Movement",
+    "XR"
   ],
-  "description": "Meta Movement",
   "dependencies": {
+    "com.meta.xr.sdk.core": "63.0.0",
+    "com.meta.xr.sdk.interaction": "63.0.0",
+    "com.meta.xr.sdk.interaction.ovr": "63.0.0",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.animation.rigging": "1.2.1",
     "com.unity.burst": "1.4.1"
