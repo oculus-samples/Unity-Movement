@@ -54,20 +54,30 @@ The following settings are recommended:
 nearby without experiencing poor quality.
 5. At least one pixel light.
 
+## Samples
+
+The project contains several sample scenes. To test the samples, they must be imported into the project's Assets folder, in one of the ways listed below:
+    <details>
+        <summary><b>Import Samples from Package Manager</b></summary>
+- Select the "Meta Movement" package in the package manager. Once selected, expand the Samples section and import the desired sample scenes.
+    </details>
+    <details>
+        <summary><b>Copy Samples directory</b></summary>
+- Copy the scenes located in the **Packages/com.meta.movement/Samples/Scenes** folder to the project's Assets folder.
+    </details>
+<br>
+
+For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
+
+For more information about the samples, please refer to [this page](https://developer.oculus.com/documentation/unity/move-samples/).
+
 ## Player Settings
 
 Make sure that the color space is set to Linear.
 
 ## Build Settings
 
-In order for the SceneSelectMenu buttons to work, add the scenes located in **Packages/Meta Movement/Samples/Scenes** folder.
-
-## Samples
-The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/Scenes** folder to the project's Assets folder. To view those scenes in the editor or make edits, you may need to make copies of those scenes in the **Assets** folder.
-
-For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
-
-For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-samples/#face-and-eye-tracking-with-aura), [Blendshape Mapping Example Sample](https://developer.oculus.com/documentation/unity/move-samples/#arkit-mapping-with-blendshape-mapping-example), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-with-hip-pinning), [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-sample), and [Retargeting Sample](https://developer.oculus.com/documentation/unity/move-samples/#retargeting-with-blue-robot).
+In order for the SceneSelectMenu buttons to work, add imported scenes in the [Samples](#samples) step to the Build Settings.
 
 ## Documentation
 The documentation for this package can be found [here](https://developer.oculus.com/documentation/unity/move-overview/).
