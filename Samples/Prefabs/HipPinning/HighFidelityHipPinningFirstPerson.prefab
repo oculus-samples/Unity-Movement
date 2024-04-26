@@ -175,6 +175,7 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     _obtainedProperReferences: 1
+    _initialHipLocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: 0.5}
 --- !u!1 &1203877893166862650
 GameObject:
   m_ObjectHideFlags: 0
@@ -781,7 +782,7 @@ MonoBehaviour:
   m_Data:
     _customSkeleton: {fileID: 729980574542687627}
     _animator: {fileID: 0}
-    _spineTranslationCorrectionType: 3
+    _spineTranslationCorrectionType: 1
     _spineLowerAlignmentWeight: 0
     _spineUpperAlignmentWeight: 0
     _chestAlignmentWeight: 0
