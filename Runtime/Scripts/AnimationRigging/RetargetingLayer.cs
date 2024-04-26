@@ -278,6 +278,10 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public void UpdateBonePairMappings()
         {
+            if (_retargetedBoneMappings == null)
+            {
+                _retargetedBoneMappings = new RetargetedBoneMappings();
+            }
             _retargetedBoneMappings.UpdateBonePairMappings(this);
         }
 
