@@ -1923,4 +1923,16 @@ namespace Oculus.Movement
         public const string HumanBodyBoneToBoneId =
             "HumanBodyBone to BodyJointId mapping for this humanoid.";
     }
+
+    public static class TargetOffsetCorrectionTooltips
+    {
+        public const string RigBuilder =
+            "Rig builder of character.";
+        public const string AnkleBone =
+            "Ankle bone.";
+        public const string TipBone =
+            "Foot tip bone.";
+        public const string GroundingConstraint =
+            "Foot grounding constraint.";
+    }
 }
