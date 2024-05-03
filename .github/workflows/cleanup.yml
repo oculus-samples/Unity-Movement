@@ -25,6 +25,8 @@ jobs:
         run: |
           git checkout HEAD~1 CHANGELOG.md
           git checkout HEAD~1 package.json
+          git rm Samples.meta
+          git mv Samples Samples~
           git commit --amend --no-edit --allow-empty
       - name: Push
         run: |
