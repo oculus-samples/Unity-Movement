@@ -7,19 +7,19 @@
   "unityRelease": "26f1",
   "samples":[
     {
-      "displayName": "Face Tracking Scenes",
-      "description": "Scenes that demonstrate the face tracking capabilities of the Movement SDK",
-      "path": "Samples/Scenes/FaceTrackingSamples"
+      "displayName": "Face Tracking Samples",
+      "description": "Samples that demonstrate the face tracking capabilities of the Movement SDK",
+      "path": "Samples~/FaceTrackingSamples"
     },
     {
-      "displayName": "Body Tracking Scenes",
-      "description": "Scenes that demonstrate the body tracking capabilities of the Movement SDK",
-      "path": "Samples/Scenes/BodyTrackingSamples"
+      "displayName": "Body Tracking Samples",
+      "description": "Samples that demonstrate the body tracking capabilities of the Movement SDK",
+      "path": "Samples~/BodyTrackingSamples"
     },
     {
-      "displayName": "Advanced Scenes",
-      "description": "Scenes that demonstrate how the Movement SDK samples can be extended",
-      "path": "Samples/Scenes/AdvancedSamples"
+      "displayName": "Advanced Samples",
+      "description": "Samples that demonstrate how the Movement SDK samples can be extended",
+      "path": "Samples~/AdvancedSamples"
     }
   ],
   "author": {
