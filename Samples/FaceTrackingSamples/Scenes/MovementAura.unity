@@ -957,10 +957,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 998197330}
-  - {fileID: 1438888680}
-  - {fileID: 1171584013}
   - {fileID: 2094724099}
   - {fileID: 1686754103}
+  - {fileID: 1171584013}
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1184,7 +1183,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7679282542875227671, guid: b2e64c8c2ec8b4b9eb8f461a43f655ef, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7679282542875227671, guid: b2e64c8c2ec8b4b9eb8f461a43f655ef, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1555,236 +1554,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5545149144574972019, guid: ea16c3c8c1688234fa81a4f39339bf1b, type: 3}
   m_PrefabInstance: {fileID: 1404505943}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1438888679
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 851446171}
-    m_Modifications:
-    - target: {fileID: 2267799048079188300, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _faceExpressions
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _skeletonToCopy
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[0].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[1].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[2].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[3].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[4].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[5].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[6].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[7].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[8].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[9].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[10].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[11].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[12].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[13].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[14].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[15].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[16].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[17].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[18].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[19].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[20].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[21].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[22].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[23].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[24].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[25].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[26].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[27].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[28].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[29].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[30].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[31].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[32].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[33].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[34].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2536231694802738737, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _mirroredBonePairs.Array.data[35].OriginalBone
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2550476028627066485, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_Name
-      value: AuraMirrored
-      objectReference: {fileID: 0}
-    - target: {fileID: 2550476028627066485, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3734935905854523833, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _faceExpressions
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 8865039754712819280, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8865039754712819280, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-      propertyPath: _ovrFaceExpressions
-      value: 
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
---- !u!4 &1438888680 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2895476751637890255, guid: ba603d7826a9d9344a7c045f1a073390, type: 3}
-  m_PrefabInstance: {fileID: 1438888679}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1548721494
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1879,12 +1648,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1686754102}
   m_LocalRotation: {x: 0.30339965, y: 0.49524462, z: -0.5075732, w: -0.6364361}
-  m_LocalPosition: {x: -0, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 851446171}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 6.693, y: 289.123, z: 72.38}
 --- !u!108 &1686754104
 Light:
@@ -2445,12 +2214,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2094724098}
   m_LocalRotation: {x: 0.018571505, y: 0.22204776, z: -0.63235545, w: -0.7419411}
-  m_LocalPosition: {x: -0, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 851446171}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 14.671, y: 338.6, z: 78.095}
 --- !u!108 &2094724100
 Light:
