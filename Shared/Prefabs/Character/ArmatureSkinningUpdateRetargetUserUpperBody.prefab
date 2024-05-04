@@ -916,7 +916,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7890163646267885795}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
   m_Name: 
@@ -1002,6 +1002,11 @@ MonoBehaviour:
       Target: {fileID: 1977851119}
     _fullBody: 0
     _enabled: 1
+  _retargetedBoneMappings:
+    _humanBodyBonePairs: 
+    _humanBodyBoneToBoneId: 
+    _boneIdToBonePairs: 
+  _updateBoneMappingsData: 0
 --- !u!4 &8023271195216576026 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8984739037707363565, guid: 4d1160b6537bb3e42802d3a5219e72c4, type: 3}

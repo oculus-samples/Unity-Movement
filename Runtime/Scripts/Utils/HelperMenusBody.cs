@@ -109,6 +109,9 @@ namespace Oculus.Movement.Utils
             RigBuilder rigBuilder;
             (rigBuilder, rigObject) =
                 AddComponentsHelper.AddBasicAnimationRiggingComponents(activeGameObject, runtimeInvocation);
+            // Disable rig builder to allow T-pose to be captured by retargeting without having animation
+            // rigging forcing character into the "motorcycle pose" first.
+            rigBuilder.enabled = false;
 
             List<MonoBehaviour> constraintMonos = new List<MonoBehaviour>();
             RetargetingAnimationConstraint retargetConstraint =

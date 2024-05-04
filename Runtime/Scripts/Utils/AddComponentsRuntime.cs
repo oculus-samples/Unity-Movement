@@ -54,7 +54,9 @@ namespace Oculus.Movement.Utils
                 animatorComp.gameObject.SetActive(false);
             }
 
-            rigBuilder.enabled = true;
+            // Disable rig builder to allow T-pose to be captured by retargeting without having animation
+            // rigging forcing character into the "motorcycle pose" first.
+            rigBuilder.enabled = false;
             selectedGameObject.SetActive(true);
         }
     }
