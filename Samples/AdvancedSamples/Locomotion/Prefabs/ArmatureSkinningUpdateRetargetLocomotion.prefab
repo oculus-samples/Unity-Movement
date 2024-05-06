@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: _blendCurve.m_Curve.Array.data[1].outSlope
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2324633634594971607, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
+      propertyPath: _retargetingProcessors.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
     - target: {fileID: 2444161089806565791, guid: 1d0c5ce9ae27cab4b88cd35738a08552, type: 3}
       propertyPath: m_Enabled
       value: 1

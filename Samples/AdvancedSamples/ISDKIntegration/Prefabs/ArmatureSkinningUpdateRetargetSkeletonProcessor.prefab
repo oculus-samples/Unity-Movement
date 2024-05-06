@@ -228,6 +228,10 @@ PrefabInstance:
       propertyPath: _retargetingLayer
       value: 
       objectReference: {fileID: 2324633634594971607}
+    - target: {fileID: 7866900989153904485, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
+      propertyPath: _retargetingProcessors.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: fe9461a9c9e3a714b99266aba4a4807b, type: 2}
     - target: {fileID: 8041379379990558817, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
       propertyPath: _autoAddTo
       value: 
