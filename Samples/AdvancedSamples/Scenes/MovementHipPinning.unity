@@ -542,6 +542,11 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &341165825 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4745486616392266156, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
+  m_PrefabInstance: {fileID: 804730340}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &361435587
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -662,11 +667,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8065065785454080346, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
   m_PrefabInstance: {fileID: 804730340}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &505483994 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2567101040732880021, guid: bc3f0e03432171b4a934d508d7df1bca, type: 3}
-  m_PrefabInstance: {fileID: 804730340}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &516573877
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,7 +712,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5558038247458039740, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5558038247458039740, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -829,7 +829,7 @@ PrefabInstance:
     - target: {fileID: 7125125211647871229, guid: 3766248d4977d5e4bb67e39bac133acb, type: 3}
       propertyPath: _mainCharacterRenderer
       value: 
-      objectReference: {fileID: 505483994}
+      objectReference: {fileID: 341165825}
     - target: {fileID: 7125125211647871229, guid: 3766248d4977d5e4bb67e39bac133acb, type: 3}
       propertyPath: _mirroredCharacterRenderer
       value: 
