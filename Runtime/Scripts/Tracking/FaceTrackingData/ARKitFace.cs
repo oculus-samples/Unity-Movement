@@ -60,7 +60,8 @@ namespace Oculus.Movement.Tracking
             ("CheekSquintLeft", OVRFaceExpressions.FaceExpression.CheekRaiserL),
             ("CheekSquintRight", OVRFaceExpressions.FaceExpression.CheekRaiserR),
             ("NoseSneerLeft", OVRFaceExpressions.FaceExpression.NoseWrinklerL),
-            ("NoseSneerRight", OVRFaceExpressions.FaceExpression.NoseWrinklerR)
+            ("NoseSneerRight", OVRFaceExpressions.FaceExpression.NoseWrinklerR),
+            ("TongueOut", OVRFaceExpressions.FaceExpression.TongueOut),
         };
 
         /// <summary>
