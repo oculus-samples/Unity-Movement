@@ -1012,6 +1012,10 @@ namespace Oculus.Movement
             "When using the original spine bone positions to influence " +
             "the current ones, scale them based on the current hips to head.";
 
+        public const string OriginalSpineFixRotations =
+            "Allows rotation correction when using the original spine bone " +
+            "positions.";
+
         public const string HipsToHeadBones =
             "Array of transform bones from hips to head.";
 

@@ -269,6 +269,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.OriginalSpinePositionsWeight = 0.5f;
             deformationConstraint.data.OriginalSpineBoneCount = 0;
             deformationConstraint.data.OriginalSpineUseHipsToHeadToScale = true;
+            deformationConstraint.data.OriginalSpineFixRotations = true;
 
             deformationConstraint.data.AssignAnimator(animator);
             deformationConstraint.data.SetUpLeftArmData();

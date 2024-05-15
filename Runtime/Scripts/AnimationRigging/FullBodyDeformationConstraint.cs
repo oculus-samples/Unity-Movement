@@ -302,6 +302,13 @@ namespace Oculus.Movement.AnimationRigging
         public string OriginalSpineUseHipsToHeadScaleBoolProperty { get; }
 
         /// <summary>
+        /// Allows correcting the rotations of the spine too when using
+        /// original spine positions.
+        /// WARNING! EXPERIMENTAL!
+        /// </summary>
+        public string OriginalSpineFixRotationsBoolProperty { get; }
+
+        /// <summary>
         /// Sets up hips and head bones.
         /// </summary>
         public void SetUpHipsAndHeadBones();
@@ -547,6 +554,9 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         string IFullBodyDeformationData.OriginalSpineUseHipsToHeadScaleBoolProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpineUseHipsToHeadToScale));
+
+        string IFullBodyDeformationData.OriginalSpineFixRotationsBoolProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpineFixRotations));
 
         /// <inheritdoc cref="IFullBodyDeformationData.BodyType"/>
         [SyncSceneToStream, SerializeField, IntAsEnumAttribute(typeof(DeformationBodyType))]
@@ -843,6 +853,19 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _originalSpineUseHipsToHeadToScale;
             set => _originalSpineUseHipsToHeadToScale = value;
+        }
+
+        /// <summary>
+        /// Allows rotation correction when using the original spine bone
+        /// positions.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(DeformationDataTooltips.OriginalSpineFixRotations)]
+        private bool _originalSpineFixRotations;
+        public bool OriginalSpineFixRotations
+        {
+            get => _originalSpineFixRotations;
+            set => _originalSpineFixRotations = value;
         }
 
         /// <inheritdoc cref="IFullBodyDeformationData.SpineCorrectionType"/>
@@ -1462,6 +1485,7 @@ namespace Oculus.Movement.AnimationRigging
             _originalSpinePositionsWeight = 0.0f;
             _originalSpineBoneCount = 0;
             _originalSpineUseHipsToHeadToScale = false;
+            _originalSpineFixRotations = false;
 
             _startingScale = Vector3.one;
             _bonePairData = null;
