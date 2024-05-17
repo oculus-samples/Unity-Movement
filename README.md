@@ -5,7 +5,10 @@ Unity-Movement is a package that uses OpenXR’s tracking layer APIs to expose M
 The Unity-Movement package is released under the [Oculus License](https://github.com/oculus-samples/Unity-Movement/blob/main/LICENSE). The MIT License applies to only certain, clearly marked documents. If an individual file does not indicate which license it is subject to, then the Oculus License applies.
 
 ### Requirements
-- Unity 2021.3.26f1 (2021 LTS) or newer installed. For Unity 2022, use 2022.3.11f1 (2022 LTS) or newer. For Unity 2023, use 2023.1.17f1 or newer (Unity 2023.1.x). Unity 2023.2+ however will not currently work due to the fact TMPro has been deprecated.
+- A version of Unity supported for Movement SDK installed:
+  - 2021.3.26f1 (2021 LTS or newer)
+  - 2022.3.11f2 (2022 LTS or newer)
+  - 2023.2.7f1 or newer
 - v63.0 or newer of the Meta XR SDK. You will need the Meta XR Core SDK and the [Meta XR Interaction SDK OVR Integration](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-ovr-integration-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
 - A project set up with these [configuration settings](https://developer.oculus.com/documentation/unity/unity-conf-settings/)
 
@@ -54,20 +57,24 @@ The following settings are recommended:
 nearby without experiencing poor quality.
 5. At least one pixel light.
 
+## Samples
+
+The project contains several sample scenes. To test the samples, they must be imported into the project's Assets folder:
+- Select the "Meta Movement" package in the package manager. Once selected, expand the Samples section and import the desired sample scenes.
+<br>
+
+
+For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
+
+For more information about the samples, please refer to [this page](https://developer.oculus.com/documentation/unity/move-samples/).
+
 ## Player Settings
 
 Make sure that the color space is set to Linear.
 
 ## Build Settings
 
-In order for the SceneSelectMenu buttons to work, add the scenes located in **Packages/Meta Movement/Samples/Scenes** folder.
-
-## Samples
-The project contains several sample scenes. To test the samples, add the scenes located in the **Packages/com.meta.movement/Samples/Scenes** folder to the project's Assets folder. To view those scenes in the editor or make edits, you may need to make copies of those scenes in the **Assets** folder.
-
-For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
-
-For more information about the samples, read [Aura Sample](https://developer.oculus.com/documentation/unity/move-samples/#face-and-eye-tracking-with-aura), [Blendshape Mapping Example Sample](https://developer.oculus.com/documentation/unity/move-samples/#arkit-mapping-with-blendshape-mapping-example), [Hip Pinning Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-with-hip-pinning), [High Fidelity Sample](https://developer.oculus.com/documentation/unity/move-samples/#high-fidelity-sample), and [Retargeting Sample](https://developer.oculus.com/documentation/unity/move-samples/#retargeting-with-blue-robot).
+In order for the SceneSelectMenu buttons to work, add imported scenes in the [Samples](#samples) step to the Build Settings.
 
 ## Documentation
 The documentation for this package can be found [here](https://developer.oculus.com/documentation/unity/move-overview/).

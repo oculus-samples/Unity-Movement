@@ -109,6 +109,9 @@ namespace Oculus.Movement.Utils
             RigBuilder rigBuilder;
             (rigBuilder, rigObject) =
                 AddComponentsHelper.AddBasicAnimationRiggingComponents(activeGameObject, runtimeInvocation);
+            // Disable rig builder to allow T-pose to be captured by retargeting without having animation
+            // rigging forcing character into the "motorcycle pose" first.
+            rigBuilder.enabled = false;
 
             List<MonoBehaviour> constraintMonos = new List<MonoBehaviour>();
             RetargetingAnimationConstraint retargetConstraint =
@@ -266,6 +269,7 @@ namespace Oculus.Movement.Utils
             deformationConstraint.data.OriginalSpinePositionsWeight = 0.5f;
             deformationConstraint.data.OriginalSpineBoneCount = 0;
             deformationConstraint.data.OriginalSpineUseHipsToHeadToScale = true;
+            deformationConstraint.data.OriginalSpineFixRotations = true;
 
             deformationConstraint.data.AssignAnimator(animator);
             deformationConstraint.data.SetUpLeftArmData();

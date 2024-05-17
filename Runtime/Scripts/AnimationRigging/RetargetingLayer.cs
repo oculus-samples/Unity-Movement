@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
 
 namespace Oculus.Movement.AnimationRigging
@@ -207,6 +208,11 @@ namespace Oculus.Movement.AnimationRigging
         private Dictionary<HumanBodyBones, OVRUnityHumanoidSkeletonRetargeter.OVRSkeletonMetadata.BoneData>
             _lastReferencedtargetBoneData = null;
 
+        private int _lastSkelChangeCountRt = -1;
+        private Vector3 _lastTrackedScaleRt;
+        private Dictionary<Transform, Quaternion> _storedRotationsAboveRoot =
+            new Dictionary<Transform, Quaternion>();
+
         /// <summary>
         /// Check for required components.
         /// </summary>
@@ -254,7 +260,16 @@ namespace Oculus.Movement.AnimationRigging
         {
             try
             {
+                _lastTrackedScaleRt = transform.lossyScale;
+                // cache any transformation information above hips to make sure upright rest pose is captured.
+                CaptureTransformInformationHipsUpwards(GetComponent<Animator>().GetBoneTransform(HumanBodyBones.Hips));
+                if (_retargetingAnimationRig.RigBuilderComp.enabled)
+                {
+                    Debug.LogError("Please disable the rig builder by default or else the animation system " +
+                        " will prevent a correct capture of the rest pose.");
+                }
                 base.Start();
+
                 ConstructDefaultPoseInformation();
                 ConstructBoneAdjustmentInformation();
                 CacheJointConstraints();
@@ -273,11 +288,31 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
+        private void CaptureTransformInformationHipsUpwards(Transform currentTransform)
+        {
+            // Avoid going to topmost transform (the character). We want to ignore any rotations
+            // a user wants to apply to the character itself.
+            if (currentTransform == this.transform)
+            {
+                return;
+            }
+
+            if (!_storedRotationsAboveRoot.ContainsKey(currentTransform))
+            {
+                _storedRotationsAboveRoot[currentTransform] = currentTransform.localRotation;
+            }
+            CaptureTransformInformationHipsUpwards(currentTransform.parent);
+        }
+
         /// <summary>
         /// Update bone pair mappings for the retargeted humanoid.
         /// </summary>
         public void UpdateBonePairMappings()
         {
+            if (_retargetedBoneMappings == null)
+            {
+                _retargetedBoneMappings = new RetargetedBoneMappings();
+            }
             _retargetedBoneMappings.UpdateBonePairMappings(this);
         }
 
@@ -396,7 +431,19 @@ namespace Oculus.Movement.AnimationRigging
         {
             UpdateSkeleton();
             _skeletonPostProcessing?.Invoke(this);
+            var offsetRecomputedThisFrame = OffsetRegenerationNeededThisFrame();
+            // The character needs to forced into a rest pose. Disable any transforms above the hips.
+            if (offsetRecomputedThisFrame)
+            {
+                ResetBoneTransformationsHipsUpwards(AnimatorTargetSkeleton.GetBoneTransform(HumanBodyBones.Hips));
+            }
             RecomputeSkeletalOffsetsIfNecessary();
+            if (offsetRecomputedThisFrame)
+            {
+                // update state tracking variables.
+                _lastTrackedScaleRt = transform.lossyScale;
+                _lastSkelChangeCountRt = SkeletonChangedCount;
+            }
 
             UpdateBoneDataToArray();
 
@@ -407,6 +454,37 @@ namespace Oculus.Movement.AnimationRigging
                 _proxyTransformLogic.UpdateState(Bones, transform);
             }
             _retargetingAnimationRig.UpdateRig(this);
+        }
+
+        private bool OffsetRegenerationNeededThisFrame()
+        {
+            bool scaleChanged = (transform.lossyScale - _lastTrackedScaleRt).sqrMagnitude
+                > Mathf.Epsilon;
+            bool skeletalCountChange = _lastSkelChangeCountRt != SkeletonChangedCount;
+
+            return skeletalCountChange || scaleChanged;
+        }
+
+        /// <summary>
+        /// If we want to force a character into T-pose, reset the transforms
+        /// above the hips, but NOT on the character itself. Sometimes animation rigging
+        /// changes transform values above the hips during runtime, which prevents us
+        /// from forcing a character into a proper rest pose.
+        /// </summary>
+        /// <param name="currentTransform"></param>
+        private void ResetBoneTransformationsHipsUpwards(Transform currentTransform)
+        {
+            // Avoid going to topmost transform (the character). We want to not affect any rotations
+            // a user wants to apply to the character itself.
+            if (currentTransform == this.transform)
+            {
+                return;
+            }
+
+            Quaternion defaultQuaternion = _storedRotationsAboveRoot[currentTransform];
+            currentTransform.localRotation = defaultQuaternion;
+
+            ResetBoneTransformationsHipsUpwards(currentTransform.parent);
         }
 
         /// <summary>
@@ -445,7 +523,10 @@ namespace Oculus.Movement.AnimationRigging
         {
             foreach (var retargetingProcessor in _retargetingProcessors)
             {
-                retargetingProcessor.DrawGizmos();
+                if (retargetingProcessor != null)
+                {
+                    retargetingProcessor.DrawGizmos();
+                }
             }
         }
 
@@ -466,7 +547,7 @@ namespace Oculus.Movement.AnimationRigging
 
         protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)
         {
-            var bodySectionOfJoint =_boneToBodySectionArray[(int)humanBodyBone];
+            var bodySectionOfJoint = _boneToBodySectionArray[(int)humanBodyBone];
             return IsBodySectionInArray(bodySectionOfJoint,
                 _skeletonType == SkeletonType.FullBody ? FullBodySectionToPosition : BodySectionToPosition);
         }

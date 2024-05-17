@@ -1012,6 +1012,10 @@ namespace Oculus.Movement
             "When using the original spine bone positions to influence " +
             "the current ones, scale them based on the current hips to head.";
 
+        public const string OriginalSpineFixRotations =
+            "Allows rotation correction when using the original spine bone " +
+            "positions.";
+
         public const string HipsToHeadBones =
             "Array of transform bones from hips to head.";
 
@@ -1922,5 +1926,17 @@ namespace Oculus.Movement
         
         public const string HumanBodyBoneToBoneId =
             "HumanBodyBone to BodyJointId mapping for this humanoid.";
+    }
+
+    public static class TargetOffsetCorrectionTooltips
+    {
+        public const string RigBuilder =
+            "Rig builder of character.";
+        public const string AnkleBone =
+            "Ankle bone.";
+        public const string TipBone =
+            "Foot tip bone.";
+        public const string GroundingConstraint =
+            "Foot grounding constraint.";
     }
 }

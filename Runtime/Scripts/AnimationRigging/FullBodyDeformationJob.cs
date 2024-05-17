@@ -388,6 +388,12 @@ namespace Oculus.Movement.AnimationRigging
         public BoolProperty OriginalSpineUseHipsToHeadToScale;
 
         /// <summary>
+        /// Allows correcting the rotations of the spine too when using
+        /// original spine positions.
+        /// </summary>
+        public BoolProperty OriginalSpineFixRotations;
+
+        /// <summary>
         /// True if the arms should be affected by spine correction.
         /// </summary>
         public BoolProperty AffectArmsBySpineCorrection;
@@ -431,6 +437,10 @@ namespace Oculus.Movement.AnimationRigging
         /// Hips to head distance on original character.
         /// </summary>
         public float OriginalHipsToHeadDistance;
+
+        public NativeArray<Vector3> OriginalHipsToPositions;
+        public NativeArray<Quaternion> CachedFixedHipsToHeadRotations;
+        public NativeArray<Vector3> CachedFixedHipsToHeadPositions;
 
         private Vector3 _targetHipsPos;
         private Vector3 _targetHeadPos;
@@ -757,6 +767,13 @@ namespace Oculus.Movement.AnimationRigging
                 HeadIndex - 1 : requestedBoneCount;
             float currentToOriginalSpineScale = ComputeCurrentToOriginalSpineScale(stream);
 
+            // cache original positions first, this is used for rotation correction
+            for (int i = HipsIndex; i <= numBonesToCorrect; i++)
+            {
+                OriginalHipsToPositions[i] = HipsToHeadBones[i].GetPosition(stream);
+            }
+
+            // perform position correction
             for (int i = HipsIndex; i < numBonesToCorrect; i++)
             {
                 var boneToAffect = EndBones[i];
@@ -776,6 +793,47 @@ namespace Oculus.Movement.AnimationRigging
                     originalSpinePositionsWeight);
 
                 EndBones[i] = boneToAffect;
+            }
+
+            // cache final results
+            for (int i = HipsIndex; i <= numBonesToCorrect; i++)
+            {
+                CachedFixedHipsToHeadPositions[i] = HipsToHeadBones[i].GetPosition(stream);
+                CachedFixedHipsToHeadRotations[i] = HipsToHeadBones[i].GetRotation(stream);
+            }
+
+            // after the positions are set, adjust the rotations if the user requests
+            if (OriginalSpineFixRotations.Get(stream))
+            {
+                // correct rotations of each spine position to respond the fixes to positions.
+                // that's because rotations should match the new positions set.
+                // do not correct hips, because that might cause the legs to to rotate out
+                // of position.
+                for (int i = HipsIndex + 1; i < numBonesToCorrect; i++)
+                {
+                    var oldJointPosition = OriginalHipsToPositions[i];
+                    var oldJointTargetPosition = OriginalHipsToPositions[i + 1];
+
+                    var newJointPosition = HipsToHeadBones[i].GetPosition(stream);
+                    var newJointTargetPosition = HipsToHeadBones[i + 1].GetPosition(stream);
+
+                    RotateJointBasedOnNewPosition(stream,
+                        oldJointPosition, oldJointTargetPosition,
+                        newJointPosition, newJointTargetPosition,
+                        i, originalSpinePositionsWeight);
+
+                    // restore bone transforms after the current one to make sure they are not
+                    // affected by the current bone's rotation.
+                    for (int j = i + 1; j <= numBonesToCorrect; j++)
+                    {
+                        var boneToAffect = HipsToHeadBones[j];
+
+                        boneToAffect.SetPosition(stream, CachedFixedHipsToHeadPositions[j]);
+                        boneToAffect.SetRotation(stream, CachedFixedHipsToHeadRotations[j]);
+
+                        HipsToHeadBones[j] = boneToAffect;
+                    }
+                }
             }
         }
 
@@ -807,6 +865,35 @@ namespace Oculus.Movement.AnimationRigging
             var lerpPosition = Vector3.Lerp(boneOriginalLocalPos,
                 boneFixedLocalPosition, originalSpinePositionsWeight);
             boneToAffect.SetLocalPosition(stream, lerpPosition);
+        }
+
+        private void RotateJointBasedOnNewPosition(AnimationStream stream,
+            Vector3 oldJointPosition, Vector3 oldJointTargetPosition,
+            Vector3 newJointPosition, Vector3 newJointTargetPosition,
+            int boneIndex, float interpolationValue)
+        {
+            // rotate the joint so that it points toward its target
+            var rotationChange = GetRotationChange(
+                oldJointPosition, oldJointTargetPosition,
+                newJointPosition, newJointTargetPosition);
+
+            var bone = HipsToHeadBones[boneIndex];
+            var currentRotation = bone.GetRotation(stream);
+            var newRotation = rotationChange * currentRotation;
+            var interpolatedRotation =
+                Quaternion.Slerp(currentRotation, newRotation, interpolationValue);
+            bone.SetRotation(stream, interpolatedRotation);
+
+            HipsToHeadBones[boneIndex] = bone;
+        }
+
+        private Quaternion GetRotationChange(
+            Vector3 oldJointPosition, Vector3 oldJointTargetPosition,
+            Vector3 newJointPosition, Vector3 newTargetPosition)
+        {
+            Vector3 boneToOldTarget = oldJointTargetPosition - oldJointPosition;
+            Vector3 boneToNewTarget = newTargetPosition - newJointPosition;
+            return Quaternion.FromToRotation(boneToOldTarget, boneToNewTarget);
         }
 
         /// <summary>
@@ -1552,6 +1639,16 @@ namespace Oculus.Movement.AnimationRigging
                 NativeArrayOptions.UninitializedMemory);
             job.OriginalHipsToHeadDistance = data.HipsToHeadDistance;
 
+            job.OriginalHipsToPositions = new NativeArray<Vector3>(data.HipsToHeadBones.Length,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.CachedFixedHipsToHeadRotations = new NativeArray<Quaternion>(data.HipsToHeadBones.Length,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+            job.CachedFixedHipsToHeadPositions = new NativeArray<Vector3>(data.HipsToHeadBones.Length,
+                Allocator.Persistent,
+                NativeArrayOptions.UninitializedMemory);
+
             var upperBodyProportion = 0.0f;
             for (int i = 0; i < data.HipsToHeadBones.Length; i++)
             {
@@ -1559,6 +1656,9 @@ namespace Oculus.Movement.AnimationRigging
                 job.UpperBodyOffsets[i] = Vector3.zero;
                 job.UpperBodyTargetPositions[i] = Vector3.zero;
                 upperBodyProportion += data.BonePairs[i].HeightProportion;
+                job.OriginalHipsToPositions[i] = Vector3.zero;
+                job.CachedFixedHipsToHeadRotations[i] = Quaternion.identity;
+                job.CachedFixedHipsToHeadPositions[i] = Vector3.zero;
             }
             job.LowerBodyProportion = 1.0f - upperBodyProportion;
 
@@ -1647,6 +1747,8 @@ namespace Oculus.Movement.AnimationRigging
                 IntProperty.Bind(animator, component, data.OriginalSpineBoneCountIntProperty);
             job.OriginalSpineUseHipsToHeadToScale =
                 BoolProperty.Bind(animator, component, data.OriginalSpineUseHipsToHeadScaleBoolProperty);
+            job.OriginalSpineFixRotations =
+                BoolProperty.Bind(animator, component, data.OriginalSpineFixRotationsBoolProperty);
             job.LeftArmOffsetWeight = FloatProperty.Bind(animator, component, data.LeftArmWeightFloatProperty);
             job.RightArmOffsetWeight = FloatProperty.Bind(animator, component, data.RightArmWeightFloatProperty);
             job.LeftHandOffsetWeight = FloatProperty.Bind(animator, component, data.LeftHandWeightFloatProperty);
@@ -1728,6 +1830,9 @@ namespace Oculus.Movement.AnimationRigging
             job.BoneDirections.Dispose();
             job.EndBoneOffsetsLocal.Dispose();
             job.ScaleFactor.Dispose();
+            job.OriginalHipsToPositions.Dispose();
+            job.CachedFixedHipsToHeadPositions.Dispose();
+            job.CachedFixedHipsToHeadRotations.Dispose();
         }
     }
 }

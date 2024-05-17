@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &669339439527238449
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 669339439527238463}
+  - component: {fileID: 669339439527238448}
+  - component: {fileID: 669339439527238462}
+  m_Layer: 0
+  m_Name: DebugBones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &669339439527238463
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669339439527238449}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.81499124, y: 1.347516, z: 0.12875414}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &669339439527238448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669339439527238449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c79d7660e6ccc8a47882b41bfbda4978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _whenToRender: 2
+  _visualizationGuideType: 1
+  _maskToVisualize: {fileID: 31900000, guid: 8267e3d56146c7e43bd0296dc7f86558, type: 2}
+  _customBoneVisualData:
+    BoneTuples:
+    - FirstBone: 0
+      SecondBone: 7
+      Hide: 0
+    - FirstBone: 0
+      SecondBone: 1
+      Hide: 0
+    - FirstBone: 0
+      SecondBone: 2
+      Hide: 0
+    - FirstBone: 1
+      SecondBone: 3
+      Hide: 0
+    - FirstBone: 2
+      SecondBone: 4
+      Hide: 0
+    - FirstBone: 3
+      SecondBone: 5
+      Hide: 0
+    - FirstBone: 4
+      SecondBone: 6
+      Hide: 0
+    - FirstBone: 5
+      SecondBone: 19
+      Hide: 0
+    - FirstBone: 6
+      SecondBone: 20
+      Hide: 0
+    - FirstBone: 7
+      SecondBone: 8
+      Hide: 0
+    - FirstBone: 8
+      SecondBone: 54
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 9
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 11
+      Hide: 0
+    - FirstBone: 54
+      SecondBone: 12
+      Hide: 0
+    - FirstBone: 9
+      SecondBone: 10
+      Hide: 0
+    - FirstBone: 11
+      SecondBone: 13
+      Hide: 0
+    - FirstBone: 12
+      SecondBone: 14
+      Hide: 0
+    - FirstBone: 13
+      SecondBone: 15
+      Hide: 0
+    - FirstBone: 14
+      SecondBone: 16
+      Hide: 0
+    - FirstBone: 15
+      SecondBone: 17
+      Hide: 0
+    - FirstBone: 16
+      SecondBone: 18
+      Hide: 0
+    - FirstBone: 17
+      SecondBone: 30
+      Hide: 0
+    - FirstBone: 18
+      SecondBone: 45
+      Hide: 0
+    - FirstBone: 24
+      SecondBone: 25
+      Hide: 0
+    - FirstBone: 25
+      SecondBone: 26
+      Hide: 0
+    - FirstBone: 26
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 27
+      SecondBone: 28
+      Hide: 0
+    - FirstBone: 28
+      SecondBone: 29
+      Hide: 0
+    - FirstBone: 29
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 30
+      SecondBone: 31
+      Hide: 0
+    - FirstBone: 31
+      SecondBone: 32
+      Hide: 0
+    - FirstBone: 32
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 33
+      SecondBone: 34
+      Hide: 0
+    - FirstBone: 34
+      SecondBone: 35
+      Hide: 0
+    - FirstBone: 35
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 36
+      SecondBone: 37
+      Hide: 0
+    - FirstBone: 37
+      SecondBone: 38
+      Hide: 0
+    - FirstBone: 38
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 39
+      SecondBone: 40
+      Hide: 0
+    - FirstBone: 40
+      SecondBone: 41
+      Hide: 0
+    - FirstBone: 41
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 42
+      SecondBone: 43
+      Hide: 0
+    - FirstBone: 43
+      SecondBone: 44
+      Hide: 0
+    - FirstBone: 44
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 45
+      SecondBone: 46
+      Hide: 0
+    - FirstBone: 46
+      SecondBone: 47
+      Hide: 0
+    - FirstBone: 47
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 48
+      SecondBone: 49
+      Hide: 0
+    - FirstBone: 49
+      SecondBone: 50
+      Hide: 0
+    - FirstBone: 50
+      SecondBone: 55
+      Hide: 0
+    - FirstBone: 51
+      SecondBone: 52
+      Hide: 0
+    - FirstBone: 52
+      SecondBone: 53
+      Hide: 0
+    - FirstBone: 53
+      SecondBone: 55
+      Hide: 0
+  _lineRendererPrefab: {fileID: 7812178534108119229, guid: 6d28b0d0a0ff2234cbf60710c8c912dc, type: 3}
+  _axisRendererPrefab: {fileID: 106719106145556050, guid: 6103ef5d90d602545af4eb910563af03, type: 3}
+  _visualType: 0
+  _animatorComp: {fileID: 0}
+--- !u!114 &669339439527238462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669339439527238449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84fe64f23f2a68b4a86633382680187d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _boneVisualizer: {fileID: 669339439527238448}
+  _lineColor: {r: 0.9959899, g: 1, b: 0, a: 1}

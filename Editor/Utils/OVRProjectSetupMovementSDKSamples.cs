@@ -29,6 +29,20 @@ namespace Oculus.Movement.Utils
 
         static OVRProjectSetupMovementSDKSamplesTasks()
         {
+            // Skin weights settings.
+            OVRProjectSetup.AddTask(
+                level: OVRProjectSetup.TaskLevel.Recommended,
+                group: _group,
+                platform: BuildTargetGroup.Android,
+                isDone: group => QualitySettings.skinWeights == SkinWeights.FourBones,
+                message: "You should use four skin weights to avoid skinning problems",
+                fix: group =>
+                {
+                    QualitySettings.skinWeights = SkinWeights.FourBones;
+                },
+                fixMessage: "Set quality settings skin weights to four bones."
+            );
+
             // Body tracking settings.
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Required,

@@ -40,6 +40,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     Undo.RecordObject(constraint, "Set up data");
                     constraint.data.SetUpBoneReferences();
+                    constraint.data.SetInitialHipRotation();
                     EditorUtility.SetDirty(target);
                 }
             }

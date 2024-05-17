@@ -126,6 +126,11 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         /// <returns>Index of bone above hips.</returns>
         public int GetIndexOfFirstBoneAboveHips();
+
+        /// <summary>
+        /// Allows storing the initial hip rotation.
+        /// </summary>
+        public void SetInitialHipRotation();
     }
 
     /// <summary>
@@ -242,6 +247,10 @@ namespace Oculus.Movement.AnimationRigging
         [NotKeyable, SerializeField, HideInInspector]
         private bool _obtainedProperReferences;
 
+        /// <summary>
+        /// Initial hip rotation, used to calculate how much a person has rotated.
+        /// </summary>
+        [NotKeyable, SerializeField, HideInInspector]
         private Quaternion _initialHipLocalRotation;
 
         private Vector3 _calibratedHipTranslation;
@@ -269,8 +278,6 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
             _hasSetUp = true;
-
-            _initialHipLocalRotation = GetHipTransform().localRotation;
             _bones = new Transform[_skeleton.CustomBones.Count];
             for (int i = 0; i < _bones.Length; i++)
             {
@@ -400,6 +407,12 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _currentHipPinningTarget.UpdateHeight(position.y - _currentHipPinningTarget.HipTargetTransform.position.y);
             }
+        }
+
+        /// <inheritdoc />
+        public void SetInitialHipRotation()
+        {
+            _initialHipLocalRotation = GetHipTransform().localRotation;
         }
 
         /// <summary>

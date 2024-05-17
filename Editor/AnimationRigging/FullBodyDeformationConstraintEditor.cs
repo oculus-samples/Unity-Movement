@@ -115,6 +115,7 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _originalSpinePositionsWeight;
         private SerializedProperty _originalSpineBoneCount;
         private SerializedProperty _originalSpineUseHipsToHeadToScale;
+        private SerializedProperty _originalSpineFixRotations;
 
         private SerializedProperty _hipsToHeadBonesProperty;
         private SerializedProperty _hipsToHeadBoneTargetsProperty;
@@ -167,6 +168,7 @@ namespace Oculus.Movement.AnimationRigging
             _originalSpinePositionsWeight = data.FindPropertyRelative("_originalSpinePositionsWeight");
             _originalSpineBoneCount = data.FindPropertyRelative("_originalSpineBoneCount");
             _originalSpineUseHipsToHeadToScale = data.FindPropertyRelative("_originalSpineUseHipsToHeadToScale");
+            _originalSpineFixRotations = data.FindPropertyRelative("_originalSpineFixRotations");
 
             _hipsToHeadBonesProperty = data.FindPropertyRelative("_hipsToHeadBones");
             _hipsToHeadBoneTargetsProperty = data.FindPropertyRelative("_hipsToHeadBoneTargets");
@@ -368,6 +370,7 @@ namespace Oculus.Movement.AnimationRigging
             EditorGUILayout.PropertyField(_stretchProperty);
             EditorGUILayout.PropertyField(_originalSpineBoneCount);
             EditorGUILayout.PropertyField(_originalSpineUseHipsToHeadToScale);
+            EditorGUILayout.PropertyField(_originalSpineFixRotations);
 
             EditorGUILayout.Space();
             GUILayout.BeginHorizontal();
