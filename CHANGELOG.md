@@ -1,3 +1,24 @@
+# [5.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v5.0.1...v5.1.0) (2024-05-17)
+
+
+### Bug Fixes
+
+* **Runtime:** Allocate bone mappings in RetargetingLayer to prevent null ref when adding at runtime ([7211879](https://github.com/oculus-samples/Unity-Movement/commit/72118797ee2de6754d1e57991159f6aafb764392))
+* **Runtime:** Allow fixing spine rotations in deformation's ApplyOriginalSpineOffsets ([0963b46](https://github.com/oculus-samples/Unity-Movement/commit/0963b46a9f4e51006bb09f8d054ca18ad39f917f))
+* **Runtime:** Check for null retargeting processor gizmos ([d1d1f88](https://github.com/oculus-samples/Unity-Movement/commit/d1d1f88f2aeff675ff2b9707497148a38f5b696a))
+* **Runtime:** Enforce proper rest pose when using animation rigging retargeting ([92eadc3](https://github.com/oculus-samples/Unity-Movement/commit/92eadc368816a7b1d2b3e748d0a0ee7b98b0b68c))
+* **Runtime:** Properly align feet in hip pinning sample ([21bdcbc](https://github.com/oculus-samples/Unity-Movement/commit/21bdcbcfe981c8a493bc51e7a602037fe25e7404))
+* **Runtime:** Update the ISDK sample mug material to be compatible with URP ([ec01def](https://github.com/oculus-samples/Unity-Movement/commit/ec01def81fe9e2722a42cdb0d63193ce108db2c3))
+* **Samples:** Fix finger and shoulder accuracy with ISDK scene ([cb791d6](https://github.com/oculus-samples/Unity-Movement/commit/cb791d6e42b72c27259d5bfaadf141f240cc1d44))
+* **Samples:** Fix initial rotation issue with hip pinning ([cf6bc80](https://github.com/oculus-samples/Unity-Movement/commit/cf6bc80f9ed360560dc3f239f26c03c0ad96d6ac))
+* **Samples:** Update Aura with constraints ([521f246](https://github.com/oculus-samples/Unity-Movement/commit/521f2465927e8e8e2f886cb18e88310ee46d4f45))
+
+
+### Features
+
+* **Editor:** Recommend four bones for skinning in project setup tool ([db7a615](https://github.com/oculus-samples/Unity-Movement/commit/db7a615382b1f480362477a824ba6e84839e3a25))
+* **Editor:** Support auto mapping TongueOut for ARKitFace ([bcb30a6](https://github.com/oculus-samples/Unity-Movement/commit/bcb30a674c4759627a7bc412046329781610aec4))
+
 ## [5.0.1](https://github.com/oculus-samples/Unity-Movement/compare/v5.0.0...v5.0.1) (2024-04-22)
 
 
