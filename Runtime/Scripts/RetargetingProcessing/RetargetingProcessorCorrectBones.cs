@@ -46,7 +46,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         [SerializeField, Range(0.0f, 1.0f)]
         [Tooltip(RetargetingLayerTooltips.FingerPositionCorrectionWeight)]
-        private float _fingerPositionCorrectionWeight = 1.0f;
+        private float _fingerPositionCorrectionWeight = 0.0f;
         public float FingerPositionCorrectionWeight
         {
             get => _fingerPositionCorrectionWeight;
@@ -65,6 +65,7 @@ namespace Oculus.Movement.AnimationRigging
             }
             _correctPositionsLateUpdate = sourceCorrectBones.CorrectPositionsLateUpdate;
             _shoulderCorrectionWeightLateUpdate = sourceCorrectBones.ShoulderCorrectionWeightLateUpdate;
+            _fingerPositionCorrectionWeight = sourceCorrectBones.FingerPositionCorrectionWeight;
         }
 
         /// <inheritdoc />

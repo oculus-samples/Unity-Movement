@@ -9,12 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f38af004169e6854ebdb84ca480dcfa1, type: 3}
-  m_Name: ArmatureBlendHandRight
+  m_Script: {fileID: 11500000, guid: e245a3cf228c72d4ab693be869f73596, type: 3}
+  m_Name: ArmatureCorrectHandFABRIK
   m_EditorClassIdentifier: 
   Weight: 1
-  _constraintsMinDistance: 0.2
-  _constraintsMaxDistance: 0.5
+  _handIKType: 2
+  _ikTolerance: 0.000001
+  _ikIterations: 10
+  _maxHandStretch: 0.01
+  _maxShoulderStretch: 0
+  _minDistance: 0.2
+  _maxDistance: 0.5
   _blendCurve:
     serializedVersion: 2
     m_Curve:
@@ -39,6 +44,19 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _fullBodyBoneIdToTest: 19
-  _boneIdToTest: 19
-  _isFullBody: 0
+  _headView: 0
+  _isFullBody: 1
+  _leftHandProcessor:
+    CorrectHandWeight: 1
+    BlendHandWeight: 1
+    _useWorldHandPosition: 1
+    _useCustomHandTargetPosition: 1
+    _fullBodyBoneIdToTest: 19
+    _boneIdToTest: 19
+  _rightHandProcessor:
+    CorrectHandWeight: 1
+    BlendHandWeight: 1
+    _useWorldHandPosition: 1
+    _useCustomHandTargetPosition: 1
+    _fullBodyBoneIdToTest: 45
+    _boneIdToTest: 45

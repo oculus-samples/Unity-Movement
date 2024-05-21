@@ -133,11 +133,8 @@ namespace Oculus.Movement.Utils
 #endif
 
             // Add retargeting processors to the retargeting layer.
-            AddComponentsHelper.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
-            AddComponentsHelper.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Right);
             AddComponentsHelper.AddCorrectBonesRetargetingProcessor(retargetingLayer);
-            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
-            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
+            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer);
 
             // Body deformation.
             if (addConstraints)

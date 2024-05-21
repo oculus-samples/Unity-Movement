@@ -696,6 +696,7 @@ MonoBehaviour:
     _originalSpinePositionsWeight: 0.5
     _originalSpineBoneCount: 5
     _originalSpineUseHipsToHeadToScale: 1
+    _originalSpineFixRotations: 0
     _spineTranslationCorrectionType: 3
     _customSkeleton: {fileID: 0}
     _animator: {fileID: 4325497552437736820}
@@ -1531,8 +1532,8 @@ MonoBehaviour:
     PositionChange: {x: 0, y: 0, z: 0}
     RotationChange: {x: 0, y: 0, z: 0, w: 1}
     RotationTweaks:
-    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
-    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
+    - {x: 0, y: 0.38268346, z: 0, w: 0.9238795}
+    - {x: 0.043609004, y: -0.00095155207, z: 0.021794124, w: 0.99881047}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
@@ -1541,8 +1542,8 @@ MonoBehaviour:
     PositionChange: {x: 0, y: 0, z: 0}
     RotationChange: {x: 0, y: 0, z: 0, w: 1}
     RotationTweaks:
-    - {x: 0, y: 0.42261827, z: 0, w: 0.90630776}
-    - {x: 0, y: 0, z: 0.1736483, w: -0.9848077}
+    - {x: 0, y: 0.38268346, z: 0, w: 0.9238795}
+    - {x: 0.043609004, y: -0.0009515519, z: 0.021794122, w: 0.99881047}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
@@ -1556,11 +1557,8 @@ MonoBehaviour:
   _enableTrackingByProxy: 1
   _retargetingAnimationConstraint: {fileID: 3289871368579812835}
   _retargetingProcessors:
-  - {fileID: 11400000, guid: 050b10261d9b9bd4ebce9c2c08d9d757, type: 2}
-  - {fileID: 11400000, guid: 89f86b76c1fd36e47a44da808dc59836, type: 2}
   - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
-  - {fileID: 11400000, guid: 8033477507feea54a9c44eb17a69be20, type: 2}
-  - {fileID: 11400000, guid: b47ca2dcc0aa6e34484b90e7122d3db4, type: 2}
+  - {fileID: 11400000, guid: 2f4117f1d60a81945a0e08b16219ca51, type: 2}
   _retargetingAnimationRig:
     _rebindAnimator: 1
     _reEnableRig: 1
