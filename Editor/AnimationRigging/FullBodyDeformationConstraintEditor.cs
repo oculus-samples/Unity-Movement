@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using Oculus.Movement.Utils;
+using System;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -246,8 +248,63 @@ namespace Oculus.Movement.AnimationRigging
                 var rigBuilder = constraint.GetComponentInParent<RigBuilder>();
                 rigBuilder.Build();
             }
+            if (GUILayout.Button("Save to JSON"))
+            {
+                SaveToJSON(constraint);
+            }
+            if (GUILayout.Button("Read from JSON"))
+            {
+                ReadFromJSON(constraint);
+            }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void SaveToJSON(FullBodyDeformationConstraint constraint)
+        {
+            try
+            {
+                var jsonPath = EditorUtility.SaveFilePanel(
+                    "Save configuration into JSON",
+                    Application.dataPath,
+                    "",
+                    "json");
+                if (String.IsNullOrEmpty(jsonPath))
+                {
+                    return;
+                }
+                var jsonResult = JsonUtility.ToJson(constraint, true);
+                File.WriteAllText(jsonPath, jsonResult);
+                Debug.Log($"Wrore JSON config to path {jsonPath}.");
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Could not save deformation to JSON, exception: {exception}");
+            }
+        }
+
+        private void ReadFromJSON(FullBodyDeformationConstraint constraint)
+        {
+            try
+            {
+                var jsonPath = EditorUtility.OpenFilePanel(
+                    "Load configuration from JSON",
+                    Application.dataPath,
+                    "json");
+                if (String.IsNullOrEmpty(jsonPath))
+                {
+                    return;
+                }
+                string text = File.ReadAllText(jsonPath);
+                JsonUtility.FromJsonOverwrite(text, constraint);
+                Debug.Log($"Read JSON config from {jsonPath}.");
+                // Calculate our bone data because JSON will reference bone data from other character.
+                DisplayCalculateBoneData(constraint);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Could not save deformation to JSON, exception: {exception}");
+            }
         }
 
         private void DisplayCalculateBoneData(FullBodyDeformationConstraint constraint)
