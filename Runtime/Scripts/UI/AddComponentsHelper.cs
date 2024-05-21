@@ -593,6 +593,7 @@ namespace Oculus.Movement.Utils
             DestroyLegacyComponents<AnimationRigSetup>(gameObject);
             DestroyLegacyComponents<FullBodyHandDeformation>(gameObject);
             DestroyLegacyProcessor<RetargetingHandDeformationProcessor>(gameObject);
+            DestroyLegacyComponents<BlendHandConstraintsFullBody>(gameObject);
         }
 
         /// <summary>
