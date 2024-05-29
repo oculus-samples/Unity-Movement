@@ -1655,6 +1655,9 @@ namespace Oculus.Movement
 
         public const string Animators =
             "Animators who should receive signals to animate";
+
+        public const string MaxInputAcceleration =
+            "Max input acceleration.";
     }
 
     public static class JumpingRigidbodyTooltips
@@ -1918,12 +1921,12 @@ namespace Oculus.Movement
         public const string Enabled =
             "Enables or disables functionality.";
     }
-    
+
     public static class RetargetedBoneMappingsTooltips
     {
         public const string HumanBodyBonePairs =
         "HumanBodyBone pairs for this humanoid.";
-        
+
         public const string HumanBodyBoneToBoneId =
             "HumanBodyBone to BodyJointId mapping for this humanoid.";
     }

@@ -30,9 +30,25 @@ namespace Oculus.Movement.Locomotion
         [System.Serializable]
         public class JoystickEvents
         {
+            /// <summary>
+            /// Locomotion direction.
+            /// </summary>
             public UnityEvent_Quaternion OnDirectionChange = new UnityEvent_Quaternion();
+            /// <summary>
+            /// User input, follows character direction.
+            /// </summary>
             public UnityEvent_Vector2 OnUserInputChange = new UnityEvent_Vector2();
+            /// <summary>
+            /// User input, follows joystick direction.
+            /// </summary>
+            public UnityEvent_Vector2 OnUserInputChangeJoystickDir = new UnityEvent_Vector2();
+            /// <summary>
+            /// Start move event.
+            /// </summary>
             public UnityEvent OnStartMove = new UnityEvent();
+            /// <summary>
+            /// Stop move event.
+            /// </summary>
             public UnityEvent OnStopMove = new UnityEvent();
         }
 
@@ -277,34 +293,29 @@ namespace Oculus.Movement.Locomotion
             _joystickInput = joystickInput;
             _locomotionDirection += cameraOrientation * (_joystickInput.x * Vector3.right);
             _locomotionDirection += cameraOrientation * (_joystickInput.y * Vector3.forward);
-            Vector3 avatarDirection;
 
-            bool avatarOrientationNeedsMoreMath = cameraOrientation != avatarOrientation;
-            if (avatarOrientationNeedsMoreMath)
-            {
-                Vector3 avatarOrientationEuler = avatarOrientation.eulerAngles;
-                Quaternion avatarOrientationOffset = Quaternion.Euler(0, -avatarOrientationEuler.y, 0);
-                avatarDirection = cameraOrientation * avatarOrientationOffset * (_joystickInput.x * Vector3.right);
-                avatarDirection += cameraOrientation * avatarOrientationOffset * (_joystickInput.y * Vector3.forward);
-            }
-            else
-            {
-                avatarDirection = _locomotionDirection;
-            }
+            Vector3 avatarDirection = CalculateDirectionBasedOnRigAndReferenceTransform(
+                cameraOrientation, avatarOrientation, _locomotionDirection);
 
-            Vector2 userInput =  _scaleInputByActualVelocity ? ScaledByVelocity(avatarDirection)
+            Vector2 userInput = _scaleInputByActualVelocity ? ScaledByVelocity(avatarDirection)
                 : new Vector2(avatarDirection.x, avatarDirection.z);
+            Vector2 userInputJoystick = new Vector2(_joystickInput.x, _joystickInput.y);
+            userInputJoystick = _scaleInputByActualVelocity ?
+                ScaledByVelocity(new Vector3(userInputJoystick.x, 0.0f, userInputJoystick.y)) :
+                userInputJoystick;
 
             if (_locomotionDirection != _lastLocomotionDirection || _lastReportedUserInput != userInput)
             {
                 if (_joystickInput == Vector2.zero)
                 {
                     _movementEvents.OnUserInputChange.Invoke(Vector2.zero);
+                    _movementEvents.OnUserInputChangeJoystickDir.Invoke(Vector2.zero);
                     _movementEvents.OnStopMove.Invoke();
                 }
                 else
                 {
                     _movementEvents.OnUserInputChange.Invoke(userInput);
+                    _movementEvents.OnUserInputChangeJoystickDir.Invoke(userInputJoystick);
                     Quaternion newDirection = Quaternion.LookRotation(_locomotionDirection, Vector3.up);
                     _movementEvents.OnDirectionChange.Invoke(newDirection);
                     if (_lastLocomotionDirection == Vector3.zero)
@@ -317,9 +328,33 @@ namespace Oculus.Movement.Locomotion
             }
         }
 
+        private Vector3 CalculateDirectionBasedOnRigAndReferenceTransform(
+            Quaternion cameraOrientation,
+            Quaternion avatarOrientation,
+            Vector3 fallbackLocomotionDirection)
+        {
+            Vector3 avatarDirection;
+
+            bool avatarCameraRigOrientationMismatch = cameraOrientation != avatarOrientation;
+            if (avatarCameraRigOrientationMismatch)
+            {
+                Vector3 avatarOrientationEuler = avatarOrientation.eulerAngles;
+                Quaternion avatarOrientationOffset = Quaternion.Euler(0, -avatarOrientationEuler.y, 0);
+                Quaternion combinedOrientation = cameraOrientation * avatarOrientationOffset;
+                avatarDirection = combinedOrientation * (_joystickInput.x * Vector3.right);
+                avatarDirection += combinedOrientation * (_joystickInput.y * Vector3.forward);
+            }
+            else
+            {
+                avatarDirection = fallbackLocomotionDirection;
+            }
+
+            return avatarDirection;
+        }
+
         private Vector2 ScaledByVelocity(Vector3 directionInput)
         {
-            if ( _joystickInput == Vector2.zero)
+            if (_joystickInput == Vector2.zero)
             {
                 return Vector2.zero;
             }

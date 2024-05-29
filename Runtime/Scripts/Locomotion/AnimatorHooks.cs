@@ -75,9 +75,13 @@ namespace Oculus.Movement.Locomotion
         /// </summary>
         [Tooltip(AnimatorHooksTooltips.Animators)]
         [SerializeField]
-        [ContextMenuItem(nameof(RefreshAnimators),nameof(RefreshAnimators))]
+        [ContextMenuItem(nameof(RefreshAnimators), nameof(RefreshAnimators))]
         private Animator[] _animators;
 
+        /// <summary>
+        /// Max input acceleration.
+        /// </summary>
+        [Tooltip(AnimatorHooksTooltips.MaxInputAcceleration)]
         [SerializeField]
         private float _maxInputAcceleration = 0.1f;
 
