@@ -50,6 +50,16 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<bool> BonesToSkip;
 
         /// <summary>
+        /// Controls if positions from the animation should affect result.
+        /// </summary>
+        public BoolProperty AffectPositions;
+
+        /// <summary>
+        /// Controls if rotations from the animation should affect result.
+        /// </summary>
+        public BoolProperty AffectRotations;
+
+        /// <summary>
         /// Job weight.
         /// </summary>
         public FloatProperty jobWeight { get; set; }
@@ -104,8 +114,14 @@ namespace Oculus.Movement.AnimationRigging
                         targetBoneRotation = Quaternion.Slerp(targetBoneRotation, OverrideBoneRotations[i], weight);
                     }
 
-                    Bones[i].SetLocalPosition(stream, targetBonePosition);
-                    Bones[i].SetLocalRotation(stream, targetBoneRotation);
+                    if (AffectPositions.Get(stream))
+                    {
+                        Bones[i].SetLocalPosition(stream, targetBonePosition);
+                    }
+                    if (AffectRotations.Get(stream))
+                    {
+                        Bones[i].SetLocalRotation(stream, targetBoneRotation);
+                    }
                 }
             }
             else
@@ -148,6 +164,11 @@ namespace Oculus.Movement.AnimationRigging
                 NativeArrayOptions.UninitializedMemory);
             job.BonesToSkip = new NativeArray<bool>((int)HumanBodyBones.LastBone, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
+
+            job.AffectPositions =
+                BoolProperty.Bind(animator, component, data.AffectPositionsBoolProperty);
+            job.AffectRotations =
+                BoolProperty.Bind(animator, component, data.AffectRotationsBoolProperty);
 
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
             {

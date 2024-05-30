@@ -1108,6 +1108,12 @@ namespace Oculus.Movement
 
         public const string AvatarMask =
             "The avatar mask for masking the animation.";
+
+        public const string AffectPositions =
+            "Affect positions via the animation.";
+
+        public const string AffectRotations =
+            "Affect rotations via the animation.";
     }
 
     public static class AnimationRigSetupTooltips

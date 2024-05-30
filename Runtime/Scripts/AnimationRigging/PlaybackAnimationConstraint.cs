@@ -32,6 +32,16 @@ namespace Oculus.Movement.AnimationRigging
         /// The animation playback type int property.
         /// </summary>
         public string PlaybackTypeIntProperty { get; }
+
+        /// <summary>
+        /// Affect positions via the animation.
+        /// </summary>
+        public string AffectPositionsBoolProperty { get; }
+
+        /// <summary>
+        /// Affect rotation via the animation.
+        /// </summary>
+        public string AffectRotationsBoolProperty { get; }
     }
 
     /// <summary>
@@ -66,6 +76,14 @@ namespace Oculus.Movement.AnimationRigging
         string IPlaybackAnimationData.PlaybackTypeIntProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_animationPlaybackType));
 
+        /// <inheritdoc />
+        string IPlaybackAnimationData.AffectPositionsBoolProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_affectPositions));
+
+        /// <inheritdoc />
+        string IPlaybackAnimationData.AffectRotationsBoolProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_affectRotations));
+
         /// <summary>
         /// Avatar mask instance accessor.
         /// </summary>
@@ -91,6 +109,20 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Optional]
         [Tooltip(PlaybackAnimationDataTooltips.AvatarMask)]
         private AvatarMask _avatarMask;
+
+        /// <summary>
+        /// Affect positions via the animation.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(PlaybackAnimationDataTooltips.AffectPositions)]
+        private bool _affectPositions;
+
+        /// <summary>
+        /// Affect rotations via the animation.
+        /// </summary>
+        [SyncSceneToStream, SerializeField]
+        [Tooltip(PlaybackAnimationDataTooltips.AffectRotations)]
+        private bool _affectRotations;
 
         /// <summary>
         /// Don't allow changing the original field directly, as that
@@ -131,6 +163,8 @@ namespace Oculus.Movement.AnimationRigging
             _captureAnimationConstraint = null;
             _avatarMask = null;
             _avatarMaskInst = null;
+            _affectPositions = true;
+            _affectRotations = true;
         }
     }
 
