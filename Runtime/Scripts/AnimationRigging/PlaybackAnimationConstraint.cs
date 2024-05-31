@@ -5,6 +5,7 @@ using System;
 using Oculus.Movement.Utils;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Animations;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -27,6 +28,11 @@ namespace Oculus.Movement.AnimationRigging
         /// The avatar mask for masking the animation.
         /// </summary>
         public AvatarMask AnimationMask { get; }
+
+        /// <summary>
+        /// Bones array mask.
+        /// </summary>
+        public HumanBodyBones[] BonesArrayMask { get; }
 
         /// <summary>
         /// The animation playback type int property.
@@ -84,6 +90,9 @@ namespace Oculus.Movement.AnimationRigging
         string IPlaybackAnimationData.AffectRotationsBoolProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_affectRotations));
 
+        /// <inheritdoc />
+        HumanBodyBones[] IPlaybackAnimationData.BonesArrayMask => _bonesArrayMask;
+
         /// <summary>
         /// Avatar mask instance accessor.
         /// </summary>
@@ -123,6 +132,13 @@ namespace Oculus.Movement.AnimationRigging
         [SyncSceneToStream, SerializeField]
         [Tooltip(PlaybackAnimationDataTooltips.AffectRotations)]
         private bool _affectRotations;
+
+        /// <summary>
+        /// Bones to mask by array.
+        /// </summary>
+        [NotKeyable, SerializeField]
+        [Tooltip(PlaybackAnimationDataTooltips.BonesArrayMask)]
+        private HumanBodyBones[] _bonesArrayMask;
 
         /// <summary>
         /// Don't allow changing the original field directly, as that
@@ -165,6 +181,7 @@ namespace Oculus.Movement.AnimationRigging
             _avatarMaskInst = null;
             _affectPositions = true;
             _affectRotations = true;
+            _bonesArrayMask = new HumanBodyBones[0];
         }
     }
 

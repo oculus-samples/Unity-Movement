@@ -195,9 +195,25 @@ namespace Oculus.Movement.AnimationRigging
                 var index = (int)i;
                 var playbackType = (PlaybackAnimationData.AnimationPlaybackType)data.PlaybackType;
 
+                bool boneFailsAnimationMask = data.AnimationMask != null &&
+                     !data.AnimationMask.GetHumanoidBodyPartActive(BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i]);
+                bool boneFailsArrayMask = false;
+                if (data.BonesArrayMask != null && data.BonesArrayMask.Length > 0)
+                {
+                    // bone fails array mask UNLESS user specifies bone to be in it
+                    boneFailsArrayMask = true;
+                    foreach (var bodyBone in  data.BonesArrayMask)
+                    {
+                        if (bodyBone == i)
+                        {
+                            boneFailsArrayMask = false;
+                            break;
+                        }
+                    }
+                }
+
                 if (playbackType == PlaybackAnimationData.AnimationPlaybackType.None ||
-                    (data.AnimationMask != null &&
-                     !data.AnimationMask.GetHumanoidBodyPartActive(BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i])))
+                    boneFailsAnimationMask || boneFailsArrayMask)
                 {
                     job.BonePositionDeltas[index] = Vector3.zero;
                     job.BoneRotationDeltas[index] = Quaternion.identity;

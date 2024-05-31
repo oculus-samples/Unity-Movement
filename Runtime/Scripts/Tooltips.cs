@@ -1114,6 +1114,9 @@ namespace Oculus.Movement
 
         public const string AffectRotations =
             "Affect rotations via the animation.";
+
+        public const string BonesArrayMask =
+            "Bones to mask by array.";
     }
 
     public static class AnimationRigSetupTooltips
