@@ -8,7 +8,7 @@ using UnityEngine.Animations.Rigging;
 namespace Oculus.Movement.AnimationRigging
 {
     /// <summary>
-    /// The capture animation job, which will write bone local position and rotation data
+    /// The capture animation job, which will write bone position and rotation data
     /// into accessible native arrays.
     /// </summary>
     [Unity.Burst.BurstCompile]
@@ -20,14 +20,14 @@ namespace Oculus.Movement.AnimationRigging
         public NativeArray<ReadWriteTransformHandle> Bones;
 
         /// <summary>
-        /// The array of bone local positions to write to.
+        /// The array of bone positions to write to.
         /// </summary>
-        public NativeArray<Vector3> BoneLocalPositions;
+        public NativeArray<Vector3> BonePositions;
 
         /// <summary>
-        /// The array of bone local rotations to write to.
+        /// The array of bone rotations to write to.
         /// </summary>
-        public NativeArray<Quaternion> BoneLocalRotations;
+        public NativeArray<Quaternion> BoneRotations;
 
         /// <summary>
         /// Job weight.
@@ -58,8 +58,8 @@ namespace Oculus.Movement.AnimationRigging
 
                     var bonePosition = Bones[i].GetLocalPosition(stream);
                     var boneRotation = Bones[i].GetLocalRotation(stream);
-                    BoneLocalPositions[i] = bonePosition;
-                    BoneLocalRotations[i] = boneRotation;
+                    BonePositions[i] = bonePosition;
+                    BoneRotations[i] = boneRotation;
                 }
             }
             else
@@ -90,9 +90,9 @@ namespace Oculus.Movement.AnimationRigging
 
             job.Bones = new NativeArray<ReadWriteTransformHandle>(data.CurrentPose.Length, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
-            job.BoneLocalPositions = new NativeArray<Vector3>(data.CurrentPose.Length, Allocator.Persistent,
+            job.BonePositions = new NativeArray<Vector3>(data.CurrentPose.Length, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
-            job.BoneLocalRotations = new NativeArray<Quaternion>(data.CurrentPose.Length, Allocator.Persistent,
+            job.BoneRotations = new NativeArray<Quaternion>(data.CurrentPose.Length, Allocator.Persistent,
                 NativeArrayOptions.UninitializedMemory);
 
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
@@ -101,8 +101,8 @@ namespace Oculus.Movement.AnimationRigging
                 job.Bones[(int)i] = bone != null ?
                     ReadWriteTransformHandle.Bind(animator, bone) :
                     new ReadWriteTransformHandle();
-                job.BoneLocalPositions[(int)i] = Vector3.zero;
-                job.BoneLocalRotations[(int)i] = Quaternion.identity;
+                job.BonePositions[(int)i] = Vector3.zero;
+                job.BoneRotations[(int)i] = Quaternion.identity;
             }
 
             return job;
@@ -126,10 +126,10 @@ namespace Oculus.Movement.AnimationRigging
                     for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
                     {
                         var referencePoseBone = data.ReferencePose[(int)i];
-                        var bonePosition = job.BoneLocalPositions[(int)i];
-                        var boneRotation = job.BoneLocalRotations[(int)i];
-                        referencePoseBone.LocalPosition = bonePosition;
-                        referencePoseBone.LocalRotation = boneRotation;
+                        var bonePosition = job.BonePositions[(int)i];
+                        var boneRotation = job.BoneRotations[(int)i];
+                        referencePoseBone.Position = bonePosition;
+                        referencePoseBone.Rotation = boneRotation;
                         data.ReferencePose[(int)i] = referencePoseBone;
                     }
                 }
@@ -139,10 +139,10 @@ namespace Oculus.Movement.AnimationRigging
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
             {
                 var currentPoseBone = data.CurrentPose[(int)i];
-                var bonePosition = job.BoneLocalPositions[(int)i];
-                var boneRotation = job.BoneLocalRotations[(int)i];
-                currentPoseBone.LocalPosition = bonePosition;
-                currentPoseBone.LocalRotation = boneRotation;
+                var bonePosition = job.BonePositions[(int)i];
+                var boneRotation = job.BoneRotations[(int)i];
+                currentPoseBone.Position = bonePosition;
+                currentPoseBone.Rotation = boneRotation;
                 data.CurrentPose[(int)i] = currentPoseBone;
             }
         }
@@ -151,8 +151,8 @@ namespace Oculus.Movement.AnimationRigging
         public override void Destroy(CaptureAnimationJob job)
         {
             job.Bones.Dispose();
-            job.BoneLocalPositions.Dispose();
-            job.BoneLocalRotations.Dispose();
+            job.BonePositions.Dispose();
+            job.BoneRotations.Dispose();
         }
     }
 }

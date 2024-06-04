@@ -1117,6 +1117,27 @@ namespace Oculus.Movement
 
         public const string BonesArrayMask =
             "Bones to mask by array.";
+
+        public const string FixedHipsPosition =
+            "Allows setting hips to a fixed position.";
+
+        public const string FixedHipsRotation =
+            "Allows setting hips to a fixed rotation.";
+
+        public const string UsedFixedHipsPose =
+            "Used fixed hips pose or not.";
+
+        public const string AffectHipsPositionY =
+            "Affect hips position Y value.";
+
+        public const string AffectHipsRotationX =
+            "Affect hips rotation X value.";
+
+        public const string AffectHipsRotationY =
+            "Affect hips rotation Y value.";
+
+        public const string AffectHipsRotationZ =
+            "Affect hips rotation Z value.";
     }
 
     public static class AnimationRigSetupTooltips

@@ -60,6 +60,36 @@ namespace Oculus.Movement.AnimationRigging
         public BoolProperty AffectRotations;
 
         /// <summary>
+        /// Fixed hips pose.
+        /// </summary>
+        public NativeArray<Pose> FixedHipsPose;
+
+        /// <summary>
+        /// Whether to use fixed hips pose or not.
+        /// </summary>
+        public BoolProperty UseFixedHipsPose;
+
+        /// <summary>
+        /// Whether to affect hips position Y-value.
+        /// </summary>
+        public BoolProperty AffectHipsPositionY;
+
+        /// <summary>
+        /// Whether to affect hips rotation X-value.
+        /// </summary>
+        public BoolProperty AffectHipsRotationX;
+
+        /// <summary>
+        /// Whether to affect hips rotation Y-value.
+        /// </summary>
+        public BoolProperty AffectHipsRotationY;
+
+        /// <summary>
+        /// Whether to affect hips rotation Z-value.
+        /// </summary>
+        public BoolProperty AffectHipsRotationZ;
+
+        /// <summary>
         /// Job weight.
         /// </summary>
         public FloatProperty jobWeight { get; set; }
@@ -93,8 +123,11 @@ namespace Oculus.Movement.AnimationRigging
                         continue;
                     }
 
-                    var targetBonePosition = Bones[i].GetLocalPosition(stream);
-                    var targetBoneRotation = Bones[i].GetLocalRotation(stream);
+                    var originalBonePosition = Bones[i].GetLocalPosition(stream);
+                    var originalBoneRotation = Bones[i].GetLocalRotation(stream);
+                    var targetBonePosition = originalBonePosition;
+                    var targetBoneRotation = originalBoneRotation;
+
                     if (playbackType == PlaybackAnimationData.AnimationPlaybackType.Additive)
                     {
                         targetBonePosition += Vector3.Lerp(Vector3.zero, BonePositionDeltas[i], weight);
@@ -102,16 +135,14 @@ namespace Oculus.Movement.AnimationRigging
                     }
                     if (playbackType == PlaybackAnimationData.AnimationPlaybackType.Override)
                     {
-                        if (i == (int)HumanBodyBones.Hips)
-                        {
-                            // Skip setting the hips bone.
-                            // We want to keep the tracked position and rotation of the character
-                            // when we apply the override animation to allow for blending between
-                            // tracking and animation playback.
-                            continue;
-                        }
                         targetBonePosition = Vector3.Lerp(targetBonePosition, OverrideBonePositions[i], weight);
                         targetBoneRotation = Quaternion.Slerp(targetBoneRotation, OverrideBoneRotations[i], weight);
+                    }
+
+                    if (HumanBodyBones.Hips == (HumanBodyBones)i)
+                    {
+                        targetBonePosition = HandleHipsPosition(stream, targetBonePosition, originalBonePosition);
+                        targetBoneRotation = HandleHipsRotation(stream, targetBoneRotation, originalBoneRotation);
                     }
 
                     if (AffectPositions.Get(stream))
@@ -135,6 +166,62 @@ namespace Oculus.Movement.AnimationRigging
                     AnimationRuntimeUtils.PassThrough(stream, Bones[i]);
                 }
             }
+        }
+
+        private Vector3 HandleHipsPosition(AnimationStream stream, Vector3 targetHipsPosition,
+            Vector3 originalHipsPosition)
+        {
+            var finalHipsPosition = originalHipsPosition;
+            // Be careful when setting the hips position; only affect portions specified.
+            // If X and Z are modified, then that will put the hips into a horizontal
+            // position that does not match tracking.
+            if (AffectHipsPositionY.Get(stream))
+            {
+                finalHipsPosition = new Vector3(
+                        originalHipsPosition.x,
+                        UseFixedHipsPose.Get(stream) ? FixedHipsPose[0].position.y : targetHipsPosition.y,
+                        originalHipsPosition.z
+                    );
+            }
+
+            return finalHipsPosition;
+        }
+
+        private Quaternion HandleHipsRotation(AnimationStream stream, Quaternion targetHipsRotation,
+            Quaternion originalHipsRotation)
+        {
+            var finalHipsRotation = originalHipsRotation;
+
+            bool affectHipsRotationX = AffectHipsRotationX.Get(stream);
+            bool affectHipsRotationY = AffectHipsRotationY.Get(stream);
+            bool affectHipsRotationZ = AffectHipsRotationZ.Get(stream);
+
+            if (affectHipsRotationX || affectHipsRotationY || affectHipsRotationZ)
+            {
+                bool useFixedHipsPose = UseFixedHipsPose.Get(stream);
+                Vector3 fixedRotEuler = FixedHipsPose[0].rotation.eulerAngles;
+                Vector3 originalRotEuler = originalHipsRotation.eulerAngles;
+                Vector3 targetRotEuler = targetHipsRotation.eulerAngles;
+
+                if (useFixedHipsPose)
+                {
+                    finalHipsRotation = Quaternion.Euler(
+                        affectHipsRotationX ? fixedRotEuler.x : originalRotEuler.x,
+                        affectHipsRotationY ? fixedRotEuler.y : originalRotEuler.y,
+                        affectHipsRotationZ ? fixedRotEuler.z : originalRotEuler.z
+                        );
+                }
+                else
+                {
+                    finalHipsRotation = Quaternion.Euler(
+                        affectHipsRotationX ? targetRotEuler.x : originalRotEuler.x,
+                        affectHipsRotationY ? targetRotEuler.y : originalRotEuler.y,
+                        affectHipsRotationZ ? targetRotEuler.z : originalRotEuler.z
+                        );
+                }
+            }
+
+            return finalHipsRotation;
         }
     }
 
@@ -170,16 +257,38 @@ namespace Oculus.Movement.AnimationRigging
             job.AffectRotations =
                 BoolProperty.Bind(animator, component, data.AffectRotationsBoolProperty);
 
+            job.FixedHipsPose =
+                new NativeArray<Pose>(1, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+            job.FixedHipsPose[0] = new Pose(data.FixedHipsPosition, Quaternion.Euler(data.FixedHipsRotationEuler));
+            job.UseFixedHipsPose =
+                BoolProperty.Bind(animator, component, data.UseFixedHipsPoseProperty);
+            job.AffectHipsPositionY =
+                BoolProperty.Bind(animator, component, data.AffectHipsPositionPropertyY);
+            job.AffectHipsRotationX =
+                BoolProperty.Bind(animator, component, data.AffectHipsRotationPropertyX);
+            job.AffectHipsRotationY =
+                BoolProperty.Bind(animator, component, data.AffectHipsRotationPropertyY);
+            job.AffectHipsRotationZ =
+                BoolProperty.Bind(animator, component, data.AffectHipsRotationPropertyZ);
+
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
             {
                 var bone = animator.GetBoneTransform(i);
                 job.Bones[(int)i] = bone != null ?
                     ReadWriteTransformHandle.Bind(animator, bone) :
                     new ReadWriteTransformHandle();
-                job.BonePositionDeltas[(int)i] = bone != null ? bone.localPosition : Vector3.zero;
-                job.BoneRotationDeltas[(int)i] = bone != null ? bone.localRotation : Quaternion.identity;
-                job.OverrideBonePositions[(int)i] = bone != null ? bone.localPosition : Vector3.zero;
-                job.OverrideBoneRotations[(int)i] = bone != null ? bone.localRotation : Quaternion.identity;
+                var defaultPosition = Vector3.zero;
+                var defaultRotation = Quaternion.identity;
+
+                if (bone != null)
+                {
+                    defaultPosition = bone.localPosition;
+                    defaultRotation = bone.localRotation;
+                }
+                job.BonePositionDeltas[(int)i] = defaultPosition;
+                job.BoneRotationDeltas[(int)i] = defaultRotation;
+                job.OverrideBonePositions[(int)i] = defaultPosition;
+                job.OverrideBoneRotations[(int)i] = defaultRotation;
                 job.BonesToSkip[(int)i] = bone == null;
             }
 
@@ -190,6 +299,9 @@ namespace Oculus.Movement.AnimationRigging
         public override void Update(PlaybackAnimationJob job, ref T data)
         {
             ICaptureAnimationData captureAnimationData = data.SourceConstraint.data;
+
+            job.FixedHipsPose[0] = new Pose(data.FixedHipsPosition,
+                Quaternion.Euler(data.FixedHipsRotationEuler));
             for (var i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
             {
                 var index = (int)i;
@@ -200,9 +312,11 @@ namespace Oculus.Movement.AnimationRigging
                 bool boneFailsArrayMask = false;
                 if (data.BonesArrayMask != null && data.BonesArrayMask.Length > 0)
                 {
+                    // override the other test
+                    boneFailsAnimationMask = false;
                     // bone fails array mask UNLESS user specifies bone to be in it
                     boneFailsArrayMask = true;
-                    foreach (var bodyBone in  data.BonesArrayMask)
+                    foreach (var bodyBone in data.BonesArrayMask)
                     {
                         if (bodyBone == i)
                         {
@@ -232,8 +346,8 @@ namespace Oculus.Movement.AnimationRigging
 
                 if (playbackType == PlaybackAnimationData.AnimationPlaybackType.Override)
                 {
-                    job.OverrideBonePositions[index] = captureAnimationData.CurrentPose[index].LocalPosition;
-                    job.OverrideBoneRotations[index] = captureAnimationData.CurrentPose[index].LocalRotation;
+                    job.OverrideBonePositions[index] = captureAnimationData.CurrentPose[index].Position;
+                    job.OverrideBoneRotations[index] = captureAnimationData.CurrentPose[index].Rotation;
                     job.BonesToSkip[index] = false;
                 }
             }
@@ -250,6 +364,7 @@ namespace Oculus.Movement.AnimationRigging
             job.BoneRotationDeltas.Dispose();
             job.OverrideBonePositions.Dispose();
             job.OverrideBoneRotations.Dispose();
+            job.FixedHipsPose.Dispose();
         }
     }
 }

@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction;
 using System;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -61,14 +60,14 @@ namespace Oculus.Movement.AnimationRigging
             public HumanBodyBones Bone = HumanBodyBones.LastBone;
 
             /// <summary>
-            /// The local position of the bone.
+            /// The position of the bone.
             /// </summary>
-            public Vector3 LocalPosition = Vector3.zero;
+            public Vector3 Position = Vector3.zero;
 
             /// <summary>
-            /// The local rotation of the bone.
+            /// The rotation of the bone.
             /// </summary>
-            public Quaternion LocalRotation = Quaternion.identity;
+            public Quaternion Rotation = Quaternion.identity;
         }
 
         /// <inheritdoc />
@@ -142,8 +141,8 @@ namespace Oculus.Movement.AnimationRigging
                 _referencePose[(int)i] = new PoseBone
                 {
                     Bone = i,
-                    LocalPosition = Vector3.zero,
-                    LocalRotation = Quaternion.identity
+                    Position = Vector3.zero,
+                    Rotation = Quaternion.identity
                 };
             }
             for (HumanBodyBones i = HumanBodyBones.Hips; i < HumanBodyBones.LastBone; i++)
@@ -151,8 +150,8 @@ namespace Oculus.Movement.AnimationRigging
                 _currentPose[(int)i] = new PoseBone
                 {
                     Bone = i,
-                    LocalPosition = Vector3.zero,
-                    LocalRotation = Quaternion.identity
+                    Position = Vector3.zero,
+                    Rotation = Quaternion.identity
                 };
             }
         }
@@ -166,8 +165,8 @@ namespace Oculus.Movement.AnimationRigging
         {
             var referencePoseBone = _referencePose[(int)humanBodyBones];
             var currentPoseBone = _currentPose[(int)humanBodyBones];
-            return currentPoseBone.LocalPosition -
-                   referencePoseBone.LocalPosition;
+            return currentPoseBone.Position -
+                   referencePoseBone.Position;
         }
 
         /// <summary>
@@ -179,8 +178,8 @@ namespace Oculus.Movement.AnimationRigging
         {
             var referencePoseBone = _referencePose[(int)humanBodyBones];
             var currentPoseBone = _currentPose[(int)humanBodyBones];
-            return Quaternion.Inverse(referencePoseBone.LocalRotation) *
-                   currentPoseBone.LocalRotation;
+            return Quaternion.Inverse(referencePoseBone.Rotation) *
+                   currentPoseBone.Rotation;
         }
 
         bool IAnimationJobData.IsValid()
