@@ -39,6 +39,10 @@ namespace Oculus.Movement.AnimationRigging.Utils
             /// </summary>
             public void Update()
             {
+                if (DrivenTransform == null)
+                {
+                    return;
+                }
                 DrivenTransform.SetPositionAndRotation(
                     SourceTransform.position,
                     SourceTransform.rotation);
