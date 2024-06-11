@@ -1932,6 +1932,24 @@ namespace Oculus.Movement
             "The type of head that should be used to blend hands.";
     }
 
+    public static class RetargetingProcessorCorrectHandTooltips
+    {
+        public const string BlendHandWeight =
+            "The weight of the hand blending.";
+
+        public const string HandIKWeight =
+            "The weight of the hand blending.";
+
+        public const string ArmChainBones =
+            "The weight of the hand blending.";
+
+        public const string LeftHandProcessor =
+            "Left hand processor.";
+
+        public const string RightHandProcessor =
+            "Right hand processor.";
+    }
+
     public static class ExternalBoneTargetsTooltips
     {
         public static class BoneTargetTooltips

@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
 using Oculus.Interaction.Input;
 using System;
 using System.Collections.Generic;
@@ -25,12 +26,14 @@ namespace Oculus.Movement.AnimationRigging
             /// The weight of the hand blending.
             /// </summary>
             [Range(0.0f, 1.0f)]
+            [Tooltip(RetargetingProcessorCorrectHandTooltips.BlendHandWeight)]
             public float BlendHandWeight = 1.0f;
 
             /// <summary>
             /// The weight of the hand IK.
             /// </summary>
             [Range(0.0f, 1.0f)]
+            [Tooltip(RetargetingProcessorCorrectHandTooltips.HandIKWeight)]
             public float HandIKWeight = 1.0f;
 
             /// <summary>
@@ -100,6 +103,19 @@ namespace Oculus.Movement.AnimationRigging
                 set => _boneIdToTest = value;
             }
 
+            /// <summary>
+            /// Arm chain bones to affect. WARNING: Advanced feature.
+            /// </summary>
+            [SerializeField, Optional]
+            [Tooltip(RetargetingProcessorCorrectHandTooltips.ArmChainBones)]
+            private HumanBodyBones[] _armChainBones;
+            /// <inheritdoc cref="_armChainBones"/>
+            public HumanBodyBones[] ArmChainBones
+            {
+                get => _armChainBones;
+                set => _armChainBones = value;
+            }
+
             private Transform[] _armBones;
             private Transform[] _armBonesEndEffectorLast;
             private float[] _distanceToNextBoneEndEffectorLast;
@@ -129,12 +145,19 @@ namespace Oculus.Movement.AnimationRigging
                     }
 
                     if ((handedness == Handedness.Left &&
-                         BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i] == AvatarMaskBodyPart.LeftArm) ||
+                         BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i] != AvatarMaskBodyPart.LeftArm) ||
                         (handedness == Handedness.Right &&
-                         BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i] == AvatarMaskBodyPart.RightArm))
+                         BoneMappingsExtension.HumanBoneToAvatarBodyPartArray[(int)i] != AvatarMaskBodyPart.RightArm))
                     {
-                        armBones.Add(boneTransform);
+                        continue;
                     }
+
+                    if (!BonePassesChainTest(i))
+                    {
+                        continue;
+                    }
+
+                    armBones.Add(boneTransform);
                 }
                 _armBones = armBones.ToArray();
                 armBones.Reverse();
@@ -157,6 +180,24 @@ namespace Oculus.Movement.AnimationRigging
                                        $"{retargetingLayer.gameObject.name}'s blend hand processor.");
                     }
                 }
+            }
+
+            private bool BonePassesChainTest(HumanBodyBones humanBodyBone)
+            {
+                if (_armChainBones == null || _armChainBones.Length == 0)
+                {
+                    return true;
+                }
+                bool boneFound = false;
+                foreach (var bone in _armChainBones)
+                {
+                    if (bone == humanBodyBone)
+                    {
+                        boneFound = true;
+                        break;
+                    }
+                }
+                return boneFound;
             }
 
             /// <inheritdoc cref="RetargetingProcessorCorrectHand.PrepareRetargetingProcessor"/>
@@ -186,7 +227,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     var localScale = retargetingLayer.transform.localScale;
                     // Divide by absolute value of scale to avoid sign of scale.
-                    localScale = new Vector3 (Mathf.Abs(localScale.x), Mathf.Abs(localScale.y), Mathf.Abs(localScale.z));
+                    localScale = new Vector3(Mathf.Abs(localScale.x), Mathf.Abs(localScale.y), Mathf.Abs(localScale.z));
                     targetHandPosition = RiggingUtilities.DivideVector3(targetHandPosition, localScale);
                 }
 
@@ -514,7 +555,11 @@ namespace Oculus.Movement.AnimationRigging
             set => _isFullBody = value;
         }
 
+        /// <summary>
+        /// Left hand processor.
+        /// </summary>
         [SerializeField, Header("Processors")]
+        [Tooltip(RetargetingProcessorCorrectHandTooltips.LeftHandProcessor)]
         private HandProcessor _leftHandProcessor;
         /// <inheritdoc cref="_leftHandProcessor" />
         public HandProcessor LeftHandProcessor
@@ -523,8 +568,12 @@ namespace Oculus.Movement.AnimationRigging
             set => _leftHandProcessor = value;
         }
 
+        /// <summary>
+        /// Right hand processor.
+        /// </summary>
         [SerializeField]
         private HandProcessor _rightHandProcessor;
+        [Tooltip(RetargetingProcessorCorrectHandTooltips.RightHandProcessor)]
         /// <inheritdoc cref="_rightHandProcessor" />
         public HandProcessor RightHandProcessor
         {
