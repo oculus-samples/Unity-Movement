@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
-using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
 
 namespace Oculus.Movement.AnimationRigging
@@ -220,6 +219,8 @@ namespace Oculus.Movement.AnimationRigging
         {
             base.Awake();
 
+            _proxyTransformLogic.UseJobs = true;
+
             if (_retargetedBoneMappings.ConvertBonePairsToDictionaries())
             {
                 BodyBoneMappingsInterface = _retargetedBoneMappings;
@@ -250,6 +251,11 @@ namespace Oculus.Movement.AnimationRigging
                     $"at {animatorComp.avatar} -> Configure Avatar -> Muscles " +
                     $"& Settings -> Translation DoF", animatorComp.avatar);
             }
+        }
+
+        private void OnDestroy()
+        {
+            _proxyTransformLogic.CleanUp();
         }
 
         /// <summary>
