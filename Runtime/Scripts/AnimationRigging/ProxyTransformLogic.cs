@@ -317,8 +317,7 @@ namespace Oculus.Movement.AnimationRigging.Utils
             }
 
             JobHandle posesJobHandle = _getPosesJob.ScheduleReadOnly(_sourceTransformsArray, 32);
-            posesJobHandle.Complete();
-            JobHandle jobHandle = _proxyTransformJob.Schedule(_drivenTransformsArray);
+            JobHandle jobHandle = _proxyTransformJob.Schedule(_drivenTransformsArray, posesJobHandle);
             jobHandle.Complete();
         }
 
