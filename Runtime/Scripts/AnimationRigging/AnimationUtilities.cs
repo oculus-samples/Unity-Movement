@@ -230,7 +230,15 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private static Quaternion GetRotationChange(
+        /// <summary>
+        /// Gets the rotation change between two bone pairs.
+        /// </summary>
+        /// <param name="oldJointPosition">The old first joint position.</param>
+        /// <param name="oldJointTargetPosition">The old second joint position.</param>
+        /// <param name="newJointPosition">The new first joint position.</param>
+        /// <param name="newTargetPosition">The new second joint position.</param>
+        /// <returns>The rotation to go from the first to the second bone pair.</returns>
+        public static Quaternion GetRotationChange(
             Vector3 oldJointPosition, Vector3 oldJointTargetPosition,
             Vector3 newJointPosition, Vector3 newTargetPosition)
         {

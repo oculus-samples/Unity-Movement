@@ -1374,6 +1374,9 @@ namespace Oculus.Movement
         public const string UseCustomHandTargetPosition =
             "If true, use the custom hand target position for the target position.";
 
+        public const string UseSecondaryBondId =
+            "If true, use the secondary bone position before solving for the target position.";
+
         public const string CustomHandTargetPosition =
             "The custom hand target position.";
 
@@ -1918,6 +1921,11 @@ namespace Oculus.Movement
 
         public const string BlendCurve =
             "Multiplier that influences weight interpolation based on distance.";
+
+        public const string FullBodySecondBoneIdToTest =
+            "(Full Body) Secondary Bone ID, usually the lower arm. " +
+            "This is the target bone that the upper arm will pre-rotate to for a more accurate IK solve. " +
+            "Can be modified depending on the skeleton used.";
 
         public const string FullBodyBoneIdToTest =
             "(Full Body) Bone ID, usually the wrist. Can be modified depending on the skeleton used.";

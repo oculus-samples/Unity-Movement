@@ -786,10 +786,14 @@ namespace Oculus.Movement.Utils
             retargetingProcessorCorrectHand.name = "CorrectHand";
             retargetingProcessorCorrectHand.LeftHandProcessor = new RetargetingProcessorCorrectHand.HandProcessor();
             retargetingProcessorCorrectHand.RightHandProcessor = new RetargetingProcessorCorrectHand.HandProcessor();
+            retargetingProcessorCorrectHand.LeftHandProcessor.FullBodySecondBoneIdToTest =
+                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftArmLower;
             retargetingProcessorCorrectHand.LeftHandProcessor.FullBodyBoneIdToTest =
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
             retargetingProcessorCorrectHand.LeftHandProcessor.BoneIdToTest =
                 OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+            retargetingProcessorCorrectHand.RightHandProcessor.FullBodyBoneIdToTest =
+                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightArmLower;
             retargetingProcessorCorrectHand.RightHandProcessor.FullBodyBoneIdToTest =
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
             retargetingProcessorCorrectHand.RightHandProcessor.BoneIdToTest =
