@@ -444,6 +444,10 @@ namespace Oculus.Movement.AnimationRigging
 
         private Vector3 _targetHipsPos;
         private Vector3 _targetHeadPos;
+        private Vector3 _originalLeftShoulderPos;
+        private Vector3 _originalRightShoulderPos;
+        private Vector3 _originalLeftUpperArmPos;
+        private Vector3 _originalRightUpperArmPos;
         private Vector3 _preDeformationLeftUpperArmLocalPos;
         private Vector3 _preDeformationRightUpperArmLocalPos;
         private Vector3 _preDeformationLeftLowerArmLocalPos;
@@ -584,6 +588,10 @@ namespace Oculus.Movement.AnimationRigging
         {
             _targetHipsPos = HipsToHeadBoneTargets[HipsIndex].GetPosition(stream);
             _targetHeadPos = HipsToHeadBoneTargets[^1].GetPosition(stream);
+            _originalLeftShoulderPos = LeftShoulderBone.GetPosition(stream);
+            _originalRightShoulderPos = RightShoulderBone.GetPosition(stream);
+            _originalLeftUpperArmPos = LeftUpperArmBone.GetPosition(stream);
+            _originalRightUpperArmPos = RightUpperArmBone.GetPosition(stream);
         }
 
         /// <summary>
@@ -1427,26 +1435,40 @@ namespace Oculus.Movement.AnimationRigging
             var shoulderRollWeight = weight * ShoulderRollWeight.Get(stream);
             if (LeftShoulderBone.IsValid(stream) && RightShoulderBone.IsValid(stream))
             {
-                var leftShoulderRotation = LeftShoulderBone.GetLocalRotation(stream);
-                var rightShoulderRotation = RightShoulderBone.GetLocalRotation(stream);
+                var leftShoulderRotation = LeftShoulderBone.GetRotation(stream);
+                var rightShoulderRotation = RightShoulderBone.GetRotation(stream);
                 var leftUpperArmRotation = LeftUpperArmBone.GetRotation(stream);
                 var rightUpperArmRotation = RightUpperArmBone.GetRotation(stream);
-                var leftTargetShoulderRotation = LeftShoulderOriginalLocalRot;
-                var rightTargetShoulderRotation = RightShoulderOriginalLocalRot;
-                LeftShoulderBone.SetLocalRotation(stream,
-                    Quaternion.Slerp(
+
+                // This will rotate the shoulders such that the upper arm meets its target,
+                // with the target position being the tracked position of the upper arm.
+                var leftShoulderPos = LeftShoulderBone.GetPosition(stream);
+                var rightShoulderPos = RightShoulderBone.GetPosition(stream);
+                var leftArmPos = LeftUpperArmBone.GetPosition(stream);
+                var rightArmPos = RightUpperArmBone.GetPosition(stream);
+                var leftArmTargetPos = _originalLeftUpperArmPos;
+                var rightArmTargetPos = _originalRightUpperArmPos;
+
+                leftArmTargetPos.y = leftArmPos.y;
+                rightArmTargetPos.y = rightArmPos.y;
+                var leftDelta = AnimationUtilities.GetRotationChange(
+                    leftShoulderPos, leftArmPos,
+                    leftShoulderPos, leftArmTargetPos);
+                var rightDelta = AnimationUtilities.GetRotationChange(
+                    rightShoulderPos, rightArmPos,
+                    rightShoulderPos, rightArmTargetPos);
+                var leftTargetShoulderRotation = leftDelta * leftShoulderRotation;
+                var rightTargetShoulderRotation = rightDelta * rightShoulderRotation;
+
+                LeftShoulderBone.SetRotation(stream,
+                    Quaternion.SlerpUnclamped(
                         leftShoulderRotation, leftTargetShoulderRotation, shoulderRollWeight));
-                RightShoulderBone.SetLocalRotation(stream,
-                    Quaternion.Slerp(
+                RightShoulderBone.SetRotation(stream,
+                    Quaternion.SlerpUnclamped(
                         rightShoulderRotation, rightTargetShoulderRotation, shoulderRollWeight));
+
                 LeftUpperArmBone.SetRotation(stream, leftUpperArmRotation);
                 RightUpperArmBone.SetRotation(stream, rightUpperArmRotation);
-            }
-            else
-            {
-                // If shoulder bones aren't valid, use the upper arm bone rotations.
-                LeftUpperArmBone.SetLocalRotation(stream, LeftShoulderOriginalLocalRot);
-                RightUpperArmBone.SetLocalRotation(stream, RightShoulderOriginalLocalRot);
             }
         }
 

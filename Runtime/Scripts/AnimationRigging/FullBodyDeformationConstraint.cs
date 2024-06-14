@@ -643,7 +643,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The weight for the deformation shoulder roll.
         /// </summary>
-        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [SyncSceneToStream, SerializeField, Range(0.0f, 2.0f)]
         private float _shoulderRollWeight;
         public float ShoulderRollWeight
         {
