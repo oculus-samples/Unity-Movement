@@ -752,6 +752,7 @@ namespace Oculus.Movement.Utils
             RetargetingLayer retargetingLayer,
             bool runtimeInvocation = false)
         {
+            RetargetingProcessorCorrectHand correctHandProcessor = null;
             int correctHandProcessorCount = 0;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
             {
@@ -759,6 +760,7 @@ namespace Oculus.Movement.Utils
                 if (correctHand != null)
                 {
                     correctHandProcessorCount++;
+                    correctHandProcessor = correctHand;
                 }
             }
 
@@ -770,6 +772,22 @@ namespace Oculus.Movement.Utils
             }
             if (correctHandProcessorCount > 0)
             {
+                if (correctHandProcessor != null)
+                {
+                    correctHandProcessor.LeftHandProcessor.FullBodySecondBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftArmLower;
+                    correctHandProcessor.LeftHandProcessor.FullBodyBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
+                    correctHandProcessor.LeftHandProcessor.BoneIdToTest =
+                        OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+
+                    correctHandProcessor.RightHandProcessor.FullBodySecondBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightArmLower;
+                    correctHandProcessor.RightHandProcessor.FullBodyBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
+                    correctHandProcessor.RightHandProcessor.BoneIdToTest =
+                        OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
+                }
                 return;
             }
 
@@ -792,7 +810,7 @@ namespace Oculus.Movement.Utils
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
             retargetingProcessorCorrectHand.LeftHandProcessor.BoneIdToTest =
                 OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
-            retargetingProcessorCorrectHand.RightHandProcessor.FullBodyBoneIdToTest =
+            retargetingProcessorCorrectHand.RightHandProcessor.FullBodySecondBoneIdToTest =
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightArmLower;
             retargetingProcessorCorrectHand.RightHandProcessor.FullBodyBoneIdToTest =
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;

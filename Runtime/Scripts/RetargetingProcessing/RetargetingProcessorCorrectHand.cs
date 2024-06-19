@@ -97,8 +97,8 @@ namespace Oculus.Movement.AnimationRigging
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.NoOverride;
             public OVRHumanBodyBonesMappings.FullBodyTrackingBoneId FullBodySecondBoneIdToTest
             {
-                get => _fullBodyBoneIdToTest;
-                set => _fullBodyBoneIdToTest = value;
+                get => _fullBodySecondBoneIdToTest;
+                set => _fullBodySecondBoneIdToTest = value;
             }
 
             /// <summary>
