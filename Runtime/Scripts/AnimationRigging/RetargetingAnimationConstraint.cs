@@ -112,7 +112,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Allow dynamic adjustments at runtime.
+        /// Allow dynamic adjustments at runtime. Editor-only.
         /// </summary>
         [SerializeField]
         [Tooltip(RetargetingConstraintDataTooltips.AllowDynamicAdjustmentsRuntime)]
@@ -198,7 +198,6 @@ namespace Oculus.Movement.AnimationRigging
             _allowDynamicAdjustmentsRuntime = true;
             _avatarMask = new AvatarMask();
             _avatarMask.InitializeDefaultValues(true);
-
         }
 
         /// <summary>
@@ -238,11 +237,11 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public void UpdateDynamicMetadata()
         {
-            if (!_allowDynamicAdjustmentsRuntime)
+            if (_allowDynamicAdjustmentsRuntime &&
+                Application.isEditor)
             {
-                return;
+                UpdateDataArraysWithAdjustments();
             }
-            UpdateDataArraysWithAdjustments();
             UpdateRetargetingLateUpdateMasks();
         }
 
@@ -284,7 +283,10 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
-        private void UpdateDataArraysWithAdjustments()
+        /// <summary>
+        /// Updates data arrays with adjustments from RetargetingLayer.
+        /// </summary>
+        public void UpdateDataArraysWithAdjustments()
         {
             if (IsSourceSkeletonNotInitialized())
             {

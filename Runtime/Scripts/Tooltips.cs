@@ -1320,7 +1320,7 @@ namespace Oculus.Movement
             "Retargeting layer component to get data from.";
 
         public const string AllowDynamicAdjustmentsRuntime =
-            "Allow dynamic adjustments at runtime.";
+            "Allow dynamic adjustments at runtime. Editor-only.";
 
         public const string AvatarMask =
             "Avatar mask to restrict retargeting. While the humanoid retargeter " +
