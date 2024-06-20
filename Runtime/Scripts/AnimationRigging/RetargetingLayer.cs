@@ -221,6 +221,7 @@ namespace Oculus.Movement.AnimationRigging
             base.Awake();
 
             _proxyTransformLogic.UseJobs = true;
+            _externalBoneTargets.UseJobs = true;
 
             if (_retargetedBoneMappings.ConvertBonePairsToDictionaries())
             {
@@ -257,6 +258,7 @@ namespace Oculus.Movement.AnimationRigging
         private void OnDestroy()
         {
             _proxyTransformLogic.CleanUp();
+            _externalBoneTargets.CleanUp();
             foreach (var processor in _retargetingProcessors)
             {
                 processor.CleanUp();
@@ -463,12 +465,11 @@ namespace Oculus.Movement.AnimationRigging
 
             UpdateBoneDataToArray();
 
-            _externalBoneTargets.ProcessSkeleton(this);
-
             if (_enableTrackingByProxy)
             {
                 _proxyTransformLogic.UpdateState(Bones, transform);
             }
+            _externalBoneTargets.ProcessSkeleton(this);
             _retargetingAnimationRig.UpdateRig(this);
         }
 
@@ -520,6 +521,8 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
+
+            _externalBoneTargets.Complete();
 
             foreach (var retargetingProcessor in _retargetingProcessors)
             {

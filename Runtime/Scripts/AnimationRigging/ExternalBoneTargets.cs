@@ -2,7 +2,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.Jobs;
+using static Oculus.Movement.Utils.JobCommons;
 using static OVRUnityHumanoidSkeletonRetargeter;
 
 namespace Oculus.Movement.AnimationRigging
@@ -44,6 +48,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(ExternalBoneTargetsTooltips.BoneTargets)]
         protected BoneTarget[] _boneTargets;
+
         /// <inheritdoc cref="_boneTargets"/>
         public BoneTarget[] BoneTargetsArray
         {
@@ -57,6 +62,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(ExternalBoneTargetsTooltips.IsFullBody)]
         protected bool _fullBody = false;
+
         /// <inheritdoc cref="_fullBody"/>
         public bool FullBody
         {
@@ -70,6 +76,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(ExternalBoneTargetsTooltips.Enabled)]
         protected bool _enabled = false;
+
         /// <inheritdoc cref="_enabled"/>
         public bool Enabled
         {
@@ -77,7 +84,20 @@ namespace Oculus.Movement.AnimationRigging
             set => _enabled = value;
         }
 
-        private bool _initialized = false;
+        /// <summary>
+        /// Whether to C# jobs or not.
+        /// </summary>
+        public bool UseJobs { get; set; }
+
+        private bool _initialized;
+        private Transform[] _currentTargetBones;
+        private TransformAccessArray _targetBones;
+        private TransformAccessArray _retargetedBoneTargets;
+        private NativeArray<Pose> _boneTargetPoses;
+        private GetPosesJob _getPosesJob;
+        private WritePosesToTransformsJob _setExternalBoneTargetsJob;
+        private JobHandle _getPosesJobHandle;
+        private JobHandle _setExternalBoneTargetsJobHandle;
 
         /// <summary>
         /// Correlate HumanBodyBones to OVRSkeleton.BoneId.
@@ -88,10 +108,11 @@ namespace Oculus.Movement.AnimationRigging
             {
                 return;
             }
-            var humanBodyBoneToOVRBoneId = _fullBody ?
-                OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone.ToDictionary(
-                    x => x.Value, x => x.Key) :
-                OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone.ToDictionary(
+
+            var humanBodyBoneToOVRBoneId = _fullBody
+                ? OVRHumanBodyBonesMappings.FullBodyBoneIdToHumanBodyBone.ToDictionary(
+                    x => x.Value, x => x.Key)
+                : OVRHumanBodyBonesMappings.BoneIdToHumanBodyBone.ToDictionary(
                     x => x.Value, x => x.Key);
             foreach (var retargetedBoneTarget in _boneTargets)
             {
@@ -101,6 +122,61 @@ namespace Oculus.Movement.AnimationRigging
             // Sort by bone id.
             _boneTargets = _boneTargets.OrderBy(x => x.BoneId).ToArray();
             _initialized = true;
+        }
+
+        private void InitializeJobs(IList<OVRBone> bones)
+        {
+            if (!BonesChanged())
+            {
+                return;
+            }
+
+            Complete();
+            CleanUp();
+
+            _currentTargetBones = new Transform[_boneTargets.Length];
+            var retargetedBoneTargets = new Transform[_boneTargets.Length];
+            var retargetedBoneTargetIndex = 0;
+            foreach (var bone in bones)
+            {
+                var retargetedBoneTarget = _boneTargets[retargetedBoneTargetIndex];
+                if (bone.Id != retargetedBoneTarget.BoneId)
+                {
+                    continue;
+                }
+
+                var targetBone = bone.Transform;
+                if (targetBone == null)
+                {
+                    continue;
+                }
+
+                _currentTargetBones[retargetedBoneTargetIndex] = targetBone;
+                retargetedBoneTargets[retargetedBoneTargetIndex] = retargetedBoneTarget.Target;
+                retargetedBoneTargetIndex++;
+            }
+
+            _targetBones = new TransformAccessArray(_currentTargetBones);
+            _retargetedBoneTargets = new TransformAccessArray(retargetedBoneTargets);
+            _boneTargetPoses = new NativeArray<Pose>(_retargetedBoneTargets.length, Allocator.Persistent);
+            _getPosesJob = new GetPosesJob { Poses = _boneTargetPoses };
+            _setExternalBoneTargetsJob = new WritePosesToTransformsJob { SourcePoses = _boneTargetPoses };
+        }
+
+        private bool BonesChanged()
+        {
+            if (_currentTargetBones == null || _currentTargetBones.Length == 0)
+            {
+                return true;
+            }
+
+            // If first element is null, then rest are invalid.
+            if (_currentTargetBones[0] == null)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -115,22 +191,68 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             Initialize();
-            var retargetedBoneTargetIndex = 0;
-            var bones = skeleton.Bones;
-            for (var i = 0; i < bones.Count; i++)
+            if (UseJobs)
             {
-                var retargetedBoneTarget = _boneTargets[retargetedBoneTargetIndex];
-                if (bones[i].Id == retargetedBoneTarget.BoneId)
+                InitializeJobs(skeleton.Bones);
+                _getPosesJobHandle = _getPosesJob.ScheduleReadOnly(_targetBones, 32);
+                _setExternalBoneTargetsJobHandle = _setExternalBoneTargetsJob.Schedule(_retargetedBoneTargets, _getPosesJobHandle);
+            }
+            else
+            {
+                var retargetedBoneTargetIndex = 0;
+                var bones = skeleton.Bones;
+                foreach (var bone in bones)
                 {
+                    var retargetedBoneTarget = _boneTargets[retargetedBoneTargetIndex];
+                    if (bone.Id != retargetedBoneTarget.BoneId)
+                    {
+                        continue;
+                    }
+
                     retargetedBoneTargetIndex++;
-                    var targetBone = bones[i].Transform;
+                    var targetBone = bone.Transform;
                     if (targetBone == null)
                     {
                         continue;
                     }
+
                     retargetedBoneTarget.Target.SetPositionAndRotation(
                         targetBone.position, targetBone.rotation);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Complete the job.
+        /// </summary>
+        public void Complete()
+        {
+            if (!UseJobs)
+            {
+                return;
+            }
+            _getPosesJobHandle.Complete();
+            _setExternalBoneTargetsJobHandle.Complete();
+        }
+
+        /// <summary>
+        /// Cleans up anything that needs to be manually deallocated.
+        /// </summary>
+        public void CleanUp()
+        {
+            if (_targetBones.isCreated)
+            {
+                _targetBones.Dispose();
+            }
+
+            if (_retargetedBoneTargets.isCreated)
+            {
+                _retargetedBoneTargets.Dispose();
+            }
+
+            if (_boneTargetPoses.IsCreated)
+            {
+                _boneTargetPoses.Dispose();
             }
         }
     }

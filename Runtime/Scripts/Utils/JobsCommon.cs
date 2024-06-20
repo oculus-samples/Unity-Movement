@@ -24,6 +24,10 @@ namespace Oculus.Movement.Utils
             [Unity.Burst.BurstCompile]
             public void Execute(int index, TransformAccess transform)
             {
+                if (!transform.isValid)
+                {
+                    return;
+                }
                 Poses[index] = new Pose(transform.position, transform.rotation);
             }
         }
@@ -44,6 +48,10 @@ namespace Oculus.Movement.Utils
             [Unity.Burst.BurstCompile]
             public void Execute(int index, TransformAccess transform)
             {
+                if (!transform.isValid)
+                {
+                    return;
+                }
                 var sourcePose = SourcePoses[index];
                 transform.SetPositionAndRotation(sourcePose.position, sourcePose.rotation);
             }
