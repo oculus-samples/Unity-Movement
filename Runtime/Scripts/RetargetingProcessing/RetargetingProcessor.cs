@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using Unity.Jobs;
 using UnityEngine;
+using static Oculus.Movement.AnimationRigging.IRetargetingProcessor;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -28,6 +30,16 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc />
+        public virtual void CleanUp()
+        {
+        }
+
+        /// <inheritdoc />
+        public virtual void RespondToCalibration(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
+        {
+        }
+
+        /// <inheritdoc />
         public virtual void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)
         {
         }
@@ -43,8 +55,17 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc />
+        public virtual JobHandle ProcessRetargetingLayerJob(JobHandle? previousJob, RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
+        {
+            return new JobHandle();
+        }
+
+        /// <inheritdoc />
         public virtual void DrawGizmos()
         {
         }
+
+        /// <inheritdoc />
+        public virtual RetargetingProcessorType ProcessorType { get; set; }
     }
 }

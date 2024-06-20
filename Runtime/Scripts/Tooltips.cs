@@ -1419,6 +1419,12 @@ namespace Oculus.Movement
 
         public const string FingerPositionCorrectionWeight =
             "Finger position correction weight.";
+
+        public const string RegenJobData =
+            "Regenerate job data.";
+
+        public const string ProcessorType =
+            "Whether to use jobs or not.";
     }
 
     public static class LateMirroredObjectTooltips

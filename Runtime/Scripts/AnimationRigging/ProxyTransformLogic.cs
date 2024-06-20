@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Jobs;
+using static Oculus.Movement.Utils.JobCommons;
 
 namespace Oculus.Movement.AnimationRigging.Utils
 {
@@ -17,47 +18,6 @@ namespace Oculus.Movement.AnimationRigging.Utils
     /// </summary>
     public class ProxyTransformLogic
     {
-        /// <summary>
-        /// Job used to quickly store poses from transforms.
-        /// </summary>
-        [Unity.Burst.BurstCompile]
-        public struct GetPosesJob : IJobParallelForTransform
-        {
-            /// <summary>
-            /// Poses to write to.
-            /// </summary>
-            [WriteOnly]
-            public NativeArray<Pose> Poses;
-
-            /// <inheritdoc cref="IJobParallelForTransform.Execute(int, TransformAccess)"/>
-            [Unity.Burst.BurstCompile]
-            public void Execute(int index, TransformAccess transform)
-            {
-                Poses[index] = new Pose(transform.position, transform.rotation);
-            }
-        }
-
-        /// <summary>
-        /// Job used to apply stored poses to proxy transforms.
-        /// </summary>
-        [Unity.Burst.BurstCompile]
-        public struct ProxyTransformLogicJob : IJobParallelForTransform
-        {
-            /// <summary>
-            /// Poses to read from.
-            /// </summary>
-            [ReadOnly]
-            public NativeArray<Pose> SourcePoses;
-
-            /// <inheritdoc cref="IJobParallelForTransform.Execute(int, TransformAccess)"/>
-            [Unity.Burst.BurstCompile]
-            public void Execute(int index, TransformAccess transform)
-            {
-                var sourcePose = SourcePoses[index];
-                transform.SetPositionAndRotation(sourcePose.position, sourcePose.rotation);
-            }
-        }
-
         /// <summary>
         /// Class that tracks proxy and source transforms.
         /// </summary>
@@ -140,7 +100,7 @@ namespace Oculus.Movement.AnimationRigging.Utils
         private TransformAccessArray _sourceTransformsArray;
         private NativeArray<Pose> _sourcesPoses;
         private GetPosesJob _getPosesJob;
-        private ProxyTransformLogicJob _proxyTransformJob;
+        private WritePosesToTransformsJob _writePosesToTransformsJob;
 
         /// <summary>
         /// Updates the state of the proxies using the skeletal
@@ -236,7 +196,7 @@ namespace Oculus.Movement.AnimationRigging.Utils
             {
                 Poses = _sourcesPoses
             };
-            _proxyTransformJob = new ProxyTransformLogicJob()
+            _writePosesToTransformsJob = new WritePosesToTransformsJob()
             {
                 SourcePoses = _sourcesPoses
             };
@@ -317,7 +277,7 @@ namespace Oculus.Movement.AnimationRigging.Utils
             }
 
             JobHandle posesJobHandle = _getPosesJob.ScheduleReadOnly(_sourceTransformsArray, 32);
-            JobHandle jobHandle = _proxyTransformJob.Schedule(_drivenTransformsArray, posesJobHandle);
+            JobHandle jobHandle = _writePosesToTransformsJob.Schedule(_drivenTransformsArray, posesJobHandle);
             jobHandle.Complete();
         }
 
