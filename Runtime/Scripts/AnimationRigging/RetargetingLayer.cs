@@ -4,6 +4,7 @@ using Oculus.Interaction;
 using Oculus.Movement.AnimationRigging.Utils;
 using System;
 using System.Collections.Generic;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Assertions;
@@ -71,7 +72,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The array of joint position adjustments.
+        /// The array of joint position adjustments. Used by copy pose job.
         /// </summary>
         public JointPositionAdjustment[] JointPositionAdjustments
         {
@@ -256,6 +257,10 @@ namespace Oculus.Movement.AnimationRigging
         private void OnDestroy()
         {
             _proxyTransformLogic.CleanUp();
+            foreach (var processor in _retargetingProcessors)
+            {
+                processor.CleanUp();
+            }
         }
 
         /// <summary>
@@ -449,6 +454,11 @@ namespace Oculus.Movement.AnimationRigging
                 // update state tracking variables.
                 _lastTrackedScaleRt = transform.lossyScale;
                 _lastSkelChangeCountRt = SkeletonChangedCount;
+
+                foreach (var processor in _retargetingProcessors)
+                {
+                    processor.RespondToCalibration(this, Bones);
+                }
             }
 
             UpdateBoneDataToArray();
@@ -514,6 +524,17 @@ namespace Oculus.Movement.AnimationRigging
             foreach (var retargetingProcessor in _retargetingProcessors)
             {
                 retargetingProcessor.PrepareRetargetingProcessor(this, Bones);
+            }
+
+            JobHandle? lastJobHandle = null;
+            foreach (var retargetingProcessor in _retargetingProcessors)
+            {
+                JobHandle newJob = retargetingProcessor.ProcessRetargetingLayerJob(lastJobHandle, this, Bones);
+                lastJobHandle = newJob;
+            }
+            if (lastJobHandle.HasValue && !lastJobHandle.Value.IsCompleted)
+            {
+                lastJobHandle.Value.Complete();
             }
 
             foreach (var retargetingProcessor in _retargetingProcessors)
