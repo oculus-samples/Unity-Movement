@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace Oculus.Movement.Utils
     /// Provides useful menus to help one set up body tracking technologies
     /// on characters.
     /// </summary>
-    internal static class HelperMenusBody
+    public static class HelperMenusBody
     {
 #if UNITY_EDITOR
         private const string _MOVEMENT_SAMPLES_BT_MENU =
