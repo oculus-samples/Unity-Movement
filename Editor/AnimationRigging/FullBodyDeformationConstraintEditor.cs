@@ -275,7 +275,7 @@ namespace Oculus.Movement.AnimationRigging
                 }
                 var jsonResult = JsonUtility.ToJson(constraint, true);
                 File.WriteAllText(jsonPath, jsonResult);
-                Debug.Log($"Wrore JSON config to path {jsonPath}.");
+                Debug.Log($"Wrote JSON config to path {jsonPath}.");
             }
             catch (Exception exception)
             {
@@ -295,11 +295,10 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     return;
                 }
-                string text = File.ReadAllText(jsonPath);
-                JsonUtility.FromJsonOverwrite(text, constraint);
-                Debug.Log($"Read JSON config from {jsonPath}.");
-                // Calculate our bone data because JSON will reference bone data from other character.
-                DisplayCalculateBoneData(constraint);
+                Undo.RecordObject(constraint, "Read and calculate bone data");
+                constraint.ReadJSONConfigFromFile(jsonPath);
+                EditorUtility.SetDirty(target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(target);
             }
             catch (Exception exception)
             {
@@ -310,31 +309,7 @@ namespace Oculus.Movement.AnimationRigging
         private void DisplayCalculateBoneData(FullBodyDeformationConstraint constraint)
         {
             Undo.RecordObject(constraint, "Calculate bone data");
-            var constraintData = constraint.data;
-            var skeleton = constraint.GetComponentInParent<OVRCustomSkeleton>();
-            var animator = constraint.GetComponentInParent<Animator>();
-            if (skeleton != null)
-            {
-                constraintData.AssignOVRCustomSkeleton(skeleton);
-            }
-            else
-            {
-                constraintData.AssignAnimator(animator);
-            }
-            // Determine if this character is in T-pose or A-pose.
-            var isTPose = AddComponentsHelper.CheckIfTPose(animator);
-
-            constraintData.InitializeStartingScale();
-            constraintData.ClearTransformData();
-            constraintData.SetUpLeftArmData();
-            constraintData.SetUpRightArmData();
-            constraintData.SetUpLeftLegData();
-            constraintData.SetUpRightLegData();
-            constraintData.SetUpHipsAndHeadBones();
-            constraintData.SetUpBonePairs();
-            constraintData.SetUpBoneTargets(constraint.transform);
-            constraintData.SetUpAdjustments(AddComponentsHelper.GetRestPoseObject(isTPose));
-            constraint.data = constraintData;
+            constraint.CalculateBoneData();
             EditorUtility.SetDirty(target);
             PrefabUtility.RecordPrefabInstancePropertyModifications(target);
         }
