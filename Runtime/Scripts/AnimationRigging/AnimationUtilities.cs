@@ -1,7 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -11,8 +10,9 @@ namespace Oculus.Movement.AnimationRigging
     /// </summary>
     public static class AnimationUtilities
     {
-        private static Vector3[] _cachedFabrikPositions;
+        private static Pose[] _cachedOldPoses;
         private static Pose[] _cachedFabrikPoses;
+        private static Quaternion[] _fabrikRotChanges;
 
         /// <summary>
         /// Cyclic Coordinate Descent IK algorithm implementation. This rotates each bone in the chain so
@@ -63,7 +63,7 @@ namespace Oculus.Movement.AnimationRigging
         /// algorithm on joints so that the end effector moves to the desired
         /// target, and its children move with it. The joints can be an IK chain
         /// representing a finger, where the tip moves toward the target and the
-        /// joints behind it are translated as well.
+        /// joints behind it are translated as well. Rotations are solved for.
         /// From: Aristidou A, Lasenby J. FABRIK: A fast, iterative solver for
         /// the Inverse Kinematics problem. Graphical Models 2011; 73(5): 243–260.
         /// </summary>
@@ -73,7 +73,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <param name="targetTolerance">If target is reachable, the max distance between end
         /// effector and target.</param>
         /// <param name="maxIterations">Max iterations to run.</param>
-        /// <returns>True if succesful, false if not.</returns>
+        /// <returns>True if successful, false if not.</returns>
         public static bool SolveFABRIK(
             Transform[] joints,
             float[] distanceToNextJoint,
@@ -82,31 +82,83 @@ namespace Oculus.Movement.AnimationRigging
             int maxIterations = 10,
             bool solveRotations = false)
         {
-            bool successful = true;
-            Assert.IsTrue(joints.Length >= 3, "Please run FABRIK on at least three joints.");
-            CachePositions(joints, ref _cachedFabrikPositions);
+            if (joints.Length < 3)
+            {
+                Debug.LogError("Please run FABRIK on at least three joints.");
+                return false;
+            }
 
+            int numPoses = joints.Length;
+            bool targetIsUnreachable = IsTargetUnreachable(target, joints,
+                distanceToNextJoint);
+
+            CachePoses(joints, ref _cachedOldPoses, ref _cachedFabrikPoses,
+                ref _fabrikRotChanges);
+            RunFABRIK(targetIsUnreachable, distanceToNextJoint,
+                target, targetTolerance, _cachedFabrikPoses, maxIterations);
+            if (solveRotations)
+            {
+                FixJointRotations(joints, _cachedOldPoses, _cachedFabrikPoses, _fabrikRotChanges);
+            }
+            else
+            {
+                WritePosesToJoints(joints, _cachedFabrikPoses);
+            }
+            return WasFABRIKSuccessful(targetTolerance, target, joints);
+        }
+
+        private static bool IsTargetUnreachable(Vector3 target, Transform[] joints,
+            float[] distanceToNextJoint)
+        {
             var distanceRootAndTarget = (target - joints[0].position).magnitude;
             float sumOfAllJointDistances = 0.0f;
             foreach (var jointDistance in distanceToNextJoint)
             {
                 sumOfAllJointDistances += jointDistance;
             }
+            return distanceRootAndTarget > sumOfAllJointDistances;
+        }
 
-            bool targetIsUnreachable = distanceRootAndTarget > sumOfAllJointDistances;
+        private static void CachePoses(Transform[] joints, ref Pose[] cachedPoses,
+            ref Pose[] finalPoses, ref Quaternion[] rotationalChanges)
+        {
             int numJoints = joints.Length;
+            if (cachedPoses == null || cachedPoses.Length != numJoints)
+            {
+                cachedPoses = new Pose[numJoints];
+                finalPoses = new Pose[numJoints];
+                rotationalChanges = new Quaternion[numJoints];
+            }
+            for (int i = 0; i < numJoints; i++)
+            {
+                var currentJoint = joints[i];
+                cachedPoses[i] = new Pose(currentJoint.position, currentJoint.rotation);
+                finalPoses[i] = cachedPoses[i];
+                rotationalChanges[i] = Quaternion.identity;
+            }
+        }
+
+        private static void RunFABRIK(
+            bool targetIsUnreachable,
+            float[] distanceToNextJoint,
+            Vector3 target,
+            float targetTolerance,
+            Pose[] fabrikPoses,
+            int maxIterations = 10)
+        {
+            int numJoints = fabrikPoses.Length;
             if (targetIsUnreachable)
             {
                 for (int i = 0; i < numJoints - 1; i++)
                 {
+                    var currentJointPosition = fabrikPoses[i].position;
                     // find the distance between the target and the current joint
-                    float jointToTargetDist = (target - joints[i].position).magnitude;
+                    float jointToTargetDist = (target - currentJointPosition).magnitude;
                     float segmentDistanceOverTarget =
                         distanceToNextJoint[i] / jointToTargetDist;
                     // lerp next position toward to target
-                    var nextJoint = joints[i + 1];
-                    nextJoint.position =
-                        Vector3.Lerp(joints[i].position, target,
+                    fabrikPoses[i + 1].position =
+                        Vector3.Lerp(currentJointPosition, target,
                             segmentDistanceOverTarget);
                 }
             }
@@ -114,9 +166,9 @@ namespace Oculus.Movement.AnimationRigging
             {
                 // target is reachable, set initial position of
                 // first joint
-                Vector3 firstJointPos = joints[0].position;
+                Vector3 firstJointPos = fabrikPoses[0].position;
                 float toleranceSquared = targetTolerance * targetTolerance;
-                float diffEndTargetSqr = (joints[numJoints - 1].position - target).sqrMagnitude;
+                float diffEndTargetSqr = (fabrikPoses[numJoints - 1].position - target).sqrMagnitude;
                 int numIterationsSoFar = 0;
                 while (diffEndTargetSqr > toleranceSquared &&
                     numIterationsSoFar < maxIterations)
@@ -124,11 +176,12 @@ namespace Oculus.Movement.AnimationRigging
                     // forward reaching stage.
                     // first set end position to target. the points before
                     // will act like they are reaching toward the target.
-                    joints[numJoints - 1].position = target;
+                    fabrikPoses[numJoints - 1].position = target;
                     for (int i = numJoints - 2; i >= 0; i--)
                     {
-                        var nextPosition = joints[i + 1].position;
-                        var oldCurrentPosition = joints[i].position;
+                        var nextPosition = fabrikPoses[i + 1].position;
+                        var oldNextPosition = nextPosition;
+                        var oldCurrentPosition = fabrikPoses[i].position;
                         float distanceBetweenJoints =
                             (oldCurrentPosition - nextPosition).magnitude;
                         // what fraction is old distance to new distance?
@@ -136,108 +189,82 @@ namespace Oculus.Movement.AnimationRigging
                         // re-calculate current point so that matches up with next
                         // point. remember that initially, the end effector is set to the
                         // target.
-                        joints[i].position = Vector3.Lerp(nextPosition,
+                        fabrikPoses[i].position = Vector3.Lerp(nextPosition,
                             oldCurrentPosition, distanceRatio);
+                        fabrikPoses[i + 1].position = oldNextPosition;
                     }
 
                     // backward reaching, set p[0] to original
                     // the points after will be corrected so that they reach toward
                     // the first point.
-                    joints[0].position = firstJointPos;
+                    fabrikPoses[0].position = firstJointPos;
                     for (int i = 0; i < numJoints - 1; i++)
                     {
-                        var oldNextPosition = joints[i + 1].position;
-                        var currentPosition = joints[i].position;
+                        var oldNextPosition = fabrikPoses[i + 1].position;
+                        var currentPosition = fabrikPoses[i].position;
                         float distanceToNext =
                             (oldNextPosition - currentPosition).magnitude;
                         float distanceRatio = distanceToNextJoint[i] / distanceToNext;
                         // recalculate next point such that is lies in line between
                         // current point and the next point. Remember that initially,
                         // the first point is set to the beginning of the IK chain.
-                        joints[i + 1].position = Vector3.Lerp(currentPosition,
+                        fabrikPoses[i + 1].position = Vector3.Lerp(currentPosition,
                             oldNextPosition, distanceRatio);
                     }
-                    diffEndTargetSqr = (joints[numJoints - 1].position - target).sqrMagnitude;
+                    diffEndTargetSqr = (fabrikPoses[numJoints - 1].position - target).sqrMagnitude;
                     numIterationsSoFar++;
                 }
-                if (diffEndTargetSqr > toleranceSquared)
-                {
-                    successful = false;
-                }
-            }
-
-            if (solveRotations)
-            {
-                CacheFinalPoses(joints, ref _cachedFabrikPoses);
-                FixRotationsOfJoints(joints, _cachedFabrikPositions, _cachedFabrikPoses);
-            }
-            return successful;
-        }
-
-        private static void CachePositions(Transform[] joints, ref Vector3[] positions)
-        {
-            if (positions == null || positions.Length != joints.Length)
-            {
-                positions = new Vector3[joints.Length];
-            }
-            for (int i = 0; i < joints.Length; i++)
-            {
-                positions[i] = joints[i].position;
             }
         }
 
-        private static void CacheFinalPoses(Transform[] joints, ref Pose[] finalPoses)
+        private static void WritePosesToJoints(Transform[] joints,
+            Pose[] cachedFabrikPoses)
         {
-            if (finalPoses == null || finalPoses.Length != joints.Length)
+            int numJoints = joints.Length;
+            for (int i = 0; i < numJoints; i++)
             {
-                finalPoses = new Pose[joints.Length];
-            }
-            for (int i = 0; i < joints.Length; i++)
-            {
-                finalPoses[i].position = joints[i].position;
-                finalPoses[i].rotation = joints[i].rotation;
+                joints[i].SetPositionAndRotation(cachedFabrikPoses[i].position,
+                    cachedFabrikPoses[i].rotation);
             }
         }
 
-        private static void FixRotationsOfJoints(Transform[] joints, Vector3[] oldPositions,
-            Pose[] worldPoses)
+        private static void FixJointRotations(Transform[] joints,
+            Pose[] oldPoses, Pose[] cachedFABRIKPoses, Quaternion[] rotationDeltas)
         {
-            int lastJointIndex = joints.Length - 1;
+            int lastJointIndex = oldPoses.Length - 1;
             // we don't want to fix the rotation of the last joint, just
-            // the joints that come beofre it.
+            // the joints that come before it.
             for (int i = 0; i < lastJointIndex; i++)
             {
-                var oldJointPosition = oldPositions[i];
-                var oldJointTargetPosition = oldPositions[i + 1];
+                var oldJointPosition = oldPoses[i].position;
+                var oldJointTargetPosition = oldPoses[i + 1].position;
 
-                var joint = joints[i];
-                var newJointPosition = joint.position;
-                var newJointTargetPosition = joints[i + 1].position;
+                var newJointPosition = cachedFABRIKPoses[i].position;
+                var newJointTargetPosition = cachedFABRIKPoses[i + 1].position;
 
-                // rotate the joint so that it points toward its target
-                var rotationChange = GetRotationChange(
+                // rotate the joint so that it points toward its new target
+                rotationDeltas[i] = GetRotationChange(
                     oldJointPosition, oldJointTargetPosition,
                     newJointPosition, newJointTargetPosition);
-                joint.rotation = rotationChange * joint.rotation;
-                // we want to change the rotation of this joint so that the mesh looks
-                // correct, but leave the children (including last joint) unaffected
-                // by the rotation of the current joint.
-                for (int j = i + 1; j <= lastJointIndex; j++)
-                {
-                    joints[j].position = worldPoses[j].position;
-                    joints[j].rotation = worldPoses[j].rotation;
-                }
+            }
+            rotationDeltas[lastJointIndex] = Quaternion.identity;
+
+            // Affect joints by rotation deltas computed.
+            for (int i = 0; i <= lastJointIndex; i++)
+            {
+                joints[i].position = cachedFABRIKPoses[i].position;
+                joints[i].rotation = rotationDeltas[i] * cachedFABRIKPoses[i].rotation;
             }
         }
 
         /// <summary>
-        /// Gets the rotation change between two bone pairs.
+        /// Fix rotation of joint to match new target position.
         /// </summary>
-        /// <param name="oldJointPosition">The old first joint position.</param>
-        /// <param name="oldJointTargetPosition">The old second joint position.</param>
-        /// <param name="newJointPosition">The new first joint position.</param>
-        /// <param name="newTargetPosition">The new second joint position.</param>
-        /// <returns>The rotation to go from the first to the second bone pair.</returns>
+        /// <param name="oldJointPosition">Old joint position.</param>
+        /// <param name="oldJointTargetPosition">Old target position.</param>
+        /// <param name="newJointPosition">New joint position.</param>
+        /// <param name="newTargetPosition">New joint target position.</param>
+        /// <returns></returns>
         public static Quaternion GetRotationChange(
             Vector3 oldJointPosition, Vector3 oldJointTargetPosition,
             Vector3 newJointPosition, Vector3 newTargetPosition)
@@ -245,6 +272,16 @@ namespace Oculus.Movement.AnimationRigging
             Vector3 boneToOldTarget = oldJointTargetPosition - oldJointPosition;
             Vector3 boneToNewTarget = newTargetPosition - newJointPosition;
             return Quaternion.FromToRotation(boneToOldTarget, boneToNewTarget);
+        }
+
+        private static bool WasFABRIKSuccessful(float targetTolerance,
+            Vector3 target, Transform[] joints)
+        {
+            float toleranceSquared = targetTolerance * targetTolerance;
+            int numJoints = joints.Length;
+            float diffEndTargetSqr = (joints[numJoints - 1].position - target).sqrMagnitude;
+            bool differenceToTargetPasses = diffEndTargetSqr < toleranceSquared;
+            return differenceToTargetPasses;
         }
 
         /// <summary>

@@ -51,7 +51,7 @@ MonoBehaviour:
     HandIKWeight: 1
     _useWorldHandPosition: 1
     _useCustomHandTargetPosition: 1
-    _useSecondaryBondId: 1
+    _useSecondaryBoneId: 1
     _fullBodySecondBoneIdToTest: 11
     _fullBodyBoneIdToTest: 19
     _boneIdToTest: 19
@@ -61,7 +61,7 @@ MonoBehaviour:
     HandIKWeight: 1
     _useWorldHandPosition: 1
     _useCustomHandTargetPosition: 1
-    _useSecondaryBondId: 1
+    _useSecondaryBoneId: 1
     _fullBodySecondBoneIdToTest: 16
     _fullBodyBoneIdToTest: 45
     _boneIdToTest: 45

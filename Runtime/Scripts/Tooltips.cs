@@ -1374,7 +1374,7 @@ namespace Oculus.Movement
         public const string UseCustomHandTargetPosition =
             "If true, use the custom hand target position for the target position.";
 
-        public const string UseSecondaryBondId =
+        public const string UseSecondaryBoneId =
             "If true, use the secondary bone position before solving for the target position.";
 
         public const string CustomHandTargetPosition =

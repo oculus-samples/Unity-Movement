@@ -66,13 +66,13 @@ namespace Oculus.Movement.AnimationRigging
             /// If true, use the secondary bone position before solving for the target position.
             /// </summary>
             [SerializeField]
-            [Tooltip(RetargetingLayerTooltips.UseSecondaryBondId)]
-            private bool _useSecondaryBondId = true;
-            /// <inheritdoc cref="_useSecondaryBondId" />
-            public bool UseSecondaryBondId
+            [Tooltip(RetargetingLayerTooltips.UseSecondaryBoneId)]
+            private bool _useSecondaryBoneId = true;
+            /// <inheritdoc cref="_useSecondaryBoneId" />
+            public bool UseSecondaryBoneId
             {
-                get => _useSecondaryBondId;
-                set => _useSecondaryBondId = value;
+                get => _useSecondaryBoneId;
+                set => _useSecondaryBoneId = value;
             }
 
             /// <summary>
@@ -94,7 +94,8 @@ namespace Oculus.Movement.AnimationRigging
             [SerializeField]
             [Tooltip(RetargetingBlendHandProcessorTooltips.FullBodySecondBoneIdToTest)]
             private OVRHumanBodyBonesMappings.FullBodyTrackingBoneId _fullBodySecondBoneIdToTest =
-                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.NoOverride;
+                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftArmLower;
+            /// <inheritdoc cref="_fullBodySecondBoneIdToTest"/>
             public OVRHumanBodyBonesMappings.FullBodyTrackingBoneId FullBodySecondBoneIdToTest
             {
                 get => _fullBodySecondBoneIdToTest;
@@ -191,7 +192,7 @@ namespace Oculus.Movement.AnimationRigging
                 armBones.Reverse();
 
                 // If the secondary bone id is not set, set it to use the appropriate side
-                if (_useSecondaryBondId)
+                if (_useSecondaryBoneId)
                 {
                     if (_fullBodySecondBoneIdToTest == OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.NoOverride)
                     {
@@ -284,12 +285,10 @@ namespace Oculus.Movement.AnimationRigging
                     targetHandPosition = _customHandTargetPosition.Value;
                 }
 
-                // Capture hand rotation.
                 var handBone = _armBones[0];
-                var handRotation = handBone.rotation;
 
                 // Rotate upper arm toward the tracked lower arm.
-                if (_useSecondaryBondId)
+                if (_useSecondaryBoneId)
                 {
                     var upperArm = _armBones[2];
                     var upperArmPos = upperArm.position;
@@ -299,14 +298,14 @@ namespace Oculus.Movement.AnimationRigging
                     var rotationChange =
                         AnimationUtilities.GetRotationChange(upperArmPos, lowerArmPos,
                             upperArmPos, targetLowerArmPos);
-                    upperArm.rotation = Quaternion.Slerp(Quaternion.identity, rotationChange, handIKWeight) *
-                                        upperArm.rotation;
+                    upperArm.rotation = Quaternion.Slerp(Quaternion.identity,
+                        rotationChange, handIKWeight) * upperArm.rotation;
                 }
                 else
                 {
                     handBone.position = _originalHandPosition;
                 }
-
+                var handRotation = handBone.rotation;
                 Vector3 targetPosition = Vector3.Lerp(handBone.position, targetHandPosition, handIKWeight);
                 bool solvedIK = false;
                 if (handIKWeight > 0.0f)
@@ -320,8 +319,12 @@ namespace Oculus.Movement.AnimationRigging
                     {
                         UpdateBoneDistances();
                         solvedIK = AnimationUtilities.SolveFABRIK(
-                            _armBonesEndEffectorLast, _distanceToNextBoneEndEffectorLast,
-                            targetPosition, parentProcessor.IKTolerance, parentProcessor.IKIterations, true);
+                            _armBonesEndEffectorLast,
+                            _distanceToNextBoneEndEffectorLast,
+                            targetPosition,
+                            parentProcessor.IKTolerance,
+                            parentProcessor.IKIterations,
+                            true);
                     }
                 }
                 handBone.position = Vector3.MoveTowards(
@@ -489,7 +492,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             None,
             CCDIK,
-            FABRIK
+            FABRIK,
         }
 
         /// <summary>
@@ -678,19 +681,21 @@ namespace Oculus.Movement.AnimationRigging
             _leftHandProcessor.BlendHandWeight = sourceCorrectHand.LeftHandProcessor.BlendHandWeight;
             _leftHandProcessor.UseWorldHandPosition = sourceCorrectHand.LeftHandProcessor.UseWorldHandPosition;
             _leftHandProcessor.UseCustomHandTargetPosition = sourceCorrectHand.LeftHandProcessor.UseCustomHandTargetPosition;
-            _leftHandProcessor.FullBodySecondBoneIdToTest =
-                sourceCorrectHand.LeftHandProcessor.FullBodySecondBoneIdToTest;
+            _leftHandProcessor.UseSecondaryBoneId = sourceCorrectHand.LeftHandProcessor.UseSecondaryBoneId;
+            _leftHandProcessor.FullBodySecondBoneIdToTest = sourceCorrectHand.LeftHandProcessor.FullBodySecondBoneIdToTest;
             _leftHandProcessor.FullBodyBoneIdToTest = sourceCorrectHand.LeftHandProcessor.FullBodyBoneIdToTest;
             _leftHandProcessor.BoneIdToTest = sourceCorrectHand.LeftHandProcessor.BoneIdToTest;
+            _leftHandProcessor.ArmChainBones = sourceCorrectHand.LeftHandProcessor.ArmChainBones;
 
             _rightHandProcessor.HandIKWeight = sourceCorrectHand.RightHandProcessor.HandIKWeight;
             _rightHandProcessor.BlendHandWeight = sourceCorrectHand.RightHandProcessor.BlendHandWeight;
             _rightHandProcessor.UseWorldHandPosition = sourceCorrectHand.RightHandProcessor.UseWorldHandPosition;
             _rightHandProcessor.UseCustomHandTargetPosition = sourceCorrectHand.RightHandProcessor.UseCustomHandTargetPosition;
-            _rightHandProcessor.FullBodySecondBoneIdToTest =
-                sourceCorrectHand.RightHandProcessor.FullBodySecondBoneIdToTest;
+            _rightHandProcessor.UseSecondaryBoneId = sourceCorrectHand.RightHandProcessor.UseSecondaryBoneId;
+            _rightHandProcessor.FullBodySecondBoneIdToTest = sourceCorrectHand.RightHandProcessor.FullBodySecondBoneIdToTest;
             _rightHandProcessor.FullBodyBoneIdToTest = sourceCorrectHand.RightHandProcessor.FullBodyBoneIdToTest;
             _rightHandProcessor.BoneIdToTest = sourceCorrectHand.RightHandProcessor.BoneIdToTest;
+            _rightHandProcessor.ArmChainBones = sourceCorrectHand.RightHandProcessor.ArmChainBones;
         }
 
         /// <inheritdoc />
