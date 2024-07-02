@@ -438,6 +438,11 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public float OriginalHipsToHeadDistance;
 
+        /// <summary>
+        /// Arm length multiplier. Advanced feature.
+        /// </summary>
+        public FloatProperty ArmLengthMultiplier;
+
         public NativeArray<Vector3> OriginalHipsToPositions;
         public NativeArray<Quaternion> CachedFixedHipsToHeadRotations;
         public NativeArray<Vector3> CachedFixedHipsToHeadPositions;
@@ -1369,8 +1374,21 @@ namespace Oculus.Movement.AnimationRigging
                 var startPos = startBone.GetPosition(stream);
                 var endPos = endBone.GetPosition(stream);
                 var data = BoneAnimData[i];
+                var multiplier = 1.0f;
+                if (i == _leftUpperLegBoneAnimIndex - 4 ||
+                    i == _leftUpperLegBoneAnimIndex - 3 ||
+                    i == _leftUpperLegBoneAnimIndex - 2 ||
+                    i == _leftUpperLegBoneAnimIndex - 1)
+                {
+                    multiplier = ArmLengthMultiplier.Get(stream);
+                    if (multiplier < 0.01f)
+                    {
+                        // if value is not initialized, set it to a default value.
+                        multiplier = 1.0f;
+                    }
+                }
+                var targetDir = Vector3.Scale(BoneDirections[i] * data.Distance * multiplier, ScaleFactor[0]);
 
-                var targetDir = Vector3.Scale(BoneDirections[i] * data.Distance, ScaleFactor[0]);
                 var targetPos = startPos + targetDir;
                 endBone.SetPosition(stream, Vector3.Lerp(endPos, targetPos, weight));
                 StartBones[i] = startBone;
@@ -1486,11 +1504,13 @@ namespace Oculus.Movement.AnimationRigging
             var rightLowerArmPos = RightLowerArmBone.GetLocalPosition(stream);
             var leftArmOffsetWeight = weight * LeftArmOffsetWeight.Get(stream);
             var rightArmOffsetWeight = weight * RightArmOffsetWeight.Get(stream);
+            var leftShoulderOffsetWeight = weight * LeftShoulderOffsetWeight.Get(stream);
+            var rightShoulderOffsetWeight = weight * RightShoulderOffsetWeight.Get(stream);
 
             LeftUpperArmBone.SetLocalPosition(stream,
-                Vector3.Lerp(_preDeformationLeftUpperArmLocalPos, leftUpperArmPos, leftArmOffsetWeight));
+                Vector3.Lerp(_preDeformationLeftUpperArmLocalPos, leftUpperArmPos, leftShoulderOffsetWeight));
             RightUpperArmBone.SetLocalPosition(stream,
-                Vector3.Lerp(_preDeformationRightUpperArmLocalPos, rightUpperArmPos, rightArmOffsetWeight));
+                Vector3.Lerp(_preDeformationRightUpperArmLocalPos, rightUpperArmPos, rightShoulderOffsetWeight));
             LeftLowerArmBone.SetLocalPosition(stream,
                 Vector3.Lerp(_preDeformationLeftLowerArmLocalPos, leftLowerArmPos, leftArmOffsetWeight));
             RightLowerArmBone.SetLocalPosition(stream,
@@ -1771,6 +1791,7 @@ namespace Oculus.Movement.AnimationRigging
                 BoolProperty.Bind(animator, component, data.OriginalSpineUseHipsToHeadScaleBoolProperty);
             job.OriginalSpineFixRotations =
                 BoolProperty.Bind(animator, component, data.OriginalSpineFixRotationsBoolProperty);
+            job.ArmLengthMultiplier = FloatProperty.Bind(animator, component, data.ArmLengthMultiplierFloatProperty);
             job.LeftArmOffsetWeight = FloatProperty.Bind(animator, component, data.LeftArmWeightFloatProperty);
             job.RightArmOffsetWeight = FloatProperty.Bind(animator, component, data.RightArmWeightFloatProperty);
             job.LeftHandOffsetWeight = FloatProperty.Bind(animator, component, data.LeftHandWeightFloatProperty);

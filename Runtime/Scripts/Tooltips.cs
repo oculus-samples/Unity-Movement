@@ -1002,7 +1002,11 @@ namespace Oculus.Movement
             "Weight used for feet alignment.";
 
         public const string OriginalSpinePositionsWeight =
-            "Attempts to match the original spine positions. WARNING:" +
+            "Attempts to match the original spine positions. WARNING: " +
+            " increasing this value might cause inaccuracy wrt to body tracking.";
+
+        public const string ArmLengthMultiplier =
+            "Allows stretching arms. WARNING:" +
             "increasing this value might cause inaccuracy wrt to body tracking.";
 
         public const string OriginalSpineBoneCount =

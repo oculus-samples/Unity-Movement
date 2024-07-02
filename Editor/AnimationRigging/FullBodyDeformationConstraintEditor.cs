@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Movement.Utils;
 using System;
 using System.IO;
 using System.Linq;
@@ -114,6 +113,7 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _rightToesWeightProperty;
         private SerializedProperty _squashProperty;
         private SerializedProperty _stretchProperty;
+        private SerializedProperty _armLengthMultiplierProperty;
         private SerializedProperty _originalSpinePositionsWeight;
         private SerializedProperty _originalSpineBoneCount;
         private SerializedProperty _originalSpineUseHipsToHeadToScale;
@@ -167,6 +167,7 @@ namespace Oculus.Movement.AnimationRigging
             _alignFeetWeightProperty = data.FindPropertyRelative("_alignFeetWeight");
             _squashProperty = data.FindPropertyRelative("_squashLimit");
             _stretchProperty = data.FindPropertyRelative("_stretchLimit");
+            _armLengthMultiplierProperty = data.FindPropertyRelative("_armLengthMultiplier");
             _originalSpinePositionsWeight = data.FindPropertyRelative("_originalSpinePositionsWeight");
             _originalSpineBoneCount = data.FindPropertyRelative("_originalSpineBoneCount");
             _originalSpineUseHipsToHeadToScale = data.FindPropertyRelative("_originalSpineUseHipsToHeadToScale");
@@ -358,6 +359,7 @@ namespace Oculus.Movement.AnimationRigging
                 new[] { _leftArmWeightProperty, _rightArmWeightProperty });
             AverageWeightSlider(Content.HandsWeight,
                 new[] { _leftHandWeightProperty, _rightHandWeightProperty });
+            EditorGUILayout.PropertyField(_armLengthMultiplierProperty);
 
             if (!_isFullBody)
             {

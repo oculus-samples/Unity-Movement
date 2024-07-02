@@ -290,6 +290,13 @@ namespace Oculus.Movement.AnimationRigging
         public string OriginalSpinePositionsWeightProperty { get; }
 
         /// <summary>
+        /// Allows stretching arms.
+        /// WARNING! EXPERIMENTAL! increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        public string ArmLengthMultiplierFloatProperty { get; }
+
+        /// <summary>
         /// Control how many bones to straighten.
         /// WARNING! EXPERIMENTAL!
         /// </summary>
@@ -547,6 +554,10 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         string IFullBodyDeformationData.OriginalSpinePositionsWeightProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpinePositionsWeight));
+
+        /// <inheritdoc />
+        string IFullBodyDeformationData.ArmLengthMultiplierFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_armLengthMultiplier));
 
         /// <inheritdoc />
         string IFullBodyDeformationData.OriginalSpineBoneCountIntProperty =>
@@ -827,6 +838,20 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _originalSpinePositionsWeight;
             set => _originalSpinePositionsWeight = value;
+        }
+
+        /// <summary>
+        /// Allows stretching arms.
+        /// WARNING! EXPERIMENTAL! increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.01f, 5.0f)]
+        [Tooltip(DeformationDataTooltips.ArmLengthMultiplier)]
+        private float _armLengthMultiplier;
+        public float ArmLengthMultiplier
+        {
+            get => _armLengthMultiplier;
+            set => _armLengthMultiplier = value;
         }
 
         /// <summary>
@@ -1484,6 +1509,7 @@ namespace Oculus.Movement.AnimationRigging
             _leftToesWeight = 0.0f;
             _rightToesWeight = 0.0f;
             _originalSpinePositionsWeight = 0.0f;
+            _armLengthMultiplier = 1.0f;
             _originalSpineBoneCount = 0;
             _originalSpineUseHipsToHeadToScale = false;
             _originalSpineFixRotations = false;

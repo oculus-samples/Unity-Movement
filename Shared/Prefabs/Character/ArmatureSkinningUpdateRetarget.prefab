@@ -286,336 +286,336 @@ MonoBehaviour:
     _referencePoseTime: 0
     _referencePose:
     - Bone: 0
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 1
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 2
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 3
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 4
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 5
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 6
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 7
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 8
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 9
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 10
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 11
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 12
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 13
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 14
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 15
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 16
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 17
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 18
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 19
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 20
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 21
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 22
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 23
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 24
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 25
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 26
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 27
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 28
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 29
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 30
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 31
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 32
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 33
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 34
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 35
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 36
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 37
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 38
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 39
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 40
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 41
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 42
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 43
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 44
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 45
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 46
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 47
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 48
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 49
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 50
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 51
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 52
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 53
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 54
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     _currentPose:
     - Bone: 0
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 1
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 2
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 3
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 4
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 5
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 6
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 7
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 8
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 9
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 10
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 11
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 12
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 13
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 14
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 15
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 16
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 17
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 18
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 19
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 20
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 21
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 22
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 23
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 24
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 25
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 26
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 27
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 28
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 29
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 30
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 31
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 32
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 33
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 34
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 35
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 36
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 37
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 38
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 39
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 40
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 41
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 42
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 43
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 44
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 45
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 46
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 47
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 48
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 49
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 50
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 51
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 52
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 53
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
     - Bone: 54
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!1 &6381604311219588075
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,6 +694,7 @@ MonoBehaviour:
     _rightToesWeight: 1
     _alignFeetWeight: 0.75
     _originalSpinePositionsWeight: 0.5
+    _armLengthMultiplier: 1
     _originalSpineBoneCount: 5
     _originalSpineUseHipsToHeadToScale: 1
     _originalSpineFixRotations: 0
