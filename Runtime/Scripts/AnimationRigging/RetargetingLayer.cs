@@ -329,6 +329,23 @@ namespace Oculus.Movement.AnimationRigging
             _retargetedBoneMappings.UpdateBonePairMappings(this);
         }
 
+        /// <summary>
+        /// Update the current bones to the animator avatar human description skeleton.
+        /// </summary>
+        /// <param name="source"></param>
+        public void UpdateToAnimatorPose(Animator source)
+        {
+            var skeletonBones = source.avatar.humanDescription.skeleton;
+            foreach (var skeletonBone in skeletonBones)
+            {
+                var targetBone = transform.FindChildRecursive(skeletonBone.name);
+                if (targetBone != null)
+                {
+                    targetBone.SetLocalPositionAndRotation(skeletonBone.position, skeletonBone.rotation);
+                }
+            }
+        }
+
         private void ConstructDefaultPoseInformation()
         {
             _defaultPoses = new Pose[(int)HumanBodyBones.LastBone];

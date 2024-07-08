@@ -17,8 +17,9 @@ namespace Oculus.Movement.AnimationRigging
         {
             var retargetingLayer = serializedObject.targetObject as RetargetingLayer;
             var animatorComponent = retargetingLayer.GetComponent<Animator>();
+            var animatorProperlyConfigured = IsAnimatorProperlyConfigured(animatorComponent);
 
-            if (!IsAnimatorProperlyConfigured(animatorComponent))
+            if (!animatorProperlyConfigured)
             {
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.HelpBox("Requires Animator component with a humanoid " +
@@ -28,13 +29,17 @@ namespace Oculus.Movement.AnimationRigging
 
             base.OnInspectorGUI();
 
-            if (GUILayout.Button("Calculate Adjustments"))
+            if (animatorProperlyConfigured)
             {
-
-                if (retargetingLayer != null)
+                if (GUILayout.Button("Calculate Adjustments"))
                 {
-                    var animator = retargetingLayer.GetComponent<Animator>();
-                    AddComponentsHelper.AddJointAdjustments(animator, retargetingLayer);
+                    AddComponentsHelper.AddJointAdjustments(animatorComponent, retargetingLayer);
+                    EditorUtility.SetDirty(retargetingLayer);
+                }
+
+                if (GUILayout.Button("Update to Animator Pose"))
+                {
+                    retargetingLayer.UpdateToAnimatorPose(animatorComponent);
                     EditorUtility.SetDirty(retargetingLayer);
                 }
             }
