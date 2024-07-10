@@ -13,6 +13,7 @@ namespace Oculus.Movement.AnimationRigging
         private static Pose[] _cachedOldPoses;
         private static Pose[] _cachedFabrikPoses;
         private static Quaternion[] _fabrikRotChanges;
+        private static Pose[] _cachedCcdPoses;
 
         /// <summary>
         /// Cyclic Coordinate Descent IK algorithm implementation. This rotates each bone in the chain so
@@ -30,31 +31,60 @@ namespace Oculus.Movement.AnimationRigging
             float tolerance,
             float maxIterations)
         {
-            float sqrTolerance = float.MaxValue;
-            var effector = bones[0];
-
-            int iterations = 1;
-            while (sqrTolerance > tolerance && iterations <= maxIterations)
+            if (bones.Length < 2)
             {
-                for (int i = 2; i < bones.Length; i++)
+                Debug.LogError("Please run CCDIK on at least two joints.");
+                return false;
+            }
+            if (_cachedCcdPoses == null || _cachedCcdPoses.Length != bones.Length)
+            {
+                _cachedCcdPoses = new Pose[bones.Length];
+            }
+            var rootPosition = bones[^1].parent.position;
+            var rootRotation = bones[^1].parent.rotation;
+            for (var i = 0; i < _cachedCcdPoses.Length; i++)
+            {
+                var bone = bones[i];
+                _cachedCcdPoses[i] = new Pose(bone.localPosition, bone.localRotation);
+            }
+
+            const int effectorIndex = 0;
+            var sqrTolerance = float.MaxValue;
+            var effectorPosePosition =
+                GetBoneWorldPosition(_cachedCcdPoses, rootPosition, rootRotation, effectorIndex);
+            var iterations = 0;
+            while (sqrTolerance > tolerance && iterations < maxIterations)
+            {
+                for (int i = 1; i < _cachedCcdPoses.Length; i++)
                 {
-                    for (int j = 1; j <= i; j++)
+                    var pose = _cachedCcdPoses[i];
+                    var poseWorldPosition = GetBoneWorldPosition(_cachedCcdPoses, rootPosition, rootRotation, i);
+                    var poseWorldRotation = GetBoneWorldRotation(_cachedCcdPoses, rootRotation, i);
+                    // This is the target world rotation.
+                    var newPoseRotation = GetBoneDeltaRotationWithEffectorTowardGoal(
+                        effectorPosePosition, poseWorldPosition, targetPosition) * poseWorldRotation;
+                    // Convert to local rotation.
+                    var localPoseRotation =
+                        Quaternion.Inverse(GetBoneWorldRotation(_cachedCcdPoses, rootRotation, i + 1)) *
+                        newPoseRotation;
+                    pose.rotation = localPoseRotation;
+                    _cachedCcdPoses[i] = pose;
+                    // Update effector position after rotation change
+                    effectorPosePosition =
+                        GetBoneWorldPosition(_cachedCcdPoses, rootPosition, rootRotation, effectorIndex);
+                    // Check tolerance after each bone update
+                    sqrTolerance = (effectorPosePosition - targetPosition).sqrMagnitude;
+                    if (sqrTolerance <= tolerance)
                     {
-                        bones[j].rotation = GetBoneRotationWithEffectorTowardGoal(effector, bones[j], targetPosition);
-
-                        sqrTolerance = (effector.position - targetPosition).sqrMagnitude;
-
-                        if (sqrTolerance <= tolerance)
-                        {
-                            return true;
-                        }
+                        ApplyPosesToTransforms(_cachedCcdPoses, bones);
+                        return true;
                     }
                 }
 
-                sqrTolerance = (effector.position - targetPosition).sqrMagnitude;
                 iterations++;
             }
 
+            ApplyPosesToTransforms(_cachedCcdPoses, bones);
             return false;
         }
 
@@ -287,20 +317,51 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Gets the rotation of a bone toward the goal with an effector.
         /// </summary>
-        /// <param name="effector">The effector transform.</param>
-        /// <param name="bone">The bone transform.</param>
+        /// <param name="effectorPosition">The effector position.</param>
+        /// <param name="bonePosition">The bone position.</param>
         /// <param name="goalPosition">The goal position.</param>
-        /// <returns>The desired bone rotation.</returns>
-        public static Quaternion GetBoneRotationWithEffectorTowardGoal(Transform effector, Transform bone, Vector3 goalPosition)
+        /// <returns>The desired delta bone rotation to be applied.</returns>
+        private static Quaternion GetBoneDeltaRotationWithEffectorTowardGoal(
+            Vector3 effectorPosition, Vector3 bonePosition, Vector3 goalPosition)
         {
-            var effectorPosition = effector.position;
-            var bonePosition = bone.position;
-            var boneRotation = bone.rotation;
-
             var boneToEffector = effectorPosition - bonePosition;
             var boneToGoal = goalPosition - bonePosition;
+            return Quaternion.FromToRotation(boneToEffector, boneToGoal);
+        }
 
-            return Quaternion.FromToRotation(boneToEffector, boneToGoal) * boneRotation;
+        private static Vector3 GetBoneWorldPosition(Pose[] poses, Vector3 rootPosition, Quaternion rootRotation,
+            int boneIndex)
+        {
+            var position = rootPosition;
+            var rotation = rootRotation;
+            for (var i = poses.Length - 1; i >= boneIndex; i--)
+            {
+                var pose = poses[i];
+                position += rotation * pose.position;
+                rotation *= pose.rotation;
+            }
+
+            return position;
+        }
+
+        private static Quaternion GetBoneWorldRotation(Pose[] poses, Quaternion rootRotation, int boneIndex)
+        {
+            var rotation = rootRotation;
+            for (var i = poses.Length - 1; i >= boneIndex; i--)
+            {
+                var pose = poses[i];
+                rotation *= pose.rotation;
+            }
+
+            return rotation;
+        }
+
+        private static void ApplyPosesToTransforms(Pose[] poses, Transform[] bones)
+        {
+            for (var i = bones.Length - 1; i >= 0; i--)
+            {
+                bones[i].localRotation = poses[i].rotation;
+            }
         }
     }
 }
