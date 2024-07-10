@@ -191,36 +191,31 @@ namespace Oculus.Movement.Utils
             bool isFullBody,
             bool runtimeInvocation = false)
         {
+            // Delete retargeting layer so that new one computes offsets.
             RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
-
-            // Check for old retargeting layer first.
-            RetargetingLayer baseRetargetingLayer = mainParent.GetComponent<RetargetingLayer>();
-            if (retargetingLayer == null && baseRetargetingLayer != null)
+            if (retargetingLayer != null)
             {
 #if UNITY_EDITOR
                 if (!runtimeInvocation)
                 {
-                    Undo.DestroyObjectImmediate(baseRetargetingLayer);
+                    Undo.DestroyObjectImmediate(retargetingLayer);
                 }
                 else
                 {
-                    GameObject.DestroyImmediate(baseRetargetingLayer);
+                    GameObject.DestroyImmediate(retargetingLayer);
                 }
 #else
-                GameObject.DestroyImmediate(baseRetargetingLayer);
+                GameObject.DestroyImmediate(retargetingLayer);
 #endif
             }
 
-            if (!retargetingLayer)
-            {
-                retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
+            retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
 #if UNITY_EDITOR
-                if (!runtimeInvocation)
-                {
-                    Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
-                }
-#endif
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
             }
+#endif
 
             if (isFullBody)
             {
