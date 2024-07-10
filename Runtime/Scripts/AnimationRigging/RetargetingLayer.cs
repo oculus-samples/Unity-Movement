@@ -4,9 +4,11 @@ using Oculus.Interaction;
 using Oculus.Movement.AnimationRigging.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.Assertions;
 
 namespace Oculus.Movement.AnimationRigging
@@ -346,6 +348,18 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
+        /// <summary>
+        /// Read JSON config from file.
+        /// </summary>
+        /// <param name="filePath">File path to read from.</param>
+        public void ReadJSONConfigFromFile(string filePath)
+        {
+            string text = File.ReadAllText(filePath);
+            JsonUtility.FromJsonOverwrite(text, this);
+            Debug.Log($"Read JSON config from {filePath}.");
+            UpdateReferences();
+        }
+
         private void ConstructDefaultPoseInformation()
         {
             _defaultPoses = new Pose[(int)HumanBodyBones.LastBone];
@@ -443,6 +457,44 @@ namespace Oculus.Movement.AnimationRigging
             {
                 Debug.LogWarning($"In the ideal case, the parent of right shoulder ({rightShoulder}) should be the" +
                     $" upper chest ({upperChest}).");
+            }
+        }
+
+        private void UpdateReferences()
+        {
+            // Update references when loading from a JSON.
+            _retargetingAnimationConstraint = GetComponentInChildren<RetargetingAnimationConstraint>(true);
+            _retargetingAnimationRig.RigBuilderComp = GetComponent<RigBuilder>();
+
+            // Retargeting animation rig.
+            var skeletonConstraints = GetComponentsInChildren<IOVRSkeletonConstraint>(true);
+            var constraintsAsMonoBehaviour = new MonoBehaviour[skeletonConstraints.Length];
+            for (int i = 0; i < skeletonConstraints.Length; i++)
+            {
+                constraintsAsMonoBehaviour[i] = skeletonConstraints[i] as MonoBehaviour;
+            }
+            _retargetingAnimationRig.OVRSkeletonConstraintComps = constraintsAsMonoBehaviour;
+
+            // External bone targets.
+            var bonesToRetargetNames = new Dictionary<BoneId, string>
+            {
+                { BoneId.FullBody_Hips, "HipsTarget" },
+                { BoneId.FullBody_SpineLower, "SpineLowerTarget" },
+                { BoneId.FullBody_SpineUpper, "SpineUpperTarget" },
+                { BoneId.FullBody_Chest, "ChestTarget" },
+                { BoneId.FullBody_Neck, "NeckTarget" },
+                { BoneId.FullBody_Head, "HeadTarget" },
+                { BoneId.FullBody_LeftFootAnkle, "LeftFootTarget" },
+                { BoneId.FullBody_LeftFootBall, "LeftToesTarget" },
+                { BoneId.FullBody_RightFootAnkle, "RightFootTarget" },
+                { BoneId.FullBody_RightFootBall, "RightToesTarget" }
+            };
+            foreach (var boneTarget in _externalBoneTargets.BoneTargetsArray)
+            {
+                if (boneTarget.Target == null)
+                {
+                    boneTarget.Target = transform.FindChildRecursive(bonesToRetargetNames[boneTarget.BoneId]);
+                }
             }
         }
 

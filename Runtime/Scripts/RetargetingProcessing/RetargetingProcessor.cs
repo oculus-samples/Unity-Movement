@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Unity.Jobs;
 using UnityEngine;
 using static Oculus.Movement.AnimationRigging.IRetargetingProcessor;
@@ -63,6 +64,15 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public virtual void DrawGizmos()
         {
+        }
+
+
+        /// <inheritdoc />
+        public virtual void ReadJSONConfigFromFile(string filePath)
+        {
+            string text = File.ReadAllText(filePath);
+            JsonUtility.FromJsonOverwrite(text, this);
+            Debug.Log($"Read JSON config from {filePath}.");
         }
 
         /// <inheritdoc />

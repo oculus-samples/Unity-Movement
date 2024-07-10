@@ -277,6 +277,7 @@ namespace Oculus.Movement.AnimationRigging
                 var jsonResult = JsonUtility.ToJson(constraint, true);
                 File.WriteAllText(jsonPath, jsonResult);
                 Debug.Log($"Wrote JSON config to path {jsonPath}.");
+                AssetDatabase.Refresh();
             }
             catch (Exception exception)
             {
@@ -303,7 +304,7 @@ namespace Oculus.Movement.AnimationRigging
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Could not save deformation to JSON, exception: {exception}");
+                Debug.LogError($"Could not read deformation from JSON, exception: {exception}");
             }
         }
 

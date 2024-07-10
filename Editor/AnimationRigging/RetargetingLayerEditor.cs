@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System;
+using System.IO;
 using Oculus.Movement.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -44,16 +46,72 @@ namespace Oculus.Movement.AnimationRigging
                 }
             }
 
+            if (GUILayout.Button("Save to JSON"))
+            {
+                SaveToJSON(retargetingLayer);
+            }
+            if (GUILayout.Button("Read from JSON"))
+            {
+                ReadFromJSON(retargetingLayer);
+            }
+
             serializedObject.Update();
 
             serializedObject.ApplyModifiedProperties();
         }
 
-        internal static bool IsAnimatorProperlyConfigured(Animator animatorComponent)
+        private static bool IsAnimatorProperlyConfigured(Animator animatorComponent)
         {
             return animatorComponent != null && animatorComponent.avatar != null &&
                 animatorComponent.avatar.isHuman &&
                 animatorComponent.avatar.humanDescription.hasTranslationDoF;
+        }
+
+        private void SaveToJSON(RetargetingLayer retargetingLayer)
+        {
+            try
+            {
+                var jsonPath = EditorUtility.SaveFilePanel(
+                    "Save configuration into JSON",
+                    Application.dataPath,
+                    "",
+                    "json");
+                if (string.IsNullOrEmpty(jsonPath))
+                {
+                    return;
+                }
+                var jsonResult = JsonUtility.ToJson(retargetingLayer, true);
+                File.WriteAllText(jsonPath, jsonResult);
+                Debug.Log($"Wrote JSON config to path {jsonPath}.");
+                AssetDatabase.Refresh();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Could not save retargeting layer to JSON, exception: {exception}");
+            }
+        }
+
+        private void ReadFromJSON(RetargetingLayer retargetingLayer)
+        {
+            try
+            {
+                var jsonPath = EditorUtility.OpenFilePanel(
+                    "Load configuration from JSON",
+                    Application.dataPath,
+                    "json");
+                if (string.IsNullOrEmpty(jsonPath))
+                {
+                    return;
+                }
+                Undo.RecordObject(retargetingLayer, "Read retargeting layer data");
+                retargetingLayer.ReadJSONConfigFromFile(jsonPath);
+                EditorUtility.SetDirty(target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Could not read retargeting layer from JSON, exception: {exception}");
+            }
         }
     }
 }
