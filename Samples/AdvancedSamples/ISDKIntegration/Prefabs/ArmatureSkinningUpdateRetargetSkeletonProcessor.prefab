@@ -49,6 +49,16 @@ MonoBehaviour:
     _animationPlaybackType: 2
     _captureAnimationConstraint: {fileID: 5356593900378066967}
     _avatarMask: {fileID: 31900000, guid: 7129d5b0eec7de64a93fce9a6ba8f4d7, type: 2}
+    _affectPositions: 0
+    _affectRotations: 0
+    _bonesArrayMask: 
+    _fixedHipsPosition: {x: 0, y: 0, z: 0}
+    _fixedHipRotation: {x: 0, y: 0, z: 0}
+    _useFixedHipsPose: 0
+    _affectHipsPositionY: 0
+    _affectHipsRotationX: 0
+    _affectHipsRotationY: 0
+    _affectHipsRotationZ: 0
 --- !u!1001 &5579424741284206770
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -228,6 +238,14 @@ PrefabInstance:
       propertyPath: _retargetingLayer
       value: 
       objectReference: {fileID: 2324633634594971607}
+    - target: {fileID: 7866900989153904485, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
+      propertyPath: _retargetingProcessors.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: fe9461a9c9e3a714b99266aba4a4807b, type: 2}
+    - target: {fileID: 7866900989153904485, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
+      propertyPath: _retargetingProcessors.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 021794d4a244daa429cbbe8384b1a2fd, type: 2}
     - target: {fileID: 7866900989153904485, guid: eb6bc10f92728a546a3d8c144d0ef787, type: 3}
       propertyPath: _retargetingProcessors.Array.data[2]
       value: 

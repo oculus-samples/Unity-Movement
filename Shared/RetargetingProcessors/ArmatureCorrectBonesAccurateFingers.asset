@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99f3c86fa39b08a438ed987947aa34c7, type: 3}
-  m_Name: ArmatureCorrectBonesAccurateShoulderFingers
+  m_Name: ArmatureCorrectBonesAccurateFingers
   m_EditorClassIdentifier: 
   Weight: 1
+  _processorType: 0
   _correctPositionsLateUpdate: 1
   _shoulderCorrectionWeightLateUpdate: 0
-  _fingerPositionCorrectionWeight: 0
+  _fingerPositionCorrectionWeight: 1
+  _regenJobData: 0
