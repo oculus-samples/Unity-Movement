@@ -40,12 +40,15 @@ namespace Oculus.Movement.AnimationRigging
             {
                 _cachedCcdPoses = new Pose[bones.Length];
             }
-            var rootPosition = bones[^1].parent.position;
-            var rootRotation = bones[^1].parent.rotation;
-            for (var i = 0; i < _cachedCcdPoses.Length; i++)
+            var parentBone = bones[^1].parent;
+            var rootPosition = parentBone.position;
+            var rootRotation = parentBone.rotation;
+            for (var i = bones.Length - 1; i >= 0; i--)
             {
                 var bone = bones[i];
-                _cachedCcdPoses[i] = new Pose(bone.localPosition, bone.localRotation);
+                _cachedCcdPoses[i] = new Pose(parentBone.InverseTransformPoint(bone.position),
+                    Quaternion.Inverse(parentBone.rotation) * bone.rotation);
+                parentBone = bone;
             }
 
             const int effectorIndex = 0;
@@ -358,9 +361,12 @@ namespace Oculus.Movement.AnimationRigging
 
         private static void ApplyPosesToTransforms(Pose[] poses, Transform[] bones)
         {
+            var parentBone = bones[^1].parent;
             for (var i = bones.Length - 1; i >= 0; i--)
             {
-                bones[i].localRotation = poses[i].rotation;
+                var bone = bones[i];
+                bone.rotation = parentBone.rotation * poses[i].rotation;
+                parentBone = bone;
             }
         }
     }
