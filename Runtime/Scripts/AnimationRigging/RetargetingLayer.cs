@@ -332,15 +332,34 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Read JSON config from file.
+        /// Read JSON config from file and applies it.
         /// </summary>
         /// <param name="filePath">File path to read from.</param>
         public void ReadJSONConfigFromFile(string filePath)
         {
-            string text = File.ReadAllText(filePath);
-            JsonUtility.FromJsonOverwrite(text, this);
-            Debug.Log($"Read JSON config from {filePath}.");
+            string jsonConfigText = File.ReadAllText(filePath);
+            Debug.Log($"Read JSON config from {jsonConfigText}.");
+            ApplyJSONConfig(jsonConfigText);
+        }
+
+        /// <summary>
+        /// Applies JSON config to file.
+        /// </summary>
+        /// <param name="jsonData">JSON data.</param>
+        public void ApplyJSONConfig(string jsonData)
+        {
+            JsonUtility.FromJsonOverwrite(jsonData, this);
             UpdateReferences();
+            Debug.Log($"Applied JSON config to {this}.");
+        }
+
+        /// <summary>
+        /// Returns JSON config as string.
+        /// </summary>
+        /// <returns>JSON config as string.</returns>
+        public string GetJSONConfig()
+        {
+            return JsonUtility.ToJson(this, true);
         }
 
         private void ConstructDefaultPoseInformation()

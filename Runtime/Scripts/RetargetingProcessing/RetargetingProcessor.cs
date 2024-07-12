@@ -66,13 +66,25 @@ namespace Oculus.Movement.AnimationRigging
         {
         }
 
-
         /// <inheritdoc />
         public virtual void ReadJSONConfigFromFile(string filePath)
         {
             string text = File.ReadAllText(filePath);
-            JsonUtility.FromJsonOverwrite(text, this);
             Debug.Log($"Read JSON config from {filePath}.");
+            ApplyJSONConfig(text);
+        }
+
+        /// <inheritdoc />
+        public virtual void ApplyJSONConfig(string jsonData)
+        {
+            JsonUtility.FromJsonOverwrite(jsonData, this);
+            Debug.Log($"Applied JSON config to {this}.");
+        }
+
+        /// <inheritdoc />
+        public virtual string GetJSONConfig()
+        {
+            return JsonUtility.ToJson(this, true);
         }
 
         /// <inheritdoc />

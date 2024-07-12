@@ -80,7 +80,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     return;
                 }
-                var jsonResult = JsonUtility.ToJson(retargetingLayer, true);
+                var jsonResult = retargetingLayer.GetJSONConfig();
                 File.WriteAllText(jsonPath, jsonResult);
                 Debug.Log($"Wrote JSON config to path {jsonPath}.");
                 AssetDatabase.Refresh();

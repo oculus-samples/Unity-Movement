@@ -45,7 +45,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     return;
                 }
-                var jsonResult = JsonUtility.ToJson(processor, true);
+                var jsonResult = processor.GetJSONConfig();
                 File.WriteAllText(jsonPath, jsonResult);
                 Debug.Log($"Wrote JSON config to path {jsonPath}.");
                 AssetDatabase.Refresh();

@@ -57,10 +57,22 @@ namespace Oculus.Movement.AnimationRigging
         public void DrawGizmos();
 
         /// <summary>
-        /// Read JSON config from file.
+        /// Reads and applies JSON config from file.
         /// </summary>
         /// <param name="filePath">File path to read from.</param>
         public void ReadJSONConfigFromFile(string filePath);
+
+        /// <summary>
+        /// Applies JSON config.
+        /// </summary>
+        /// <param name="jsonData">JSON data.</param>
+        public void ApplyJSONConfig(string jsonData);
+
+        /// <summary>
+        /// Returns JSON config as string.
+        /// </summary>
+        /// <returns>JSON config as string.</returns>
+        public string GetJSONConfig();
 
         /// <summary>
         /// Processor type (normal or jobs).
