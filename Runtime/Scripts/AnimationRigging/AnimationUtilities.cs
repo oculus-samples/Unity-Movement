@@ -16,6 +16,24 @@ namespace Oculus.Movement.AnimationRigging
         private static Pose[] _cachedCcdPoses;
 
         /// <summary>
+        /// Update animator to the pose stored in the avatar's human
+        /// description.
+        /// </summary>
+        /// <param name="sourceAnimator">The animator that contains the human description.</param>
+        public static void UpdateToAnimatorPose(Animator sourceAnimator)
+        {
+            var skeletonBones = sourceAnimator.avatar.humanDescription.skeleton;
+            foreach (var skeletonBone in skeletonBones)
+            {
+                var targetBone = sourceAnimator.transform.FindChildRecursive(skeletonBone.name);
+                if (targetBone != null)
+                {
+                    targetBone.SetLocalPositionAndRotation(skeletonBone.position, skeletonBone.rotation);
+                }
+            }
+        }
+
+        /// <summary>
         /// Cyclic Coordinate Descent IK algorithm implementation. This rotates each bone in the chain so
         /// that the effector bone will reach the target position. An example of this usage is rotating the entire arm
         /// so that the specified hand can match the tracked hand position.

@@ -41,7 +41,7 @@ namespace Oculus.Movement.AnimationRigging
 
                 if (GUILayout.Button("Update to Animator Pose"))
                 {
-                    retargetingLayer.UpdateToAnimatorPose(animatorComponent);
+                    AnimationUtilities.UpdateToAnimatorPose(animatorComponent);
                     EditorUtility.SetDirty(retargetingLayer);
                 }
             }

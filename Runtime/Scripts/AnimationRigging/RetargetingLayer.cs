@@ -332,23 +332,6 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// Update the current bones to the animator avatar human description skeleton.
-        /// </summary>
-        /// <param name="source"></param>
-        public void UpdateToAnimatorPose(Animator source)
-        {
-            var skeletonBones = source.avatar.humanDescription.skeleton;
-            foreach (var skeletonBone in skeletonBones)
-            {
-                var targetBone = transform.FindChildRecursive(skeletonBone.name);
-                if (targetBone != null)
-                {
-                    targetBone.SetLocalPositionAndRotation(skeletonBone.position, skeletonBone.rotation);
-                }
-            }
-        }
-
-        /// <summary>
         /// Read JSON config from file.
         /// </summary>
         /// <param name="filePath">File path to read from.</param>
