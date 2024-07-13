@@ -732,7 +732,9 @@ namespace Oculus.Movement.Utils
             }
 #endif
             retargetingProcessorCorrectBones.name = "CorrectBones";
+            retargetingProcessorCorrectBones.ProcessorType = IRetargetingProcessor.RetargetingProcessorType.Jobs;
             retargetingProcessorCorrectBones.FingerPositionCorrectionWeight = 0.0f;
+            retargetingProcessorCorrectBones.ShoulderCorrectionWeightLateUpdate = 0.0f;
             retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectBones);
         }
 

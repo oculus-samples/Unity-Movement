@@ -673,7 +673,7 @@ MonoBehaviour:
   m_Weight: 1
   m_Data:
     _deformationBodyType: 0
-    _spineLowerAlignmentWeight: 1
+    _spineLowerAlignmentWeight: 0.5
     _spineUpperAlignmentWeight: 1
     _chestAlignmentWeight: 0
     _shouldersHeightReductionWeight: 0
@@ -697,7 +697,7 @@ MonoBehaviour:
     _armLengthMultiplier: 1
     _originalSpineBoneCount: 5
     _originalSpineUseHipsToHeadToScale: 1
-    _originalSpineFixRotations: 0
+    _originalSpineFixRotations: 1
     _spineTranslationCorrectionType: 3
     _customSkeleton: {fileID: 0}
     _animator: {fileID: 4325497552437736820}
@@ -1525,26 +1525,6 @@ MonoBehaviour:
     RotationChange: {x: 0, y: 0, z: 0, w: 1}
     RotationTweaks:
     - {x: 0.07186479, y: -0.0044752015, z: 0.030848932, w: 0.9969272}
-    DisableRotationTransform: 0
-    DisablePositionTransform: 0
-    FullBodyBoneIdOverrideValue: 85
-    BoneIdOverrideValue: 71
-  - Joint: 17
-    PositionChange: {x: 0, y: 0, z: 0}
-    RotationChange: {x: 0, y: 0, z: 0, w: 1}
-    RotationTweaks:
-    - {x: 0, y: 0.38268346, z: 0, w: 0.9238795}
-    - {x: 0.043609004, y: -0.00095155207, z: 0.021794124, w: 0.99881047}
-    DisableRotationTransform: 0
-    DisablePositionTransform: 0
-    FullBodyBoneIdOverrideValue: 85
-    BoneIdOverrideValue: 71
-  - Joint: 18
-    PositionChange: {x: 0, y: 0, z: 0}
-    RotationChange: {x: 0, y: 0, z: 0, w: 1}
-    RotationTweaks:
-    - {x: 0, y: 0.38268346, z: 0, w: 0.9238795}
-    - {x: 0.043609004, y: -0.0009515519, z: 0.021794122, w: 0.99881047}
     DisableRotationTransform: 0
     DisablePositionTransform: 0
     FullBodyBoneIdOverrideValue: 85
