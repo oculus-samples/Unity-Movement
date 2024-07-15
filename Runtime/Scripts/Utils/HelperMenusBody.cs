@@ -151,6 +151,9 @@ namespace Oculus.Movement.Utils
                 AddComponentsHelper.SetupExternalBoneTargets(retargetingLayer, isFullBody, boneTargets);
             }
 
+            // Update bone pair mappings.
+            retargetingLayer.UpdateBonePairMappings();
+
             // Add joint adjustments.
             AddComponentsHelper.AddJointAdjustments(animatorComp, retargetingLayer);
 

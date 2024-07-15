@@ -223,15 +223,6 @@ namespace Oculus.Movement.AnimationRigging
             base.Awake();
 
             _proxyTransformLogic.UseJobs = true;
-            _externalBoneTargets.UseJobs = true;
-
-            if (_retargetedBoneMappings.ConvertBonePairsToDictionaries())
-            {
-                BodyBoneMappingsInterface = _retargetedBoneMappings;
-            }
-
-            Assert.IsNotNull(_retargetingAnimationConstraint,
-                "Please assign the retargeting constraint to RetargetingLayer.");
 
             for (int i = 0; i < _retargetingProcessors.Count; i++)
             {
@@ -276,13 +267,28 @@ namespace Oculus.Movement.AnimationRigging
             try
             {
                 _lastTrackedScaleRt = transform.lossyScale;
-                // cache any transformation information above hips to make sure upright rest pose is captured.
+                _externalBoneTargets.UseJobs = true;
+                Assert.IsNotNull(_retargetingAnimationConstraint,
+                    "Please assign the retargeting constraint to RetargetingLayer.");
+
+                // Convert bone mappings.
+                if (_retargetedBoneMappings == null)
+                {
+                    UpdateBonePairMappings();
+                }
+                if (_retargetedBoneMappings.ConvertBonePairsToDictionaries())
+                {
+                    BodyBoneMappingsInterface = _retargetedBoneMappings;
+                }
+
+                // Cache any transformation information above hips to make sure upright rest pose is captured.
                 CaptureTransformInformationHipsUpwards(GetComponent<Animator>().GetBoneTransform(HumanBodyBones.Hips));
                 if (_retargetingAnimationRig.RigBuilderComp.enabled)
                 {
                     Debug.LogError("Please disable the rig builder by default or else the animation system " +
                         " will prevent a correct capture of the rest pose.");
                 }
+
                 base.Start();
 
                 ConstructDefaultPoseInformation();
