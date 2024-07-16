@@ -240,6 +240,7 @@ namespace Oculus.Movement.AnimationRigging
         /// </summary>
         public void CleanUp()
         {
+            Complete();
             if (_targetBones.isCreated)
             {
                 _targetBones.Dispose();
