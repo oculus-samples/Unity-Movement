@@ -1538,7 +1538,7 @@ MonoBehaviour:
   _enableTrackingByProxy: 1
   _retargetingAnimationConstraint: {fileID: 3289871368579812835}
   _retargetingProcessors:
-  - {fileID: 11400000, guid: 15440560904a85846a7a4b75e1f7b96e, type: 2}
+  - {fileID: 11400000, guid: fe9461a9c9e3a714b99266aba4a4807b, type: 2}
   - {fileID: 11400000, guid: 2f4117f1d60a81945a0e08b16219ca51, type: 2}
   _retargetingAnimationRig:
     _rebindAnimator: 1

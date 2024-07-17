@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ArmatureCorrectBonesAccurateFingers
   m_EditorClassIdentifier: 
   Weight: 1
-  _processorType: 0
+  _processorType: 1
   _correctPositionsLateUpdate: 1
   _shoulderCorrectionWeightLateUpdate: 0
   _fingerPositionCorrectionWeight: 1
