@@ -91,6 +91,18 @@ namespace Oculus.Movement.Utils
                 UnityEditor.Undo.IncrementCurrentGroup();
             }
 #endif
+            // Force character to desired pose before retargeting is added to it.
+            // If called at runtime, enable gameobject so that dependendent bones can be found.
+            if (runtimeInvocation)
+            {
+                activeGameObject.SetActive(true);
+            }
+            Animator animatorComp = activeGameObject.GetComponentInChildren<Animator>(true);
+            AnimationUtilities.UpdateToAnimatorPose(animatorComp);
+            if (runtimeInvocation)
+            {
+                activeGameObject.SetActive(false);
+            }
 
             // Store the previous transform data.
             var previousPositionAndRotation =
@@ -100,7 +112,6 @@ namespace Oculus.Movement.Utils
             activeGameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
             // Add the retargeting and body tracking components at root first.
-            Animator animatorComp = activeGameObject.GetComponentInChildren<Animator>(true);
             RetargetingLayer retargetingLayer =
                 AddComponentsHelper.AddMainRetargetingComponent(activeGameObject, isFullBody, runtimeInvocation);
 
