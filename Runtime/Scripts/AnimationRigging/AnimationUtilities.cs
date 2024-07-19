@@ -59,6 +59,7 @@ namespace Oculus.Movement.AnimationRigging
                 _cachedCcdPoses = new Pose[bones.Length];
             }
             var parentBone = bones[^1].parent;
+            var rootScale = parentBone.lossyScale;
             var rootPosition = parentBone.position;
             var rootRotation = parentBone.rotation;
             for (var i = bones.Length - 1; i >= 0; i--)
@@ -72,14 +73,14 @@ namespace Oculus.Movement.AnimationRigging
             const int effectorIndex = 0;
             var sqrTolerance = float.MaxValue;
             var effectorPosePosition =
-                GetBoneWorldPosition(_cachedCcdPoses, rootPosition, rootRotation, effectorIndex);
+                GetBoneWorldPosition(_cachedCcdPoses, rootScale, rootPosition, rootRotation, effectorIndex);
             var iterations = 0;
             while (sqrTolerance > tolerance && iterations < maxIterations)
             {
                 for (int i = 1; i < _cachedCcdPoses.Length; i++)
                 {
                     var pose = _cachedCcdPoses[i];
-                    var poseWorldPosition = GetBoneWorldPosition(_cachedCcdPoses, rootPosition, rootRotation, i);
+                    var poseWorldPosition = GetBoneWorldPosition(_cachedCcdPoses, rootScale, rootPosition, rootRotation, i);
                     var poseWorldRotation = GetBoneWorldRotation(_cachedCcdPoses, rootRotation, i);
                     // This is the target world rotation.
                     var newPoseRotation = GetBoneDeltaRotationWithEffectorTowardGoal(
@@ -92,7 +93,7 @@ namespace Oculus.Movement.AnimationRigging
                     _cachedCcdPoses[i] = pose;
                     // Update effector position after rotation change
                     effectorPosePosition =
-                        GetBoneWorldPosition(_cachedCcdPoses, rootPosition, rootRotation, effectorIndex);
+                        GetBoneWorldPosition(_cachedCcdPoses, rootScale, rootPosition, rootRotation, effectorIndex);
                     // Check tolerance after each bone update
                     sqrTolerance = (effectorPosePosition - targetPosition).sqrMagnitude;
                     if (sqrTolerance <= tolerance)
@@ -350,15 +351,16 @@ namespace Oculus.Movement.AnimationRigging
             return Quaternion.FromToRotation(boneToEffector, boneToGoal);
         }
 
-        private static Vector3 GetBoneWorldPosition(Pose[] poses, Vector3 rootPosition, Quaternion rootRotation,
+        private static Vector3 GetBoneWorldPosition(Pose[] poses, Vector3 rootScale, Vector3 rootPosition, Quaternion rootRotation,
             int boneIndex)
         {
+            var scale = rootScale;
             var position = rootPosition;
             var rotation = rootRotation;
             for (var i = poses.Length - 1; i >= boneIndex; i--)
             {
                 var pose = poses[i];
-                position += rotation * pose.position;
+                position += rotation * Vector3.Scale(pose.position, rootScale);
                 rotation *= pose.rotation;
             }
 
