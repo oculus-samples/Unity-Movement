@@ -162,6 +162,18 @@ namespace Oculus.Movement.Utils
                 AddComponentsHelper.SetupExternalBoneTargets(retargetingLayer, isFullBody, boneTargets);
             }
 
+            if (ShouldCorrectFingers(animatorComp, restPoseObjectHumanoid))
+            {
+                foreach (var retargetingProcessor in retargetingLayer.RetargetingProcessors)
+                {
+                    var correctBones = retargetingProcessor as RetargetingProcessorCorrectBones;
+                    if (correctBones != null)
+                    {
+                        correctBones.FingerPositionCorrectionWeight = 1.0f;
+                    }
+                }
+            }
+
             // Update bone pair mappings.
             retargetingLayer.UpdateBonePairMappings();
 
@@ -299,6 +311,49 @@ namespace Oculus.Movement.Utils
             }
 #endif
             return deformationConstraint;
+        }
+
+        private static bool ShouldCorrectFingers(Animator animator, RestPoseObjectHumanoid restPoseObjectHumanoid)
+        {
+            var hand = HumanBodyBones.LeftHand;
+            var fingers = new []
+            {
+                HumanBodyBones.LeftThumbDistal,
+                HumanBodyBones.LeftIndexDistal,
+                HumanBodyBones.LeftMiddleDistal,
+                HumanBodyBones.LeftRingDistal,
+                HumanBodyBones.LeftLittleDistal
+            };
+            var approximateSourceHandSize = 0.0f;
+            var approximateTargetHandSize = 0.0f;
+            var sourceWristBonePosition = restPoseObjectHumanoid.GetBonePoseData(hand).WorldPose.position;
+            var targetWristBonePosition = animator.GetBoneTransform(hand).position;
+            var validFingers = 0;
+            foreach (var finger in fingers)
+            {
+                var fingerBone = animator.GetBoneTransform(finger);
+                if (fingerBone != null)
+                {
+                    approximateSourceHandSize += Vector3.Distance(sourceWristBonePosition,
+                        restPoseObjectHumanoid.GetBonePoseData(finger).WorldPose.position);
+                    approximateTargetHandSize += Vector3.Distance(targetWristBonePosition, fingerBone.position);
+                    validFingers++;
+                }
+            }
+
+            // If no fingers to check against, we don't want finger positional accuracy.
+            if (validFingers == 0)
+            {
+                return false;
+            }
+            approximateSourceHandSize /= validFingers;
+            approximateTargetHandSize /= validFingers;
+
+            // Check if the sizes are within 10% of each other.
+            var threshold = 0.1f;
+            var maxDifference = Mathf.Max(approximateSourceHandSize, approximateTargetHandSize) * threshold;
+            var difference = Mathf.Abs(approximateSourceHandSize - approximateTargetHandSize);
+            return difference <= maxDifference;
         }
     }
 }
