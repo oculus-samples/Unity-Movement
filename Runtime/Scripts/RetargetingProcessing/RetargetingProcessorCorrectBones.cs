@@ -826,6 +826,11 @@ namespace Oculus.Movement.AnimationRigging
                 return new JobHandle();
             }
 
+            if (Weight <= 0.0f)
+            {
+                return new JobHandle();
+            }
+
             var hipsCorrection = retargetingLayer.GetCorrectionQuaternion(HumanBodyBones.Hips);
             var referenceCorrection = _hipsCorrectionQuatLastDataGen;
             bool jobHipDataOffsetDiffers = hipsCorrection != referenceCorrection;
