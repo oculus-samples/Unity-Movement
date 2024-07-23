@@ -24,6 +24,11 @@ namespace Oculus.Movement.AnimationRigging
         public class HandProcessor
         {
             /// <summary>
+            /// The hand bone.
+            /// </summary>
+            public Transform HandBone => _armBones[0];
+
+            /// <summary>
             /// The weight of the hand blending.
             /// </summary>
             [Range(0.0f, 1.0f)]
@@ -586,7 +591,9 @@ namespace Oculus.Movement.AnimationRigging
         public enum SyncOvrOption
         {
             None,
-            Positions
+            Positions,
+            Rotations,
+            PositionsAndRotations
         }
 
         /// <summary>
@@ -777,6 +784,8 @@ namespace Oculus.Movement.AnimationRigging
         private Pose _leftHandControllerPoseOffset;
         private OVRSkeleton.IOVRSkeletonDataProvider _leftOvrHand;
         private OVRSkeleton.IOVRSkeletonDataProvider _rightOvrHand;
+        // Wrist fixup rotation value from OVRSkeleton.
+        private readonly Quaternion _wristFixupRotation = new(0.0f, 1.0f, 0.0f, 0.0f);
 
         /// <inheritdoc />
         public override void CopyData(RetargetingProcessor source)
@@ -877,11 +886,28 @@ namespace Oculus.Movement.AnimationRigging
 
             var leftHandTargetPosition = leftTargetHand.position;
             var rightHandTargetPosition = rightTargetHand.position;
+            var syncOption = _syncOvrControllersAndHandsSettings.SyncOption;
 
-            if (_syncOvrControllersAndHandsSettings.SyncOption != SyncOvrOption.None)
+            if (syncOption != SyncOvrOption.None)
             {
+                var leftTargetPosition = leftHandTargetPosition;
+                var rightTargetPosition = rightHandTargetPosition;
+                var leftTargetRotation = leftTargetHand.rotation;
+                var rightTargetRotation = rightTargetHand.rotation;
                 FindHandReferences();
-                UpdateTargetHandPositions(ref leftHandTargetPosition, ref rightHandTargetPosition);
+                UpdateTargetHandData(retargetingLayer,
+                    ref leftTargetPosition, ref rightTargetPosition,
+                    ref leftTargetRotation, ref rightTargetRotation);
+                if (syncOption == SyncOvrOption.Rotations || syncOption == SyncOvrOption.PositionsAndRotations)
+                {
+                    _leftHandProcessor.HandBone.rotation = leftTargetRotation;
+                    _rightHandProcessor.HandBone.rotation = rightTargetRotation;
+                }
+                if (syncOption == SyncOvrOption.Positions || syncOption == SyncOvrOption.PositionsAndRotations)
+                {
+                    leftHandTargetPosition = leftTargetPosition;
+                    rightHandTargetPosition = rightTargetPosition;
+                }
             }
 
             _leftHandProcessor.ProcessRetargetingLayer(retargetingLayer, leftHandTargetPosition, this);
@@ -920,7 +946,9 @@ namespace Oculus.Movement.AnimationRigging
             _rightOvrHand = _cameraRig.rightHandAnchor.GetComponentInChildren<OVRHand>(true);
         }
 
-        private void UpdateTargetHandPositions(ref Vector3 leftHandTargetPosition, ref Vector3 rightHandTargetPosition)
+        private void UpdateTargetHandData(RetargetingLayer retargetingLayer,
+            ref Vector3 leftHandTargetPosition, ref Vector3 rightHandTargetPosition,
+            ref Quaternion leftHandTargetRotation, ref Quaternion rightHandTargetRotation)
         {
             if (_leftOvrHand == null || _rightOvrHand == null)
             {
@@ -929,10 +957,29 @@ namespace Oculus.Movement.AnimationRigging
 
             var leftHandData = _leftOvrHand.GetSkeletonPoseData();
             var rightHandData = _rightOvrHand.GetSkeletonPoseData();
+            var leftHandPosition = leftHandData.RootPose.Position.FromFlippedZVector3f();
+            var leftHandRotation = leftHandData.RootPose.Orientation.FromFlippedZQuatf();
+            var rightHandPosition = rightHandData.RootPose.Position.FromFlippedZVector3f();
+            var rightHandRotation = rightHandData.RootPose.Orientation.FromFlippedZQuatf();
+            var leftCorrectionQuaternion =
+                retargetingLayer.GetCorrectionQuaternion(HumanBodyBones.LeftHand);
+            var rightCorrectionQuaternion =
+                retargetingLayer.GetCorrectionQuaternion(HumanBodyBones.RightHand);
+            if (leftCorrectionQuaternion == null || rightCorrectionQuaternion == null)
+            {
+                return;
+            }
+
+            // Ensure that the hands have valid non-identity rotations.
+            if (leftHandRotation != Quaternion.identity && rightHandRotation != Quaternion.identity)
+            {
+                leftHandTargetRotation =
+                    leftHandRotation * _wristFixupRotation * leftCorrectionQuaternion.Value;
+                rightHandTargetRotation =
+                    rightHandRotation * _wristFixupRotation * rightCorrectionQuaternion.Value;
+            }
 
             // Ensure that the hands have valid non-zero positions.
-            var leftHandPosition = leftHandData.RootPose.Position.FromFlippedZVector3f();
-            var rightHandPosition = rightHandData.RootPose.Position.FromFlippedZVector3f();
             if (leftHandPosition != Vector3.zero && rightHandPosition != Vector3.zero)
             {
                 leftHandTargetPosition = leftHandPosition;
@@ -940,9 +987,11 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
-            // Ensure that the controllers have valid non-zero positions.
+            // Ensure that the controllers have valid non-zero positions and valid non-identity rotations.
             if (_cameraRig.leftHandOnControllerAnchor.position == Vector3.zero ||
-                _cameraRig.rightHandOnControllerAnchor.position == Vector3.zero)
+                _cameraRig.rightHandOnControllerAnchor.position == Vector3.zero ||
+                _cameraRig.leftHandOnControllerAnchor.rotation == Quaternion.identity ||
+                _cameraRig.rightHandOnControllerAnchor.rotation == Quaternion.identity)
             {
                 return;
             }
@@ -958,6 +1007,8 @@ namespace Oculus.Movement.AnimationRigging
             PoseUtils.Multiply(rightHandControllerPose, _rightHandControllerPoseOffset, ref rightHandPose);
             leftHandTargetPosition = leftHandPose.position;
             rightHandTargetPosition = rightHandPose.position;
+            leftHandTargetRotation = leftHandPose.rotation * _wristFixupRotation * leftCorrectionQuaternion.Value;
+            rightHandTargetRotation = rightHandPose.rotation * _wristFixupRotation * rightCorrectionQuaternion.Value;
         }
     }
 }
