@@ -1952,6 +1952,23 @@ namespace Oculus.Movement
 
     public static class RetargetingProcessorCorrectHandTooltips
     {
+        public static class SyncOvrControllersAndHandsSettingsTooltips
+        {
+            public const string SyncOvrOption =
+                "Specifies how hand target data should be synced with the OVRControllers and OVRHands data.";
+
+            public const string OvrHandControllerPositionOffset =
+                "The offset to get the hand position from the OVR controller root position. \n" +
+                "This offset value is taken from Interaction SDK.";
+
+            public const string OvrHandControllerOrientationOffset =
+                "The offset to get the hand rotation from the OVR controller root rotation. \n" +
+                "This offset value is taken from Interaction SDK.";
+
+            public const string MirrorHandControllerOffsets =
+                "True if the hand controller offsets should be mirrored for the left hand.";
+        }
+
         public const string BlendHandWeight =
             "The weight of the hand blending.";
 
@@ -1960,6 +1977,9 @@ namespace Oculus.Movement
 
         public const string ArmChainBones =
             "The weight of the hand blending.";
+
+        public const string SyncOvrControllersAndHandsSettings =
+            "Settings for syncing with OVRControllers and OVRHands.";
 
         public const string LeftHandProcessor =
             "Left hand processor.";

@@ -46,6 +46,11 @@ MonoBehaviour:
     m_RotationOrder: 4
   _headView: 0
   _isFullBody: 1
+  _syncOvrControllersAndHands: 1
+  _syncOvrControllersAndHandsSettings:
+    _ovrHandControllerPositionOffset: {x: 0.04, y: -0.04, z: -0.11}
+    _ovrHandControllerOrientationOffset: {x: 0.45096692, y: 0.5491966, z: -0.54516363, w: 0.44475672}
+    _mirrorHandControllerOffsets: 1
   _leftHandProcessor:
     BlendHandWeight: 1
     HandIKWeight: 1

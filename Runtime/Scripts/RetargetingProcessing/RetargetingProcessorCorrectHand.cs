@@ -13,7 +13,8 @@ namespace Oculus.Movement.AnimationRigging
     /// Retargeting processor used to fix the arm via an IK algorithm so that the retargeted hand position matches
     /// the tracked hand position.
     /// </summary>
-    [CreateAssetMenu(fileName = "Correct Hand", menuName = "Movement Samples/Data/Retargeting Processors/Correct Hand", order = 1)]
+    [CreateAssetMenu(fileName = "Correct Hand", menuName = "Movement Samples/Data/Retargeting Processors/Correct Hand",
+        order = 1)]
     public sealed class RetargetingProcessorCorrectHand : RetargetingProcessor
     {
         /// <summary>
@@ -42,6 +43,7 @@ namespace Oculus.Movement.AnimationRigging
             [SerializeField]
             [Tooltip(RetargetingLayerTooltips.UseWorldHandPosition)]
             private bool _useWorldHandPosition = true;
+
             /// <inheritdoc cref="_useWorldHandPosition" />
             public bool UseWorldHandPosition
             {
@@ -55,6 +57,7 @@ namespace Oculus.Movement.AnimationRigging
             [SerializeField]
             [Tooltip(RetargetingLayerTooltips.UseCustomHandTargetPosition)]
             private bool _useCustomHandTargetPosition = true;
+
             /// <inheritdoc cref="_useCustomHandTargetPosition" />
             public bool UseCustomHandTargetPosition
             {
@@ -68,6 +71,7 @@ namespace Oculus.Movement.AnimationRigging
             [SerializeField]
             [Tooltip(RetargetingLayerTooltips.UseSecondaryBoneId)]
             private bool _useSecondaryBoneId = true;
+
             /// <inheritdoc cref="_useSecondaryBoneId" />
             public bool UseSecondaryBoneId
             {
@@ -79,6 +83,7 @@ namespace Oculus.Movement.AnimationRigging
             /// The custom hand target position.
             /// </summary>
             private Vector3? _customHandTargetPosition;
+
             /// <inheritdoc cref="_customHandTargetPosition" />
             public Vector3? CustomHandTargetPosition
             {
@@ -95,6 +100,7 @@ namespace Oculus.Movement.AnimationRigging
             [Tooltip(RetargetingBlendHandProcessorTooltips.FullBodySecondBoneIdToTest)]
             private OVRHumanBodyBonesMappings.FullBodyTrackingBoneId _fullBodySecondBoneIdToTest =
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftArmLower;
+
             /// <inheritdoc cref="_fullBodySecondBoneIdToTest"/>
             public OVRHumanBodyBonesMappings.FullBodyTrackingBoneId FullBodySecondBoneIdToTest
             {
@@ -110,6 +116,7 @@ namespace Oculus.Movement.AnimationRigging
             [Tooltip(RetargetingBlendHandProcessorTooltips.FullBodyBoneIdToTest)]
             private OVRHumanBodyBonesMappings.FullBodyTrackingBoneId _fullBodyBoneIdToTest =
                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
+
             /// <inheritdoc cref="_fullBodyBoneIdToTest"/>
             public OVRHumanBodyBonesMappings.FullBodyTrackingBoneId FullBodyBoneIdToTest
             {
@@ -125,6 +132,7 @@ namespace Oculus.Movement.AnimationRigging
             [Tooltip(RetargetingBlendHandProcessorTooltips.BoneIdToTest)]
             private OVRHumanBodyBonesMappings.BodyTrackingBoneId _boneIdToTest =
                 OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+
             /// <inheritdoc cref="_boneIdToTest"/>
             public OVRHumanBodyBonesMappings.BodyTrackingBoneId BoneIdToTest
             {
@@ -138,6 +146,7 @@ namespace Oculus.Movement.AnimationRigging
             [SerializeField, Optional]
             [Tooltip(RetargetingProcessorCorrectHandTooltips.ArmChainBones)]
             private HumanBodyBones[] _armChainBones;
+
             /// <inheritdoc cref="_armChainBones"/>
             public HumanBodyBones[] ArmChainBones
             {
@@ -188,6 +197,7 @@ namespace Oculus.Movement.AnimationRigging
 
                     armBones.Add(boneTransform);
                 }
+
                 _armBones = armBones.ToArray();
                 armBones.Reverse();
 
@@ -202,6 +212,7 @@ namespace Oculus.Movement.AnimationRigging
                             _fullBodySecondBoneIdToTest =
                                 OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftArmLower;
                         }
+
                         if (_fullBodyBoneIdToTest ==
                             OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist)
                         {
@@ -237,6 +248,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     return true;
                 }
+
                 bool boneFound = false;
                 foreach (var bone in _armChainBones)
                 {
@@ -246,6 +258,7 @@ namespace Oculus.Movement.AnimationRigging
                         break;
                     }
                 }
+
                 return boneFound;
             }
 
@@ -256,7 +269,7 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             /// <inheritdoc cref="RetargetingProcessorCorrectHand.ProcessRetargetingLayer"/>
-            public void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, Transform targetHand,
+            public void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, Vector3 targetHandPosition,
                 RetargetingProcessorCorrectHand parentProcessor)
             {
                 // Handle blend hand.
@@ -271,7 +284,6 @@ namespace Oculus.Movement.AnimationRigging
 
                 // Handle correct hand.
                 var handIKWeight = HandIKWeight * parentProcessor.Weight;
-                var targetHandPosition = targetHand.position;
                 if (_useWorldHandPosition)
                 {
                     var localScale = retargetingLayer.transform.localScale;
@@ -305,6 +317,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     handBone.position = _originalHandPosition;
                 }
+
                 var handRotation = handBone.rotation;
                 Vector3 targetPosition = Vector3.Lerp(handBone.position, targetHandPosition, handIKWeight);
                 bool solvedIK = false;
@@ -327,6 +340,7 @@ namespace Oculus.Movement.AnimationRigging
                             true);
                     }
                 }
+
                 handBone.position = Vector3.MoveTowards(
                     handBone.position, targetPosition, parentProcessor.MaxHandStretch);
                 handBone.rotation = handRotation;
@@ -370,8 +384,11 @@ namespace Oculus.Movement.AnimationRigging
             {
                 var bones = skeleton.Bones;
                 var boneToTest = bones[parentProcessor.IsFullBody ?
-                    (int)_fullBodyBoneIdToTest : (int)_boneIdToTest].Transform;
-                var headBoneId = parentProcessor.IsFullBody ? (int)OVRSkeleton.BoneId.FullBody_Head : (int)OVRSkeleton.BoneId.Body_Head;
+                    (int)_fullBodyBoneIdToTest :
+                    (int)_boneIdToTest].Transform;
+                var headBoneId = parentProcessor.IsFullBody ?
+                    (int)OVRSkeleton.BoneId.FullBody_Head :
+                    (int)OVRSkeleton.BoneId.Body_Head;
                 _cachedTransform = boneToTest;
 
                 if (parentProcessor.HeadViewType == HeadView.BodyTracking)
@@ -382,6 +399,7 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     _cachedHeadTransform = _ovrCameraRigHead;
                 }
+
                 var boneDistanceToViewVector =
                     GetDistanceToViewVector(boneToTest.position, parentProcessor.HeadViewType);
 
@@ -401,7 +419,7 @@ namespace Oculus.Movement.AnimationRigging
                     else
                     {
                         var lerpValue = (scaledMaxDistance - boneDistanceToViewVector) /
-                                          (scaledMaxDistance - scaledMinDistance);
+                                        (scaledMaxDistance - scaledMinDistance);
                         var curveValue = parentProcessor.BlendCurve.Evaluate(lerpValue);
                         // Amplify lerping before clamping it.
                         _cachedWeight = Mathf.Clamp01(curveValue);
@@ -449,6 +467,7 @@ namespace Oculus.Movement.AnimationRigging
                     // The local up is what points forward for the OVRSkeleton head.
                     return _cachedHeadTransform.up;
                 }
+
                 return _cachedHeadTransform.forward;
             }
 
@@ -477,6 +496,72 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Container for settings to sync OVRControllers and Hands.
+        /// </summary>
+        [Serializable]
+        public class SyncOvrControllersAndHandsSettings
+        {
+            [SerializeField]
+            [Tooltip(RetargetingProcessorCorrectHandTooltips.SyncOvrControllersAndHandsSettingsTooltips.
+                SyncOvrOption)]
+            private SyncOvrOption _syncOvrOption;
+
+            /// <inheritdoc cref="_syncOvrOption"/>
+            public SyncOvrOption SyncOption
+            {
+                get => _syncOvrOption;
+                set => _syncOvrOption = value;
+            }
+
+            /// <summary>
+            /// The offset to get the hand position from the OVR controller root position.
+            /// This offset value is taken from Interaction SDK.
+            /// </summary>
+            [SerializeField]
+            [Tooltip(RetargetingProcessorCorrectHandTooltips.SyncOvrControllersAndHandsSettingsTooltips.
+                OvrHandControllerPositionOffset)]
+            private Vector3 _ovrHandControllerPositionOffset = new Vector3(0.04f, -0.04f, -0.11f);
+
+            /// <inheritdoc cref="_ovrHandControllerPositionOffset"/>
+            public Vector3 OvrHandControllerPositionOffset
+            {
+                get => _ovrHandControllerPositionOffset;
+                set => _ovrHandControllerPositionOffset = value;
+            }
+
+            /// <summary>
+            /// The offset to get the hand rotation from the OVR controller root rotation.
+            /// This offset value is taken from Interaction SDK.
+            /// </summary>
+            [SerializeField]
+            [Tooltip(RetargetingProcessorCorrectHandTooltips.SyncOvrControllersAndHandsSettingsTooltips.
+                OvrHandControllerOrientationOffset)]
+            private Quaternion _ovrHandControllerOrientationOffset = Quaternion.Euler(89.4f, 197.7f, 96.3f);
+
+            /// <inheritdoc cref="_ovrHandControllerOrientationOffset"/>
+            public Quaternion OvrHandControllerOrientationOffset
+            {
+                get => _ovrHandControllerOrientationOffset;
+                set => _ovrHandControllerOrientationOffset = value;
+            }
+
+            /// <summary>
+            /// True if the hand controller offsets should be mirrored for the left hand.
+            /// </summary>
+            [SerializeField]
+            [Tooltip(RetargetingProcessorCorrectHandTooltips.SyncOvrControllersAndHandsSettingsTooltips.
+                MirrorHandControllerOffsets)]
+            private bool _mirrorHandControllerOffsets = true;
+
+            /// <inheritdoc cref="_mirrorHandControllerOffsets"/>
+            public bool MirrorHandControllerOffsets
+            {
+                get => _mirrorHandControllerOffsets;
+                set => _mirrorHandControllerOffsets = value;
+            }
+        }
+
+        /// <summary>
         /// Enum used to determine which type of head should be used to blend hands.
         /// </summary>
         public enum HeadView
@@ -496,12 +581,22 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// The type of syncing that should be done if syncing OVR data.
+        /// </summary>
+        public enum SyncOvrOption
+        {
+            None,
+            Positions
+        }
+
+        /// <summary>
         /// The type of IK that should be applied to modify the arm bones toward the
         /// correct hand target.
         /// </summary>
         [SerializeField, Header("IK Settings")]
         [Tooltip(RetargetingLayerTooltips.HandIKType)]
         private IKType _handIKType = IKType.None;
+
         /// <inheritdoc cref="_handIKType" />
         public IKType HandIKType
         {
@@ -515,6 +610,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.IKTolerance)]
         private float _ikTolerance = 1e-6f;
+
         /// <inheritdoc cref="_ikTolerance" />
         public float IKTolerance
         {
@@ -528,6 +624,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.IKIterations)]
         private int _ikIterations = 10;
+
         /// <inheritdoc cref="_ikIterations" />
         public int IKIterations
         {
@@ -541,6 +638,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.MaxHandStretch)]
         private float _maxHandStretch = 0.01f;
+
         /// <inheritdoc cref="_maxHandStretch" />
         public float MaxHandStretch
         {
@@ -554,6 +652,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingLayerTooltips.MaxShoulderStretch)]
         private float _maxShoulderStretch;
+
         /// <inheritdoc cref="_maxShoulderStretch" />
         public float MaxShoulderStretch
         {
@@ -567,6 +666,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField, Header("Blend Settings")]
         [Tooltip(RetargetingBlendHandProcessorTooltips.MinDistance)]
         private float _minDistance = 0.2f;
+
         /// <inheritdoc cref="_minDistance"/>
         public float MinDistance
         {
@@ -580,6 +680,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingBlendHandProcessorTooltips.MaxDistance)]
         private float _maxDistance = 0.5f;
+
         /// <inheritdoc cref="_maxDistance"/>
         public float MaxDistance
         {
@@ -593,6 +694,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingBlendHandProcessorTooltips.BlendCurve)]
         private AnimationCurve _blendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
         /// <inheritdoc cref="_blendCurve"/>
         public AnimationCurve BlendCurve
         {
@@ -606,6 +708,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingBlendHandProcessorTooltips.HeadView)]
         private HeadView _headView = HeadView.BodyTracking;
+
         /// <inheritdoc cref="_headView"/>
         public HeadView HeadViewType
         {
@@ -619,6 +722,7 @@ namespace Oculus.Movement.AnimationRigging
         [SerializeField]
         [Tooltip(RetargetingBlendHandProcessorTooltips.IsFullBody)]
         private bool _isFullBody = true;
+
         /// <inheritdoc cref="_isFullBody"/>
         public bool IsFullBody
         {
@@ -627,11 +731,26 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// Settings for syncing with OVRControllers and OVRHands.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingProcessorCorrectHandTooltips.SyncOvrControllersAndHandsSettings)]
+        private SyncOvrControllersAndHandsSettings _syncOvrControllersAndHandsSettings;
+
+        /// <inheritdoc cref="_syncOvrControllersAndHandsSettings" />
+        public SyncOvrControllersAndHandsSettings SyncOvrSettings
+        {
+            get => _syncOvrControllersAndHandsSettings;
+            set => _syncOvrControllersAndHandsSettings = value;
+        }
+
+        /// <summary>
         /// Left hand processor.
         /// </summary>
         [SerializeField, Header("Processors")]
         [Tooltip(RetargetingProcessorCorrectHandTooltips.LeftHandProcessor)]
         private HandProcessor _leftHandProcessor;
+
         /// <inheritdoc cref="_leftHandProcessor" />
         public HandProcessor LeftHandProcessor
         {
@@ -643,14 +762,21 @@ namespace Oculus.Movement.AnimationRigging
         /// Right hand processor.
         /// </summary>
         [SerializeField]
-        private HandProcessor _rightHandProcessor;
         [Tooltip(RetargetingProcessorCorrectHandTooltips.RightHandProcessor)]
+        private HandProcessor _rightHandProcessor;
+
         /// <inheritdoc cref="_rightHandProcessor" />
         public HandProcessor RightHandProcessor
         {
             get => _rightHandProcessor;
             set => _rightHandProcessor = value;
         }
+
+        private OVRCameraRig _cameraRig;
+        private Pose _rightHandControllerPoseOffset;
+        private Pose _leftHandControllerPoseOffset;
+        private OVRSkeleton.IOVRSkeletonDataProvider _leftOvrHand;
+        private OVRSkeleton.IOVRSkeletonDataProvider _rightOvrHand;
 
         /// <inheritdoc />
         public override void CopyData(RetargetingProcessor source)
@@ -680,9 +806,11 @@ namespace Oculus.Movement.AnimationRigging
             _leftHandProcessor.HandIKWeight = sourceCorrectHand.LeftHandProcessor.HandIKWeight;
             _leftHandProcessor.BlendHandWeight = sourceCorrectHand.LeftHandProcessor.BlendHandWeight;
             _leftHandProcessor.UseWorldHandPosition = sourceCorrectHand.LeftHandProcessor.UseWorldHandPosition;
-            _leftHandProcessor.UseCustomHandTargetPosition = sourceCorrectHand.LeftHandProcessor.UseCustomHandTargetPosition;
+            _leftHandProcessor.UseCustomHandTargetPosition =
+                sourceCorrectHand.LeftHandProcessor.UseCustomHandTargetPosition;
             _leftHandProcessor.UseSecondaryBoneId = sourceCorrectHand.LeftHandProcessor.UseSecondaryBoneId;
-            _leftHandProcessor.FullBodySecondBoneIdToTest = sourceCorrectHand.LeftHandProcessor.FullBodySecondBoneIdToTest;
+            _leftHandProcessor.FullBodySecondBoneIdToTest =
+                sourceCorrectHand.LeftHandProcessor.FullBodySecondBoneIdToTest;
             _leftHandProcessor.FullBodyBoneIdToTest = sourceCorrectHand.LeftHandProcessor.FullBodyBoneIdToTest;
             _leftHandProcessor.BoneIdToTest = sourceCorrectHand.LeftHandProcessor.BoneIdToTest;
             _leftHandProcessor.ArmChainBones = sourceCorrectHand.LeftHandProcessor.ArmChainBones;
@@ -690,9 +818,11 @@ namespace Oculus.Movement.AnimationRigging
             _rightHandProcessor.HandIKWeight = sourceCorrectHand.RightHandProcessor.HandIKWeight;
             _rightHandProcessor.BlendHandWeight = sourceCorrectHand.RightHandProcessor.BlendHandWeight;
             _rightHandProcessor.UseWorldHandPosition = sourceCorrectHand.RightHandProcessor.UseWorldHandPosition;
-            _rightHandProcessor.UseCustomHandTargetPosition = sourceCorrectHand.RightHandProcessor.UseCustomHandTargetPosition;
+            _rightHandProcessor.UseCustomHandTargetPosition =
+                sourceCorrectHand.RightHandProcessor.UseCustomHandTargetPosition;
             _rightHandProcessor.UseSecondaryBoneId = sourceCorrectHand.RightHandProcessor.UseSecondaryBoneId;
-            _rightHandProcessor.FullBodySecondBoneIdToTest = sourceCorrectHand.RightHandProcessor.FullBodySecondBoneIdToTest;
+            _rightHandProcessor.FullBodySecondBoneIdToTest =
+                sourceCorrectHand.RightHandProcessor.FullBodySecondBoneIdToTest;
             _rightHandProcessor.FullBodyBoneIdToTest = sourceCorrectHand.RightHandProcessor.FullBodyBoneIdToTest;
             _rightHandProcessor.BoneIdToTest = sourceCorrectHand.RightHandProcessor.BoneIdToTest;
             _rightHandProcessor.ArmChainBones = sourceCorrectHand.RightHandProcessor.ArmChainBones;
@@ -703,6 +833,10 @@ namespace Oculus.Movement.AnimationRigging
         {
             _leftHandProcessor.SetupRetargetingProcessor(retargetingLayer, this, Handedness.Left);
             _rightHandProcessor.SetupRetargetingProcessor(retargetingLayer, this, Handedness.Right);
+            if (_syncOvrControllersAndHandsSettings.SyncOption != SyncOvrOption.None)
+            {
+                FindHandReferences();
+            }
         }
 
         /// <inheritdoc />
@@ -721,13 +855,15 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             var isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
-            var leftHandWristIndex = isFullBody ? (int)OVRSkeleton.BoneId.FullBody_LeftHandWrist :
+            var leftHandWristIndex = isFullBody ?
+                (int)OVRSkeleton.BoneId.FullBody_LeftHandWrist :
                 (int)OVRSkeleton.BoneId.Body_LeftHandWrist;
-            var rightHandWristIndex = isFullBody ? (int)OVRSkeleton.BoneId.FullBody_RightHandWrist :
+            var rightHandWristIndex = isFullBody ?
+                (int)OVRSkeleton.BoneId.FullBody_RightHandWrist :
                 (int)OVRSkeleton.BoneId.Body_RightHandWrist;
 
             if (ovrBones.Count < leftHandWristIndex ||
-                 ovrBones.Count < rightHandWristIndex)
+                ovrBones.Count < rightHandWristIndex)
             {
                 return;
             }
@@ -739,8 +875,17 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
-            _leftHandProcessor.ProcessRetargetingLayer(retargetingLayer, leftTargetHand, this);
-            _rightHandProcessor.ProcessRetargetingLayer(retargetingLayer, rightTargetHand, this);
+            var leftHandTargetPosition = leftTargetHand.position;
+            var rightHandTargetPosition = rightTargetHand.position;
+
+            if (_syncOvrControllersAndHandsSettings.SyncOption != SyncOvrOption.None)
+            {
+                FindHandReferences();
+                UpdateTargetHandPositions(ref leftHandTargetPosition, ref rightHandTargetPosition);
+            }
+
+            _leftHandProcessor.ProcessRetargetingLayer(retargetingLayer, leftHandTargetPosition, this);
+            _rightHandProcessor.ProcessRetargetingLayer(retargetingLayer, rightHandTargetPosition, this);
         }
 
         /// <inheritdoc />
@@ -748,6 +893,71 @@ namespace Oculus.Movement.AnimationRigging
         {
             _leftHandProcessor.DrawGizmos(_headView);
             _rightHandProcessor.DrawGizmos(_headView);
+        }
+
+        private void FindHandReferences()
+        {
+            // Check if we have the references we need already.
+            if (_leftOvrHand != null && _rightOvrHand != null)
+            {
+                return;
+            }
+
+            // Set the hand controller pose offsets.
+            _leftHandControllerPoseOffset = _rightHandControllerPoseOffset =
+                new Pose(_syncOvrControllersAndHandsSettings.OvrHandControllerPositionOffset,
+                    _syncOvrControllersAndHandsSettings.OvrHandControllerOrientationOffset);
+            if (_syncOvrControllersAndHandsSettings.MirrorHandControllerOffsets)
+            {
+                _leftHandControllerPoseOffset.position.x = -_leftHandControllerPoseOffset.position.x;
+                _leftHandControllerPoseOffset.rotation =
+                    Quaternion.Euler(180f, 0f, 0f) * _rightHandControllerPoseOffset.rotation;
+            }
+
+            // Camera rig reference.
+            _cameraRig = OVRManager.instance.GetComponent<OVRCameraRig>();
+            _leftOvrHand = _cameraRig.leftHandAnchor.GetComponentInChildren<OVRHand>(true);
+            _rightOvrHand = _cameraRig.rightHandAnchor.GetComponentInChildren<OVRHand>(true);
+        }
+
+        private void UpdateTargetHandPositions(ref Vector3 leftHandTargetPosition, ref Vector3 rightHandTargetPosition)
+        {
+            if (_leftOvrHand == null || _rightOvrHand == null)
+            {
+                return;
+            }
+
+            var leftHandData = _leftOvrHand.GetSkeletonPoseData();
+            var rightHandData = _rightOvrHand.GetSkeletonPoseData();
+
+            // Ensure that the hands have valid non-zero positions.
+            var leftHandPosition = leftHandData.RootPose.Position.FromFlippedZVector3f();
+            var rightHandPosition = rightHandData.RootPose.Position.FromFlippedZVector3f();
+            if (leftHandPosition != Vector3.zero && rightHandPosition != Vector3.zero)
+            {
+                leftHandTargetPosition = leftHandPosition;
+                rightHandTargetPosition = rightHandPosition;
+                return;
+            }
+
+            // Ensure that the controllers have valid non-zero positions.
+            if (_cameraRig.leftHandOnControllerAnchor.position == Vector3.zero ||
+                _cameraRig.rightHandOnControllerAnchor.position == Vector3.zero)
+            {
+                return;
+            }
+
+            // Controller pose into hand pose.
+            var leftHandPose = new Pose();
+            var rightHandPose = new Pose();
+            var leftHandControllerPose = new Pose(_cameraRig.leftHandOnControllerAnchor.position,
+                _cameraRig.leftHandOnControllerAnchor.rotation);
+            var rightHandControllerPose = new Pose(_cameraRig.rightHandOnControllerAnchor.position,
+                _cameraRig.rightHandOnControllerAnchor.rotation);
+            PoseUtils.Multiply(leftHandControllerPose, _leftHandControllerPoseOffset, ref leftHandPose);
+            PoseUtils.Multiply(rightHandControllerPose, _rightHandControllerPoseOffset, ref rightHandPose);
+            leftHandTargetPosition = leftHandPose.position;
+            rightHandTargetPosition = rightHandPose.position;
         }
     }
 }
