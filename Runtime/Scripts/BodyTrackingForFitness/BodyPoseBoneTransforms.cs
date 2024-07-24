@@ -263,7 +263,12 @@ namespace Oculus.Movement.BodyTrackingForFitness
                         {
                             parent = BoneContainer;
                         }
-                        bone.SetParent(parent);
+#if UNITY_EDITOR
+                        if (!UnityEditor.PrefabUtility.IsPartOfAnyPrefab(bone))
+#endif
+                        {
+                            bone.SetParent(parent);
+                        }
                     }
                     break;
             }
