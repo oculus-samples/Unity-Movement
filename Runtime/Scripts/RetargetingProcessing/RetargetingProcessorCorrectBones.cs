@@ -238,6 +238,7 @@ namespace Oculus.Movement.AnimationRigging
         private ShoulderInformation _leftShoulderInfo;
         private ShoulderInformation _rightShoulderInfo;
         private bool[] _hasPositionConstraintOffset;
+        private AvatarMask _lastRetargetingMask;
 
         /// <inheritdoc />
         public override void CleanUp()
@@ -412,6 +413,12 @@ namespace Oculus.Movement.AnimationRigging
             _correctPositionsLateUpdate = sourceCorrectBones.CorrectPositionsLateUpdate;
             _shoulderCorrectionWeightLateUpdate = sourceCorrectBones.ShoulderCorrectionWeightLateUpdate;
             _fingerPositionCorrectionWeight = sourceCorrectBones.FingerPositionCorrectionWeight;
+        }
+
+        /// <inheritdoc />
+        public override void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)
+        {
+            _lastRetargetingMask = retargetingLayer.CustomPositionsToCorrectLateUpdateMask;
         }
 
         /// <inheritdoc />
@@ -834,13 +841,15 @@ namespace Oculus.Movement.AnimationRigging
             var hipsCorrection = retargetingLayer.GetCorrectionQuaternion(HumanBodyBones.Hips);
             var referenceCorrection = _hipsCorrectionQuatLastDataGen;
             bool jobHipDataOffsetDiffers = hipsCorrection != referenceCorrection;
+            bool maskDataDiffers = retargetingLayer.CustomPositionsToCorrectLateUpdateMask != _lastRetargetingMask;
 
-            if (_regenJobData || !_allocatedDataFirstFrame ||
+            if (_regenJobData || !_allocatedDataFirstFrame || maskDataDiffers ||
                 jobHipDataOffsetDiffers)
             {
                 RegenJobData(retargetingLayer, ovrBones);
                 _regenJobData = false;
                 _allocatedDataFirstFrame = true;
+                _lastRetargetingMask = retargetingLayer.CustomPositionsToCorrectLateUpdateMask;
             }
             else
             {

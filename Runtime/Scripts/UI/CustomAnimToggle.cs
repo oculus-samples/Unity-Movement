@@ -86,6 +86,7 @@ namespace Oculus.Movement.UI
             {
                 retargetConstraint.data.AvatarMaskComp =
                     _customAnimEnabled ? _customMask : null;
+                retargetConstraint.data.UpdateDataArraysWithAdjustments();
             }
             foreach (var animator in _animators)
             {
