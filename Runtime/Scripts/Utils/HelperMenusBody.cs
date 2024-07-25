@@ -32,6 +32,7 @@ namespace Oculus.Movement.Utils
             foreach (var activeGameObject in UnityEditor.Selection.gameObjects)
             {
                 var animator = activeGameObject.GetComponent<Animator>();
+                AnimationUtilities.UpdateToAnimatorPose(animator, false);
                 var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
                 SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, true);
             }
@@ -44,6 +45,7 @@ namespace Oculus.Movement.Utils
             foreach (var activeGameObject in UnityEditor.Selection.gameObjects)
             {
                 var animator = activeGameObject.GetComponent<Animator>();
+                AnimationUtilities.UpdateToAnimatorPose(animator, false);
                 var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
                 SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, false);
             }
@@ -91,22 +93,10 @@ namespace Oculus.Movement.Utils
                 UnityEditor.Undo.IncrementCurrentGroup();
             }
 #endif
-            // Force character to desired pose before retargeting is added to it.
-            // If called at runtime, enable gameobject so that dependendent bones can be found.
-            if (runtimeInvocation)
-            {
-                activeGameObject.SetActive(true);
-            }
-            Animator animatorComp = activeGameObject.GetComponentInChildren<Animator>(true);
-            AnimationUtilities.UpdateToAnimatorPose(animatorComp);
-            if (runtimeInvocation)
-            {
-                activeGameObject.SetActive(false);
-            }
-
             // Store the previous transform data.
             var previousPositionAndRotation =
                 new AffineTransform(activeGameObject.transform.position, activeGameObject.transform.rotation);
+            Animator animatorComp = activeGameObject.GetComponentInChildren<Animator>(true);
 
             // Bring the object to root so that the auto adjustments calculations are correct.
             activeGameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -178,7 +168,7 @@ namespace Oculus.Movement.Utils
             retargetingLayer.UpdateBonePairMappings();
 
             // Add joint adjustments.
-            AddComponentsHelper.AddJointAdjustments(animatorComp, retargetingLayer);
+            AddComponentsHelper.AddJointAdjustments(animatorComp, retargetingLayer, restPoseObjectHumanoid);
 
 #if UNITY_EDITOR
             if (!runtimeInvocation)

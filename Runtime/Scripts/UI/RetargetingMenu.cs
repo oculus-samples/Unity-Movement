@@ -122,6 +122,7 @@ namespace Oculus.Movement.UI
                 return;
             }
             GameObject newCharacter = Instantiate(_characterToSpawn);
+            AnimationUtilities.UpdateToAnimatorPose(newCharacter.GetComponent<Animator>(), true);
             AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, true);
 
             AdjustSpawnedCharacterTransform(newCharacter, true, _currentSpawnOffset);
@@ -141,7 +142,7 @@ namespace Oculus.Movement.UI
             }
             GameObject newCharacter = Instantiate(_characterToSpawn);
             Animator animator = newCharacter.GetComponent<Animator>();
-            AnimationUtilities.UpdateToAnimatorPose(animator);
+            AnimationUtilities.UpdateToAnimatorPose(animator, true);
             RestPoseObjectHumanoid restPoseToUse = AddComponentsHelper.CheckIfTPose(animator) ?
                 _restTPoseObject :
                 _restPoseObject;

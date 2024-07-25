@@ -90,11 +90,14 @@ namespace Oculus.Movement.Utils
         /// </summary>
         /// <param name="animator">Animator component.</param>
         /// <param name="retargetingLayer">Retargeting layer component to change adjustments of.</param>
+        /// <param name="restPoseHumanoid">Optional humanoid rest pose asset used for adjustment calculation.</param>
         public static void AddJointAdjustments(
             Animator animator,
-            RetargetingLayer retargetingLayer)
+            RetargetingLayer retargetingLayer,
+            RestPoseObjectHumanoid restPoseHumanoid = null)
         {
-            var restPoseObject = GetRestPoseObject(CheckIfTPose(animator));
+            var restPoseObject = restPoseHumanoid == null ? GetRestPoseObject(CheckIfTPose(animator)) :
+                restPoseHumanoid;
             if (restPoseObject == null)
             {
                 Debug.LogError($"Cannot compute adjustments because asset {_HUMANOID_REFERENCE_POSE_ASSET_NAME} " +

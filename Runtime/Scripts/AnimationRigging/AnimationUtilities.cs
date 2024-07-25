@@ -20,8 +20,17 @@ namespace Oculus.Movement.AnimationRigging
         /// description.
         /// </summary>
         /// <param name="sourceAnimator">The animator that contains the human description.</param>
-        public static void UpdateToAnimatorPose(Animator sourceAnimator)
+        /// <param name="isRuntimeInstance">If called during runtime.</param>
+        public static void UpdateToAnimatorPose(Animator sourceAnimator,
+            bool isRuntimeInstance = false)
         {
+            var previousEnableValue = sourceAnimator.gameObject.activeSelf;
+            if (isRuntimeInstance)
+            {
+                // should enable game object to find bones
+                sourceAnimator.gameObject.SetActive(true);
+            }
+
             var skeletonBones = sourceAnimator.avatar.humanDescription.skeleton;
             foreach (var skeletonBone in skeletonBones)
             {
@@ -30,6 +39,11 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     targetBone.SetLocalPositionAndRotation(skeletonBone.position, skeletonBone.rotation);
                 }
+            }
+
+            if (isRuntimeInstance)
+            {
+                sourceAnimator.gameObject.SetActive(previousEnableValue);
             }
         }
 
