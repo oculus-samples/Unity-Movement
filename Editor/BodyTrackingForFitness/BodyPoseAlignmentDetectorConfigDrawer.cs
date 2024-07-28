@@ -25,7 +25,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// <param name="property"></param>
         /// <param name="label"></param>
         private static void BoneTupleGUI(Rect position, SerializedProperty property,
-        GUIContent label) {
+        GUIContent label)
+        {
             SerializedProperty angle = property.FindPropertyRelative(
                 nameof(BodyPoseAlignmentDetector.AlignmentState.AngleDelta));
             EditorGUI.BeginProperty(position, label, property);

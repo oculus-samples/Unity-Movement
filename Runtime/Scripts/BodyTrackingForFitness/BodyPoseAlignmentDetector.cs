@@ -216,7 +216,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// </summary>
         [Tooltip(BodyPoseAlignmentDetectorTooltips.PoseA)]
         [SerializeField, Interface(typeof(IBodyPose))]
-        [ContextMenuItem(nameof(SwapPoseOrder),nameof(SwapPoseOrder))]
+        [ContextMenuItem(nameof(SwapPoseOrder), nameof(SwapPoseOrder))]
         private UnityEngine.Object _poseA;
         private IBodyPose _iPoseA;
 
@@ -225,7 +225,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// </summary>
         [Tooltip(BodyPoseAlignmentDetectorTooltips.PoseB)]
         [SerializeField, Interface(typeof(IBodyPose))]
-        [ContextMenuItem(nameof(SwapPoseOrder),nameof(SwapPoseOrder))]
+        [ContextMenuItem(nameof(SwapPoseOrder), nameof(SwapPoseOrder))]
         private UnityEngine.Object _poseB;
         private IBodyPose _iPoseB;
 
@@ -262,7 +262,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// Colors used for alignment visualization
         /// </summary>
         [Tooltip(BodyPoseAlignmentDetectorTooltips.BoneVisualErrorColor)]
-        [ContextMenuItem(nameof(ForceCompareLogic),nameof(ForceCompareLogic))]
+        [ContextMenuItem(nameof(ForceCompareLogic), nameof(ForceCompareLogic))]
         [SerializeField]
         protected Gradient BoneVisualErrorColor = new Gradient()
         {
@@ -280,8 +280,9 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// Bone visual collections to color based on the alignment of bones
         /// </summary>
         [Tooltip(BodyPoseAlignmentDetectorTooltips.BoneVisualsToColor)]
-        [ContextMenuItem(nameof(ForceCompareLogic),nameof(ForceCompareLogic))]
-        [SerializeField] protected List<BodyPoseBoneVisuals> _boneVisualsToColor =
+        [ContextMenuItem(nameof(ForceCompareLogic), nameof(ForceCompareLogic))]
+        [SerializeField]
+        protected List<BodyPoseBoneVisuals> _boneVisualsToColor =
             new List<BodyPoseBoneVisuals>();
 
         /// <summary>
@@ -289,10 +290,10 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// <see cref="DetectorConfig.Width"/>: difference between what counts as in and out
         /// </summary>
         [Tooltip(BodyPoseAlignmentDetectorTooltips.AlignmentWiggleRoom)]
-        [ContextMenuItem(nameof(LabelConfigs),nameof(LabelConfigs))]
-        [ContextMenuItem(nameof(CheckMostBones),nameof(CheckMostBones))]
-        [ContextMenuItem(nameof(SelectTrackedBoneVisuals),nameof(SelectTrackedBoneVisuals))]
-        [ContextMenuItem(nameof(SelectUntrackedBoneVisuals),nameof(SelectUntrackedBoneVisuals))]
+        [ContextMenuItem(nameof(LabelConfigs), nameof(LabelConfigs))]
+        [ContextMenuItem(nameof(CheckMostBones), nameof(CheckMostBones))]
+        [ContextMenuItem(nameof(SelectTrackedBoneVisuals), nameof(SelectTrackedBoneVisuals))]
+        [ContextMenuItem(nameof(SelectUntrackedBoneVisuals), nameof(SelectUntrackedBoneVisuals))]
         [SerializeField]
         private List<DetectorConfig> _alignmentWiggleRoom = new List<DetectorConfig>();
 
@@ -389,7 +390,9 @@ namespace Oculus.Movement.BodyTrackingForFitness
             {
                 DetectorConfig config = new DetectorConfig
                 {
-                    Id = id, MaxAngleDelta = 30, Width = 4
+                    Id = id,
+                    MaxAngleDelta = 30,
+                    Width = 4
                 };
                 configs.Add(config);
             }
@@ -446,8 +449,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
             (_iPoseA, _iPoseB) = (_iPoseB, _iPoseA);
         }
 #else
-        private void SwapPoseOrder(){}
-        private void LabelConfigs(){}
+        private void SwapPoseOrder() { }
+        private void LabelConfigs() { }
 #endif
 
         private void AddEvents()
@@ -763,8 +766,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
             Selection.objects = objects.ToArray();
         }
 #else
-        private void SelectTrackedBoneVisuals(){}
-        private void SelectUntrackedBoneVisuals(){}
+        private void SelectTrackedBoneVisuals() { }
+        private void SelectUntrackedBoneVisuals() { }
 #endif
     }
 }

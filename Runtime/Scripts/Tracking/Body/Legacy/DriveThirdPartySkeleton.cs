@@ -354,7 +354,7 @@ namespace Oculus.Movement.Tracking.Deprecated
 
         private void CopyBoneIdToHumanBodyBoneMapping()
         {
-            foreach(var keyValuePair in HumanBodyBonesMappings.BoneIdToHumanBodyBone)
+            foreach (var keyValuePair in HumanBodyBonesMappings.BoneIdToHumanBodyBone)
             {
                 _customBoneIdToHumanBodyBone.Add(keyValuePair.Key, keyValuePair.Value);
             }

@@ -90,7 +90,7 @@ namespace Oculus.Movement.Effects
         /// </summary>
         private void LateUpdate()
         {
-            if (_mySkeleton.IsInitialized  && _skeletonToCopy.IsInitialized)
+            if (_mySkeleton.IsInitialized && _skeletonToCopy.IsInitialized)
             {
                 // Reparent any bones under OVRSkeleton if required.
                 // This is needed for any transforms that aren't updated by OVRSkeleton

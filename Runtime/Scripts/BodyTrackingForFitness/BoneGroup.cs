@@ -370,28 +370,34 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// Mirrors the given body pose horizontally, modifying the given bone pose list.
         /// </summary>
         /// <param name="bones">each index matches a <see cref="BodyJointId"/></param>
-        public static void MirrorX(IList<Pose> bones) {
-            for (int i = 0; i < bones.Count; ++i) {
+        public static void MirrorX(IList<Pose> bones)
+        {
+            for (int i = 0; i < bones.Count; ++i)
+            {
                 bones[i] = MirroredPoseX(bones[i]);
             }
-            for (int i = 0; i < HorizontalReflection.Length; ++i) {
+            for (int i = 0; i < HorizontalReflection.Length; ++i)
+            {
                 int leftBodyJointId = (int)HorizontalReflection[i].Item1;
                 int rightBodyJointId = (int)HorizontalReflection[i].Item2;
                 SwapBones(bones, leftBodyJointId, rightBodyJointId);
             }
         }
 
-        private static void SwapBones(IList<Pose> bones, int left, int right) {
+        private static void SwapBones(IList<Pose> bones, int left, int right)
+        {
             Pose swap = bones[left];
             bones[left] = bones[right];
             bones[right] = swap;
         }
 
-        private static Quaternion MirrorRotationX(Quaternion q) {
+        private static Quaternion MirrorRotationX(Quaternion q)
+        {
             return new Quaternion(q.x * -1.0f, q.y, q.z, q.w * -1.0f) * CoefficientMirrorRotationX;
         }
 
-        private static Vector3 MirrorPositionX(Vector3 p) {
+        private static Vector3 MirrorPositionX(Vector3 p)
+        {
             p.Scale(CoefficientMirrorPositionX);
             return p;
         }

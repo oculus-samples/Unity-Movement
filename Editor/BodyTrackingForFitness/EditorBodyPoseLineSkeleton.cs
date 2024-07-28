@@ -25,8 +25,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// <summary>
         /// Any GameObject with a <inheritdoc cref="IBodyPose"/> script could draw a skeleton
         /// </summary>
-        private Dictionary<GameObject,IBodyPose> _drawList =
-            new Dictionary<GameObject,IBodyPose>();
+        private Dictionary<GameObject, IBodyPose> _drawList =
+            new Dictionary<GameObject, IBodyPose>();
 
         /// <code>[InitializeOnLoadMethod]</code> will trigger the static constructor
         [InitializeOnLoadMethod]

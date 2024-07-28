@@ -15,32 +15,32 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public Dictionary<HumanBodyBones, Tuple<HumanBodyBones, HumanBodyBones>> GetBoneToJointPair =>
             _boneToJointPair;
-        
+
         /// <inheritdoc />
-        public Dictionary<OVRSkeleton.BoneId, Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>> GetBoneIdToJointPair => 
+        public Dictionary<OVRSkeleton.BoneId, Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>> GetBoneIdToJointPair =>
             _fullBodyBoneIdToBonePairs;
-        
+
         /// <inheritdoc />
-        public Dictionary<OVRSkeleton.BoneId, Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>> GetFullBodyBoneIdToJointPair => 
+        public Dictionary<OVRSkeleton.BoneId, Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>> GetFullBodyBoneIdToJointPair =>
             _fullBodyBoneIdToBonePairs;
-        
+
         /// <inheritdoc />
         public Dictionary<OVRSkeleton.BoneId, HumanBodyBones> GetBoneIdToHumanBodyBone =>
             _fullBodyBoneIdToHumanBodyBone;
-        
+
         /// <inheritdoc />
-        public Dictionary<OVRSkeleton.BoneId, HumanBodyBones> GetFullBodyBoneIdToHumanBodyBone => 
+        public Dictionary<OVRSkeleton.BoneId, HumanBodyBones> GetFullBodyBoneIdToHumanBodyBone =>
             _fullBodyBoneIdToHumanBodyBone;
-        
+
         // Static members from interface.
         /// <inheritdoc />
-        public Dictionary<HumanBodyBones, BodySection> GetBoneToBodySection => 
+        public Dictionary<HumanBodyBones, BodySection> GetBoneToBodySection =>
             BoneToBodySection;
 
         /// <summary>
         /// HumanBodyBone pairs for this humanoid.
         /// </summary>
-        [SerializeField, EnumNamedArray(typeof(HumanBodyBones))] 
+        [SerializeField, EnumNamedArray(typeof(HumanBodyBones))]
         [Tooltip(RetargetedBoneMappingsTooltips.HumanBodyBonePairs)]
         private HumanBodyBones[] _humanBodyBonePairs;
 
@@ -61,7 +61,7 @@ namespace Oculus.Movement.AnimationRigging
         private Dictionary<HumanBodyBones, Tuple<HumanBodyBones, HumanBodyBones>> _boneToJointPair;
         private Dictionary<OVRSkeleton.BoneId, Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>> _fullBodyBoneIdToBonePairs;
         private Dictionary<OVRSkeleton.BoneId, HumanBodyBones> _fullBodyBoneIdToHumanBodyBone;
-        
+
         /// <summary>
         /// Update bone pair mappings for the retargeted humanoid.
         /// </summary>
@@ -97,7 +97,7 @@ namespace Oculus.Movement.AnimationRigging
             _humanBodyBonePairs = humanBodyBonePairs.ToArray();
             UpdateBoneIdToBonePairs();
             UpdateHumanBodyBoneToBoneId(animator);
-            
+
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(retargetingLayer);
             UnityEditor.PrefabUtility.RecordPrefabInstancePropertyModifications(retargetingLayer);
@@ -126,7 +126,7 @@ namespace Oculus.Movement.AnimationRigging
                 var childBone = _humanBodyBonePairs[boneIndex];
                 var targetBone = _humanBodyBoneToBoneId[boneIndex];
                 var targetBoneId = (OVRSkeleton.BoneId)targetBone;
-                
+
                 _boneToJointPair.Add(bone, new Tuple<HumanBodyBones, HumanBodyBones>(bone, childBone));
                 if (targetBone != FullBodyTrackingBoneId.Remove)
                 {
@@ -144,9 +144,9 @@ namespace Oculus.Movement.AnimationRigging
                 {
                     continue;
                 }
-                
+
                 var childBoneId = (OVRSkeleton.BoneId)targetBoneId;
-                _fullBodyBoneIdToBonePairs.Add(boneId, 
+                _fullBodyBoneIdToBonePairs.Add(boneId,
                     new Tuple<OVRSkeleton.BoneId, OVRSkeleton.BoneId>(boneId, childBoneId));
             }
             return true;
@@ -154,7 +154,7 @@ namespace Oculus.Movement.AnimationRigging
 
         private void UpdateBoneIdToBonePairs()
         {
-            _boneIdToBonePairs = new []
+            _boneIdToBonePairs = new[]
             {
                 FullBodyTrackingBoneId.Remove,
                 FullBodyTrackingBoneId.Remove,
@@ -248,7 +248,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             // The Humanoid Chest bone is mapped to the OVRSkeleton.SpineMiddle bone, instead of the default mapping
             // which is the OVRSkeleton.SpineUpper bone.
-            _humanBodyBoneToBoneId = new []
+            _humanBodyBoneToBoneId = new[]
             {
                 FullBodyTrackingBoneId.FullBody_Hips, // Hips
                 FullBodyTrackingBoneId.FullBody_LeftUpperLeg,

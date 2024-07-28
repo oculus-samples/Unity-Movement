@@ -35,7 +35,7 @@ namespace Oculus.Movement.Utils
 
         private string FormatName(string name)
         {
-            return System.Text.RegularExpressions.Regex.Replace(name, @"([a-z])([A-Z])", "$1 $2");;
+            return System.Text.RegularExpressions.Regex.Replace(name, @"([a-z])([A-Z])", "$1 $2"); ;
         }
     }
 }

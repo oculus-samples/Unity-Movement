@@ -27,7 +27,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// Private singleton so some editor time functionality can be static.
         /// </summary>
         private static EditorTransformAwareness _instance;
-        
+
         /// <summary>
         /// Set of currently selected tracked transforms
         /// </summary>
@@ -49,8 +49,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// Objects that own lists of transforms (eg: bone managers).
         /// Allows clusters of transforms to use the same callback.
         /// </summary>
-        private Dictionary<Object, Func<Transform,bool>> _transformsFromOwner =
-            new Dictionary<Object, Func<Transform,bool>>();
+        private Dictionary<Object, Func<Transform, bool>> _transformsFromOwner =
+            new Dictionary<Object, Func<Transform, bool>>();
 
         /// <summary>
         /// Callback methods to notify when a tracked transform has moved
@@ -240,7 +240,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
             _activeTransforms.Add(selectedTransform);
             _ownersOfActiveTransform[selectedTransform] = owners;
         }
-        
+
         private IEnumerable<Object> GetKnownOwnersOfTransform(Transform transform, bool getAll)
         {
             List<Object> owners = null;
@@ -250,7 +250,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
                 {
                     continue;
                 }
-                Func<Transform,bool> isTransformOwned = kvp.Value;
+                Func<Transform, bool> isTransformOwned = kvp.Value;
                 if (isTransformOwned == null)
                 {
                     continue;
@@ -345,7 +345,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         {
             return new Pose(transform.position, transform.rotation);
         }
-        
+
         /// <summary>
         /// Determines if <see cref="Transform"/> is reasonably close to a <see cref="Pose"/>
         /// </summary>
@@ -364,7 +364,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
                    Mathf.Abs(a.y - b.y) <= Epsilon &&
                    Mathf.Abs(a.z - b.z) <= Epsilon;
         }
-        
+
         /// <summary>
         /// Determines if vectors are reasonably close (within <see cref="Epsilon"/> in a dimension)
         /// </summary>

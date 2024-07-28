@@ -83,7 +83,7 @@ namespace Oculus.Movement.Utils
                     UnityEditor.EditorUtility.DisplayDialog("Retargeting setup error.", e.Message, "Ok");
                 }
 #else
-                    Debug.LogError("Retargeting setup error.");
+                Debug.LogError("Retargeting setup error.");
 #endif
                 return;
             }
@@ -214,7 +214,7 @@ namespace Oculus.Movement.Utils
                         $"Deformation Constraint Transform Init");
                 }
 #else
-                    deformationConstraint.transform.SetParent(rigObject.transform);
+                deformationConstraint.transform.SetParent(rigObject.transform);
 #endif
                 deformationConstraintObject.transform.localPosition = Vector3.zero;
                 deformationConstraintObject.transform.localRotation = Quaternion.identity;
@@ -306,7 +306,7 @@ namespace Oculus.Movement.Utils
         private static bool ShouldCorrectFingers(Animator animator, RestPoseObjectHumanoid restPoseObjectHumanoid)
         {
             var hand = HumanBodyBones.LeftHand;
-            var fingers = new []
+            var fingers = new[]
             {
                 HumanBodyBones.LeftThumbDistal,
                 HumanBodyBones.LeftIndexDistal,

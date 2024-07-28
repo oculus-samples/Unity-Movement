@@ -344,7 +344,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
 
                     if (i == SpineLowerIndex)
                     {
-                        spineOffset = Vector3.Lerp(Vector3.zero, spineLowerOffset, SpineLowerAlignmentWeight.Get(stream) * weight);;
+                        spineOffset = Vector3.Lerp(Vector3.zero, spineLowerOffset, SpineLowerAlignmentWeight.Get(stream) * weight); ;
                     }
                     if (i == SpineUpperIndex)
                     {
@@ -379,7 +379,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
                 if (IsOVRCustomSkeleton)
                 {
                     var chestPos = HipsToHeadBones[ChestIndex].GetPosition(stream);
-                    var chestRot =  HipsToHeadBones[ChestIndex].GetRotation(stream);
+                    var chestRot = HipsToHeadBones[ChestIndex].GetRotation(stream);
                     var shoulderWeight = weight * LeftShoulderOffsetWeight.Get(stream);
                     var shoulderPos = LeftShoulderBone.GetPosition(stream);
                     var targetShoulderPos = chestPos + chestRot * LeftShoulderOriginalLocalPos;
@@ -400,7 +400,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
                 if (IsOVRCustomSkeleton)
                 {
                     var chestPos = HipsToHeadBones[ChestIndex].GetPosition(stream);
-                    var chestRot =  HipsToHeadBones[ChestIndex].GetRotation(stream);
+                    var chestRot = HipsToHeadBones[ChestIndex].GetRotation(stream);
                     var shoulderWeight = weight * RightShoulderOffsetWeight.Get(stream);
                     var shoulderPos = RightShoulderBone.GetPosition(stream);
                     var targetShoulderPos = chestPos + chestRot * RightShoulderOriginalLocalPos;

@@ -41,7 +41,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         private bool IsShowingRefreshButton() => !IsSkeletonInvalid();
 
         private bool IsBoneVisualEmpty() => Target.BoneVisualPrefab == null;
-        
+
         private bool IsSkeletonInvalid() => Target.Skeleton == null;
 
         private bool IsPopulatedWithBones() => Target.BoneVisuals.Count != 0;

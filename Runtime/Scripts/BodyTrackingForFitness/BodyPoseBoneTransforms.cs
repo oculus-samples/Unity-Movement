@@ -76,7 +76,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// </summary>
         [Tooltip(BodyPoseBoneTransformsTooltips.BoneTransforms)]
         [ContextMenuItem(nameof(RefreshHierarchy), nameof(RefreshHierarchy))]
-        [EnumNamedArray (typeof(BodyBoneName))]
+        [EnumNamedArray(typeof(BodyBoneName))]
         [SerializeField]
         protected Transform[] _boneTransforms = new Transform[0];
 

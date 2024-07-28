@@ -139,7 +139,7 @@ namespace Oculus.Movement.Effects.Deprecated
             upperToTarget.Normalize();
             var midToUpper = middlePos - upperPos;
             var poleToUpper = _poleTransform.position - upperPos;
-            var midToUpperProjected =  midToUpper - upperToTarget * Vector3.Dot(midToUpper, upperToTarget);
+            var midToUpperProjected = midToUpper - upperToTarget * Vector3.Dot(midToUpper, upperToTarget);
             var poleToUpperProjected = poleToUpper - upperToTarget * Vector3.Dot(poleToUpper, upperToTarget);
             if (Mathf.Abs(midToUpperProjected.sqrMagnitude - poleToUpperProjected.sqrMagnitude) > _epsilon)
             {

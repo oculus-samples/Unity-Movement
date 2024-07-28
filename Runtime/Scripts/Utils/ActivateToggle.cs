@@ -19,7 +19,8 @@ namespace Oculus.Movement.Utils
         /// <summary>
         /// Describes objects bound to a state and functionality triggered by state change
         /// </summary>
-        [System.Serializable] public class State
+        [System.Serializable]
+        public class State
         {
             /// <summary>
             /// Name of this state

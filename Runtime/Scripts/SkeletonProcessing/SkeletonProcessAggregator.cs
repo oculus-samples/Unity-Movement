@@ -38,7 +38,7 @@ namespace Oculus.Movement.AnimationRigging
             private UnityEngine.Object _lastKownProcessor;
 #endif
             [Interface(typeof(IOVRSkeletonProcessor))]
-            [Tooltip("The "+nameof(IOVRSkeletonProcessor))]
+            [Tooltip("The " + nameof(IOVRSkeletonProcessor))]
             public UnityEngine.Object Processor;
 
             private IOVRSkeletonProcessor _iProcessor;

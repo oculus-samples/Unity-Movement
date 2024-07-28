@@ -51,7 +51,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
         /// The <see cref="IOVRSkeletonProcessorAggregator"/> to give self to
         /// </summary>
         [SerializeField]
-        [ContextMenuItem(nameof(FindLocalProcessorAggregator),nameof(FindLocalProcessorAggregator))]
+        [ContextMenuItem(nameof(FindLocalProcessorAggregator), nameof(FindLocalProcessorAggregator))]
         [Interface(typeof(IOVRSkeletonProcessorAggregator))]
         protected UnityEngine.Object _autoAddTo;
         public Object AutoAddTo

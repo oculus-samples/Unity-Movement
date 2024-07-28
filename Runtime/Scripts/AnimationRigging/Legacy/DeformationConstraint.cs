@@ -630,7 +630,8 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
             {
                 bonePairs.Add(new BonePairData
                 {
-                    StartBone = highestSpineBone, EndBone = leftShoulderBone,
+                    StartBone = highestSpineBone,
+                    EndBone = leftShoulderBone,
                 });
             }
             else
@@ -642,7 +643,8 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
             {
                 bonePairs.Add(new BonePairData
                 {
-                    StartBone = highestSpineBone, EndBone = rightShoulderBone,
+                    StartBone = highestSpineBone,
+                    EndBone = rightShoulderBone,
                 });
             }
             else
@@ -665,21 +667,25 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
             // Upper arm to lower arm bones.
             bonePairs.Add(new BonePairData
             {
-                StartBone = _leftArmData.UpperArmBone, EndBone = _leftArmData.LowerArmBone
+                StartBone = _leftArmData.UpperArmBone,
+                EndBone = _leftArmData.LowerArmBone
             });
             bonePairs.Add(new BonePairData
             {
-                StartBone = _rightArmData.UpperArmBone, EndBone = _rightArmData.LowerArmBone
+                StartBone = _rightArmData.UpperArmBone,
+                EndBone = _rightArmData.LowerArmBone
             });
 
             // Lower arm to hand bones.
             bonePairs.Add(new BonePairData
             {
-                StartBone = _leftArmData.LowerArmBone, EndBone = _leftArmData.HandBone
+                StartBone = _leftArmData.LowerArmBone,
+                EndBone = _leftArmData.HandBone
             });
             bonePairs.Add(new BonePairData
             {
-                StartBone = _rightArmData.LowerArmBone, EndBone = _rightArmData.HandBone
+                StartBone = _rightArmData.LowerArmBone,
+                EndBone = _rightArmData.HandBone
             });
 
             // Calculate original bone pair lengths.

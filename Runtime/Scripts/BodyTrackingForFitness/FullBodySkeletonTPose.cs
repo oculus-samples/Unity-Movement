@@ -24,7 +24,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
             /// <summary>
             /// Provides an expected count of bones in a full body skeleton
             /// </summary>
-            public static int ExpectedBoneCount => (int) BodyJointId.Body_End;
+            public static int ExpectedBoneCount => (int)BodyJointId.Body_End;
 
             /// <inheritdoc cref="BoneLink{TBoneId}.parent"/>
             public static int GetParent(int bodyJointId) => (int)_boneLinks[bodyJointId].parent;
@@ -39,7 +39,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
             public static int[] GetChildren(int bodyJointId) => _boneLinks[bodyJointId].children;
 
             /// <inheritdoc cref="BoneLink{TBoneId}.length"/>
-            public static float GetBoneLength(int bodyJointId) =>  _boneLinks[bodyJointId].length;
+            public static float GetBoneLength(int bodyJointId) => _boneLinks[bodyJointId].length;
 
             /// <inheritdoc cref="BoneLink{TBoneId}.alignment"/>
             public static Quaternion GetForwardRotation(int boneId) => _boneLinks[boneId].alignment;
