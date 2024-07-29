@@ -139,6 +139,13 @@ namespace Oculus.Movement.AnimationRigging
             var retargetedBoneTargetIndex = 0;
             foreach (var bone in bones)
             {
+                // Check if the current index is within range of the bone targets.
+                // This condition is to prevent the case where we've found all of the bone target
+                // transforms, but still are iterating through the skeleton bones.
+                if (retargetedBoneTargetIndex >= _boneTargets.Length)
+                {
+                    continue;
+                }
                 var retargetedBoneTarget = _boneTargets[retargetedBoneTargetIndex];
                 if (bone.Id != retargetedBoneTarget.BoneId)
                 {
@@ -190,6 +197,10 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
+            if (!skeleton.IsInitialized || !skeleton.IsDataValid)
+            {
+                return;
+            }
             Initialize();
             if (UseJobs)
             {
