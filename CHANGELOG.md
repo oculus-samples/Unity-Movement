@@ -1,3 +1,57 @@
+# [5.2.0](https://github.com/oculus-samples/Unity-Movement/compare/v5.1.0...v5.2.0) (2024-07-31)
+
+
+### Bug Fixes
+
+* **Editor:** Allow saving and loading deformation configuration via JSON ([46bf685](https://github.com/oculus-samples/Unity-Movement/commit/46bf685959aaedd1d71969557c928c3b96871058))
+* **Runtime:** Correct bones job regenerates metadata with mask changes, fix hand wave ([539cb0b](https://github.com/oculus-samples/Unity-Movement/commit/539cb0b8d10a8166ac23a163c38040523f2d860e))
+* **Runtime:** Don't run correct bones job if weight is zero ([b452051](https://github.com/oculus-samples/Unity-Movement/commit/b452051e90db36292efd48544bee24b2cb74de36))
+* **Runtime:** Fix CCDIK edge cases when the skeleton is scaled ([ab0a8af](https://github.com/oculus-samples/Unity-Movement/commit/ab0a8af92f0ce323e30afe819e3ba95270acd83a))
+* **Runtime:** Fix character's rest pose before humanoid asset is used ([32895a6](https://github.com/oculus-samples/Unity-Movement/commit/32895a6ce6ee852e107c3baa6474083cca95ad0c))
+* **Runtime:** Fix correct hand assigning the wrong bone for the secondary IK target ([1ab07df](https://github.com/oculus-samples/Unity-Movement/commit/1ab07df3844c5c72caf9ff03f725287a51ab51f7))
+* **Runtime:** Fix external bone targets job when containing invalid bones ([f56c881](https://github.com/oculus-samples/Unity-Movement/commit/f56c8816e1a6312d0bf0a78a5c83495a1a06a78d))
+* **Runtime:** Fix incorrect bone mappings being set when spawning an inactive character ([4acc069](https://github.com/oculus-samples/Unity-Movement/commit/4acc069ec9a674e8d0a017e0c22f6eb29bb0f90a))
+* **Runtime:** Fix locomotion animation playback direction for embodied character ([5fa894c](https://github.com/oculus-samples/Unity-Movement/commit/5fa894c629a38b8982b2da641cba86bc45f32a58))
+* **Runtime:** Fix OnDestroy job activity for ExternalBoneTargets ([24cc82f](https://github.com/oculus-samples/Unity-Movement/commit/24cc82f6fed296b722d2a062221eaf237d0a0f2d))
+* **Runtime:** Force character into t-pose when adding retargeting components to it ([418c235](https://github.com/oculus-samples/Unity-Movement/commit/418c235bc91b1b31982253636cb8c5c1508a0e7a))
+* **Runtime:** Handle CCDIK cases where the bones aren't directly hierarchical ([0cdafa8](https://github.com/oculus-samples/Unity-Movement/commit/0cdafa81ff2c85041f7fd9bc84b6f81fd68aef72))
+* **Runtime:** Optimize CCDIK performance by using poses ([f0e2e54](https://github.com/oculus-samples/Unity-Movement/commit/f0e2e544c0c2eea3bd52eb6c5b6b29b78e139860))
+* **Runtime:** Remove retargeting layer in AddMainRetargetingComponent ([801e8e7](https://github.com/oculus-samples/Unity-Movement/commit/801e8e75e1d8d0ec4b8272217f0ff9523295d2c4))
+* **Runtime:** Skip DrivenTransform in proxy transform update if the DrivenTransform is null ([be1bb3f](https://github.com/oculus-samples/Unity-Movement/commit/be1bb3ff34470532f3d61aa2402bc11794633448))
+* **Samples:** Retargeted uses correct bones with finger accuracy, jobs enabled ([c29802c](https://github.com/oculus-samples/Unity-Movement/commit/c29802caa4949cc5a03623a02639c9261349605c))
+* **Samples:** Update ISDK sample to be more accurate ([b4f897a](https://github.com/oculus-samples/Unity-Movement/commit/b4f897a300a2ced8c152c90ea17ec200ae2c2502))
+
+
+### Features
+
+* **Editor:** Add functionality to update the current skeleton to the animator's avatar humanDescription ([02cdf82](https://github.com/oculus-samples/Unity-Movement/commit/02cdf8288e3441562d2777d3bcba20f1c04c069d))
+* **Editor:** Add JSON read/write for RetargetingLayer and RetargetingProcessor ([0350d55](https://github.com/oculus-samples/Unity-Movement/commit/0350d55af8b0cbdbe7b50c22e2037b7ae6ae5ac0))
+* **Editor:** Update one-click retargeting to take into account hand proportions for setting the finger position correction weight ([ae76d7b](https://github.com/oculus-samples/Unity-Movement/commit/ae76d7bd5a2e82fb8db41eb948fa37eff0685ee4))
+* **Editor:** Update the one-click retargeting constraint setup ([4189415](https://github.com/oculus-samples/Unity-Movement/commit/41894151f218701dcafd4c5e07d6bfee1542d870))
+* **Runtime:** Add arm length multiplier to full body deformation constraint ([86c7028](https://github.com/oculus-samples/Unity-Movement/commit/86c7028fad1e57f44a734c5d7c0f341f53430554))
+* **Runtime:** Add OVRControllersHands positions sync option for RetargetingProcessorCorrectHand ([922e374](https://github.com/oculus-samples/Unity-Movement/commit/922e3740493513d34d7cb91e6382b70430ea665a))
+* **Runtime:** Add public config functions LateMirroredObject ([c6ba3c5](https://github.com/oculus-samples/Unity-Movement/commit/c6ba3c511d61778e7de0961124da304e7d4103a7))
+* **Runtime:** Add public JSON loading API to retargeter classes ([cd16f3a](https://github.com/oculus-samples/Unity-Movement/commit/cd16f3aa715df0ef89f5eb89d6dc14f34c25c5e2))
+* **Runtime:** Add UpdateToAnimatorPose to AnimationUtilities ([ca3dad3](https://github.com/oculus-samples/Unity-Movement/commit/ca3dad3f1bec196a50738f370e2aabf4e0999cf1))
+* **Runtime:** Add use secondary bone id option for the correct hand IK processor ([a154d6d](https://github.com/oculus-samples/Unity-Movement/commit/a154d6d3f221cd51afe8843f196789f61f2574e0))
+* **Runtime:** Allow jobs for retargeting processors ([43a7be2](https://github.com/oculus-samples/Unity-Movement/commit/43a7be276cd9e4f9a2ecca1c6e323da53aa7c5f1))
+* **runtime:** Allow specifying arm chain bones for arm IK ([9108de5](https://github.com/oculus-samples/Unity-Movement/commit/9108de521b14b574b43c9c922af3e0a98f56b24c))
+* **Runtime:** ARKitFace forces usage of proper mapping value ([fa2ed7f](https://github.com/oculus-samples/Unity-Movement/commit/fa2ed7ff0e5111087618a2689677490e051885c7))
+* **Runtime:** Chain proxy target jobs ([30c7c45](https://github.com/oculus-samples/Unity-Movement/commit/30c7c45f9797a1c53f909ac1eb050c2a0430d920))
+* **Runtime:** Change HelperMenusBody access to public ([9feca2c](https://github.com/oculus-samples/Unity-Movement/commit/9feca2cda8ffb94b3b6f192fc5802e7d76d9ba82))
+* **Runtime:** Combine blend and correct hand processors ([d4dadf1](https://github.com/oculus-samples/Unity-Movement/commit/d4dadf15f9ff1ee733242f065dc6173388727779))
+* **Runtime:** Control positions and rotations on PlaybackAnimationConstraint ([e42342a](https://github.com/oculus-samples/Unity-Movement/commit/e42342a3947f4d5cd0c28fd43adb804d2be617cc))
+* **Runtime:** Custom playback of PlaybackAnimationJob ([31b7fd2](https://github.com/oculus-samples/Unity-Movement/commit/31b7fd21cfe1e4a767614712b2ca659a28e82917))
+* **Runtime:** Disable updating RT constraint adjustments from editor ([7a7dd55](https://github.com/oculus-samples/Unity-Movement/commit/7a7dd559464f15eff7bc34836a656e92b954725e))
+* **Runtime:** Improve shoulder roll to be more accurate in its function ([b37a37f](https://github.com/oculus-samples/Unity-Movement/commit/b37a37f7eeed43a8b92d930699621162c41a2aae))
+* **Runtime:** Move JSON functions to deformation constraint class ([b9d5240](https://github.com/oculus-samples/Unity-Movement/commit/b9d5240e02e7e9a1091cb25b136894eac4fa9927))
+* **Runtime:** Optimize FABRIK ([ce3153f](https://github.com/oculus-samples/Unity-Movement/commit/ce3153fc7b0f84fb68c1d0bf202b33f7990af616))
+* **Runtime:** PlaybackAnimationConstraint can mask by individual bone ([26fdec7](https://github.com/oculus-samples/Unity-Movement/commit/26fdec7139f42b67b05d8475be620104bdca6c80))
+* **Runtime:** RetargetingLayer supports jobs-base processors ([d0776fc](https://github.com/oculus-samples/Unity-Movement/commit/d0776fcc390c8fd300c5c632d72cb0aba9f95130))
+* **Runtime:** Update RetargetingProcessorCorrectHand sync with OVRControllersHands to also optionally sync rotations ([a1c9b30](https://github.com/oculus-samples/Unity-Movement/commit/a1c9b30622ec87ce6fe087a9e5f8f47289b642f1))
+* **Runtime:** Use a job to update proxies ([e672abb](https://github.com/oculus-samples/Unity-Movement/commit/e672abbe14706ac55f3926e40413338646a34a22))
+* **Runtime:** Use jobs for external bone targets ([d39e9de](https://github.com/oculus-samples/Unity-Movement/commit/d39e9dee2da52bcfa509be5bfe4e83fb08c541b4))
+
 # [5.1.0](https://github.com/oculus-samples/Unity-Movement/compare/v5.0.1...v5.1.0) (2024-05-17)
 
 
