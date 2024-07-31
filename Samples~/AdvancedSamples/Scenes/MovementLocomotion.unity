@@ -280,11 +280,10 @@ MonoBehaviour:
     OnUserInputChange:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1438153950}
-          m_TargetAssemblyTypeName: Oculus.Movement.Experimental.Effects.SkeletonPostprocess.AnimatorHooks,
-            Assembly-CSharp
-          m_MethodName: set_InputHorizontalVertical
-          m_Mode: 0
+        - m_Target: {fileID: 562641234}
+          m_TargetAssemblyTypeName: EventSet, Assembly-CSharp
+          m_MethodName: RefreshActiveDuration
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -293,10 +292,13 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 562641234}
-          m_TargetAssemblyTypeName: EventSet, Assembly-CSharp
-          m_MethodName: RefreshActiveDuration
-          m_Mode: 1
+    OnUserInputChangeJoystickDir:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1438153950}
+          m_TargetAssemblyTypeName: Oculus.Movement.Locomotion.AnimatorHooks, Meta.Movement
+          m_MethodName: set_InputHorizontalVertical
+          m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -361,6 +363,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  _referenceCharacterBone: {fileID: 314474975}
+  _referenceBoneUpAxis: 1
 --- !u!54 &39895797
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1620,6 +1624,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5395463374951535443, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 7362976725013471432, guid: 0737e3f63e17bac45b774695173860d1, type: 3}
       propertyPath: m_RootOrder
       value: 7
