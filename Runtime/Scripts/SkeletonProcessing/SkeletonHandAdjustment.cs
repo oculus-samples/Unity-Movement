@@ -142,7 +142,7 @@ namespace Oculus.Movement.AnimationRigging
         private HandBodyJointPair[] _jointPairs;
         private Quaternion _rigRotationOffset;
         private Vector3 _rigPositionOffset;
-        private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
+        private RetargetingProcessorCorrectHand.HandProcessor _retargetingHandProcessor;
 
         /// <summary>
         /// If the camera rig moves but the body is stationary, this should be true
@@ -231,11 +231,11 @@ namespace Oculus.Movement.AnimationRigging
             // we need to position the hand with an IK solver so that it affects the entire arm.
             // By setting the custom target hand position for the correct hand retargeting processor
             // and using the body tracked hand instead, misaligned hands from the arms shouldn't occur.
-            if (_retargetingProcessorCorrectHand == null)
+            if (_retargetingHandProcessor == null)
             {
                 FindRetargetingProcessorCorrectHand(skeleton);
             }
-            if (_retargetingProcessorCorrectHand == null)
+            if (_retargetingHandProcessor == null)
             {
                 return;
             }
@@ -256,7 +256,7 @@ namespace Oculus.Movement.AnimationRigging
                 bone.position += vectorToStartingHandPosition;
             }
             // Update the custom target hand position for the IK solver to be at the ISDK hand position.
-            _retargetingProcessorCorrectHand.CustomHandTargetPosition = targetHandPosition;
+            _retargetingHandProcessor.CustomHandTargetPosition = targetHandPosition;
         }
 
         private void FindRetargetingProcessorCorrectHand(OVRSkeleton skeleton)
@@ -269,9 +269,16 @@ namespace Oculus.Movement.AnimationRigging
             foreach (var processor in retargetingLayer.RetargetingProcessors)
             {
                 var correctHands = processor as RetargetingProcessorCorrectHand;
-                if (correctHands != null && correctHands.Handedness == Hand.Handedness)
+                if (correctHands != null)
                 {
-                    _retargetingProcessorCorrectHand = correctHands;
+                    if (Hand.Handedness == Handedness.Left)
+                    {
+                        _retargetingHandProcessor = correctHands.LeftHandProcessor;
+                    }
+                    if (Hand.Handedness == Handedness.Right)
+                    {
+                        _retargetingHandProcessor = correctHands.RightHandProcessor;
+                    }
                     break;
                 }
             }

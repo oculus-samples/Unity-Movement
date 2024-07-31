@@ -26,7 +26,8 @@ namespace Oculus.Movement.Utils
         /// <param name="position"></param>
         /// <param name="property"></param>
         /// <param name="label"></param>
-        public static void BoneTupleGUI(Rect position, SerializedProperty property, GUIContent label) {
+        public static void BoneTupleGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
             FullBodyOVRSkeletonBoneVisualizer.BoneTuple tuple;
             SerializedProperty hide = property.FindPropertyRelative(nameof(tuple.Hide));
             SerializedProperty fromBone = property.FindPropertyRelative(nameof(tuple.FirstBone));

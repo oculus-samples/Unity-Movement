@@ -67,11 +67,11 @@ namespace Oculus.Movement.BodyTrackingForFitness
             ? helpers
             : helpers = new InspectorGuiHelper[]
             {
-                new InspectorGuiHelper(IsAbleToRefreshSource, RefreshSource, null, 
+                new InspectorGuiHelper(IsAbleToRefreshSource, RefreshSource, null,
                     "Refresh Source Data", InspectorGuiHelper.OptionalIcon.None),
-                new InspectorGuiHelper(IsAbleToTPose, RefreshTPose, null, 
+                new InspectorGuiHelper(IsAbleToTPose, RefreshTPose, null,
                     "Refresh T-Pose", InspectorGuiHelper.OptionalIcon.None),
-                new InspectorGuiHelper(IsAbleToSave, SaveAsset, null, 
+                new InspectorGuiHelper(IsAbleToSave, SaveAsset, null,
                     "Export Asset", InspectorGuiHelper.OptionalIcon.None),
             };
 
@@ -87,7 +87,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         private bool IsAbleToSave() => Target.BonePoses.Length != 0;
 
         private bool IsAbleToTPose() => true;
-        
+
         private bool IsAbleToRefreshSource() => Target.BodyPose != null;
 
         private void SaveAsset()
@@ -112,7 +112,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
             AssetDatabase.Refresh();
             EditorGUIUtility.PingObject(assetToWrite);
         }
-        
+
         private static BodyPoseData GeneratePoseAsset(string name)
         {
             var poseDataAsset = ScriptableObject.CreateInstance<BodyPoseData>();

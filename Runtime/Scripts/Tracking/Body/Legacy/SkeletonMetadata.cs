@@ -403,8 +403,8 @@ namespace Oculus.Movement.Tracking.Deprecated
                             jointPairEndPosition);
                 }
 
-                boneData.FromPosition   = boneData.OriginalJoint.position;
-                boneData.ToPosition     = boneData.OriginalJoint.position +
+                boneData.FromPosition = boneData.OriginalJoint.position;
+                boneData.ToPosition = boneData.OriginalJoint.position +
                     (jointPairEndPosition - jointPairStartPosition);
             }
         }

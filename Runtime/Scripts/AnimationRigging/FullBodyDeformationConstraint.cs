@@ -3,6 +3,7 @@
 using Oculus.Movement.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
@@ -289,6 +290,13 @@ namespace Oculus.Movement.AnimationRigging
         public string OriginalSpinePositionsWeightProperty { get; }
 
         /// <summary>
+        /// Allows stretching arms.
+        /// WARNING! EXPERIMENTAL! increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        public string ArmLengthMultiplierFloatProperty { get; }
+
+        /// <summary>
         /// Control how many bones to straighten.
         /// WARNING! EXPERIMENTAL!
         /// </summary>
@@ -548,6 +556,10 @@ namespace Oculus.Movement.AnimationRigging
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpinePositionsWeight));
 
         /// <inheritdoc />
+        string IFullBodyDeformationData.ArmLengthMultiplierFloatProperty =>
+            ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_armLengthMultiplier));
+
+        /// <inheritdoc />
         string IFullBodyDeformationData.OriginalSpineBoneCountIntProperty =>
             ConstraintsUtils.ConstructConstraintDataPropertyName(nameof(_originalSpineBoneCount));
 
@@ -643,7 +655,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// The weight for the deformation shoulder roll.
         /// </summary>
-        [SyncSceneToStream, SerializeField, Range(0.0f, 1.0f)]
+        [SyncSceneToStream, SerializeField, Range(0.0f, 2.0f)]
         private float _shoulderRollWeight;
         public float ShoulderRollWeight
         {
@@ -826,6 +838,20 @@ namespace Oculus.Movement.AnimationRigging
         {
             get => _originalSpinePositionsWeight;
             set => _originalSpinePositionsWeight = value;
+        }
+
+        /// <summary>
+        /// Allows stretching arms.
+        /// WARNING! EXPERIMENTAL! increasing this value might cause
+        /// inaccuracy wrt to body tracking.
+        /// </summary>
+        [SyncSceneToStream, SerializeField, Range(0.01f, 5.0f)]
+        [Tooltip(DeformationDataTooltips.ArmLengthMultiplier)]
+        private float _armLengthMultiplier;
+        public float ArmLengthMultiplier
+        {
+            get => _armLengthMultiplier;
+            set => _armLengthMultiplier = value;
         }
 
         /// <summary>
@@ -1483,6 +1509,7 @@ namespace Oculus.Movement.AnimationRigging
             _leftToesWeight = 0.0f;
             _rightToesWeight = 0.0f;
             _originalSpinePositionsWeight = 0.0f;
+            _armLengthMultiplier = 1.0f;
             _originalSpineBoneCount = 0;
             _originalSpineUseHipsToHeadToScale = false;
             _originalSpineFixRotations = false;
@@ -1510,6 +1537,68 @@ namespace Oculus.Movement.AnimationRigging
         /// <inheritdoc />
         public void RegenerateData()
         {
+        }
+
+        /// <summary>
+        /// Write JSON config to file.
+        /// </summary>
+        /// <param name="filePath">File path to write to.</param>
+        public void WriteJSONConfigToFile(string filePath)
+        {
+            if (String.IsNullOrEmpty(filePath))
+            {
+                Debug.LogError($"Can't serialize deformation to invalid file path.");
+                return;
+            }
+            var jsonResult = JsonUtility.ToJson(this, true);
+            File.WriteAllText(filePath, jsonResult);
+        }
+
+        /// <summary>
+        /// Read JSON config from file.
+        /// </summary>
+        /// <param name="filePath">File path to read from.</param>
+        public void ReadJSONConfigFromFile(string filePath)
+        {
+            string text = File.ReadAllText(filePath);
+            JsonUtility.FromJsonOverwrite(text, this);
+            Debug.Log($"Read JSON config from {filePath}.");
+            // Calculate our bone data because JSON will reference bone data from other character.
+            CalculateBoneData();
+        }
+
+        /// <summary>
+        /// Initializes meta data.
+        /// </summary>
+        public void CalculateBoneData()
+        {
+            var constraintData = (FullBodyDeformationData)data;
+
+            var skeleton = gameObject.GetComponentInParent<OVRCustomSkeleton>();
+            var animator = gameObject.GetComponentInParent<Animator>();
+            if (skeleton != null)
+            {
+                constraintData.AssignOVRCustomSkeleton(skeleton);
+            }
+            else
+            {
+                constraintData.AssignAnimator(animator);
+            }
+            // Determine if this character is in T-pose or A-pose.
+            var isTPose = AddComponentsHelper.CheckIfTPose(animator);
+
+            constraintData.InitializeStartingScale();
+            constraintData.ClearTransformData();
+            constraintData.SetUpLeftArmData();
+            constraintData.SetUpRightArmData();
+            constraintData.SetUpLeftLegData();
+            constraintData.SetUpRightLegData();
+            constraintData.SetUpHipsAndHeadBones();
+            constraintData.SetUpBonePairs();
+            constraintData.SetUpBoneTargets(this.transform);
+            constraintData.SetUpAdjustments(AddComponentsHelper.GetRestPoseObject(isTPose));
+            // assign new structs values back to data field
+            this.data = constraintData;
         }
     }
 }

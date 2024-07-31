@@ -2,7 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Unity.Jobs;
 using UnityEngine;
+using static Oculus.Movement.AnimationRigging.IRetargetingProcessor;
 
 namespace Oculus.Movement.AnimationRigging
 {
@@ -28,6 +31,16 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc />
+        public virtual void CleanUp()
+        {
+        }
+
+        /// <inheritdoc />
+        public virtual void RespondToCalibration(RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
+        {
+        }
+
+        /// <inheritdoc />
         public virtual void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)
         {
         }
@@ -43,8 +56,38 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <inheritdoc />
+        public virtual JobHandle ProcessRetargetingLayerJob(JobHandle? previousJob, RetargetingLayer retargetingLayer, IList<OVRBone> ovrBones)
+        {
+            return new JobHandle();
+        }
+
+        /// <inheritdoc />
         public virtual void DrawGizmos()
         {
         }
+
+        /// <inheritdoc />
+        public virtual void ReadJSONConfigFromFile(string filePath)
+        {
+            string text = File.ReadAllText(filePath);
+            Debug.Log($"Read JSON config from {filePath}.");
+            ApplyJSONConfig(text);
+        }
+
+        /// <inheritdoc />
+        public virtual void ApplyJSONConfig(string jsonData)
+        {
+            JsonUtility.FromJsonOverwrite(jsonData, this);
+            Debug.Log($"Applied JSON config to {this}.");
+        }
+
+        /// <inheritdoc />
+        public virtual string GetJSONConfig()
+        {
+            return JsonUtility.ToJson(this, true);
+        }
+
+        /// <inheritdoc />
+        public virtual RetargetingProcessorType ProcessorType { get; set; }
     }
 }

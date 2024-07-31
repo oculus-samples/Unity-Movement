@@ -76,7 +76,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// </summary>
         [Tooltip(BodyPoseBoneTransformsTooltips.BoneTransforms)]
         [ContextMenuItem(nameof(RefreshHierarchy), nameof(RefreshHierarchy))]
-        [EnumNamedArray (typeof(BodyBoneName))]
+        [EnumNamedArray(typeof(BodyBoneName))]
         [SerializeField]
         protected Transform[] _boneTransforms = new Transform[0];
 
@@ -263,7 +263,12 @@ namespace Oculus.Movement.BodyTrackingForFitness
                         {
                             parent = BoneContainer;
                         }
-                        bone.SetParent(parent);
+#if UNITY_EDITOR
+                        if (!UnityEditor.PrefabUtility.IsPartOfAnyPrefab(bone))
+#endif
+                        {
+                            bone.SetParent(parent);
+                        }
                     }
                     break;
             }

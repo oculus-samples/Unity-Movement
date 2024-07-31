@@ -39,7 +39,7 @@ namespace Oculus.Movement.Utils
             _loading = true;
 
             // make sure we wait for all parties concerned to let us know they're ready to load
-            _waitingCount = WhenLoadingScene.GetInvocationList().Length-1;  // remove the count for the blank delegate
+            _waitingCount = WhenLoadingScene.GetInvocationList().Length - 1;  // remove the count for the blank delegate
             if (_waitingCount == 0)
             {
                 // if nobody else cares just set the preload to go directly to the loading of the scene

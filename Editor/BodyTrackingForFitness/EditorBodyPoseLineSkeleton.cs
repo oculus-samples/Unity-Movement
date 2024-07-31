@@ -25,9 +25,9 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// <summary>
         /// Any GameObject with a <inheritdoc cref="IBodyPose"/> script could draw a skeleton
         /// </summary>
-        private Dictionary<GameObject,IBodyPose> _drawList =
-            new Dictionary<GameObject,IBodyPose>();
-        
+        private Dictionary<GameObject, IBodyPose> _drawList =
+            new Dictionary<GameObject, IBodyPose>();
+
         /// <code>[InitializeOnLoadMethod]</code> will trigger the static constructor
         [InitializeOnLoadMethod]
         static void OnProjectLoadedInEditor() { }
@@ -280,6 +280,19 @@ namespace Oculus.Movement.BodyTrackingForFitness
                     container = skeleton.BoneContainer;
                     sourceData = skeleton.BodyPose;
                     break;
+                default:
+                    selfComponent = self as Component;
+                    if (selfComponent != null)
+                    {
+                        container = selfComponent.transform;
+                        BodyPoseBoneTransforms boneTransforms =
+                            container.GetComponentInChildren<BodyPoseBoneTransforms>();
+                        if (boneTransforms != null)
+                        {
+                            transforms = boneTransforms.BoneTransforms;
+                        }
+                    }
+                    break;
             }
             Component sourceComponent = sourceData as Component;
             bool bodyDataSomewhereElse = sourceComponent != null &&
@@ -290,7 +303,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
             }
             else
             {
-                DrawReferenceArrow(selfComponent.transform.position, 
+                DrawReferenceArrow(selfComponent.transform.position,
                     sourceComponent.transform.position, thick);
             }
         }
@@ -329,7 +342,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
             Handles.DrawBezier(arrowFlangeB, end,
                 arrowFlangeB, end, Gizmos.color, null, thick);
         }
-        
+
         private static void DrawBoneGizmo(int boneIndex, Pose pose, Transform root, float thick)
         {
             int next = FullBodySkeletonTPose.TPose.GetNext(boneIndex);

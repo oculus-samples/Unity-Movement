@@ -288,7 +288,7 @@ namespace Oculus.Movement.Effects.Deprecated
                 _animator.GetBoneTransform(HumanBodyBones.Head).transform;
 
             Assert.IsTrue(_hipToHeadTransforms.Count > 0);
-            foreach(var transformItem in _hipToHeadTransforms)
+            foreach (var transformItem in _hipToHeadTransforms)
             {
                 Assert.IsNotNull(transformItem);
             }

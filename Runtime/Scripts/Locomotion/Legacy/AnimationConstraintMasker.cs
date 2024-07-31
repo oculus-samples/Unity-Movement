@@ -226,7 +226,7 @@ namespace Oculus.Movement.Locomotion.Deprecated
         private List<IRigConstraint> GetNamedConstraints(IRigConstraint[] constraints, string[] nameContains)
         {
             List<IRigConstraint> found = new List<IRigConstraint>();
-            for (int i = constraints.Length-1; i >= 0; --i)
+            for (int i = constraints.Length - 1; i >= 0; --i)
             {
                 Object obj = constraints[i] as Object;
                 if (obj == null)

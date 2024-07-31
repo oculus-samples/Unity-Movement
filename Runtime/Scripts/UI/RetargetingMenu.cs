@@ -3,6 +3,7 @@
 using Oculus.Interaction;
 using Oculus.Movement.Utils;
 using System.Collections.Generic;
+using Oculus.Movement.AnimationRigging;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -47,6 +48,9 @@ namespace Oculus.Movement.UI
         [SerializeField]
         [Tooltip(RetargetingMenuTooltips.SpawnOffset)]
         protected Vector3 _spawnOffset = new Vector3(-1.0f, 0.0f, 0.0f);
+
+        [SerializeField, InspectorButton("AddRiggedRetargetedCharacterWithConstraints")]
+        private bool _addRiggedRetargetedCharacterWithConstraints;
 
         private class SpawnMetadata
         {
@@ -118,6 +122,7 @@ namespace Oculus.Movement.UI
                 return;
             }
             GameObject newCharacter = Instantiate(_characterToSpawn);
+            AnimationUtilities.UpdateToAnimatorPose(newCharacter.GetComponent<Animator>(), true);
             AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, true);
 
             AdjustSpawnedCharacterTransform(newCharacter, true, _currentSpawnOffset);
@@ -136,7 +141,9 @@ namespace Oculus.Movement.UI
                 return;
             }
             GameObject newCharacter = Instantiate(_characterToSpawn);
-            RestPoseObjectHumanoid restPoseToUse = AddComponentsHelper.CheckIfTPose(newCharacter.GetComponent<Animator>()) ?
+            Animator animator = newCharacter.GetComponent<Animator>();
+            AnimationUtilities.UpdateToAnimatorPose(animator, true);
+            RestPoseObjectHumanoid restPoseToUse = AddComponentsHelper.CheckIfTPose(animator) ?
                 _restTPoseObject :
                 _restPoseObject;
             AddComponentsRuntime.SetupCharacterForAnimationRiggingRetargeting(newCharacter, true, true, restPoseToUse);

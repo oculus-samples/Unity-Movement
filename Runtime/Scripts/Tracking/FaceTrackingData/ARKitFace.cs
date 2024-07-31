@@ -1,12 +1,14 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using UnityEngine;
+
 namespace Oculus.Movement.Tracking
 {
     /// <summary>
     /// Version of Correctives mapped to ARKit blend shapes,
     /// via "custom" mapping.
     /// </summary>
-    public class ARKitFace : CorrectivesFace
+    public class ARKitFace : CorrectivesFace, ISerializationCallbackReceiver
     {
         private static (string, OVRFaceExpressions.FaceExpression)[] ARKitBlendshapesSorted =
             {
@@ -79,6 +81,20 @@ namespace Oculus.Movement.Tracking
                 arKitFaceExpressions[i] = ARKitBlendshapesSorted[i].Item2;
             }
             return (arKitBlendShapeNames, arKitFaceExpressions);
+        }
+
+        public void OnBeforeSerialize()
+        {
+            if (RetargetingValue != RetargetingType.Custom)
+            {
+                Debug.LogError($"Please use {nameof(RetargetingType.Custom)} with ARKitFace; " +
+                    $"other values will not work. Reverting change.");
+                RetargetingValue = RetargetingType.Custom;
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
         }
     }
 }

@@ -1,7 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using Oculus.Interaction;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.Jobs;
+using static Oculus.Movement.Utils.JobCommons;
 
 namespace Oculus.Movement.AnimationRigging.Utils
 {
@@ -39,6 +44,10 @@ namespace Oculus.Movement.AnimationRigging.Utils
             /// </summary>
             public void Update()
             {
+                if (DrivenTransform == null)
+                {
+                    return;
+                }
                 DrivenTransform.SetPositionAndRotation(
                     SourceTransform.position,
                     SourceTransform.rotation);
@@ -79,8 +88,19 @@ namespace Oculus.Movement.AnimationRigging.Utils
         /// </summary>
         public int ProxyChangeCount { get; private set; } = 0;
 
+        /// <summary>
+        /// Whether to C# jobs or not.
+        /// </summary>
+        public bool UseJobs { get; set; }
+
         private const string _PROXY_CONTAINER_NAME = "ProxyBones-";
         private const string _PROXY_NAME_PREFIX = "Proxy-Bone-";
+
+        private TransformAccessArray _drivenTransformsArray;
+        private TransformAccessArray _sourceTransformsArray;
+        private NativeArray<Pose> _sourcesPoses;
+        private GetPosesJob _getPosesJob;
+        private WritePosesToTransformsJob _writePosesToTransformsJob;
 
         /// <summary>
         /// Updates the state of the proxies using the skeletal
@@ -96,7 +116,14 @@ namespace Oculus.Movement.AnimationRigging.Utils
 
             ValidateProxySourceTransforms(bones);
 
-            UpdateProxyTransforms(bones);
+            if (UseJobs)
+            {
+                UpdateProxyTransformsJob();
+            }
+            else
+            {
+                UpdateProxyTransforms(bones);
+            }
         }
 
         private void ReallocateProxiesIfBoneIdsHaveChanged(IList<OVRBone> bones,
@@ -129,7 +156,50 @@ namespace Oculus.Movement.AnimationRigging.Utils
                     new ProxyTransform(drivenTransform,
                         originalBone.Transform, originalBone.Id);
             }
+
+            AllocateJobData();
+
             ProxyChangeCount++;
+        }
+
+        private void AllocateJobData()
+        {
+            if (_drivenTransformsArray.isCreated)
+            {
+                _drivenTransformsArray.Dispose();
+            }
+            if (_sourceTransformsArray.isCreated)
+            {
+                _sourceTransformsArray.Dispose();
+            }
+            int numBones = _proxyTransforms.Length;
+            Transform[] drivenTransforms = new Transform[numBones];
+            Transform[] sourceTransforms = new Transform[numBones];
+            for (int boneIndex = 0; boneIndex < numBones; boneIndex++)
+            {
+                drivenTransforms[boneIndex] = _proxyTransforms[boneIndex].DrivenTransform;
+                sourceTransforms[boneIndex] = _proxyTransforms[boneIndex].SourceTransform;
+            }
+            _drivenTransformsArray = new TransformAccessArray(drivenTransforms);
+            _sourceTransformsArray = new TransformAccessArray(sourceTransforms);
+            if (_sourcesPoses.IsCreated)
+            {
+                _sourcesPoses.Dispose();
+            }
+            _sourcesPoses = new NativeArray<Pose>(_proxyTransforms.Length, Allocator.Persistent);
+            for (int i = 0; i < _sourcesPoses.Length; i++)
+            {
+                _sourcesPoses[i] = _proxyTransforms[i].SourceTransform.GetPose();
+            }
+
+            _getPosesJob = new GetPosesJob()
+            {
+                Poses = _sourcesPoses
+            };
+            _writePosesToTransformsJob = new WritePosesToTransformsJob()
+            {
+                SourcePoses = _sourcesPoses
+            };
         }
 
         private bool BoneIdsChanged(IList<OVRBone> bones)
@@ -156,7 +226,7 @@ namespace Oculus.Movement.AnimationRigging.Utils
 
         private void CleanUpOldProxyTransforms()
         {
-            if (_proxyTransforms == null  || _proxyTransforms.Length == 0)
+            if (_proxyTransforms == null || _proxyTransforms.Length == 0)
             {
                 return;
             }
@@ -196,6 +266,37 @@ namespace Oculus.Movement.AnimationRigging.Utils
             for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
             {
                 _proxyTransforms[boneIndex].Update();
+            }
+        }
+
+        private void UpdateProxyTransformsJob()
+        {
+            if (_proxyTransforms == null)
+            {
+                return;
+            }
+
+            JobHandle posesJobHandle = _getPosesJob.ScheduleReadOnly(_sourceTransformsArray, 32);
+            JobHandle jobHandle = _writePosesToTransformsJob.Schedule(_drivenTransformsArray, posesJobHandle);
+            jobHandle.Complete();
+        }
+
+        /// <summary>
+        /// Cleans up anything that needs to be manually deallocated.
+        /// </summary>
+        public void CleanUp()
+        {
+            if (_drivenTransformsArray.isCreated)
+            {
+                _drivenTransformsArray.Dispose();
+            }
+            if (_sourceTransformsArray.isCreated)
+            {
+                _sourceTransformsArray.Dispose();
+            }
+            if (_sourcesPoses.IsCreated)
+            {
+                _sourcesPoses.Dispose();
             }
         }
     }

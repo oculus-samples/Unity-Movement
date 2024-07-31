@@ -90,11 +90,14 @@ namespace Oculus.Movement.Utils
         /// </summary>
         /// <param name="animator">Animator component.</param>
         /// <param name="retargetingLayer">Retargeting layer component to change adjustments of.</param>
+        /// <param name="restPoseHumanoid">Optional humanoid rest pose asset used for adjustment calculation.</param>
         public static void AddJointAdjustments(
             Animator animator,
-            RetargetingLayer retargetingLayer)
+            RetargetingLayer retargetingLayer,
+            RestPoseObjectHumanoid restPoseHumanoid = null)
         {
-            var restPoseObject = GetRestPoseObject(CheckIfTPose(animator));
+            var restPoseObject = restPoseHumanoid == null ? GetRestPoseObject(CheckIfTPose(animator)) :
+                restPoseHumanoid;
             if (restPoseObject == null)
             {
                 Debug.LogError($"Cannot compute adjustments because asset {_HUMANOID_REFERENCE_POSE_ASSET_NAME} " +
@@ -191,36 +194,31 @@ namespace Oculus.Movement.Utils
             bool isFullBody,
             bool runtimeInvocation = false)
         {
+            // Delete retargeting layer so that new one computes offsets.
             RetargetingLayer retargetingLayer = mainParent.GetComponent<RetargetingLayer>();
-
-            // Check for old retargeting layer first.
-            RetargetingLayer baseRetargetingLayer = mainParent.GetComponent<RetargetingLayer>();
-            if (retargetingLayer == null && baseRetargetingLayer != null)
+            if (retargetingLayer != null)
             {
 #if UNITY_EDITOR
                 if (!runtimeInvocation)
                 {
-                    Undo.DestroyObjectImmediate(baseRetargetingLayer);
+                    Undo.DestroyObjectImmediate(retargetingLayer);
                 }
                 else
                 {
-                    GameObject.DestroyImmediate(baseRetargetingLayer);
+                    GameObject.DestroyImmediate(retargetingLayer);
                 }
 #else
-                GameObject.DestroyImmediate(baseRetargetingLayer);
+                GameObject.DestroyImmediate(retargetingLayer);
 #endif
             }
 
-            if (!retargetingLayer)
-            {
-                retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
+            retargetingLayer = mainParent.AddComponent<RetargetingLayer>();
 #if UNITY_EDITOR
-                if (!runtimeInvocation)
-                {
-                    Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
-                }
-#endif
+            if (!runtimeInvocation)
+            {
+                Undo.RegisterCreatedObjectUndo(retargetingLayer, "Add Retargeting Layer");
             }
+#endif
 
             if (isFullBody)
             {
@@ -298,7 +296,6 @@ namespace Oculus.Movement.Utils
                     OVRPlugin.BodyJointSet.FullBody : OVRPlugin.BodyJointSet.UpperBody);
 
             retargetingLayer.EnableTrackingByProxy = true;
-            retargetingLayer.UpdateBonePairMappings();
 #if UNITY_EDITOR
             if (!runtimeInvocation)
             {
@@ -508,73 +505,6 @@ namespace Oculus.Movement.Utils
             return retargetConstraint;
         }
 
-
-        /// <summary>
-        /// Add the blend hand retargeting processor.
-        /// </summary>
-        /// <param name="retargetingLayer">The retargeting layer to add to.</param>
-        /// <param name="handedness">The handedness of the processor.</param>
-        /// <param name="runtimeInvocation">If activated from runtime code. We want to possibly
-        /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
-        public static void AddBlendHandRetargetingProcessor(
-            RetargetingLayer retargetingLayer,
-            Handedness handedness,
-            bool runtimeInvocation = false)
-        {
-            bool needCorrectHand = true;
-            foreach (var processor in retargetingLayer.RetargetingProcessors)
-            {
-                var blendHandProcessor = processor as RetargetingBlendHandProcessor;
-                if (blendHandProcessor != null)
-                {
-                    if (blendHandProcessor.GetHandedness() == handedness)
-                    {
-                        needCorrectHand = false;
-                    }
-                }
-            }
-
-            if (!needCorrectHand)
-            {
-                return;
-            }
-
-            bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
-            var blendHand = ScriptableObject.CreateInstance<RetargetingBlendHandProcessor>();
-            var handednessString = handedness == Handedness.Left ? "Left" : "Right";
-#if UNITY_EDITOR
-            if (!runtimeInvocation)
-            {
-                Undo.RegisterCreatedObjectUndo(blendHand, $"Create ({handednessString}) blend hand.");
-                Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
-            }
-#endif
-            blendHand.BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-            blendHand.IsFullBody = isFullBody;
-            if (isFullBody)
-            {
-                blendHand.FullBodyBoneIdToTest = handedness == Handedness.Left ?
-                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist :
-                    OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
-            }
-            else
-            {
-                blendHand.BoneIdToTest = handedness == Handedness.Left ?
-                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist :
-                    OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
-            }
-            blendHand.name = $"Blend{handednessString}Hand";
-            // Add processor at beginning so that it runs before other processors.
-            if (retargetingLayer.RetargetingProcessors.Count > 0)
-            {
-                retargetingLayer.RetargetingProcessors.Insert(0, blendHand);
-            }
-            else
-            {
-                retargetingLayer.AddRetargetingProcessor(blendHand);
-            }
-        }
-
         /// <summary>
         /// Destroys legacy components on GameObject if they exist.
         /// </summary>
@@ -589,10 +519,12 @@ namespace Oculus.Movement.Utils
             DestroyTargetTransform(rigObject, "LeftArmIK", false);
             DestroyTargetTransform(rigObject, "RightArmIK", false);
             DestroyLegacyComponents<BlendHandConstraints>(gameObject);
+            DestroyLegacyComponents<BlendHandConstraintsFullBody>(gameObject);
             DestroyLegacyComponents<RetargetedBoneTargets>(gameObject);
             DestroyLegacyComponents<AnimationRigSetup>(gameObject);
             DestroyLegacyComponents<FullBodyHandDeformation>(gameObject);
             DestroyLegacyProcessor<RetargetingHandDeformationProcessor>(gameObject);
+            DestroyLegacyProcessor<RetargetingBlendHandProcessor>(gameObject);
         }
 
         /// <summary>
@@ -802,7 +734,9 @@ namespace Oculus.Movement.Utils
             }
 #endif
             retargetingProcessorCorrectBones.name = "CorrectBones";
+            retargetingProcessorCorrectBones.ProcessorType = IRetargetingProcessor.RetargetingProcessorType.Jobs;
             retargetingProcessorCorrectBones.FingerPositionCorrectionWeight = 0.0f;
+            retargetingProcessorCorrectBones.ShoulderCorrectionWeightLateUpdate = 0.0f;
             retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectBones);
         }
 
@@ -815,40 +749,75 @@ namespace Oculus.Movement.Utils
         /// support one-click during playmode, so we can't necessarily use Application.isPlaying.</param>
         public static void AddCorrectHandRetargetingProcessor(
             RetargetingLayer retargetingLayer,
-            Handedness handedness,
             bool runtimeInvocation = false)
         {
-            bool needCorrectHand = true;
+            RetargetingProcessorCorrectHand correctHandProcessor = null;
+            int correctHandProcessorCount = 0;
             foreach (var processor in retargetingLayer.RetargetingProcessors)
             {
                 var correctHand = processor as RetargetingProcessorCorrectHand;
                 if (correctHand != null)
                 {
-                    if (correctHand.Handedness == handedness)
-                    {
-                        needCorrectHand = false;
-                    }
+                    correctHandProcessorCount++;
+                    correctHandProcessor = correctHand;
                 }
             }
 
-            if (!needCorrectHand)
+            // If there is more than 1 correct hand processor, remove them.
+            if (correctHandProcessorCount > 1)
             {
+                DestroyLegacyProcessor<RetargetingProcessorCorrectHand>(retargetingLayer.gameObject);
+                correctHandProcessorCount = 0;
+            }
+            if (correctHandProcessorCount > 0)
+            {
+                if (correctHandProcessor != null)
+                {
+                    correctHandProcessor.LeftHandProcessor.FullBodySecondBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftArmLower;
+                    correctHandProcessor.LeftHandProcessor.FullBodyBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
+                    correctHandProcessor.LeftHandProcessor.BoneIdToTest =
+                        OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+
+                    correctHandProcessor.RightHandProcessor.FullBodySecondBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightArmLower;
+                    correctHandProcessor.RightHandProcessor.FullBodyBoneIdToTest =
+                        OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
+                    correctHandProcessor.RightHandProcessor.BoneIdToTest =
+                        OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
+                }
                 return;
             }
 
             var retargetingProcessorCorrectHand = ScriptableObject.CreateInstance<RetargetingProcessorCorrectHand>();
-            var handednessString = handedness == Handedness.Left ?
-                _LEFT_HANDEDNESS_STRING : _RIGHT_HANDEDNESS_STRING;
 #if UNITY_EDITOR
             if (!runtimeInvocation)
             {
-                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand ({handednessString}) retargeting processor.");
+                Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand retargeting processor.");
                 Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
             }
 #endif
-            retargetingProcessorCorrectHand.Handedness = handedness;
+            bool isFullBody = retargetingLayer.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
             retargetingProcessorCorrectHand.HandIKType = RetargetingProcessorCorrectHand.IKType.CCDIK;
-            retargetingProcessorCorrectHand.name = $"Correct{handednessString}Hand";
+            retargetingProcessorCorrectHand.name = "CorrectHand";
+            retargetingProcessorCorrectHand.LeftHandProcessor = new RetargetingProcessorCorrectHand.HandProcessor();
+            retargetingProcessorCorrectHand.RightHandProcessor = new RetargetingProcessorCorrectHand.HandProcessor();
+            retargetingProcessorCorrectHand.LeftHandProcessor.FullBodySecondBoneIdToTest =
+                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftArmLower;
+            retargetingProcessorCorrectHand.LeftHandProcessor.FullBodyBoneIdToTest =
+                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_LeftHandWrist;
+            retargetingProcessorCorrectHand.LeftHandProcessor.BoneIdToTest =
+                OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_LeftHandWrist;
+            retargetingProcessorCorrectHand.RightHandProcessor.FullBodySecondBoneIdToTest =
+                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightArmLower;
+            retargetingProcessorCorrectHand.RightHandProcessor.FullBodyBoneIdToTest =
+                OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_RightHandWrist;
+            retargetingProcessorCorrectHand.RightHandProcessor.BoneIdToTest =
+                OVRHumanBodyBonesMappings.BodyTrackingBoneId.Body_RightHandWrist;
+            retargetingProcessorCorrectHand.BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            retargetingProcessorCorrectHand.IsFullBody = isFullBody;
+
             retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectHand);
         }
 

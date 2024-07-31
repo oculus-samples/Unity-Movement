@@ -39,10 +39,10 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// Object to duplicate and scale for each bone
         /// </summary>
         [Tooltip(BodyPoseBoneVisualsTooltips.BoneVisualPrefab)]
-        [ContextMenuItem(nameof(CreatePrimitiveCubeVisualPrefab),nameof(CreatePrimitiveCubeVisualPrefab))]
+        [ContextMenuItem(nameof(CreatePrimitiveCubeVisualPrefab), nameof(CreatePrimitiveCubeVisualPrefab))]
         [SerializeField]
         protected GameObject _boneVisualPrefab;
-        
+
         /// <summary>
         /// Bone Thickness to Bone Length ratio; smaller value makes thinner bones
         /// </summary>
@@ -54,21 +54,21 @@ namespace Oculus.Movement.BodyTrackingForFitness
         /// Bone visuals objects that are children of <see cref="BodyPoseBoneVisuals.Skeleton"/>
         /// </summary>
         [Tooltip(BodyPoseBoneVisualsTooltips.ChildVisuals)]
-        [ContextMenuItem(nameof(RefreshVisualsInEditor),nameof(RefreshVisualsInEditor))]
-        [ContextMenuItem(nameof(ClearBoneVisuals),nameof(ClearBoneVisuals))]
-        [ContextMenuItem(nameof(SelectBoneVisuals),nameof(SelectBoneVisuals))]
-        [EnumNamedArray (typeof(BodyJointId))]
+        [ContextMenuItem(nameof(RefreshVisualsInEditor), nameof(RefreshVisualsInEditor))]
+        [ContextMenuItem(nameof(ClearBoneVisuals), nameof(ClearBoneVisuals))]
+        [ContextMenuItem(nameof(SelectBoneVisuals), nameof(SelectBoneVisuals))]
+        [EnumNamedArray(typeof(BodyJointId))]
         [SerializeField]
         protected private List<Transform> _childVisuals = new List<Transform>();
-        
+
         private const string BoneTransformPrefix = "B.";
 
         /// <inheritdoc cref="_skeletonTransforms"/>
         public BodyPoseBoneTransforms Skeleton
         {
-            get => _skeletonTransforms ;
+            get => _skeletonTransforms;
             set => _skeletonTransforms = value;
-        } 
+        }
 
         /// <inheritdoc cref="_boneVisualPrefab"/>
         public GameObject BoneVisualPrefab
@@ -87,7 +87,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
                 CreatePrimitiveCubeVisualPrefab();
             }
         }
-        
+
         private void OnEnable()
         {
             Skeleton.AddListener(RefreshVisuals);
@@ -111,7 +111,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
             for (int i = 0; i < _childVisuals.Count; ++i)
             {
                 Transform child = _childVisuals[i];
-                if (child == null){
+                if (child == null)
+                {
                     continue;
                 }
                 DestroyImmediate(child.gameObject);
@@ -239,7 +240,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
                 isBoneValid = Skeleton.GetJointPoseFromRoot((BodyJointId)targetId, out Pose target);
                 boneLength = isBoneValid ? Vector3.Distance(pose.position, target.position) : 0;
                 hasBoneTarget = true;
-            } else if (targetId < 0 && isBoneValid)
+            }
+            else if (targetId < 0 && isBoneValid)
             {
                 int pId = FullBodySkeletonTPose.TPose.GetParent(boneId);
                 isBoneValid = Skeleton.GetJointPoseFromRoot((BodyJointId)pId, out Pose parent);
@@ -309,8 +311,8 @@ namespace Oculus.Movement.BodyTrackingForFitness
             UnityEditor.Selection.objects = objects.ToArray();
         }
 #else
-        public void RefreshVisualsInEditor() {}
-        public void SelectBoneVisuals() {}
+        public void RefreshVisualsInEditor() { }
+        public void SelectBoneVisuals() { }
 #endif
     }
 }

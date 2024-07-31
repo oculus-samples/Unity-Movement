@@ -119,7 +119,7 @@ namespace Oculus.Movement.AnimationRigging
             set => _isFullBody = value;
         }
 
-        private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
+        private RetargetingProcessorCorrectHand.HandProcessor _retargetingProcessorCorrectHand;
         private Transform _cachedTransform;
         private Transform _cachedHeadTransform;
         private Transform _ovrCameraRigHead;
@@ -157,13 +157,13 @@ namespace Oculus.Movement.AnimationRigging
                 var correctHandProcessor = retargetingProcessor as RetargetingProcessorCorrectHand;
                 if (correctHandProcessor != null)
                 {
-                    if (correctHandProcessor.Handedness == Handedness.Left && IsLeftSideOfBody())
+                    if (IsLeftSideOfBody())
                     {
-                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                        _retargetingProcessorCorrectHand = correctHandProcessor.LeftHandProcessor;
                     }
-                    else if (correctHandProcessor.Handedness == Handedness.Right && !IsLeftSideOfBody())
+                    else if (!IsLeftSideOfBody())
                     {
-                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                        _retargetingProcessorCorrectHand = correctHandProcessor.RightHandProcessor;
                     }
                     if (!foundOurProcessor)
                     {
@@ -206,7 +206,7 @@ namespace Oculus.Movement.AnimationRigging
 
             if (_retargetingProcessorCorrectHand != null)
             {
-                _retargetingProcessorCorrectHand.Weight = blendWeight;
+                _retargetingProcessorCorrectHand.HandIKWeight = blendWeight;
             }
         }
 

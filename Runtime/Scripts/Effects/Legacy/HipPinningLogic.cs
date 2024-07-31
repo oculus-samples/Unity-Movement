@@ -553,7 +553,7 @@ namespace Oculus.Movement.Effects.Deprecated
             }
 
             constrainedHipEulerY =
-                Mathf.Clamp(constrainedHipEulerY,  negativeRotationLimitY, positiveRotationLimitY);
+                Mathf.Clamp(constrainedHipEulerY, negativeRotationLimitY, positiveRotationLimitY);
 
             return constrainedHipEulerY;
         }

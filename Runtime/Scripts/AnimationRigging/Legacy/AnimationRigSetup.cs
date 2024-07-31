@@ -132,7 +132,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
         public bool CheckSkeletalUpdatesByProxy
         {
             get { return _checkSkeletalUpdatesByProxy; }
-            set { _checkSkeletalUpdatesByProxy = value;  }
+            set { _checkSkeletalUpdatesByProxy = value; }
         }
 
         private bool _ranSetup;
@@ -159,7 +159,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
                 var oldConstraints = _ovrSkeletonConstraints;
                 _ovrSkeletonConstraints =
                     new MonoBehaviour[oldConstraints.Length + 1];
-                for(int i = 0; i < oldConstraints.Length; i++)
+                for (int i = 0; i < oldConstraints.Length; i++)
                 {
                     _ovrSkeletonConstraints[i] = oldConstraints[i];
                 }

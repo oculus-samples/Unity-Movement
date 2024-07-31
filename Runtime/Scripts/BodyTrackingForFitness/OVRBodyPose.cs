@@ -16,7 +16,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
     public class OVRBodyPose : OVRBody, IBodyPose, IBody, ISkeletonMapping
     {
         /// <summary>
-        /// How many frames have been processed by this body pose reader 
+        /// How many frames have been processed by this body pose reader
         /// </summary>
         private int _iterationNumber;
 
@@ -25,7 +25,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
 
         /// <inheritdoc cref="IBody.IsConnected"/>
         public bool IsConnected => BodyState != null;
-        
+
         /// <inheritdoc cref="IBody.IsHighConfidence"/>
         public bool IsHighConfidence => BodyState != null && BodyState.Value.Confidence > 0.5f;
 
@@ -45,7 +45,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
 
         /// <inheritdoc cref="IBody.WhenBodyUpdated"/>
         public event Action WhenBodyUpdated = delegate { };
-        
+
         /// <inheritdoc cref="IBodyPose.WhenBodyPoseUpdated"/>
         public event Action WhenBodyPoseUpdated = delegate { };
 
@@ -122,7 +122,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         {
             WhenBodyUpdated.Invoke();
             WhenBodyPoseUpdated.Invoke();
-            ++_iterationNumber;                    
+            ++_iterationNumber;
         }
     }
 }

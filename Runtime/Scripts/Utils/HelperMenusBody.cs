@@ -1,6 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Interaction.Input;
 using Oculus.Movement.AnimationRigging;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace Oculus.Movement.Utils
     /// Provides useful menus to help one set up body tracking technologies
     /// on characters.
     /// </summary>
-    internal static class HelperMenusBody
+    public static class HelperMenusBody
     {
 #if UNITY_EDITOR
         private const string _MOVEMENT_SAMPLES_BT_MENU =
@@ -33,6 +32,7 @@ namespace Oculus.Movement.Utils
             foreach (var activeGameObject in UnityEditor.Selection.gameObjects)
             {
                 var animator = activeGameObject.GetComponent<Animator>();
+                AnimationUtilities.UpdateToAnimatorPose(animator, false);
                 var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
                 SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, true);
             }
@@ -45,6 +45,7 @@ namespace Oculus.Movement.Utils
             foreach (var activeGameObject in UnityEditor.Selection.gameObjects)
             {
                 var animator = activeGameObject.GetComponent<Animator>();
+                AnimationUtilities.UpdateToAnimatorPose(animator, false);
                 var restPoseObjectHumanoid = AddComponentsHelper.GetRestPoseObject(AddComponentsHelper.CheckIfTPose(animator));
                 SetupCharacterForAnimationRiggingRetargetingConstraints(activeGameObject, restPoseObjectHumanoid, true, false);
             }
@@ -82,7 +83,7 @@ namespace Oculus.Movement.Utils
                     UnityEditor.EditorUtility.DisplayDialog("Retargeting setup error.", e.Message, "Ok");
                 }
 #else
-                    Debug.LogError("Retargeting setup error.");
+                Debug.LogError("Retargeting setup error.");
 #endif
                 return;
             }
@@ -92,16 +93,15 @@ namespace Oculus.Movement.Utils
                 UnityEditor.Undo.IncrementCurrentGroup();
             }
 #endif
-
             // Store the previous transform data.
             var previousPositionAndRotation =
                 new AffineTransform(activeGameObject.transform.position, activeGameObject.transform.rotation);
+            Animator animatorComp = activeGameObject.GetComponentInChildren<Animator>(true);
 
             // Bring the object to root so that the auto adjustments calculations are correct.
             activeGameObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
             // Add the retargeting and body tracking components at root first.
-            Animator animatorComp = activeGameObject.GetComponentInChildren<Animator>(true);
             RetargetingLayer retargetingLayer =
                 AddComponentsHelper.AddMainRetargetingComponent(activeGameObject, isFullBody, runtimeInvocation);
 
@@ -133,11 +133,8 @@ namespace Oculus.Movement.Utils
 #endif
 
             // Add retargeting processors to the retargeting layer.
-            AddComponentsHelper.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Left);
-            AddComponentsHelper.AddBlendHandRetargetingProcessor(retargetingLayer, Handedness.Right);
             AddComponentsHelper.AddCorrectBonesRetargetingProcessor(retargetingLayer);
-            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Left);
-            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer, Handedness.Right);
+            AddComponentsHelper.AddCorrectHandRetargetingProcessor(retargetingLayer);
 
             // Body deformation.
             if (addConstraints)
@@ -155,8 +152,23 @@ namespace Oculus.Movement.Utils
                 AddComponentsHelper.SetupExternalBoneTargets(retargetingLayer, isFullBody, boneTargets);
             }
 
+            if (ShouldCorrectFingers(animatorComp, restPoseObjectHumanoid))
+            {
+                foreach (var retargetingProcessor in retargetingLayer.RetargetingProcessors)
+                {
+                    var correctBones = retargetingProcessor as RetargetingProcessorCorrectBones;
+                    if (correctBones != null)
+                    {
+                        correctBones.FingerPositionCorrectionWeight = 1.0f;
+                    }
+                }
+            }
+
+            // Update bone pair mappings.
+            retargetingLayer.UpdateBonePairMappings();
+
             // Add joint adjustments.
-            AddComponentsHelper.AddJointAdjustments(animatorComp, retargetingLayer);
+            AddComponentsHelper.AddJointAdjustments(animatorComp, retargetingLayer, restPoseObjectHumanoid);
 
 #if UNITY_EDITOR
             if (!runtimeInvocation)
@@ -202,7 +214,7 @@ namespace Oculus.Movement.Utils
                         $"Deformation Constraint Transform Init");
                 }
 #else
-                    deformationConstraint.transform.SetParent(rigObject.transform);
+                deformationConstraint.transform.SetParent(rigObject.transform);
 #endif
                 deformationConstraintObject.transform.localPosition = Vector3.zero;
                 deformationConstraintObject.transform.localRotation = Quaternion.identity;
@@ -289,6 +301,49 @@ namespace Oculus.Movement.Utils
             }
 #endif
             return deformationConstraint;
+        }
+
+        private static bool ShouldCorrectFingers(Animator animator, RestPoseObjectHumanoid restPoseObjectHumanoid)
+        {
+            var hand = HumanBodyBones.LeftHand;
+            var fingers = new[]
+            {
+                HumanBodyBones.LeftThumbDistal,
+                HumanBodyBones.LeftIndexDistal,
+                HumanBodyBones.LeftMiddleDistal,
+                HumanBodyBones.LeftRingDistal,
+                HumanBodyBones.LeftLittleDistal
+            };
+            var approximateSourceHandSize = 0.0f;
+            var approximateTargetHandSize = 0.0f;
+            var sourceWristBonePosition = restPoseObjectHumanoid.GetBonePoseData(hand).WorldPose.position;
+            var targetWristBonePosition = animator.GetBoneTransform(hand).position;
+            var validFingers = 0;
+            foreach (var finger in fingers)
+            {
+                var fingerBone = animator.GetBoneTransform(finger);
+                if (fingerBone != null)
+                {
+                    approximateSourceHandSize += Vector3.Distance(sourceWristBonePosition,
+                        restPoseObjectHumanoid.GetBonePoseData(finger).WorldPose.position);
+                    approximateTargetHandSize += Vector3.Distance(targetWristBonePosition, fingerBone.position);
+                    validFingers++;
+                }
+            }
+
+            // If no fingers to check against, we don't want finger positional accuracy.
+            if (validFingers == 0)
+            {
+                return false;
+            }
+            approximateSourceHandSize /= validFingers;
+            approximateTargetHandSize /= validFingers;
+
+            // Check if the sizes are within 10% of each other.
+            var threshold = 0.1f;
+            var maxDifference = Mathf.Max(approximateSourceHandSize, approximateTargetHandSize) * threshold;
+            var difference = Mathf.Abs(approximateSourceHandSize - approximateTargetHandSize);
+            return difference <= maxDifference;
         }
     }
 }

@@ -143,8 +143,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
         private IRigConstraint[] _iRigConstraints;
         private Transform _cachedTransform;
         private float _cachedConstraintWeight;
-        private RetargetingProcessorCorrectBones _retargetingProcessorCorrectBones;
-        private RetargetingProcessorCorrectHand _retargetingProcessorCorrectHand;
+        private RetargetingProcessorCorrectHand.HandProcessor _retargetingProcessorCorrectHand;
 
         /// <summary>
         /// Adds constraint. Valid for use via editor scripts only.
@@ -210,22 +209,16 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
 
             foreach (var retargetingProcessor in _retargetingLayer.RetargetingProcessors)
             {
-                var correctBonesProcessor = retargetingProcessor as RetargetingProcessorCorrectBones;
-                if (correctBonesProcessor != null)
-                {
-                    _retargetingProcessorCorrectBones = correctBonesProcessor;
-                }
-
                 var correctHandProcessor = retargetingProcessor as RetargetingProcessorCorrectHand;
                 if (correctHandProcessor != null)
                 {
-                    if (correctHandProcessor.Handedness == Handedness.Left && IsLeftSideOfBody())
+                    if (IsLeftSideOfBody())
                     {
-                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                        _retargetingProcessorCorrectHand = correctHandProcessor.LeftHandProcessor;
                     }
-                    else if (correctHandProcessor.Handedness == Handedness.Right && !IsLeftSideOfBody())
+                    else if (!IsLeftSideOfBody())
                     {
-                        _retargetingProcessorCorrectHand = correctHandProcessor;
+                        _retargetingProcessorCorrectHand = correctHandProcessor.RightHandProcessor;
                     }
                 }
             }
@@ -265,7 +258,7 @@ namespace Oculus.Movement.AnimationRigging.Deprecated
 
             if (_retargetingProcessorCorrectHand != null)
             {
-                _retargetingProcessorCorrectHand.Weight = constraintWeight;
+                _retargetingProcessorCorrectHand.HandIKWeight = constraintWeight;
             }
         }
 

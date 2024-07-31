@@ -112,7 +112,7 @@ namespace Oculus.Movement.UI
         {
             var isFullBody = _skeleton.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
             Vector3 hipTranslation = _skeleton.CustomBones[isFullBody ?
-                (int)OVRSkeleton.BoneId.FullBody_Hips : 
+                (int)OVRSkeleton.BoneId.FullBody_Hips :
                 (int)OVRSkeleton.BoneId.Body_Hips].localPosition;
             var mainChairTransform = _mainHipPinningTargetRenderer.transform;
             mainChairTransform.localPosition =

@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-using Oculus.Movement.Utils;
+using System;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -112,6 +113,7 @@ namespace Oculus.Movement.AnimationRigging
         private SerializedProperty _rightToesWeightProperty;
         private SerializedProperty _squashProperty;
         private SerializedProperty _stretchProperty;
+        private SerializedProperty _armLengthMultiplierProperty;
         private SerializedProperty _originalSpinePositionsWeight;
         private SerializedProperty _originalSpineBoneCount;
         private SerializedProperty _originalSpineUseHipsToHeadToScale;
@@ -165,6 +167,7 @@ namespace Oculus.Movement.AnimationRigging
             _alignFeetWeightProperty = data.FindPropertyRelative("_alignFeetWeight");
             _squashProperty = data.FindPropertyRelative("_squashLimit");
             _stretchProperty = data.FindPropertyRelative("_stretchLimit");
+            _armLengthMultiplierProperty = data.FindPropertyRelative("_armLengthMultiplier");
             _originalSpinePositionsWeight = data.FindPropertyRelative("_originalSpinePositionsWeight");
             _originalSpineBoneCount = data.FindPropertyRelative("_originalSpineBoneCount");
             _originalSpineUseHipsToHeadToScale = data.FindPropertyRelative("_originalSpineUseHipsToHeadToScale");
@@ -246,38 +249,69 @@ namespace Oculus.Movement.AnimationRigging
                 var rigBuilder = constraint.GetComponentInParent<RigBuilder>();
                 rigBuilder.Build();
             }
+            if (GUILayout.Button("Save to JSON"))
+            {
+                SaveToJSON(constraint);
+            }
+            if (GUILayout.Button("Read from JSON"))
+            {
+                ReadFromJSON(constraint);
+            }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void SaveToJSON(FullBodyDeformationConstraint constraint)
+        {
+            try
+            {
+                var jsonPath = EditorUtility.SaveFilePanel(
+                    "Save configuration into JSON",
+                    Application.dataPath,
+                    "",
+                    "json");
+                if (String.IsNullOrEmpty(jsonPath))
+                {
+                    return;
+                }
+                var jsonResult = JsonUtility.ToJson(constraint, true);
+                File.WriteAllText(jsonPath, jsonResult);
+                Debug.Log($"Wrote JSON config to path {jsonPath}.");
+                AssetDatabase.Refresh();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Could not save deformation to JSON, exception: {exception}");
+            }
+        }
+
+        private void ReadFromJSON(FullBodyDeformationConstraint constraint)
+        {
+            try
+            {
+                var jsonPath = EditorUtility.OpenFilePanel(
+                    "Load configuration from JSON",
+                    Application.dataPath,
+                    "json");
+                if (String.IsNullOrEmpty(jsonPath))
+                {
+                    return;
+                }
+                Undo.RecordObject(constraint, "Read and calculate bone data");
+                constraint.ReadJSONConfigFromFile(jsonPath);
+                EditorUtility.SetDirty(target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Could not read deformation from JSON, exception: {exception}");
+            }
         }
 
         private void DisplayCalculateBoneData(FullBodyDeformationConstraint constraint)
         {
             Undo.RecordObject(constraint, "Calculate bone data");
-            var constraintData = constraint.data;
-            var skeleton = constraint.GetComponentInParent<OVRCustomSkeleton>();
-            var animator = constraint.GetComponentInParent<Animator>();
-            if (skeleton != null)
-            {
-                constraintData.AssignOVRCustomSkeleton(skeleton);
-            }
-            else
-            {
-                constraintData.AssignAnimator(animator);
-            }
-            // Determine if this character is in T-pose or A-pose.
-            var isTPose = AddComponentsHelper.CheckIfTPose(animator);
-
-            constraintData.InitializeStartingScale();
-            constraintData.ClearTransformData();
-            constraintData.SetUpLeftArmData();
-            constraintData.SetUpRightArmData();
-            constraintData.SetUpLeftLegData();
-            constraintData.SetUpRightLegData();
-            constraintData.SetUpHipsAndHeadBones();
-            constraintData.SetUpBonePairs();
-            constraintData.SetUpBoneTargets(constraint.transform);
-            constraintData.SetUpAdjustments(AddComponentsHelper.GetRestPoseObject(isTPose));
-            constraint.data = constraintData;
+            constraint.CalculateBoneData();
             EditorUtility.SetDirty(target);
             PrefabUtility.RecordPrefabInstancePropertyModifications(target);
         }
@@ -326,6 +360,7 @@ namespace Oculus.Movement.AnimationRigging
                 new[] { _leftArmWeightProperty, _rightArmWeightProperty });
             AverageWeightSlider(Content.HandsWeight,
                 new[] { _leftHandWeightProperty, _rightHandWeightProperty });
+            EditorGUILayout.PropertyField(_armLengthMultiplierProperty);
 
             if (!_isFullBody)
             {

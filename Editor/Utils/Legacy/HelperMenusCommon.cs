@@ -800,10 +800,7 @@ namespace Oculus.Movement.Utils.Legacy
                 var correctHand = processor as RetargetingProcessorCorrectHand;
                 if (correctHand != null)
                 {
-                    if (correctHand.Handedness == handedness)
-                    {
-                        needCorrectHand = false;
-                    }
+                    needCorrectHand = false;
                 }
             }
 
@@ -817,7 +814,6 @@ namespace Oculus.Movement.Utils.Legacy
                 _LEFT_HANDEDNESS_STRING : _RIGHT_HANDEDNESS_STRING;
             Undo.RegisterCreatedObjectUndo(retargetingProcessorCorrectHand, $"Create correct hand ({handednessString}) retargeting processor.");
             Undo.RecordObject(retargetingLayer, "Add retargeting processor to retargeting layer.");
-            retargetingProcessorCorrectHand.Handedness = handedness;
             retargetingProcessorCorrectHand.HandIKType = RetargetingProcessorCorrectHand.IKType.CCDIK;
             retargetingProcessorCorrectHand.name = $"Correct{handednessString}Hand";
             retargetingLayer.AddRetargetingProcessor(retargetingProcessorCorrectHand);

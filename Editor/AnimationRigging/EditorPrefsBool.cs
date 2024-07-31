@@ -50,6 +50,6 @@ namespace Oculus.Movement.AnimationRigging
                 _value = initialValue
             };
 
-        private EditorPrefsBool() {}
+        private EditorPrefsBool() { }
     }
 }

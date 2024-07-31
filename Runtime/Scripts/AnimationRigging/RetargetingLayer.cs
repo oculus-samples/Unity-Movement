@@ -4,6 +4,8 @@ using Oculus.Interaction;
 using Oculus.Movement.AnimationRigging.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
@@ -72,7 +74,7 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
-        /// The array of joint position adjustments.
+        /// The array of joint position adjustments. Used by copy pose job.
         /// </summary>
         public JointPositionAdjustment[] JointPositionAdjustments
         {
@@ -220,13 +222,7 @@ namespace Oculus.Movement.AnimationRigging
         {
             base.Awake();
 
-            if (_retargetedBoneMappings.ConvertBonePairsToDictionaries())
-            {
-                BodyBoneMappingsInterface = _retargetedBoneMappings;
-            }
-
-            Assert.IsNotNull(_retargetingAnimationConstraint,
-                "Please assign the retargeting constraint to RetargetingLayer.");
+            _proxyTransformLogic.UseJobs = true;
 
             for (int i = 0; i < _retargetingProcessors.Count; i++)
             {
@@ -252,6 +248,16 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
+        private void OnDestroy()
+        {
+            _proxyTransformLogic.CleanUp();
+            _externalBoneTargets.CleanUp();
+            foreach (var processor in _retargetingProcessors)
+            {
+                processor.CleanUp();
+            }
+        }
+
         /// <summary>
         /// Initialize base class and also any variables required by this class,
         /// such as the positions and rotations of the character joints at rest pose.
@@ -261,13 +267,28 @@ namespace Oculus.Movement.AnimationRigging
             try
             {
                 _lastTrackedScaleRt = transform.lossyScale;
-                // cache any transformation information above hips to make sure upright rest pose is captured.
+                _externalBoneTargets.UseJobs = true;
+                Assert.IsNotNull(_retargetingAnimationConstraint,
+                    "Please assign the retargeting constraint to RetargetingLayer.");
+
+                // Convert bone mappings.
+                if (_retargetedBoneMappings == null)
+                {
+                    UpdateBonePairMappings();
+                }
+                if (_retargetedBoneMappings.ConvertBonePairsToDictionaries())
+                {
+                    BodyBoneMappingsInterface = _retargetedBoneMappings;
+                }
+
+                // Cache any transformation information above hips to make sure upright rest pose is captured.
                 CaptureTransformInformationHipsUpwards(GetComponent<Animator>().GetBoneTransform(HumanBodyBones.Hips));
                 if (_retargetingAnimationRig.RigBuilderComp.enabled)
                 {
                     Debug.LogError("Please disable the rig builder by default or else the animation system " +
                         " will prevent a correct capture of the rest pose.");
                 }
+
                 base.Start();
 
                 ConstructDefaultPoseInformation();
@@ -314,6 +335,37 @@ namespace Oculus.Movement.AnimationRigging
                 _retargetedBoneMappings = new RetargetedBoneMappings();
             }
             _retargetedBoneMappings.UpdateBonePairMappings(this);
+        }
+
+        /// <summary>
+        /// Read JSON config from file and applies it.
+        /// </summary>
+        /// <param name="filePath">File path to read from.</param>
+        public void ReadJSONConfigFromFile(string filePath)
+        {
+            string jsonConfigText = File.ReadAllText(filePath);
+            Debug.Log($"Read JSON config from {jsonConfigText}.");
+            ApplyJSONConfig(jsonConfigText);
+        }
+
+        /// <summary>
+        /// Applies JSON config to file.
+        /// </summary>
+        /// <param name="jsonData">JSON data.</param>
+        public void ApplyJSONConfig(string jsonData)
+        {
+            JsonUtility.FromJsonOverwrite(jsonData, this);
+            UpdateReferences();
+            Debug.Log($"Applied JSON config to {this}.");
+        }
+
+        /// <summary>
+        /// Returns JSON config as string.
+        /// </summary>
+        /// <returns>JSON config as string.</returns>
+        public string GetJSONConfig()
+        {
+            return JsonUtility.ToJson(this, true);
         }
 
         private void ConstructDefaultPoseInformation()
@@ -416,6 +468,44 @@ namespace Oculus.Movement.AnimationRigging
             }
         }
 
+        private void UpdateReferences()
+        {
+            // Update references when loading from a JSON.
+            _retargetingAnimationConstraint = GetComponentInChildren<RetargetingAnimationConstraint>(true);
+            _retargetingAnimationRig.RigBuilderComp = GetComponent<RigBuilder>();
+
+            // Retargeting animation rig.
+            var skeletonConstraints = GetComponentsInChildren<IOVRSkeletonConstraint>(true);
+            var constraintsAsMonoBehaviour = new MonoBehaviour[skeletonConstraints.Length];
+            for (int i = 0; i < skeletonConstraints.Length; i++)
+            {
+                constraintsAsMonoBehaviour[i] = skeletonConstraints[i] as MonoBehaviour;
+            }
+            _retargetingAnimationRig.OVRSkeletonConstraintComps = constraintsAsMonoBehaviour;
+
+            // External bone targets.
+            var bonesToRetargetNames = new Dictionary<BoneId, string>
+            {
+                { BoneId.FullBody_Hips, "HipsTarget" },
+                { BoneId.FullBody_SpineLower, "SpineLowerTarget" },
+                { BoneId.FullBody_SpineUpper, "SpineUpperTarget" },
+                { BoneId.FullBody_Chest, "ChestTarget" },
+                { BoneId.FullBody_Neck, "NeckTarget" },
+                { BoneId.FullBody_Head, "HeadTarget" },
+                { BoneId.FullBody_LeftFootAnkle, "LeftFootTarget" },
+                { BoneId.FullBody_LeftFootBall, "LeftToesTarget" },
+                { BoneId.FullBody_RightFootAnkle, "RightFootTarget" },
+                { BoneId.FullBody_RightFootBall, "RightToesTarget" }
+            };
+            foreach (var boneTarget in _externalBoneTargets.BoneTargetsArray)
+            {
+                if (boneTarget.Target == null)
+                {
+                    boneTarget.Target = transform.FindChildRecursive(bonesToRetargetNames[boneTarget.BoneId]);
+                }
+            }
+        }
+
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
             if (Application.isEditor)
@@ -443,16 +533,20 @@ namespace Oculus.Movement.AnimationRigging
                 // update state tracking variables.
                 _lastTrackedScaleRt = transform.lossyScale;
                 _lastSkelChangeCountRt = SkeletonChangedCount;
+
+                foreach (var processor in _retargetingProcessors)
+                {
+                    processor.RespondToCalibration(this, Bones);
+                }
             }
 
             UpdateBoneDataToArray();
-
-            _externalBoneTargets.ProcessSkeleton(this);
 
             if (_enableTrackingByProxy)
             {
                 _proxyTransformLogic.UpdateState(Bones, transform);
             }
+            _externalBoneTargets.ProcessSkeleton(this);
             _retargetingAnimationRig.UpdateRig(this);
         }
 
@@ -505,9 +599,22 @@ namespace Oculus.Movement.AnimationRigging
                 return;
             }
 
+            _externalBoneTargets.Complete();
+
             foreach (var retargetingProcessor in _retargetingProcessors)
             {
                 retargetingProcessor.PrepareRetargetingProcessor(this, Bones);
+            }
+
+            JobHandle? lastJobHandle = null;
+            foreach (var retargetingProcessor in _retargetingProcessors)
+            {
+                JobHandle newJob = retargetingProcessor.ProcessRetargetingLayerJob(lastJobHandle, this, Bones);
+                lastJobHandle = newJob;
+            }
+            if (lastJobHandle.HasValue && !lastJobHandle.Value.IsCompleted)
+            {
+                lastJobHandle.Value.Complete();
             }
 
             foreach (var retargetingProcessor in _retargetingProcessors)

@@ -125,7 +125,7 @@ namespace Oculus.Movement.Utils
             }
 
             BonePoseData foundPoseData = null;
-            foreach(var bonePoseData in _bonePoseDataArray)
+            foreach (var bonePoseData in _bonePoseDataArray)
             {
                 if (bonePoseData.HumanBone == humanBone)
                 {

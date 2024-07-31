@@ -70,14 +70,14 @@ namespace Oculus.Movement.Locomotion
         /// </summary>
         [Tooltip(StateTransitionTooltips.EnterTime)]
         [SerializeField]
-        protected float _enterTime = 1f/8;
+        protected float _enterTime = 1f / 8;
 
         /// <summary>
         /// Seconds that the <see cref="OnTransitionEvents.Exiting"/> callback will be called.
         /// </summary>
         [Tooltip(StateTransitionTooltips.ExitTime)]
         [SerializeField]
-        protected float _exitTime = 1f/8;
+        protected float _exitTime = 1f / 8;
 
         /// <summary>
         /// Callbacks to trigger at specific points during the transition between states.

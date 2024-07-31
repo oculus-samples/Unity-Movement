@@ -1002,7 +1002,11 @@ namespace Oculus.Movement
             "Weight used for feet alignment.";
 
         public const string OriginalSpinePositionsWeight =
-            "Attempts to match the original spine positions. WARNING:" +
+            "Attempts to match the original spine positions. WARNING: " +
+            " increasing this value might cause inaccuracy wrt to body tracking.";
+
+        public const string ArmLengthMultiplier =
+            "Allows stretching arms. WARNING:" +
             "increasing this value might cause inaccuracy wrt to body tracking.";
 
         public const string OriginalSpineBoneCount =
@@ -1108,6 +1112,36 @@ namespace Oculus.Movement
 
         public const string AvatarMask =
             "The avatar mask for masking the animation.";
+
+        public const string AffectPositions =
+            "Affect positions via the animation.";
+
+        public const string AffectRotations =
+            "Affect rotations via the animation.";
+
+        public const string BonesArrayMask =
+            "Bones to mask by array.";
+
+        public const string FixedHipsPosition =
+            "Allows setting hips to a fixed position.";
+
+        public const string FixedHipsRotation =
+            "Allows setting hips to a fixed rotation.";
+
+        public const string UsedFixedHipsPose =
+            "Used fixed hips pose or not.";
+
+        public const string AffectHipsPositionY =
+            "Affect hips position Y value.";
+
+        public const string AffectHipsRotationX =
+            "Affect hips rotation X value.";
+
+        public const string AffectHipsRotationY =
+            "Affect hips rotation Y value.";
+
+        public const string AffectHipsRotationZ =
+            "Affect hips rotation Z value.";
     }
 
     public static class AnimationRigSetupTooltips
@@ -1290,7 +1324,7 @@ namespace Oculus.Movement
             "Retargeting layer component to get data from.";
 
         public const string AllowDynamicAdjustmentsRuntime =
-            "Allow dynamic adjustments at runtime.";
+            "Allow dynamic adjustments at runtime. Editor-only.";
 
         public const string AvatarMask =
             "Avatar mask to restrict retargeting. While the humanoid retargeter " +
@@ -1344,6 +1378,9 @@ namespace Oculus.Movement
         public const string UseCustomHandTargetPosition =
             "If true, use the custom hand target position for the target position.";
 
+        public const string UseSecondaryBoneId =
+            "If true, use the secondary bone position before solving for the target position.";
+
         public const string CustomHandTargetPosition =
             "The custom hand target position.";
 
@@ -1386,6 +1423,12 @@ namespace Oculus.Movement
 
         public const string FingerPositionCorrectionWeight =
             "Finger position correction weight.";
+
+        public const string RegenJobData =
+            "Regenerate job data.";
+
+        public const string ProcessorType =
+            "Whether to use jobs or not.";
     }
 
     public static class LateMirroredObjectTooltips
@@ -1655,6 +1698,9 @@ namespace Oculus.Movement
 
         public const string Animators =
             "Animators who should receive signals to animate";
+
+        public const string MaxInputAcceleration =
+            "Max input acceleration.";
     }
 
     public static class JumpingRigidbodyTooltips
@@ -1886,6 +1932,11 @@ namespace Oculus.Movement
         public const string BlendCurve =
             "Multiplier that influences weight interpolation based on distance.";
 
+        public const string FullBodySecondBoneIdToTest =
+            "(Full Body) Secondary Bone ID, usually the lower arm. " +
+            "This is the target bone that the upper arm will pre-rotate to for a more accurate IK solve. " +
+            "Can be modified depending on the skeleton used.";
+
         public const string FullBodyBoneIdToTest =
             "(Full Body) Bone ID, usually the wrist. Can be modified depending on the skeleton used.";
 
@@ -1897,6 +1948,44 @@ namespace Oculus.Movement
 
         public const string HeadView =
             "The type of head that should be used to blend hands.";
+    }
+
+    public static class RetargetingProcessorCorrectHandTooltips
+    {
+        public static class SyncOvrControllersAndHandsSettingsTooltips
+        {
+            public const string SyncOvrOption =
+                "Specifies how hand target data should be synced with the OVRControllers and OVRHands data.";
+
+            public const string OvrHandControllerPositionOffset =
+                "The offset to get the hand position from the OVR controller root position. \n" +
+                "This offset value is taken from Interaction SDK.";
+
+            public const string OvrHandControllerOrientationOffset =
+                "The offset to get the hand rotation from the OVR controller root rotation. \n" +
+                "This offset value is taken from Interaction SDK.";
+
+            public const string MirrorHandControllerOffsets =
+                "True if the hand controller offsets should be mirrored for the left hand.";
+        }
+
+        public const string BlendHandWeight =
+            "The weight of the hand blending.";
+
+        public const string HandIKWeight =
+            "The weight of the hand blending.";
+
+        public const string ArmChainBones =
+            "The weight of the hand blending.";
+
+        public const string SyncOvrControllersAndHandsSettings =
+            "Settings for syncing with OVRControllers and OVRHands.";
+
+        public const string LeftHandProcessor =
+            "Left hand processor.";
+
+        public const string RightHandProcessor =
+            "Right hand processor.";
     }
 
     public static class ExternalBoneTargetsTooltips
@@ -1918,12 +2007,12 @@ namespace Oculus.Movement
         public const string Enabled =
             "Enables or disables functionality.";
     }
-    
+
     public static class RetargetedBoneMappingsTooltips
     {
         public const string HumanBodyBonePairs =
         "HumanBodyBone pairs for this humanoid.";
-        
+
         public const string HumanBodyBoneToBoneId =
             "HumanBodyBone to BodyJointId mapping for this humanoid.";
     }

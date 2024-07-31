@@ -23,7 +23,7 @@ namespace Oculus.Movement.BodyTrackingForFitness
         {
             public const string SourceDataObject =
                 "A body pose source. Can be a " + nameof(ScriptableObject) + " that inherits " +
-                nameof(IBodyPose) + ". If you want to use active body data, reference " + 
+                nameof(IBodyPose) + ". If you want to use active body data, reference " +
                 nameof(OVRBodyPose) + ", or " + nameof(PoseFromBody) + ".";
 
             public const string BodyBoneTransforms =
@@ -86,13 +86,13 @@ namespace Oculus.Movement.BodyTrackingForFitness
 
         /// <inheritdoc cref="IBody.IsHighConfidence"/>
         public bool IsHighConfidence => true;
-        
+
         /// <inheritdoc cref="IBody.IsTrackedDataValid"/>
         public bool IsTrackedDataValid => true;
-        
+
         /// <inheritdoc cref="IBody.Scale"/>
         public float Scale => 1;
-        
+
         /// <inheritdoc cref="IBody.CurrentDataVersion"/>
         public int CurrentDataVersion => _currentDataVersion;
 

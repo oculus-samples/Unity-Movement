@@ -44,6 +44,7 @@ namespace Oculus.Movement.Utils
             RestPoseObjectHumanoid restPoseObjectHumanoid = null)
         {
             selectedGameObject.SetActive(false);
+
             HelperMenusBody.SetupCharacterForAnimationRiggingRetargetingConstraints(selectedGameObject, restPoseObjectHumanoid, addConstraints, isFullBody, true);
 
             RigBuilder rigBuilder = selectedGameObject.GetComponent<RigBuilder>();
