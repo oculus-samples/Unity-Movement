@@ -1,3 +1,10 @@
+## [5.2.1](https://github.com/oculus-samples/Unity-Movement/compare/v5.2.0...v5.2.1) (2024-08-08)
+
+
+### Bug Fixes
+
+* **Runtime:** BodyTrackingForFitness's scapula bonelink ([6d4d586](https://github.com/oculus-samples/Unity-Movement/commit/6d4d5866e52936087043f16ad0718d1baf4a7abb))
+
 # [5.2.0](https://github.com/oculus-samples/Unity-Movement/compare/v5.1.0...v5.2.0) (2024-07-31)
 
 
