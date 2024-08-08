@@ -24,16 +24,15 @@ The sample scenes are located under the **Samples/Scenes** folder.
 
 ## Unity Setup
 
-If the new scene or an existing scene doesn’t have a GameObject with the OVRCameraRig component, follow the steps:
-1. From the Hierarchy tab, look for a Main Camera GameObject.
-2. If the Main Camera GameObject is present, right-click Main Camera and click Delete.
-3. Using the top level file menus, navigate to **Oculus->Tools->Building Blocks**. Select the (+) icon on the lower right of the Camera Rig option.
-4. Select the Camera Rig object in the Hierarchy, and in the Inspector tab, go to OVR Manager > Quest Features.
-5. In the General tab, there are options to enable body, face, and eye tracking support. Select Supported or Required for the type of tracking support you wish to add.
-6. Under OVRManager's "Permission Requests On Startup" section, enable  Body, Face and Eye Tracking.
-7. Ensure that OVRManager's "Tracking Origin Type" is set to "Floor Level".
-8. In OVRManager's "Movement Tracking" section select "High" for "Body Tracking Fidelity."
-9. In OVRManager's "Movement Tracking" section select "Full Body" for "Body Tracking Joint Set."
+If the new scene or an existing scene doesn’t have a GameObject with the OVRCameraRig component, integrate body tracking as mentioned [here](https://developer.oculus.com/documentation/unity/move-body-tracking/#integrate-body-tracking) and then follow these verification steps:
+1. From the Hierarchy tab, look for a Main Camera GameObject which comes in a new scene by default. If it it exists, then please delete it.
+2. Make sure a Camera Rig is in your scene, either by using the OVRCameraRig or by creating one using Building Blocks. To create a Camera Rig using Building Blocks, go to **Meta->Tools->Building Blocks** and select the (+) icon on the lower right of the Camera Rig option.
+3. Select the Camera Rig object in the Hierarchy, and in the Inspector tab, go to the OVRManager component and look for the "Quest Features" section.
+4. In the General tab, there are options to enable body, face, and eye tracking support. Make sure that Supported or Required is enabled for the type of tracking that you require.
+5. Under OVRManager's "Permission Requests On Startup" section, verify that Body, Face and Eye Tracking are enabled.
+6. Ensure that OVRManager's "Tracking Origin Type" is set to "Floor Level".
+7. In OVRManager's "Movement Tracking" verify that "High" for "Body Tracking Fidelity" is selected.
+8. In OVRManager's "Movement Tracking" verify that "Full Body" for "Body Tracking Joint Set" is selected.
 
 Layer index 10, layer index 11, and the HiddenMesh layer must be present in the project for RecalculateNormals to work correctly.
 
