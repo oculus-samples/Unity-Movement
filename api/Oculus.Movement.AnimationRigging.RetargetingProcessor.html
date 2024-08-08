@@ -1,0 +1,532 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RetargetingProcessor
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RetargetingProcessor
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor">
+  
+  
+  <h1 id="Oculus_Movement_AnimationRigging_RetargetingProcessor" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor" class="text-break">Class RetargetingProcessor
+  </h1>
+  <div class="markdown level0 summary"><p>Base class for retargeting processors, meant to be used as a scriptable object.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">RetargetingProcessor</span></div>
+      <div class="level2"><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingBlendHandProcessor.html">RetargetingBlendHandProcessor</a></div>
+      <div class="level2"><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingHandDeformationProcessor.html">RetargetingHandDeformationProcessor</a></div>
+      <div class="level2"><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingProcessorCorrectBones.html">RetargetingProcessorCorrectBones</a></div>
+      <div class="level2"><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingProcessorCorrectHand.html">RetargetingProcessorCorrectHand</a></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Oculus.Movement.AnimationRigging.IRetargetingProcessor.html">IRetargetingProcessor</a></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.AnimationRigging.html">Oculus.Movement.AnimationRigging</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Serializable]
+public class RetargetingProcessor : ScriptableObject, IRetargetingProcessor</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_Weight" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.Weight">Weight</h4>
+  <div class="markdown level1 summary"><p>The weight of this processor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public float Weight</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ProcessorType_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ProcessorType*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ProcessorType" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ProcessorType">ProcessorType</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual RetargetingProcessorType ProcessorType { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingProcessorType</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ApplyJSONConfig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ApplyJSONConfig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ApplyJSONConfig_System_String_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ApplyJSONConfig(System.String)">ApplyJSONConfig(String)</h4>
+  <div class="markdown level1 summary"><p>Applies JSON config.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ApplyJSONConfig(string jsonData)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">jsonData</span></td>
+        <td><p>JSON data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_CleanUp_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.CleanUp*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_CleanUp" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.CleanUp">CleanUp()</h4>
+  <div class="markdown level1 summary"><p>Allows clean up of resources used.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void CleanUp()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_CopyData_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.CopyData*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_CopyData_Oculus_Movement_AnimationRigging_RetargetingProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.CopyData(Oculus.Movement.AnimationRigging.RetargetingProcessor)">CopyData(RetargetingProcessor)</h4>
+  <div class="markdown level1 summary"><p>Deep copy data from another processor to this processor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void CopyData(RetargetingProcessor source)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingProcessor.html">RetargetingProcessor</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The source processor to copy from.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_DrawGizmos_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.DrawGizmos*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_DrawGizmos" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.DrawGizmos">DrawGizmos()</h4>
+  <div class="markdown level1 summary"><p>Allow drawing debugging gizmos.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void DrawGizmos()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_GetJSONConfig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.GetJSONConfig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_GetJSONConfig" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.GetJSONConfig">GetJSONConfig()</h4>
+  <div class="markdown level1 summary"><p>Returns JSON config as string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual string GetJSONConfig()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><p>JSON config as string.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_PrepareRetargetingProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.PrepareRetargetingProcessor*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_PrepareRetargetingProcessor_Oculus_Movement_AnimationRigging_RetargetingLayer_IList_OVRBone__" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.PrepareRetargetingProcessor(Oculus.Movement.AnimationRigging.RetargetingLayer,IList{OVRBone})">PrepareRetargetingProcessor(RetargetingLayer, IList&lt;OVRBone&gt;)</h4>
+  <div class="markdown level1 summary"><p>Prepare the retargeting processor; this is run after retargeting, but before any processors have run.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void PrepareRetargetingProcessor(RetargetingLayer retargetingLayer, IList&lt;OVRBone&gt; ovrBones)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">IList</span>&lt;<span class="xref">OVRBone</span>&gt;</td>
+        <td><span class="parametername">ovrBones</span></td>
+        <td><p>The tracked OVR bones.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ProcessRetargetingLayer_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ProcessRetargetingLayer*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ProcessRetargetingLayer_Oculus_Movement_AnimationRigging_RetargetingLayer_IList_OVRBone__" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ProcessRetargetingLayer(Oculus.Movement.AnimationRigging.RetargetingLayer,IList{OVRBone})">ProcessRetargetingLayer(RetargetingLayer, IList&lt;OVRBone&gt;)</h4>
+  <div class="markdown level1 summary"><p>Processes a <a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a>; this is run after retargeting and in order of processors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ProcessRetargetingLayer(RetargetingLayer retargetingLayer, IList&lt;OVRBone&gt; ovrBones)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">IList</span>&lt;<span class="xref">OVRBone</span>&gt;</td>
+        <td><span class="parametername">ovrBones</span></td>
+        <td><p>The tracked OVR bones.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ProcessRetargetingLayerJob_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ProcessRetargetingLayerJob*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ProcessRetargetingLayerJob_System_Nullable_JobHandle__Oculus_Movement_AnimationRigging_RetargetingLayer_IList_OVRBone__" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ProcessRetargetingLayerJob(System.Nullable{JobHandle},Oculus.Movement.AnimationRigging.RetargetingLayer,IList{OVRBone})">ProcessRetargetingLayerJob(Nullable&lt;JobHandle&gt;, RetargetingLayer, IList&lt;OVRBone&gt;)</h4>
+  <div class="markdown level1 summary"><p>Process retargeting layer, job version.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual JobHandle ProcessRetargetingLayerJob(JobHandle? previousJob, RetargetingLayer retargetingLayer, IList&lt;OVRBone&gt; ovrBones)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">JobHandle</span>&gt;</td>
+        <td><span class="parametername">previousJob</span></td>
+        <td><p>Previous job, if any.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">IList</span>&lt;<span class="xref">OVRBone</span>&gt;</td>
+        <td><span class="parametername">ovrBones</span></td>
+        <td><p>The body tracking bones.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">JobHandle</span></td>
+        <td><p>Handle of job created.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ReadJSONConfigFromFile_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ReadJSONConfigFromFile*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_ReadJSONConfigFromFile_System_String_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.ReadJSONConfigFromFile(System.String)">ReadJSONConfigFromFile(String)</h4>
+  <div class="markdown level1 summary"><p>Reads and applies JSON config from file.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ReadJSONConfigFromFile(string filePath)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">filePath</span></td>
+        <td><p>File path to read from.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_RespondToCalibration_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.RespondToCalibration*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_RespondToCalibration_Oculus_Movement_AnimationRigging_RetargetingLayer_IList_OVRBone__" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.RespondToCalibration(Oculus.Movement.AnimationRigging.RetargetingLayer,IList{OVRBone})">RespondToCalibration(RetargetingLayer, IList&lt;OVRBone&gt;)</h4>
+  <div class="markdown level1 summary"><p>Responds to calibration event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void RespondToCalibration(RetargetingLayer retargetingLayer, IList&lt;OVRBone&gt; ovrBones)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>Retargeting layer component.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">IList</span>&lt;<span class="xref">OVRBone</span>&gt;</td>
+        <td><span class="parametername">ovrBones</span></td>
+        <td><p>Body tracking bones.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingProcessor_SetupRetargetingProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.SetupRetargetingProcessor*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingProcessor_SetupRetargetingProcessor_Oculus_Movement_AnimationRigging_RetargetingLayer_" data-uid="Oculus.Movement.AnimationRigging.RetargetingProcessor.SetupRetargetingProcessor(Oculus.Movement.AnimationRigging.RetargetingLayer)">SetupRetargetingProcessor(RetargetingLayer)</h4>
+  <div class="markdown level1 summary"><p>Setup the retargeting processor; this should only be run once.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void SetupRetargetingProcessor(RetargetingLayer retargetingLayer)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Oculus.Movement.AnimationRigging.IRetargetingProcessor.html">IRetargetingProcessor</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
