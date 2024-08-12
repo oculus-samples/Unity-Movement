@@ -1421,6 +1421,9 @@ namespace Oculus.Movement
         public const string RetargetedBoneMappings =
             "Retargeted bone mappings to be updated based on valid bones in the humanoid.";
 
+        public const string CustomBindPose =
+            "The custom bind pose that can be used to modify the current bind pose.";
+
         public const string FingerPositionCorrectionWeight =
             "Finger position correction weight.";
 

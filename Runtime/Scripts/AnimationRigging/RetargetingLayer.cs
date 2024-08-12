@@ -2,6 +2,7 @@
 
 using Oculus.Interaction;
 using Oculus.Movement.AnimationRigging.Utils;
+using Oculus.Movement.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -193,6 +194,19 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// The custom bind pose that can be used to modify the current bind pose.
+        /// </summary>
+        [SerializeField]
+        [Tooltip(RetargetingLayerTooltips.CustomBindPose)]
+        protected BindPoseObjectSkeleton _customBindPose;
+        /// <inheritdoc cref="_customBindPose"/>
+        public BindPoseObjectSkeleton CustomBindPose
+        {
+            get => _customBindPose;
+            set => _customBindPose = value;
+        }
+
+        /// <summary>
         /// Exposes a button used to update bone pair mappings based on the humanoid.
         /// </summary>
         [SerializeField, InspectorButton("UpdateBonePairMappings")]
@@ -307,6 +321,67 @@ namespace Oculus.Movement.AnimationRigging
             {
                 Debug.LogWarning(e);
             }
+        }
+
+        /// <summary>
+        /// Initializes the custom bind pose if set.
+        /// </summary>
+        protected override void InitializeBindPose()
+        {
+            base.InitializeBindPose();
+
+            if (_customBindPose == null)
+            {
+                return;
+            }
+
+            BoneId[] boneIds =
+            {
+                BoneId.FullBody_SpineLower,
+                BoneId.FullBody_SpineMiddle,
+                BoneId.FullBody_SpineUpper,
+                BoneId.FullBody_Chest,
+                BoneId.FullBody_Neck,
+                BoneId.FullBody_Head,
+                BoneId.FullBody_LeftShoulder,
+                BoneId.FullBody_RightShoulder,
+                BoneId.FullBody_LeftArmUpper,
+                BoneId.FullBody_RightArmUpper,
+            };
+            BoneId[] parentBoneIds = {
+                BoneId.FullBody_Hips,
+                BoneId.FullBody_SpineLower,
+                BoneId.FullBody_SpineMiddle,
+                BoneId.FullBody_SpineUpper,
+                BoneId.FullBody_Chest,
+                BoneId.FullBody_Neck,
+                BoneId.FullBody_Chest,
+                BoneId.FullBody_Chest,
+                BoneId.FullBody_LeftShoulder,
+                BoneId.FullBody_RightShoulder,
+            };
+            for (var i = 0; i < boneIds.Length; i++)
+            {
+                var targetBoneId = boneIds[i];
+                var parentBoneId = parentBoneIds[i];
+                var targetPose =
+                    _customBindPose.GetBonePoseData((OVRHumanBodyBonesMappings.FullBodyTrackingBoneId)targetBoneId);
+                if (targetPose == null)
+                {
+                    continue;
+                }
+
+                var targetBone = BindPoses[(int)targetBoneId].Transform;
+                var parentBone = BindPoses[(int)parentBoneId].Transform;
+                var direction = BindPoses[(int)targetBoneId].Transform.localPosition -
+                                BindPoses[(int)parentBoneId].Transform.localPosition;
+                targetBone.localPosition = parentBone.localPosition + targetPose.DeltaRot * direction;
+                if (targetPose.AdjustmentRot.eulerAngles.sqrMagnitude > float.Epsilon)
+                {
+                    parentBone.localRotation *= targetPose.AdjustmentRot;
+                }
+            }
+            ComputeOffsetsUsingSkeletonComponent();
         }
 
         private void CaptureTransformInformationHipsUpwards(Transform currentTransform)
@@ -584,7 +659,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <summary>
         /// Empty fixed update to avoid updating OVRSkeleton during fixed update.
         /// </summary>
-        private void FixedUpdate()
+        private new void FixedUpdate()
         {
         }
 
