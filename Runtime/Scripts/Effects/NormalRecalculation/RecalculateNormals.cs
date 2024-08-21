@@ -126,7 +126,7 @@ namespace Oculus.Movement.Effects
             _instantiatedMaterials = _skinnedMeshRenderer.materials;
             foreach (var recalculateMaterialIndex in _recalculateMaterialIndices)
             {
-                Assert.IsTrue(recalculateMaterialIndex < _recalculateMaterialIndices.Length);
+                Assert.IsTrue(recalculateMaterialIndex < _instantiatedMaterials.Length);
                 _recalculateMaterials.Add(_instantiatedMaterials[recalculateMaterialIndex]);
             }
 
