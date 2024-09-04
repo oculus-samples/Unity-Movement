@@ -1,3 +1,31 @@
+# [6.0.0](https://github.com/oculus-samples/Unity-Movement/compare/v5.2.1...v6.0.0) (2024-09-04)
+
+
+### Bug Fixes
+
+* **Runtime:** Fix RecalculateNormals awake assert ([dcf9da0](https://github.com/oculus-samples/Unity-Movement/commit/dcf9da0cc6d2d1f311fca4426840099c86689f22))
+* **Runtime:** Undo ARKit retargeting value check ([7d4a5ac](https://github.com/oculus-samples/Unity-Movement/commit/7d4a5ac8688603df0a2911d2afccfe334961be75))
+
+
+### Features
+
+* **Runtime:** Add custom bind pose option for retargeting ([70932d2](https://github.com/oculus-samples/Unity-Movement/commit/70932d21e8ac944ba453a1239106d8e9ae9f10e9))
+* **Samples:** Added Debug Lines to Mirrored Full Body ([2df44ee](https://github.com/oculus-samples/Unity-Movement/commit/2df44eebe734b95dd69f4f5eec911205f72442f5))
+* **Samples:** Added Debug Lines to Mirrored Upper Body ([493430c](https://github.com/oculus-samples/Unity-Movement/commit/493430c841b0464d31baf91108226b635195348d))
+
+
+### BREAKING CHANGES
+
+* **Runtime:** Overriding InitializeBindPose in OVRSkeleton requires v67 of the Core SDK.
+
+Add the option to use custom bind pose data for retargeting. This can be used to correct artifacts in the retargeting and deformation by updating the rest pose used for retargeting, which will affect the offset calculation in retargeting.
+
+Reviewed By: sohailshafiiWk
+
+Differential Revision: D61024840
+
+fbshipit-source-id: 1ca39376bfcfc98f5a5d57b7525058918c39e76f
+
 ## [5.2.1](https://github.com/oculus-samples/Unity-Movement/compare/v5.2.0...v5.2.1) (2024-08-08)
 
 
