@@ -9,8 +9,8 @@ The Unity-Movement package is released under the [Oculus License](https://github
   - 2021.3.26f1 (2021 LTS or newer)
   - 2022.3.11f2 (2022 LTS or newer)
   - 2023.2.7f1 or newer
-- v63.0 or newer of the Meta XR SDK. You will need the Meta XR Core SDK and the [Meta XR Interaction SDK OVR Integration](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-ovr-integration-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
-- A project set up with these [configuration settings](https://developer.oculus.com/documentation/unity/unity-conf-settings/)
+- v67.0 or newer of the Meta XR SDK. You will need the [Meta XR Core SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-core-sdk-269169) and the [Meta XR Interaction SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
+- A project set up with these [steps](https://developer.oculus.com/documentation/unity/move-overview/#unity-project-setup).
 
 ## Getting Started
 First, ensure that all of the [requirements](#requirements) are met.
