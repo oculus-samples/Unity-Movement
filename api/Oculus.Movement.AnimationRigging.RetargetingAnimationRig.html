@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RetargetingAnimationRig
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RetargetingAnimationRig
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig">
+  
+  
+  <h1 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig" class="text-break">Class RetargetingAnimationRig
+  </h1>
+  <div class="markdown level0 summary"><p>Handles the animation rig on the retargeting layer.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">RetargetingAnimationRig</span></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.AnimationRigging.html">Oculus.Movement.AnimationRigging</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Serializable]
+public class RetargetingAnimationRig</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig__ovrSkeletonConstraints" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig._ovrSkeletonConstraints">_ovrSkeletonConstraints</h4>
+  <div class="markdown level1 summary"><p>IOVRSkeletonConstraint-based components.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected MonoBehaviour[] _ovrSkeletonConstraints</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">MonoBehaviour</span>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig__rebindAnimator" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig._rebindAnimator">_rebindAnimator</h4>
+  <div class="markdown level1 summary"><p>If true, rebind the animator upon a skeletal change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool _rebindAnimator</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig__reEnableRig" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig._reEnableRig">_reEnableRig</h4>
+  <div class="markdown level1 summary"><p>If true, disable then re-enable the rig upon a skeletal change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool _reEnableRig</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig__rigBuilder" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig._rigBuilder">_rigBuilder</h4>
+  <div class="markdown level1 summary"><p>Rig builder on character supporting Animation rigging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected RigBuilder _rigBuilder</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RigBuilder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig__rigToggleOnFocus" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig._rigToggleOnFocus">_rigToggleOnFocus</h4>
+  <div class="markdown level1 summary"><p>If true, disable then re-enable the rig upon a focus change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool _rigToggleOnFocus</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_OVRSkeletonConstraintComps_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.OVRSkeletonConstraintComps*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_OVRSkeletonConstraintComps" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.OVRSkeletonConstraintComps">OVRSkeletonConstraintComps</h4>
+  <div class="markdown level1 summary"><p>IOVRSkeletonConstraint-based components.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MonoBehaviour[] OVRSkeletonConstraintComps { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">MonoBehaviour</span>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_RebindAnimator_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.RebindAnimator*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_RebindAnimator" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.RebindAnimator">RebindAnimator</h4>
+  <div class="markdown level1 summary"><p>If true, rebind the animator upon a skeletal change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RebindAnimator { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_ReEnableRig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.ReEnableRig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_ReEnableRig" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.ReEnableRig">ReEnableRig</h4>
+  <div class="markdown level1 summary"><p>If true, disable then re-enable the rig upon a skeletal change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ReEnableRig { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_RigBuilderComp_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.RigBuilderComp*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_RigBuilderComp" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.RigBuilderComp">RigBuilderComp</h4>
+  <div class="markdown level1 summary"><p>Rig builder on character supporting Animation rigging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RigBuilder RigBuilderComp { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RigBuilder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_RigToggleOnFocus_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.RigToggleOnFocus*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_RigToggleOnFocus" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.RigToggleOnFocus">RigToggleOnFocus</h4>
+  <div class="markdown level1 summary"><p>If true, disable then re-enable the rig upon a focus change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool RigToggleOnFocus { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_AddSkeletalConstraint_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.AddSkeletalConstraint*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_AddSkeletalConstraint_Oculus_Movement_AnimationRigging_RetargetingLayer_MonoBehaviour_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.AddSkeletalConstraint(Oculus.Movement.AnimationRigging.RetargetingLayer,MonoBehaviour)">AddSkeletalConstraint(RetargetingLayer, MonoBehaviour)</h4>
+  <div class="markdown level1 summary"><p>Adds skeletal constraint.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void AddSkeletalConstraint(RetargetingLayer retargetingLayer, MonoBehaviour newConstraint)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">MonoBehaviour</span></td>
+        <td><span class="parametername">newConstraint</span></td>
+        <td><p>New constraint to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_CheckAndAddMissingCopyPoseAnimationConstraint_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.CheckAndAddMissingCopyPoseAnimationConstraint*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_CheckAndAddMissingCopyPoseAnimationConstraint_Oculus_Movement_AnimationRigging_RetargetingAnimationConstraint_Oculus_Movement_AnimationRigging_RetargetingLayer_System_Boolean_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.CheckAndAddMissingCopyPoseAnimationConstraint(Oculus.Movement.AnimationRigging.RetargetingAnimationConstraint,Oculus.Movement.AnimationRigging.RetargetingLayer,System.Boolean)">CheckAndAddMissingCopyPoseAnimationConstraint(RetargetingAnimationConstraint, RetargetingLayer, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Check and add missing copy pose animation constraints.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual CopyPoseConstraint CheckAndAddMissingCopyPoseAnimationConstraint(RetargetingAnimationConstraint retargetConstraint, RetargetingLayer retargetingLayer, bool shouldCopyPoseToOriginal)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingAnimationConstraint.html">RetargetingAnimationConstraint</a></td>
+        <td><span class="parametername">retargetConstraint</span></td>
+        <td><p>The retargeting constraint for the copy pose constraint.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">shouldCopyPoseToOriginal</span></td>
+        <td><p>True if the pose is the original pose.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.CopyPoseConstraint.html">CopyPoseConstraint</a></td>
+        <td><p>Returns the created copy pose constraint.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_OnApplicationFocus_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.OnApplicationFocus*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_OnApplicationFocus_Oculus_Movement_AnimationRigging_RetargetingLayer_System_Boolean_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.OnApplicationFocus(Oculus.Movement.AnimationRigging.RetargetingLayer,System.Boolean)">OnApplicationFocus(RetargetingLayer, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Disable and re-enable the rig if <a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.html#Oculus_Movement_AnimationRigging_RetargetingAnimationRig__rigToggleOnFocus">_rigToggleOnFocus</a> is enabled.
+Do this for builds only. We don&apos;t want to stop everything if we run inside of the
+editor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void OnApplicationFocus(RetargetingLayer retargetingLayer, bool hasFocus)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">hasFocus</span></td>
+        <td><p>True if the application is currently focused.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_SetupRig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.SetupRig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_SetupRig_Oculus_Movement_AnimationRigging_RetargetingLayer_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.SetupRig(Oculus.Movement.AnimationRigging.RetargetingLayer)">SetupRig(RetargetingLayer)</h4>
+  <div class="markdown level1 summary"><p>Setup the animation rig if the skeleton is initialized.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void SetupRig(RetargetingLayer retargetingLayer)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_UpdateRig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.UpdateRig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_UpdateRig_Oculus_Movement_AnimationRigging_RetargetingLayer_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.UpdateRig(Oculus.Movement.AnimationRigging.RetargetingLayer)">UpdateRig(RetargetingLayer)</h4>
+  <div class="markdown level1 summary"><p>Initialize the animation rig if the skeleton is initialized, and check to re-enable the rig
+if necessary.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void UpdateRig(RetargetingLayer retargetingLayer)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_UpdateSkeletalConstraintInterfaceReferences_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.UpdateSkeletalConstraintInterfaceReferences*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_UpdateSkeletalConstraintInterfaceReferences_Oculus_Movement_AnimationRigging_RetargetingLayer_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.UpdateSkeletalConstraintInterfaceReferences(Oculus.Movement.AnimationRigging.RetargetingLayer)">UpdateSkeletalConstraintInterfaceReferences(RetargetingLayer)</h4>
+  <div class="markdown level1 summary"><p>Update skeletal constraint interface references.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void UpdateSkeletalConstraintInterfaceReferences(RetargetingLayer retargetingLayer)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_ValidateRig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.ValidateRig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingAnimationRig_ValidateRig_Oculus_Movement_AnimationRigging_RetargetingLayer_" data-uid="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.ValidateRig(Oculus.Movement.AnimationRigging.RetargetingLayer)">ValidateRig(RetargetingLayer)</h4>
+  <div class="markdown level1 summary"><p>Validate the animation rig by checking the animation rigging skeleton constraints.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ValidateRig(RetargetingLayer retargetingLayer)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.html">RetargetingLayer</a></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
