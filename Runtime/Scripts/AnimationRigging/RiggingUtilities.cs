@@ -59,7 +59,7 @@ namespace Oculus.Movement.AnimationRigging
         /// <returns>Bone transform.</returns>
         public static Transform FindBoneTransformFromSkeleton(
             OVRSkeleton skeleton,
-            OVRSkeleton.BoneId boneId,
+            int boneId,
             bool isBindPose = false)
         {
             if (!skeleton.IsInitialized ||
@@ -71,7 +71,7 @@ namespace Oculus.Movement.AnimationRigging
             var bones = isBindPose ? skeleton.BindPoses : skeleton.Bones;
             for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
             {
-                if (bones[boneIndex].Id == boneId)
+                if (boneIndex == boneId)
                 {
                     return bones[boneIndex].Transform;
                 }

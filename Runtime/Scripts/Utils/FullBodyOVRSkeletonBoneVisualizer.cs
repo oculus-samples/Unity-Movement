@@ -69,7 +69,7 @@ namespace Oculus.Movement.Utils
         protected override Transform GetBoneTransform(int currentBone)
         {
             return RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
-                (OVRSkeleton.BoneId)currentBone, _visualizeBindPose);
+                currentBone, _visualizeBindPose);
         }
 
         /// <inheritdoc />
@@ -84,12 +84,12 @@ namespace Oculus.Movement.Utils
 
             firstJoint = RiggingUtilities.FindBoneTransformFromSkeleton(
                 _ovrSkeletonComp,
-                (OVRSkeleton.BoneId)tupleItem.FirstBoneId,
+                tupleItem.FirstBoneId,
                 _visualizeBindPose);
             secondJoint = (tupleItem.SecondBoneId >= (int)OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_End)
                 ? firstJoint.GetChild(0)
                 : RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
-                    (OVRSkeleton.BoneId)tupleItem.SecondBoneId, _visualizeBindPose);
+                    tupleItem.SecondBoneId, _visualizeBindPose);
             return true;
         }
 
