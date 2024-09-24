@@ -69,14 +69,8 @@ namespace Oculus.Movement.AnimationRigging
             }
 
             var bones = isBindPose ? skeleton.BindPoses : skeleton.Bones;
-            for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
-            {
-                if (boneIndex == boneId)
-                {
-                    return bones[boneIndex].Transform;
-                }
-            }
-            return null;
+
+            return bones[boneId].Transform;
         }
 
         /// <summary>
