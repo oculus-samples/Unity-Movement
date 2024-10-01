@@ -1,8 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Oculus.Movement.Utils
 {
@@ -13,7 +11,7 @@ namespace Oculus.Movement.Utils
     public class ProjectValidation
     {
         [MenuItem("Movement/Check Project Settings", priority = 100)]
-        public static void BuildProjectAndroid64()
+        public static void CheckProjectSettings()
         {
             ProjectSettingsValidationWindow.ShowProjectSettingsValidationWindow();
         }
