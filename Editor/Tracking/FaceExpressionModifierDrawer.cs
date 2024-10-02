@@ -39,8 +39,6 @@ namespace Oculus.Movement.Tracking
         /// </summary>
         public FaceExpressionModifierDrawer()
         {
-            _labelWidth = Math.Max(_labelStyle.CalcSize(_multLabel).x, _labelStyle.CalcSize(_clmpLabel).x);
-
             List<String> blendshapeNameList = new List<string>();
             foreach (string e in Enum.GetNames(typeof(OVRFaceExpressions.FaceExpression)))
             {
@@ -66,6 +64,8 @@ namespace Oculus.Movement.Tracking
         /// <inheritdoc />
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
         {
+            _labelWidth = Math.Max(_labelStyle.CalcSize(_multLabel).x, _labelStyle.CalcSize(_clmpLabel).x);
+
             var faceExpressionsProp =
                 property.FindPropertyRelative(
                     nameof(BlendshapeModifier.FaceExpressionModifier.FaceExpressions));
