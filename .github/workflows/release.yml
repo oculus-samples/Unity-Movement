@@ -14,24 +14,49 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Pull latest
-        run: |
-          git pull
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 14
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v3
-        with:
-          semantic_version: 19
-          branch: main
-          extra_plugins: |
-            @semantic-release/changelog
-            @semantic-release/npm
-            @semantic-release/git
+          node-version: '14'
+      - name: Extract Version from package.json
+        id: package_version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PROJECT_NAME: Unity-Movement
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+      - name: Get Changelog Entry
+        id: changelog
+        run: |
+          VERSION=${{ env.VERSION }}
+          echo "Looking for changelog entries for version $VERSION"
+          CHANGELOG=$(awk -v ver="$VERSION" 'BEGIN {RS="## "; FS="\n"} $1 ~ ver {for (i=2; i<=NF; i++) print $i}' CHANGELOG.md)
+          if [ -z "$CHANGELOG" ]; then
+            echo "No changelog entry found for version $VERSION"
+          else
+            echo "Changelog entry found:"
+            echo "$CHANGELOG"
+          fi
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Update Release
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const body = process.env.CHANGELOG;
+            github.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ steps.create_release.outputs.id }},
+              body: body
+            })

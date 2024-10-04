@@ -21,10 +21,8 @@ jobs:
         run: |
           git pull
           git merge --allow-unrelated-histories $(git commit-tree -p main -m "[Automated] Cleanup" origin/dev^{tree})
-      - name: Use CHANGELOG and package.json from main
+      - name: Rename Samples folder
         run: |
-          git checkout HEAD~1 CHANGELOG.md
-          git checkout HEAD~1 package.json
           git rm Samples.meta
           git mv Samples Samples~
           git commit --amend --no-edit --allow-empty
