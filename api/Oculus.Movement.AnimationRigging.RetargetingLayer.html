@@ -1,0 +1,1465 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RetargetingLayer
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RetargetingLayer
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer">
+  
+  
+  <h1 id="Oculus_Movement_AnimationRigging_RetargetingLayer" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer" class="text-break">Class RetargetingLayer
+  </h1>
+  <div class="markdown level0 summary"><p>Retargeting class that inherits from OVRUnityHumanoidSkeletonRetargeter and provides
+functions that work with animation rigging.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">RetargetingLayer</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Oculus.Movement.AnimationRigging.IOVRSkeletonProcessorAggregator.html">IOVRSkeletonProcessorAggregator</a></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.AnimationRigging.html">Oculus.Movement.AnimationRigging</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_AnimationRigging_RetargetingLayer_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class RetargetingLayer : OVRUnityHumanoidSkeletonRetargeter, IOVRSkeletonProcessorAggregator</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__applyAnimationConstraintsToCorrectedPositions" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._applyAnimationConstraintsToCorrectedPositions">_applyAnimationConstraintsToCorrectedPositions</h4>
+  <div class="markdown level1 summary"><p>Apply position offsets done by animation rigging constraints for corrected
+positions. Due to the limited motion of humanoid avatars, this should be set if any
+animation rigging constraints are applied after the retargeting job runs.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool _applyAnimationConstraintsToCorrectedPositions</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__customBindPose" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._customBindPose">_customBindPose</h4>
+  <div class="markdown level1 summary"><p>The custom bind pose that can be used to modify the current bind pose.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected BindPoseObjectSkeleton _customBindPose</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">BindPoseObjectSkeleton</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__enableTrackingByProxy" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._enableTrackingByProxy">_enableTrackingByProxy</h4>
+  <div class="markdown level1 summary"><p>Create proxy transforms that track the skeletal bones. If the
+skeletal bone transforms change, that won&apos;t necessitate creating new
+proxy transforms in most cases. This means any Animation jobs
+that track the skeletal bone transform can use proxies
+instead, which get re-allocated less often. Re-allocation would mean
+having to create new animation jobs.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool _enableTrackingByProxy</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__externalBoneTargets" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._externalBoneTargets">_externalBoneTargets</h4>
+  <div class="markdown level1 summary"><p>External bone targets to be updated based on body tracking.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected ExternalBoneTargets _externalBoneTargets</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.ExternalBoneTargets.html">ExternalBoneTargets</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__retargetedBoneMappings" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._retargetedBoneMappings">_retargetedBoneMappings</h4>
+  <div class="markdown level1 summary"><p>Retargeted bone mappings to be updated based on valid bones in the humanoid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected RetargetedBoneMappings _retargetedBoneMappings</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetedBoneMappings.html">RetargetedBoneMappings</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__retargetingAnimationConstraint" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._retargetingAnimationConstraint">_retargetingAnimationConstraint</h4>
+  <div class="markdown level1 summary"><p>Related retargeting constraint.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected RetargetingAnimationConstraint _retargetingAnimationConstraint</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingAnimationConstraint.html">RetargetingAnimationConstraint</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__retargetingAnimationRig" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._retargetingAnimationRig">_retargetingAnimationRig</h4>
+  <div class="markdown level1 summary"><p>Retargeting animation rig to be updated based on body tracking.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected RetargetingAnimationRig _retargetingAnimationRig</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.html">RetargetingAnimationRig</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__retargetingProcessors" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._retargetingProcessors">_retargetingProcessors</h4>
+  <div class="markdown level1 summary"><p>List of retargeting processors, which run in late update after retargeting and animation rigging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected List&lt;RetargetingProcessor&gt; _retargetingProcessors</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">List</span>&lt;<a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingProcessor.html">RetargetingProcessor</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer__skeletonPostProcessing" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer._skeletonPostProcessing">_skeletonPostProcessing</h4>
+  <div class="markdown level1 summary"><p>Triggers methods that can alter bone translations and rotations, before rendering and physics</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected RetargetingLayer.OVRSkeletonProcessor _skeletonPostProcessing</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.OVRSkeletonProcessor.html">RetargetingLayer.OVRSkeletonProcessor</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_ApplyAnimationConstraintsToCorrectedPositions_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ApplyAnimationConstraintsToCorrectedPositions*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_ApplyAnimationConstraintsToCorrectedPositions" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ApplyAnimationConstraintsToCorrectedPositions">ApplyAnimationConstraintsToCorrectedPositions</h4>
+  <div class="markdown level1 summary"><p>Apply position offsets done by animation rigging constraints for corrected
+positions. Due to the limited motion of humanoid avatars, this should be set if any
+animation rigging constraints are applied after the retargeting job runs.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool ApplyAnimationConstraintsToCorrectedPositions { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_CustomBindPose_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.CustomBindPose*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_CustomBindPose" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.CustomBindPose">CustomBindPose</h4>
+  <div class="markdown level1 summary"><p>The custom bind pose that can be used to modify the current bind pose.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BindPoseObjectSkeleton CustomBindPose { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">BindPoseObjectSkeleton</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_CustomPositionsToCorrectLateUpdateMask_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.CustomPositionsToCorrectLateUpdateMask*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_CustomPositionsToCorrectLateUpdateMask" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.CustomPositionsToCorrectLateUpdateMask">CustomPositionsToCorrectLateUpdateMask</h4>
+  <div class="markdown level1 summary"><p>Allows one to specify which positions to correct during late update.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public AvatarMask CustomPositionsToCorrectLateUpdateMask { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">AvatarMask</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_EnableTrackingByProxy_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.EnableTrackingByProxy*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_EnableTrackingByProxy" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.EnableTrackingByProxy">EnableTrackingByProxy</h4>
+  <div class="markdown level1 summary"><p>Create proxy transforms that track the skeletal bones. If the
+skeletal bone transforms change, that won&apos;t necessitate creating new
+proxy transforms in most cases. This means any Animation jobs
+that track the skeletal bone transform can use proxies
+instead, which get re-allocated less often. Re-allocation would mean
+having to create new animation jobs.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool EnableTrackingByProxy { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_ExternalBoneTargetsInst_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ExternalBoneTargetsInst*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_ExternalBoneTargetsInst" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ExternalBoneTargetsInst">ExternalBoneTargetsInst</h4>
+  <div class="markdown level1 summary"><p>External bone targets to be updated based on body tracking.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ExternalBoneTargets ExternalBoneTargetsInst { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.ExternalBoneTargets.html">ExternalBoneTargets</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_JointPositionAdjustments_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.JointPositionAdjustments*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_JointPositionAdjustments" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.JointPositionAdjustments">JointPositionAdjustments</h4>
+  <div class="markdown level1 summary"><p>The array of joint position adjustments. Used by copy pose job.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RetargetingLayer.JointPositionAdjustment[] JointPositionAdjustments { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.JointPositionAdjustment.html">RetargetingLayer.JointPositionAdjustment</a>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_ProxyChangeCount_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ProxyChangeCount*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_ProxyChangeCount" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ProxyChangeCount">ProxyChangeCount</h4>
+  <div class="markdown level1 summary"><p>Triggered if proxy transforms were recreated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int ProxyChangeCount { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetedBoneMappingsInst_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetedBoneMappingsInst*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetedBoneMappingsInst" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetedBoneMappingsInst">RetargetedBoneMappingsInst</h4>
+  <div class="markdown level1 summary"><p>Retargeted bone mappings to be updated based on valid bones in the humanoid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RetargetedBoneMappings RetargetedBoneMappingsInst { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetedBoneMappings.html">RetargetedBoneMappings</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetingAnimationRigInst_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetingAnimationRigInst*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetingAnimationRigInst" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetingAnimationRigInst">RetargetingAnimationRigInst</h4>
+  <div class="markdown level1 summary"><p>Retargeting animation rig to be updated based on body tracking.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RetargetingAnimationRig RetargetingAnimationRigInst { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingAnimationRig.html">RetargetingAnimationRig</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetingConstraint_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetingConstraint*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetingConstraint" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetingConstraint">RetargetingConstraint</h4>
+  <div class="markdown level1 summary"><p>Related retargeting constraint.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RetargetingAnimationConstraint RetargetingConstraint { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingAnimationConstraint.html">RetargetingAnimationConstraint</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetingProcessors_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetingProcessors*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_RetargetingProcessors" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RetargetingProcessors">RetargetingProcessors</h4>
+  <div class="markdown level1 summary"><p>List of retargeting processors, which run in late update after retargeting and animation rigging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;RetargetingProcessor&gt; RetargetingProcessors { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">List</span>&lt;<a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingProcessor.html">RetargetingProcessor</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_SkeletonPostProcessingEv_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.SkeletonPostProcessingEv*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_SkeletonPostProcessingEv" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.SkeletonPostProcessingEv">SkeletonPostProcessingEv</h4>
+  <div class="markdown level1 summary"><p>Triggers methods that can alter bone translations and rotations, before rendering and physics</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RetargetingLayer.OVRSkeletonProcessor SkeletonPostProcessingEv { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingLayer.OVRSkeletonProcessor.html">RetargetingLayer.OVRSkeletonProcessor</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_AddProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.AddProcessor*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_AddProcessor_Oculus_Movement_AnimationRigging_IOVRSkeletonProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.AddProcessor(Oculus.Movement.AnimationRigging.IOVRSkeletonProcessor)">AddProcessor(IOVRSkeletonProcessor)</h4>
+  <div class="markdown level1 summary"><p>Adds given processor to this <a class="xref" href="Oculus.Movement.AnimationRigging.IOVRSkeletonProcessorAggregator.html">IOVRSkeletonProcessorAggregator</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddProcessor(IOVRSkeletonProcessor processor)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.IOVRSkeletonProcessor.html">IOVRSkeletonProcessor</a></td>
+        <td><span class="parametername">processor</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_AddRetargetingProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.AddRetargetingProcessor*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_AddRetargetingProcessor_Oculus_Movement_AnimationRigging_RetargetingProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.AddRetargetingProcessor(Oculus.Movement.AnimationRigging.RetargetingProcessor)">AddRetargetingProcessor(RetargetingProcessor)</h4>
+  <div class="markdown level1 summary"><p>Add the specified retargeting processor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddRetargetingProcessor(RetargetingProcessor processor)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.RetargetingProcessor.html">RetargetingProcessor</a></td>
+        <td><span class="parametername">processor</span></td>
+        <td><p>The processor to be added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_ApplyJSONConfig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ApplyJSONConfig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_ApplyJSONConfig_System_String_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ApplyJSONConfig(System.String)">ApplyJSONConfig(String)</h4>
+  <div class="markdown level1 summary"><p>Applies JSON config to file.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ApplyJSONConfig(string jsonData)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">jsonData</span></td>
+        <td><p>JSON data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_Awake_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.Awake*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_Awake" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.Awake">Awake()</h4>
+  <div class="markdown level1 summary"><p>Check for required components.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void Awake()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_FillTransformArrays_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.FillTransformArrays*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_FillTransformArrays_List_Transform__List_Transform__List_System_Boolean__List_System_Boolean__List_Quaternion__List_Quaternion__" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.FillTransformArrays(List{Transform},List{Transform},List{System.Boolean},List{System.Boolean},List{Quaternion},List{Quaternion})">FillTransformArrays(List&lt;Transform&gt;, List&lt;Transform&gt;, List&lt;Boolean&gt;, List&lt;Boolean&gt;, List&lt;Quaternion&gt;, List&lt;Quaternion&gt;)</h4>
+  <div class="markdown level1 summary"><p>Fills transform lists with meta data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void FillTransformArrays(List&lt;Transform&gt; sourceTransforms, List&lt;Transform&gt; targetTransforms, List&lt;bool&gt; shouldUpdatePositions, List&lt;bool&gt; shouldUpdateRotations, List&lt;Quaternion&gt; rotationOffsets, List&lt;Quaternion&gt; rotationAdjustments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">List</span>&lt;<span class="xref">Transform</span>&gt;</td>
+        <td><span class="parametername">sourceTransforms</span></td>
+        <td><p>Source transforms.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">List</span>&lt;<span class="xref">Transform</span>&gt;</td>
+        <td><span class="parametername">targetTransforms</span></td>
+        <td><p>Target transforms.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">List</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
+        <td><span class="parametername">shouldUpdatePositions</span></td>
+        <td><p>If joint positions should be updated or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">List</span>&lt;<span class="xref">System.Boolean</span>&gt;</td>
+        <td><span class="parametername">shouldUpdateRotations</span></td>
+        <td><p>If joint rotations should be updated or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">List</span>&lt;<span class="xref">Quaternion</span>&gt;</td>
+        <td><span class="parametername">rotationOffsets</span></td>
+        <td><p>Rotation offset per joint.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">List</span>&lt;<span class="xref">Quaternion</span>&gt;</td>
+        <td><span class="parametername">rotationAdjustments</span></td>
+        <td><p>Rotation tweak per joint.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetAnimatorTargetSkeleton_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetAnimatorTargetSkeleton*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetAnimatorTargetSkeleton" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetAnimatorTargetSkeleton">GetAnimatorTargetSkeleton()</h4>
+  <div class="markdown level1 summary"><p>Returns the animator used for retargeting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Animator GetAnimatorTargetSkeleton()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Animator</span></td>
+        <td><p>The animator used for retargeting.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetCorrectionQuaternion_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetCorrectionQuaternion*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetCorrectionQuaternion_HumanBodyBones_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetCorrectionQuaternion(HumanBodyBones)">GetCorrectionQuaternion(HumanBodyBones)</h4>
+  <div class="markdown level1 summary"><p>Returns the correction quaternion for a human body bone, if it exists.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Quaternion? GetCorrectionQuaternion(HumanBodyBones humanBodyBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">HumanBodyBones</span></td>
+        <td><span class="parametername">humanBodyBone</span></td>
+        <td><p>The human body bone to check for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">Quaternion</span>&gt;</td>
+        <td><p>The correction quaternion for a human body bone. Returns null if it doesn&apos;t exist.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetCustomBoneIdToHumanBodyBone_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetCustomBoneIdToHumanBodyBone*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetCustomBoneIdToHumanBodyBone_BoneId_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetCustomBoneIdToHumanBodyBone(BoneId)">GetCustomBoneIdToHumanBodyBone(BoneId)</h4>
+  <div class="markdown level1 summary"><p>Returns the custom bone id to human body bone pairing, if it exists.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HumanBodyBones? GetCustomBoneIdToHumanBodyBone(BoneId boneId)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">BoneId</span></td>
+        <td><span class="parametername">boneId</span></td>
+        <td><p>The bone id to check for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Nullable</span>&lt;<span class="xref">HumanBodyBones</span>&gt;</td>
+        <td><p>The human body bone for a custom bone id. Returns null if it doesn&apos;t exist.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetFindAdjustment_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetFindAdjustment*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetFindAdjustment_HumanBodyBones_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetFindAdjustment(HumanBodyBones)">GetFindAdjustment(HumanBodyBones)</h4>
+  <div class="markdown level1 summary"><p>Returns the joint adjustment for a human body bone.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public JointAdjustment GetFindAdjustment(HumanBodyBones humanBodyBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">HumanBodyBones</span></td>
+        <td><span class="parametername">humanBodyBone</span></td>
+        <td><p>The human body bone to check for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">JointAdjustment</span></td>
+        <td><p>The joint adjustment for a human body bone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetHumanBodyBoneToBodySection_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetHumanBodyBoneToBodySection*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetHumanBodyBoneToBodySection_HumanBodyBones_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetHumanBodyBoneToBodySection(HumanBodyBones)">GetHumanBodyBoneToBodySection(HumanBodyBones)</h4>
+  <div class="markdown level1 summary"><p>Returns the human body bone to body section pairing.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public OVRHumanBodyBonesMappings.BodySection GetHumanBodyBoneToBodySection(HumanBodyBones humanBodyBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">HumanBodyBones</span></td>
+        <td><span class="parametername">humanBodyBone</span></td>
+        <td><p>The human body bone to check for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRHumanBodyBonesMappings.BodySection</span></td>
+        <td><p>The body section for a human body bone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetJSONConfig_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetJSONConfig*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetJSONConfig" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetJSONConfig">GetJSONConfig()</h4>
+  <div class="markdown level1 summary"><p>Returns JSON config as string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string GetJSONConfig()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><p>JSON config as string.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetNumberOfTransformsRetargeted_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetNumberOfTransformsRetargeted*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetNumberOfTransformsRetargeted" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetNumberOfTransformsRetargeted">GetNumberOfTransformsRetargeted()</h4>
+  <div class="markdown level1 summary"><p>Gets number of transforms being retargeted currently. This can change during
+initialization.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int GetNumberOfTransformsRetargeted()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><p>Number of transforms with a valid correction quaternion.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetOriginalJoint_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetOriginalJoint*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetOriginalJoint_HumanBodyBones_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetOriginalJoint(HumanBodyBones)">GetOriginalJoint(HumanBodyBones)</h4>
+  <div class="markdown level1 summary"><p>Returns the original joint for a human body bone.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Transform GetOriginalJoint(HumanBodyBones humanBodyBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">HumanBodyBones</span></td>
+        <td><span class="parametername">humanBodyBone</span></td>
+        <td><p>The human body bone to check for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td><p>The original joint for a human body bone.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetShouldUpdatePositionOfBone_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetShouldUpdatePositionOfBone*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_GetShouldUpdatePositionOfBone_HumanBodyBones_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.GetShouldUpdatePositionOfBone(HumanBodyBones)">GetShouldUpdatePositionOfBone(HumanBodyBones)</h4>
+  <div class="markdown level1 summary"><p>Returns true if the position of a human body bone should be updated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool GetShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">HumanBodyBones</span></td>
+        <td><span class="parametername">humanBodyBone</span></td>
+        <td><p>The human body bone to check for.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if the position of a human body should be updated.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_InitializeBindPose_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.InitializeBindPose*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_InitializeBindPose" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.InitializeBindPose">InitializeBindPose()</h4>
+  <div class="markdown level1 summary"><p>Initializes the custom bind pose if set.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void InitializeBindPose()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_LateUpdate_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.LateUpdate*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_LateUpdate" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.LateUpdate">LateUpdate()</h4>
+  <div class="markdown level1 summary"><p>Allows fixing joints via the retargeting processors. The avatar does not allow
+precise finger positions even with translate DoF checked.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void LateUpdate()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_OnApplicationFocus_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.OnApplicationFocus*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_OnApplicationFocus_System_Boolean_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.OnApplicationFocus(System.Boolean)">OnApplicationFocus(Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnApplicationFocus(bool hasFocus)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">hasFocus</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_OnDrawGizmos_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.OnDrawGizmos*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_OnDrawGizmos" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.OnDrawGizmos">OnDrawGizmos()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnDrawGizmos()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_ReadJSONConfigFromFile_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ReadJSONConfigFromFile*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_ReadJSONConfigFromFile_System_String_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ReadJSONConfigFromFile(System.String)">ReadJSONConfigFromFile(String)</h4>
+  <div class="markdown level1 summary"><p>Read JSON config from file and applies it.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ReadJSONConfigFromFile(string filePath)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">filePath</span></td>
+        <td><p>File path to read from.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_RemoveProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RemoveProcessor*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_RemoveProcessor_Oculus_Movement_AnimationRigging_IOVRSkeletonProcessor_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.RemoveProcessor(Oculus.Movement.AnimationRigging.IOVRSkeletonProcessor)">RemoveProcessor(IOVRSkeletonProcessor)</h4>
+  <div class="markdown level1 summary"><p>Removes given processor from <a class="xref" href="Oculus.Movement.AnimationRigging.IOVRSkeletonProcessorAggregator.html">IOVRSkeletonProcessorAggregator</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RemoveProcessor(IOVRSkeletonProcessor processor)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.IOVRSkeletonProcessor.html">IOVRSkeletonProcessor</a></td>
+        <td><span class="parametername">processor</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_ShouldUpdatePositionOfBone_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ShouldUpdatePositionOfBone*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_ShouldUpdatePositionOfBone_HumanBodyBones_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.ShouldUpdatePositionOfBone(HumanBodyBones)">ShouldUpdatePositionOfBone(HumanBodyBones)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool ShouldUpdatePositionOfBone(HumanBodyBones humanBodyBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">HumanBodyBones</span></td>
+        <td><span class="parametername">humanBodyBone</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_Start_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.Start*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_Start" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.Start">Start()</h4>
+  <div class="markdown level1 summary"><p>Initialize base class and also any variables required by this class,
+such as the positions and rotations of the character joints at rest pose.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void Start()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_Update_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.Update*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_Update" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.Update">Update()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void Update()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_UpdateAdjustments_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.UpdateAdjustments*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_UpdateAdjustments_Quaternion___System_Boolean___System_Boolean___Quaternion___AvatarMask_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.UpdateAdjustments(Quaternion[],System.Boolean[],System.Boolean[],Quaternion[],AvatarMask)">UpdateAdjustments(Quaternion[], Boolean[], Boolean[], Quaternion[], AvatarMask)</h4>
+  <div class="markdown level1 summary"><p>Update adjustment arrays.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UpdateAdjustments(Quaternion[] rotationOffsets, bool[] shouldUpdatePositions, bool[] shouldUpdateRotations, Quaternion[] rotationAdjustments, AvatarMask avatarMask)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Quaternion</span>[]</td>
+        <td><span class="parametername">rotationOffsets</span></td>
+        <td><p>Rotation offset per joint.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span>[]</td>
+        <td><span class="parametername">shouldUpdatePositions</span></td>
+        <td><p>If joint positions should be updated or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span>[]</td>
+        <td><span class="parametername">shouldUpdateRotations</span></td>
+        <td><p>If joint rotations should be updated or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">Quaternion</span>[]</td>
+        <td><span class="parametername">rotationAdjustments</span></td>
+        <td><p>Rotation tweak per joint</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">AvatarMask</span></td>
+        <td><span class="parametername">avatarMask</span></td>
+        <td><p>Mask to restrict retargeting.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_UpdateBoneDataToArray_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.UpdateBoneDataToArray*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_UpdateBoneDataToArray" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.UpdateBoneDataToArray">UpdateBoneDataToArray()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void UpdateBoneDataToArray()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_RetargetingLayer_UpdateBonePairMappings_" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.UpdateBonePairMappings*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_RetargetingLayer_UpdateBonePairMappings" data-uid="Oculus.Movement.AnimationRigging.RetargetingLayer.UpdateBonePairMappings">UpdateBonePairMappings()</h4>
+  <div class="markdown level1 summary"><p>Update bone pair mappings for the retargeted humanoid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UpdateBonePairMappings()</code></pre>
+  </div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Oculus.Movement.AnimationRigging.IOVRSkeletonProcessorAggregator.html">IOVRSkeletonProcessorAggregator</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

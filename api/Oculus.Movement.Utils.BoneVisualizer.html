@@ -1,0 +1,542 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class BoneVisualizer
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class BoneVisualizer
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.Utils.BoneVisualizer">
+  
+  
+  <h1 id="Oculus_Movement_Utils_BoneVisualizer" data-uid="Oculus.Movement.Utils.BoneVisualizer" class="text-break">Class BoneVisualizer
+  </h1>
+  <div class="markdown level0 summary"><p>This class is a base class for <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html">BoneVisualizer&lt;BoneType&gt;</a>,
+keeping type information that does not rely on a BoneType generic, and
+allowing all <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html">BoneVisualizer&lt;BoneType&gt;</a>s to be accessed
+with a common type.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">BoneVisualizer</span></div>
+      <div class="level2"><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html">BoneVisualizer</a>&lt;BoneType&gt;</div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Oculus.Movement.Utils.IListGenerating.html">IListGenerating</a></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.Utils.html">Oculus.Movement.Utils</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_Utils_BoneVisualizer_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class BoneVisualizer : MonoBehaviour, IListGenerating</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer__AXIS_VISUAL_NAME_SUFFIX_TOKEN" data-uid="Oculus.Movement.Utils.BoneVisualizer._AXIS_VISUAL_NAME_SUFFIX_TOKEN">_AXIS_VISUAL_NAME_SUFFIX_TOKEN</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected const string _AXIS_VISUAL_NAME_SUFFIX_TOKEN = &quot;-AxisVisual.&quot;</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer__boneIdToAxisObject" data-uid="Oculus.Movement.Utils.BoneVisualizer._boneIdToAxisObject">_boneIdToAxisObject</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Dictionary&lt;int, Transform&gt; _boneIdToAxisObject</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Dictionary</span>&lt;<span class="xref">System.Int32</span>, <span class="xref">Transform</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer__boneTupleToLineRenderer" data-uid="Oculus.Movement.Utils.BoneVisualizer._boneTupleToLineRenderer">_boneTupleToLineRenderer</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Dictionary&lt;object, LineRenderer&gt; _boneTupleToLineRenderer</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Dictionary</span>&lt;<span class="xref">System.Object</span>, <span class="xref">LineRenderer</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer__CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN" data-uid="Oculus.Movement.Utils.BoneVisualizer._CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN">_CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected const string _CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN = &quot;-CustomLineVisual.&quot;</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer__LINE_VISUAL_NAME_SUFFIX_TOKEN" data-uid="Oculus.Movement.Utils.BoneVisualizer._LINE_VISUAL_NAME_SUFFIX_TOKEN">_LINE_VISUAL_NAME_SUFFIX_TOKEN</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected const string _LINE_VISUAL_NAME_SUFFIX_TOKEN = &quot;-LineVisual.&quot;</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer__whenToRender" data-uid="Oculus.Movement.Utils.BoneVisualizer._whenToRender">_whenToRender</h4>
+  <div class="markdown level1 summary"><p>When to render this skeleton during the Unity gameloop.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected BoneVisualizer.WhenToRender _whenToRender</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.WhenToRender.html">BoneVisualizer.WhenToRender</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_BoneVisualRenderers_" data-uid="Oculus.Movement.Utils.BoneVisualizer.BoneVisualRenderers*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_BoneVisualRenderers" data-uid="Oculus.Movement.Utils.BoneVisualizer.BoneVisualRenderers">BoneVisualRenderers</h4>
+  <div class="markdown level1 summary"><p>The dictionary of bone visuals.
+Note these are visuals of bones, not bones themselves.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;object, LineRenderer&gt; BoneVisualRenderers { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Dictionary</span>&lt;<span class="xref">System.Object</span>, <span class="xref">LineRenderer</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_EnableSkeletonProcessing_" data-uid="Oculus.Movement.Utils.BoneVisualizer.EnableSkeletonProcessing*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_EnableSkeletonProcessing" data-uid="Oculus.Movement.Utils.BoneVisualizer.EnableSkeletonProcessing">EnableSkeletonProcessing</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool EnableSkeletonProcessing { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_JointVisualTransforms_" data-uid="Oculus.Movement.Utils.BoneVisualizer.JointVisualTransforms*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_JointVisualTransforms" data-uid="Oculus.Movement.Utils.BoneVisualizer.JointVisualTransforms">JointVisualTransforms</h4>
+  <div class="markdown level1 summary"><p>The dictionary of bone joint visuals.
+Note these are visuals of bones, not bones themselves.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;int, Transform&gt; JointVisualTransforms { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Dictionary</span>&lt;<span class="xref">System.Int32</span>, <span class="xref">Transform</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_OnNewAxis_" data-uid="Oculus.Movement.Utils.BoneVisualizer.OnNewAxis*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_OnNewAxis" data-uid="Oculus.Movement.Utils.BoneVisualizer.OnNewAxis">OnNewAxis</h4>
+  <div class="markdown level1 summary"><p>Callback for newly generated <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.VisualType.html#Oculus_Movement_Utils_BoneVisualizer_VisualType_Axes">Axes</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BoneVisualizer.InstantiateAxisEvent OnNewAxis { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.InstantiateAxisEvent.html">BoneVisualizer.InstantiateAxisEvent</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_OnNewLine_" data-uid="Oculus.Movement.Utils.BoneVisualizer.OnNewLine*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_OnNewLine" data-uid="Oculus.Movement.Utils.BoneVisualizer.OnNewLine">OnNewLine</h4>
+  <div class="markdown level1 summary"><p>Callback for newly generated <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.VisualType.html#Oculus_Movement_Utils_BoneVisualizer_VisualType_Lines">Lines</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BoneVisualizer.InstantiateLineEvent OnNewLine { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.InstantiateLineEvent.html">BoneVisualizer.InstantiateLineEvent</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_SkeletonProcessorLabel_" data-uid="Oculus.Movement.Utils.BoneVisualizer.SkeletonProcessorLabel*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_SkeletonProcessorLabel" data-uid="Oculus.Movement.Utils.BoneVisualizer.SkeletonProcessorLabel">SkeletonProcessorLabel</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual string SkeletonProcessorLabel { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_ClearList_" data-uid="Oculus.Movement.Utils.BoneVisualizer.ClearList*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_ClearList" data-uid="Oculus.Movement.Utils.BoneVisualizer.ClearList">ClearList()</h4>
+  <div class="markdown level1 summary"><p>Clears the generated list</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void ClearList()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_GenerateList_" data-uid="Oculus.Movement.Utils.BoneVisualizer.GenerateList*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_GenerateList" data-uid="Oculus.Movement.Utils.BoneVisualizer.GenerateList">GenerateList()</h4>
+  <div class="markdown level1 summary"><p>Generates a list</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void GenerateList()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_ProcessSkeleton_" data-uid="Oculus.Movement.Utils.BoneVisualizer.ProcessSkeleton*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_ProcessSkeleton_OVRSkeleton_" data-uid="Oculus.Movement.Utils.BoneVisualizer.ProcessSkeleton(OVRSkeleton)">ProcessSkeleton(OVRSkeleton)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ProcessSkeleton(OVRSkeleton skeleton)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRSkeleton</span></td>
+        <td><span class="parametername">skeleton</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_SetBody_" data-uid="Oculus.Movement.Utils.BoneVisualizer.SetBody*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_SetBody_GameObject_" data-uid="Oculus.Movement.Utils.BoneVisualizer.SetBody(GameObject)">SetBody(GameObject)</h4>
+  <div class="markdown level1 summary"><p>Can be used by UI to change the source of the skeleton visual data</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void SetBody(GameObject body)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">body</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_BoneVisualizer_Visualize_" data-uid="Oculus.Movement.Utils.BoneVisualizer.Visualize*"></a>
+  <h4 id="Oculus_Movement_Utils_BoneVisualizer_Visualize" data-uid="Oculus.Movement.Utils.BoneVisualizer.Visualize">Visualize()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract void Visualize()</code></pre>
+  </div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Oculus.Movement.Utils.IListGenerating.html">IListGenerating</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
