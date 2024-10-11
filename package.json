@@ -1,11 +1,11 @@
 {
   "name": "com.meta.movement",
   "displayName": "Meta Movement",
-  "version": "6.0.0",
+  "version": "69.0.0",
   "description": "Contains sample scenes, prefabs, scripts, and art assets for Movement SDK.",
   "unity": "2021.3",
   "unityRelease": "26f1",
-  "samples": [
+  "samples":[
     {
       "displayName": "Face Tracking Samples",
       "description": "Samples that demonstrate the face tracking capabilities of the Movement SDK",
@@ -39,9 +39,9 @@
     "XR"
   ],
   "dependencies": {
-    "com.meta.xr.sdk.core": "63.0.0",
-    "com.meta.xr.sdk.interaction": "63.0.0",
-    "com.meta.xr.sdk.interaction.ovr": "63.0.0",
+    "com.meta.xr.sdk.core": "67.0.0",
+    "com.meta.xr.sdk.interaction": "67.0.0",
+    "com.meta.xr.sdk.interaction.ovr": "67.0.0",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.animation.rigging": "1.2.1",
     "com.unity.burst": "1.4.1"
