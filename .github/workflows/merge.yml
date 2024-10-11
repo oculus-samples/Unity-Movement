@@ -21,11 +21,6 @@ jobs:
         run: |
           git pull
           git merge --no-ff --allow-unrelated-histories -X theirs origin/dev -m "[Automated] Merged dev into main"
-      - name: Use CHANGELOG and package.json from main
-        run: |
-          git checkout HEAD~1 CHANGELOG.md
-          git checkout HEAD~1 package.json
-          git commit --amend --no-edit
       - name: Push
         run: |
           git push

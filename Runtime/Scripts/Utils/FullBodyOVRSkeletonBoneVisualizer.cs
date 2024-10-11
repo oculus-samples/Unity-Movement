@@ -50,18 +50,19 @@ namespace Oculus.Movement.Utils
         protected override BoneTuple GetBoneTuple(int currentBone)
         {
             // avoid visualizing root to hips, since we have legs now
-            if ((OVRSkeleton.BoneId)currentBone == OVRSkeleton.BoneId.FullBody_Root)
+            var currentBoneId = (OVRSkeleton.BoneId)currentBone;
+            if (currentBoneId == OVRSkeleton.BoneId.FullBody_Root)
             {
-                currentBone = (int)OVRSkeleton.BoneId.FullBody_Hips;
+                currentBoneId = OVRSkeleton.BoneId.FullBody_Hips;
             }
             // TODO: figure out how to visualize twist joints in foot,
             // OVRHumanBodeBonesMapping does not have it right now
-            if (!OVRHumanBodyBonesMappings.FullBoneIdToJointPair.ContainsKey((OVRSkeleton.BoneId)currentBone))
+            if (!OVRHumanBodyBonesMappings.FullBoneIdToJointPair.ContainsKey(currentBoneId))
             {
-                currentBone = (int)OVRSkeleton.BoneId.FullBody_Hips;
+                currentBoneId = OVRSkeleton.BoneId.FullBody_Hips;
             }
 
-            var boneTuple = OVRHumanBodyBonesMappings.FullBoneIdToJointPair[(OVRSkeleton.BoneId)currentBone];
+            var boneTuple = OVRHumanBodyBonesMappings.FullBoneIdToJointPair[currentBoneId];
             return new BoneTuple((int)boneTuple.Item1, (int)boneTuple.Item2);
         }
 
@@ -69,7 +70,7 @@ namespace Oculus.Movement.Utils
         protected override Transform GetBoneTransform(int currentBone)
         {
             return RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
-                (OVRSkeleton.BoneId)currentBone, _visualizeBindPose);
+                currentBone, _visualizeBindPose);
         }
 
         /// <inheritdoc />
@@ -81,15 +82,17 @@ namespace Oculus.Movement.Utils
                 firstJoint = secondJoint = null;
                 return false;
             }
-
             firstJoint = RiggingUtilities.FindBoneTransformFromSkeleton(
                 _ovrSkeletonComp,
-                (OVRSkeleton.BoneId)tupleItem.FirstBoneId,
+                tupleItem.FirstBoneId,
                 _visualizeBindPose);
-            secondJoint = (tupleItem.SecondBoneId >= (int)OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_End)
+
+            bool secondJointInvalid = tupleItem.SecondBone >= OVRHumanBodyBonesMappings.FullBodyTrackingBoneId.FullBody_End;
+
+            secondJoint = secondJointInvalid
                 ? firstJoint.GetChild(0)
                 : RiggingUtilities.FindBoneTransformFromSkeleton(_ovrSkeletonComp,
-                    (OVRSkeleton.BoneId)tupleItem.SecondBoneId, _visualizeBindPose);
+                    tupleItem.SecondBoneId, _visualizeBindPose);
             return true;
         }
 

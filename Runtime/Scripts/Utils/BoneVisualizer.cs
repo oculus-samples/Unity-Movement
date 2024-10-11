@@ -168,7 +168,7 @@ namespace Oculus.Movement.Utils
     /// Allows visualizing bones found in an OVRSkeleton or Animator component.
     /// <see cref="BoneType"/> should be an enum that maps to bone IDs.
     /// </summary>
-    public abstract class BoneVisualizer<BoneType> : BoneVisualizer
+    public abstract class BoneVisualizer<BoneType> : BoneVisualizer where BoneType : Enum
     {
         /// <summary>
         /// Bone tuple class: pair of bone joint IDs that define a bone
@@ -176,6 +176,7 @@ namespace Oculus.Movement.Utils
         [Serializable]
         public class BoneTuple
         {
+
             /// <summary>
             /// First bone in tuple.
             /// </summary>
@@ -190,13 +191,18 @@ namespace Oculus.Movement.Utils
             public bool Hide;
 
             /// <summary>
+            /// Dictionary with BoneType and int to initialize
+            /// </summary>
+            private static readonly Dictionary<BoneType, int> _boneTypeToInt = new Dictionary<BoneType, int>();
+
+            /// <summary>
             /// <see cref="FirstBone"/> as an Integer, which simplifies code
             /// when the bone index is ambiguous
             /// </summary>
             public int FirstBoneId
             {
-                get => (int)(object)FirstBone;
-                set => FirstBone = (BoneType)(object)value;
+                get => _boneTypeToInt[FirstBone];
+                set => _boneTypeToInt[FirstBone] = value;
             }
 
             /// <summary>
@@ -205,8 +211,21 @@ namespace Oculus.Movement.Utils
             /// </summary>
             public int SecondBoneId
             {
-                get => (int)(object)SecondBone;
-                set => SecondBone = (BoneType)(object)value;
+                get => _boneTypeToInt[SecondBone];
+                set => _boneTypeToInt[SecondBone] = value;
+            }
+
+            /// <summary>
+            /// Populating <see cref="_boneTypeToInt"/>
+            /// </summary>
+            static BoneTuple()
+            {
+                _boneTypeToInt = new Dictionary<BoneType, int>();
+                foreach (BoneType bone in Enum.GetValues(typeof(BoneType)))
+                {
+                    int intVal = Convert.ToInt32(bone);
+                    _boneTypeToInt[bone] = intVal;
+                }
             }
 
             /// <summary>

@@ -32,6 +32,12 @@ namespace Oculus.Movement.Utils
         /// <param name="sceneName">The name of the scene to load.</param>
         public void Load(string sceneName)
         {
+            if (SceneUtility.GetBuildIndexByScenePath(sceneName) == -1)
+            {
+                Debug.LogError($"Could not load {sceneName}, did you build with it?");
+                return;
+            }
+
             if (_loading)
             {
                 return;
