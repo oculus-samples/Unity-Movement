@@ -476,16 +476,22 @@ StructuredBuffer<int> vertexMetadata;
 StructuredBuffer<int> subsetVertices;
 StructuredBuffer<float3> vertices;
 int vertexCount;
+int firstSubmeshVertexIndex;
 float3 GetRecalculatedNormal(uint vid : SV_VertexID)
 {
+  // The flattened metadata assumes that the first vertex is at index 0.
+  // If the submesh vertex index starts at a larger,
+  // subtract by the submesh's first vertex index to correct it to 0.
+  int fixedVertexId = vid - firstSubmeshVertexIndex;
   // Normal Recalculation
-  int idOfVertexInMap = vertexMetadata[vid * 2];
-  int idOfNextVertexInMap = vertexMetadata[vid * 2 + 1];
+  int idOfVertexInMap = vertexMetadata[fixedVertexId * 2];
+  int idOfNextVertexInMap = vertexMetadata[fixedVertexId * 2 + 1];
   int offsetIntoVertexMap = vertexCount * 2;
   // vertexMetadata consists of two items:
   // 1. An offsets array
   // 2. A flattened map consisting of a vertex ID, followed immediately by
   //    the IDs of its neighbors.
+  // to get to the neighbors, we need to offset into the map section
   float3 vertex1 = vertices[vertexMetadata[offsetIntoVertexMap + idOfVertexInMap]];
   int startOfNeighborIndices = idOfVertexInMap + 1;
   float3 accumulatedNormal = float3(0, 0, 0);
