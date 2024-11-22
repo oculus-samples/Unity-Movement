@@ -42,8 +42,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3432884d13e0da4da9c26786cf8be8a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
@@ -134,13 +134,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Effectors:
   - m_Transform: {fileID: 2935136808920724832}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -148,7 +148,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2935136808920724832}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -156,7 +156,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2935136808920724832}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -164,7 +164,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2935136808920724832}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -172,7 +172,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2935136808920724832}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -180,7 +180,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2935136808920724832}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -188,7 +188,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 1870823507369795112}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -196,7 +196,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2561921694586897239}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -204,7 +204,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2561921694586897239}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -212,7 +212,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2561921694586897239}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -220,7 +220,7 @@ MonoBehaviour:
     m_Visible: 1
   - m_Transform: {fileID: 2561921694586897239}
     m_Style:
-      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 2}
+      shape: {fileID: 4300000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       color: {r: 1, g: 0, b: 0, a: 0.5}
       size: 0.1
       position: {x: 0, y: 0, z: 0}
@@ -236,8 +236,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   boneShape: 1
   drawBones: 1
   drawTripods: 0
@@ -302,8 +302,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3432884d13e0da4da9c26786cf8be8a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
@@ -391,8 +391,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3432884d13e0da4da9c26786cf8be8a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
@@ -480,8 +480,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3432884d13e0da4da9c26786cf8be8a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
     _skeleton: {fileID: 1024561555539579727}
@@ -604,8 +604,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb86b2c3f58d2d84c97a1b0a27b1a726, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Weight: 1
   m_Data:
     _customSkeleton: {fileID: 1024561555539579727}
@@ -730,6 +730,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2099474528858603452, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2438560284076026643, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       propertyPath: m_Name
       value: HighFidelityFirstPerson
@@ -782,6 +786,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4198482845286925592, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5064415633122877824, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -805,6 +813,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 710646372860626558, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
     - {fileID: 8112635682881487326, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
+    - {fileID: 8969943138024322065, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
 --- !u!4 &205543766343305595 stripped
 Transform:
@@ -830,8 +839,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 674a40251fe8ad841b18517ac5209957, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &2061263398344273555 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2216022236553524106, guid: 3849385062a658f40b6473aed7c7ea57, type: 3}
@@ -857,8 +866,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 642f072a06af00f42b49882dbbda8521, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _skeleton: {fileID: 1024561555539579727}
   _animator: {fileID: 9090389992127542986}
   _rigBuilder: {fileID: 4416254126646396801}
@@ -883,8 +892,8 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_RigLayers:
   - m_Rig: {fileID: 1363129986010764225}
     m_Active: 1
