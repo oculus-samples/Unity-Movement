@@ -15,14 +15,15 @@ namespace Oculus.Movement.Utils
     {
         private static readonly string[] _sceneNames =
             new string[] {
-                "t:scene, MovementAura",
-                "t:scene, MovementBlendshapeMappingExample",
+                "t:scene, MovementLina",
+                "t:scene, MovementBlendshapeMappingExampleA2E",
                 "t:scene, MovementHighFidelity",
                 "t:scene, MovementRetargeting",
                 "t:scene, MovementBodyTrackingForFitness",
                 "t:scene, MovementHipPinning",
                 "t:scene, MovementISDKIntegration",
-                "t:scene, MovementLocomotion"
+                "t:scene, MovementLocomotion",
+                "t:scene, MovementNetworking",
             };
 
         private const string _MAIN_BUILD_NAME = "movement";
@@ -77,6 +78,7 @@ namespace Oculus.Movement.Utils
             bool prevForceSDCardPerm = PlayerSettings.Android.forceSDCardPermission;
             PlayerSettings.Android.forceSDCardPermission = false;
             PlayerSettings.productName = productName;
+
             BuildPlayerOptions buildOptions = new BuildPlayerOptions()
             {
                 locationPathName = string.Format("builds/{0}.apk", buildName),

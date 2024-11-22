@@ -29,6 +29,34 @@ namespace Oculus.Movement.AnimationRigging
             /// </summary>
             public static readonly HandBodyJointPair[] LeftHandBodyJointPairs =
             {
+#if ISDK_OPENXR_HAND
+                (HandJointId.HandWristRoot, BodyJointId.Body_LeftHandWrist),
+                (HandJointId.HandPalm, BodyJointId.Body_LeftHandPalm),
+                (HandJointId.HandThumb1, BodyJointId.Body_LeftHandThumbMetacarpal),
+                (HandJointId.HandThumb2, BodyJointId.Body_LeftHandThumbProximal),
+                (HandJointId.HandThumb3, BodyJointId.Body_LeftHandThumbDistal),
+                (HandJointId.HandIndex0, BodyJointId.Body_LeftHandIndexMetacarpal),
+                (HandJointId.HandIndex1, BodyJointId.Body_LeftHandIndexProximal),
+                (HandJointId.HandIndex2, BodyJointId.Body_LeftHandIndexIntermediate),
+                (HandJointId.HandIndex3, BodyJointId.Body_LeftHandIndexDistal),
+                (HandJointId.HandMiddle0, BodyJointId.Body_LeftHandMiddleMetacarpal),
+                (HandJointId.HandMiddle1, BodyJointId.Body_LeftHandMiddleProximal),
+                (HandJointId.HandMiddle2, BodyJointId.Body_LeftHandMiddleIntermediate),
+                (HandJointId.HandMiddle3, BodyJointId.Body_LeftHandMiddleDistal),
+                (HandJointId.HandRing0, BodyJointId.Body_LeftHandRingMetacarpal),
+                (HandJointId.HandRing1, BodyJointId.Body_LeftHandRingProximal),
+                (HandJointId.HandRing2, BodyJointId.Body_LeftHandRingIntermediate),
+                (HandJointId.HandRing3, BodyJointId.Body_LeftHandRingDistal),
+                (HandJointId.HandPinky0, BodyJointId.Body_LeftHandLittleMetacarpal),
+                (HandJointId.HandPinky1, BodyJointId.Body_LeftHandLittleProximal),
+                (HandJointId.HandPinky2, BodyJointId.Body_LeftHandLittleIntermediate),
+                (HandJointId.HandPinky3, BodyJointId.Body_LeftHandLittleDistal),
+                (HandJointId.HandThumbTip, BodyJointId.Body_LeftHandThumbTip),
+                (HandJointId.HandIndexTip, BodyJointId.Body_LeftHandIndexTip),
+                (HandJointId.HandMiddleTip, BodyJointId.Body_LeftHandMiddleTip),
+                (HandJointId.HandRingTip, BodyJointId.Body_LeftHandRingTip),
+                (HandJointId.HandPinkyTip, BodyJointId.Body_LeftHandLittleTip),
+#else
                 (HandJointId.HandWristRoot, BodyJointId.Body_LeftHandWrist),
                 (HandJointId.HandForearmStub, BodyJointId.Body_LeftHandPalm),
                 (HandJointId.HandThumb0, BodyJointId.Invalid),
@@ -56,6 +84,7 @@ namespace Oculus.Movement.AnimationRigging
                 (HandJointId.Invalid, BodyJointId.Body_LeftHandIndexMetacarpal),
                 (HandJointId.Invalid, BodyJointId.Body_LeftHandMiddleMetacarpal),
                 (HandJointId.Invalid, BodyJointId.Body_LeftHandRingMetacarpal),
+#endif
             };
 
             /// <summary>
@@ -64,6 +93,34 @@ namespace Oculus.Movement.AnimationRigging
             /// </summary>
             public static readonly HandBodyJointPair[] RightHandBodyJointPairs =
             {
+#if ISDK_OPENXR_HAND
+                (HandJointId.HandWristRoot, BodyJointId.Body_RightHandWrist),
+                (HandJointId.HandPalm, BodyJointId.Body_RightHandPalm),
+                (HandJointId.HandThumb1, BodyJointId.Body_RightHandThumbMetacarpal),
+                (HandJointId.HandThumb2, BodyJointId.Body_RightHandThumbProximal),
+                (HandJointId.HandThumb3, BodyJointId.Body_RightHandThumbDistal),
+                (HandJointId.HandIndex0, BodyJointId.Body_RightHandIndexMetacarpal),
+                (HandJointId.HandIndex1, BodyJointId.Body_RightHandIndexProximal),
+                (HandJointId.HandIndex2, BodyJointId.Body_RightHandIndexIntermediate),
+                (HandJointId.HandIndex3, BodyJointId.Body_RightHandIndexDistal),
+                (HandJointId.HandMiddle0, BodyJointId.Body_RightHandMiddleMetacarpal),
+                (HandJointId.HandMiddle1, BodyJointId.Body_RightHandMiddleProximal),
+                (HandJointId.HandMiddle2, BodyJointId.Body_RightHandMiddleIntermediate),
+                (HandJointId.HandMiddle3, BodyJointId.Body_RightHandMiddleDistal),
+                (HandJointId.HandRing0, BodyJointId.Body_RightHandRingMetacarpal),
+                (HandJointId.HandRing1, BodyJointId.Body_RightHandRingProximal),
+                (HandJointId.HandRing2, BodyJointId.Body_RightHandRingIntermediate),
+                (HandJointId.HandRing3, BodyJointId.Body_RightHandRingDistal),
+                (HandJointId.HandPinky0, BodyJointId.Body_RightHandLittleMetacarpal),
+                (HandJointId.HandPinky1, BodyJointId.Body_RightHandLittleProximal),
+                (HandJointId.HandPinky2, BodyJointId.Body_RightHandLittleIntermediate),
+                (HandJointId.HandPinky3, BodyJointId.Body_RightHandLittleDistal),
+                (HandJointId.HandThumbTip, BodyJointId.Body_RightHandThumbTip),
+                (HandJointId.HandIndexTip, BodyJointId.Body_RightHandIndexTip),
+                (HandJointId.HandMiddleTip, BodyJointId.Body_RightHandMiddleTip),
+                (HandJointId.HandRingTip, BodyJointId.Body_RightHandRingTip),
+                (HandJointId.HandPinkyTip, BodyJointId.Body_RightHandLittleTip),
+#else
                 (HandJointId.HandWristRoot, BodyJointId.Body_RightHandWrist),
                 (HandJointId.HandForearmStub, BodyJointId.Body_RightHandPalm),
                 (HandJointId.HandThumb0, BodyJointId.Invalid),
@@ -91,6 +148,7 @@ namespace Oculus.Movement.AnimationRigging
                 (HandJointId.Invalid, BodyJointId.Body_RightHandIndexMetacarpal),
                 (HandJointId.Invalid, BodyJointId.Body_RightHandMiddleMetacarpal),
                 (HandJointId.Invalid, BodyJointId.Body_RightHandRingMetacarpal),
+#endif
             };
 
             public HandJointId hand;
@@ -111,17 +169,23 @@ namespace Oculus.Movement.AnimationRigging
         }
 
         /// <summary>
+        /// If the camera rig moves but the body is stationary, this should be true
+        /// If the camera rig and body move together, this can stay false
+        /// </summary>
+        public bool HandsAreOffset { get => _handsAreOffset; set => _handsAreOffset = value; }
+
+        /// <summary>
+        /// The proper <see cref="IHand"/> used to adjust the skeleton in this process
+        /// </summary>
+        public IHand Hand => _iHand ??= _hand as IHand;
+
+        /// <summary>
         /// ISDK Hand source. Can be Synthetic hand
         /// </summary>
         [SerializeField]
         [Tooltip(SkeletonHandAdjustmentTooltips.Hand)]
         [Interface(typeof(IHand))]
-        protected UnityEngine.Object _hand;
-
-        /// <summary>
-        /// The proper <see cref="IHand"/> used to adjust the skeleton in this process
-        /// </summary>
-        protected IHand _ihand;
+        protected Object _hand;
 
         /// <summary>
         /// Should be the OVRCameraRig, which ISDK hands will offset to follow when this
@@ -139,18 +203,14 @@ namespace Oculus.Movement.AnimationRigging
         [Tooltip(SkeletonHandAdjustmentTooltips.HandsAreOffset)]
         protected bool _handsAreOffset;
 
+        private IHand _iHand;
         private HandBodyJointPair[] _jointPairs;
         private Quaternion _rigRotationOffset;
         private Vector3 _rigPositionOffset;
         private RetargetingProcessorCorrectHand.HandProcessor _retargetingHandProcessor;
 
-        /// <summary>
-        /// If the camera rig moves but the body is stationary, this should be true
-        /// If the camera rig and body move together, this can stay false
-        /// </summary>
-        public bool HandsAreOffset { get => _handsAreOffset; set => _handsAreOffset = value; }
-
-        public IHand Hand => _ihand != null ? _ihand : _ihand = _hand as IHand;
+        private readonly Quaternion _openXRLeftHandRotOffset = Quaternion.Euler(180, 90, 0);
+        private readonly Quaternion _openXRRightHandRotOffset = Quaternion.Euler(0, 270, 0);
 
         /// <summary>
         /// Edit time method that initializes key variables with reasonable defaults.
@@ -216,6 +276,9 @@ namespace Oculus.Movement.AnimationRigging
                 }
                 Transform bone = bones[joint].Transform;
                 Hand.GetJointPose(pair.hand, out Pose pose);
+#if ISDK_OPENXR_HAND
+                ConvertOpenXRHandToOvrHand(pair.body, ref pose);
+#endif
                 if (HandsAreOffset && _cameraRig != null)
                 {
                     PosePropagationThatUndoesRigTransformation(ref bone, ref pose);
@@ -257,6 +320,25 @@ namespace Oculus.Movement.AnimationRigging
             }
             // Update the custom target hand position for the IK solver to be at the ISDK hand position.
             _retargetingHandProcessor.CustomHandTargetPosition = targetHandPosition;
+        }
+
+        private void ConvertOpenXRHandToOvrHand(BodyJointId id, ref Pose pose)
+        {
+            switch (id)
+            {
+                case BodyJointId.Body_LeftHandWrist:
+                    pose.rotation *= _openXRLeftHandRotOffset;
+                    break;
+                case BodyJointId.Body_RightHandWrist:
+                    pose.rotation *= _openXRRightHandRotOffset;
+                    break;
+                case > BodyJointId.Body_LeftHandWrist and < BodyJointId.Body_LeftHandLittleTip:
+                    pose.rotation *= _openXRLeftHandRotOffset;
+                    break;
+                case > BodyJointId.Body_RightHandWrist and < BodyJointId.Body_RightHandLittleTip:
+                    pose.rotation *= _openXRRightHandRotOffset;
+                    break;
+            }
         }
 
         private void FindRetargetingProcessorCorrectHand(OVRSkeleton skeleton)

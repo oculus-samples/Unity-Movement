@@ -491,7 +491,6 @@ float3 GetRecalculatedNormal(uint vid : SV_VertexID)
   // 1. An offsets array
   // 2. A flattened map consisting of a vertex ID, followed immediately by
   //    the IDs of its neighbors.
-  // to get to the neighbors, we need to offset into the map section
   float3 vertex1 = vertices[vertexMetadata[offsetIntoVertexMap + idOfVertexInMap]];
   int startOfNeighborIndices = idOfVertexInMap + 1;
   float3 accumulatedNormal = float3(0, 0, 0);

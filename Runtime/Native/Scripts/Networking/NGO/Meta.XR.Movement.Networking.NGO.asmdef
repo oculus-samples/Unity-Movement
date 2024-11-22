@@ -1,0 +1,33 @@
+{
+    "name": "Meta.XR.Movement.Networking.NGO",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:3b7cf88e9d6729441884290e764f086b",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:8e76fd86d1fdc9243a341ca50624a575",
+        "GUID:556b773d6a305d4468ac5cfc13ebbf2f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_NGO_MODULE_DEFINED"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.meta.xr.sdk.platform",
+            "expression": "",
+            "define": "META_PLATFORM_SDK_DEFINED"
+        },
+        {
+            "name": "com.unity.netcode.gameobjects",
+            "expression": "",
+            "define": "UNITY_NGO_MODULE_DEFINED"
+        }
+    ],
+    "noEngineReferences": false
+}

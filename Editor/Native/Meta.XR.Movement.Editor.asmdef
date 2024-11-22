@@ -1,0 +1,20 @@
+{
+    "name": "Meta.XR.Movement.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:f4af9e3560e85174f90917cb2bbcda01",
+        "GUID:8e76fd86d1fdc9243a341ca50624a575"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

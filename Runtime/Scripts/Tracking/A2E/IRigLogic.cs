@@ -1,0 +1,23 @@
+// Copyright (c) Meta Platforms, Inc. and affiliates.
+
+using System.Collections.Generic;
+
+namespace Meta.XR.Movement.FaceTracking.Samples
+{
+    /// <summary>
+    /// Base rig logic interface.
+    /// </summary>
+    public interface IRigLogic
+    {
+        /// <summary>
+        /// List of driver names.
+        /// </summary>
+        public IList<string> Drivers { get; }
+        /// <summary>
+        /// Creates output signal values based on driver weights.
+        /// </summary>
+        /// <param name="driverWeights">Driver weights.</param>
+        /// <param name="outputSignals">Output signals.</param>
+        public void Eval(IReadOnlyList<float> driverWeights, IList<float> outputSignals);
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "name": "Meta.XR.Movement.Networking.Fusion",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:3b7cf88e9d6729441884290e764f086b",
+        "GUID:8e76fd86d1fdc9243a341ca50624a575",
+        "GUID:cdd87b9f1e3f044a88f8bfcc0c42a540",
+        "GUID:556b773d6a305d4468ac5cfc13ebbf2f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "FUSION2",
+        "FUSION_WEAVER"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.meta.xr.sdk.platform",
+            "expression": "",
+            "define": "META_PLATFORM_SDK_DEFINED"
+        }
+    ],
+    "noEngineReferences": false
+}
