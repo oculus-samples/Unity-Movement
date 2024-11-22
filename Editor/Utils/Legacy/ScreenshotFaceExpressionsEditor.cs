@@ -3,7 +3,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Oculus.Movement.Utils
+namespace Oculus.Movement.Utils.Deprecated
 {
     /// <summary>
     /// Editor class defining interface for screenshot face expressions.

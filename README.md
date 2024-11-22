@@ -2,15 +2,15 @@
 Unity-Movement is a package that uses OpenXR’s tracking layer APIs to expose Meta Quest Pro’s Body Tracking (BT), Eye Tracking (ET), and Face Tracking (FT) capabilities. With this package, developers can leverage tracking to populate VR environments with custom avatars that bring the expressiveness of users into the virtual environments that they create.
 
 ### License
-The Unity-Movement package is released under the [Oculus License](https://github.com/oculus-samples/Unity-Movement/blob/main/LICENSE). The MIT License applies to only certain, clearly marked documents. If an individual file does not indicate which license it is subject to, then the Oculus License applies.
+The Unity-Movement package is released under the [Oculus License](https://github.com/oculus-samples/Unity-Movement/blob/main/LICENSE.md). The MIT License applies to only certain, clearly marked documents. If an individual file does not indicate which license it is subject to, then the Oculus License applies.
 
 ### Requirements
 - A version of Unity supported for Movement SDK installed:
   - 2021.3.26f1 (2021 LTS or newer)
   - 2022.3.11f2 (2022 LTS or newer)
-  - 2023.2.7f1 or newer
-- v67.0 or newer of the Meta XR SDK. You will need the [Meta XR Core SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-core-sdk-269169) and the [Meta XR Interaction SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
-- A project set up with these [steps](https://developer.oculus.com/documentation/unity/move-overview/#unity-project-setup).
+  - Unity 6 or newer
+- v71.0 or newer of the Meta XR SDK. You will need the [Meta XR Core SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-core-sdk-269169) and the [Meta XR Interaction SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
+- A project set up with these [steps](https://developers.meta.com/horizon/documentation/unity/move-overview/#unity-project-setup).
 
 ## Getting Started
 First, ensure that all of the [requirements](#requirements) are met.
@@ -24,7 +24,7 @@ The sample scenes are located under the **Samples/Scenes** folder.
 
 ## Unity Setup
 
-If the new scene or an existing scene doesn’t have a GameObject with the OVRCameraRig component, integrate body tracking as mentioned [here](https://developer.oculus.com/documentation/unity/move-body-tracking/#integrate-body-tracking) and then follow these verification steps:
+If the new scene or an existing scene doesn’t have a GameObject with the OVRCameraRig component, integrate body tracking as mentioned [here](https://developers.meta.com/horizon/documentation/unity/move-body-tracking/#integrate-body-tracking) and then follow these verification steps:
 1. From the Hierarchy tab, look for a Main Camera GameObject which comes in a new scene by default. If it it exists, then please delete it.
 2. Make sure a Camera Rig is in your scene, either by using the OVRCameraRig or by creating one using Building Blocks. To create a Camera Rig using Building Blocks, go to **Meta->Tools->Building Blocks** and select the (+) icon on the lower right of the Camera Rig option.
 3. Select the Camera Rig object in the Hierarchy, and in the Inspector tab, go to the OVRManager component and look for the "Quest Features" section.
@@ -63,9 +63,9 @@ The project contains several sample scenes. To test the samples, they must be im
 <br>
 
 
-For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
+For more information about body tracking, please refer to [this page](https://developers.meta.com/horizon/documentation/unity/move-body-tracking/).
 
-For more information about the samples, please refer to [this page](https://developer.oculus.com/documentation/unity/move-samples/).
+For more information about the samples, please refer to [this page](https://developers.meta.com/horizon/documentation/unity/move-samples/).
 
 ## Player Settings
 
@@ -76,8 +76,8 @@ Make sure that the color space is set to Linear.
 In order for the SceneSelectMenu buttons to work, add imported scenes in the [Samples](#samples) step to the Build Settings.
 
 ## Documentation
-The documentation for this package can be found [here](https://developer.oculus.com/documentation/unity/move-overview/).
+The documentation for this package can be found [here](https://developers.meta.com/horizon/documentation/unity/move-overview/).
 The API reference for this package can be found [here](https://oculus-samples.github.io/Unity-Movement/).
 
 ## License
-Unity-Movement is subject to the [Oculus SDK License Agreement](https://developer.oculus.com/licenses/oculussdk/), as found in the LICENSE file.
+Unity-Movement is subject to the [Oculus SDK License Agreement](https://developers.meta.com/horizon/licenses/oculussdk/), as found in the LICENSE file.

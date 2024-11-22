@@ -11,26 +11,24 @@ namespace Oculus.Movement.Utils
     {
         private const string _MOVEMENT_SAMPLES_FT_MENU =
             "Face Tracking/";
-        private const string _CORRECTIVES_FACE_MENU =
-            "Correctives Face";
-        private const string _ARKIT_FACE_MENU =
-            "ARKit Face";
+
+        private const string _A2E_FACE_MENU =
+            "A2E Face";
+        private const string _A2E_ARKIT_FACE_MENU =
+            "A2E ARKit Face";
 
         [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU +
-            _CORRECTIVES_FACE_MENU)]
-        private static void SetupCharacterForCorrectivesFaceNoDuplicates()
+            _A2E_FACE_MENU)]
+        private static void SetupCharacterForA2EFace()
         {
-            var activeGameObject = Selection.activeGameObject;
-
-            AddComponentsHelper.SetUpCharacterForCorrectivesFace(activeGameObject, false);
+            AddComponentsHelper.SetUpCharacterForA2EFace(Selection.activeGameObject, false);
         }
 
-        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU + _ARKIT_FACE_MENU)]
-        private static void SetupCharacterForARKitFaceNoDuplicates()
+        [MenuItem(AddComponentsHelper._MOVEMENT_SAMPLES_MENU + _MOVEMENT_SAMPLES_FT_MENU +
+            _A2E_ARKIT_FACE_MENU)]
+        private static void SetupCharacterForA2EARKitFace()
         {
-            var activeGameObject = Selection.activeGameObject;
-
-            AddComponentsHelper.SetUpCharacterForARKitFace(activeGameObject, false);
+            AddComponentsHelper.SetUpCharacterForA2EARKitFace(Selection.activeGameObject, false);
         }
     }
 }

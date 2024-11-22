@@ -103,6 +103,7 @@ namespace Oculus.Movement.Effects
                     foreach (var recalculateMaterial in _recalculateMaterials)
                     {
                         recalculateMaterial.EnableKeyword(_recalculateNormalShaderKeyword);
+                        recalculateMaterial.SetFloat("_RecalculateNormalsToggle", 1.0f);
                     }
                 }
                 else
@@ -110,6 +111,7 @@ namespace Oculus.Movement.Effects
                     foreach (var recalculateMaterial in _recalculateMaterials)
                     {
                         recalculateMaterial.DisableKeyword(_recalculateNormalShaderKeyword);
+                        recalculateMaterial.SetFloat("_RecalculateNormalsToggle", 0.0f);
                     }
                 }
                 ToggleVisibility(_runRecalculation);
@@ -162,13 +164,13 @@ namespace Oculus.Movement.Effects
                     _subMesh = 0;
                 }
 
-                int[] subMeshTriangles = _meshSnapshot.GetTriangles(_subMesh);
+                int[] subMeshTriangleIndices = _meshSnapshot.GetTriangles(_subMesh);
                 Vector3[] allVertices = _meshSnapshot.vertices;
                 int[] allTriangles = _meshSnapshot.triangles;
                 // Create a mapping from vertex *position* to neighbors. This uses
                 // a custom VertexKey to hash similar positions to each other.
                 Dictionary<VertexKey, List<int>> subMeshVertexToNeighborList =
-                    CreateSubMeshVertexToNeighborMapping(subMeshTriangles,
+                    CreateSubMeshVertexToNeighborMapping(subMeshTriangleIndices,
                         allVertices, allTriangles);
 
                 // The list of neighbors will always be even, since when you form
@@ -179,8 +181,9 @@ namespace Oculus.Movement.Effects
                 }
 
                 // Create a mapping to map vertex *ID*s to neighbors. This uses
-                // the original -> neighbors mapping to create an ID ->
-                // neighbors mapping.
+                // the original VertexKey -> neighbors mapping to create an ID ->
+                // neighbors mapping. The original VertexKey mapping might map to multiple
+                // indices, and this function takes care of that.
                 BuildVertexIdToTriangleAssociation(
                     allVertices,
                     allTriangles,
@@ -189,12 +192,18 @@ namespace Oculus.Movement.Effects
                     out HashSet<int> subMeshVertexIndexSet,
                     out int vertexIdToTriangleMapCount);
 
+                // subMeshVertexIdToNeighborList -> maps index to neighbor list.
+                // It might be possible that multiple verts exist in the same
+                // location, so multiple indices might share neighbors.
+                // subMeshVertexIndexSet -> verts that have neighbors.
+                // vertexIdToTriangleMapCount -> total neighbor counts
                 _normalRecalculator.Initialize(
                     subMeshVertexIdToNeighborList,
                     subMeshVertexIndexSet,
                     vertexIdToTriangleMapCount,
                     _meshSnapshot,
-                    _recalculateMaterials.ToArray());
+                    _recalculateMaterials.ToArray(),
+                    _subMesh);
             }
 
             GeneratedDuplicateMesh?.Invoke();
@@ -297,7 +306,8 @@ namespace Oculus.Movement.Effects
         /// <summary>
         /// Create an association between vertices and their neighbors. We use a custom
         /// key for vertices that effectively maps the same vertex positions to the
-        /// same key value.
+        /// same key value. The neighbors returned are not just the vertices of a sub mesh, but
+        /// potentially other adjacent sub meshes.
         /// </summary>
         /// <param name="subMeshTriangles">Indices of the vertices that making up the relevant
         /// sub-mesh's triangles.</param>
@@ -310,7 +320,7 @@ namespace Oculus.Movement.Effects
             int[] allTriangles)
         {
             // For the sub-mesh that we care about, create a list of neighbors
-            // that we will add to.
+            // that we will add to. They will be empty for now.
             var subMeshVertexToNeighborList =
                 new Dictionary<VertexKey, List<int>>(allVertices.Length);
             for (int i = 0; i < subMeshTriangles.Length; i += 3)
@@ -328,7 +338,9 @@ namespace Oculus.Movement.Effects
             }
 
             // Find all the triangles that have an effect on the vertices in the sub-mesh
-            // by mapping each vertex to its neighbors.
+            // by mapping each vertex to its neighbors. It's possible that a sub mesh
+            // vertex is a neighbor of an adjacent sub mesh's vertex, so we have to
+            // do the neighbor check using all vertices.
             for (int i = 0; i < allTriangles.Length; i += 3)
             {
                 int i1 = allTriangles[i];
@@ -348,7 +360,8 @@ namespace Oculus.Movement.Effects
 
         /// <summary>
         /// For each vertex, create an entry which will hold the
-        /// indices of its neighbors.
+        /// indices of its neighbors, using <see cref="VertexKey"/>
+        /// as a key, which prevents duplicates.
         /// </summary>
         /// <param name="vertex">Vertex position.</param>
         /// <param name="vertexToNeighborList">Vertex to neighbor mapping.</param>
@@ -391,7 +404,7 @@ namespace Oculus.Movement.Effects
         private void BuildVertexIdToTriangleAssociation(
             Vector3[] vertices,
             int[] allTriangles,
-            Dictionary<VertexKey, List<int>> subMeshVertexToNeighborList,
+            Dictionary<VertexKey, List<int>> subMeshVertexKeyToNeighborList,
             out Dictionary<int, List<int>> subMeshVertexIdToNeighborList,
             out HashSet<int> subMeshVertexIndexSet,
             out int vertexIdToTriangleMapCount)
@@ -406,27 +419,27 @@ namespace Oculus.Movement.Effects
                 int i3 = allTriangles[i + 2];
 
                 vertexIdToTriangleMapCount = MapVertexIndexToNeighborsAndReturnMappingCount(
-                    vertices[i1], i1, subMeshVertexToNeighborList,
+                    vertices[i1], i1, subMeshVertexKeyToNeighborList,
                     subMeshVertexIndexSet, subMeshVertexIdToNeighborList, vertexIdToTriangleMapCount);
 
                 vertexIdToTriangleMapCount = MapVertexIndexToNeighborsAndReturnMappingCount(
-                    vertices[i2], i2, subMeshVertexToNeighborList,
+                    vertices[i2], i2, subMeshVertexKeyToNeighborList,
                     subMeshVertexIndexSet, subMeshVertexIdToNeighborList, vertexIdToTriangleMapCount);
 
                 vertexIdToTriangleMapCount = MapVertexIndexToNeighborsAndReturnMappingCount(
-                    vertices[i3], i3, subMeshVertexToNeighborList,
+                    vertices[i3], i3, subMeshVertexKeyToNeighborList,
                     subMeshVertexIndexSet, subMeshVertexIdToNeighborList, vertexIdToTriangleMapCount);
             }
         }
 
         /// <summary>
         /// Map each vertex index in the sub-mesh to all the connected triangle vertices.
-        /// The original map maps from vertex to neighbors, while the new maps from
+        /// The original map maps from <see cref="VertexKey"> to neighbors, while the new maps from
         /// index to neighbors.
         /// </summary>
         /// <param name="vertex">Vertex position.</param>
         /// <param name="vertexIndex">Vertex index.</param>
-        /// <param name="subMeshVertexToNeighborList">Sub-mesh vertex to neighbors mapping.</param>
+        /// <param name="subMeshVertexToNeighborList">Sub-mesh <see cref="VertexKey"> to neighbors mapping.</param>
         /// <param name="subMeshVertexIndexSet">HashSet of all the vertex indices in the sub-mesh.</param>
         /// <param name="subMeshVertexIdToNeighborList">Sub-mesh vertex id to connected triangle
         /// vertex id lookup.</param>

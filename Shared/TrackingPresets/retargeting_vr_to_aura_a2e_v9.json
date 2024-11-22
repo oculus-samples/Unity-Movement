@@ -1,0 +1,535 @@
+[
+  {
+    "drivers": {
+      "BrowLowererL": 1
+    },
+    "targets": {
+      "browLowerer_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "BrowLowererR": 1
+    },
+    "targets": {
+      "browLowerer_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "CheekPuffL": 1
+    },
+    "targets": {
+      "cheekPuff_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "CheekPuffR": 1
+    },
+    "targets": {
+      "cheekPuff_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "CheekRaiserL": 1
+    },
+    "targets": {
+      "cheekRaiser_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "CheekRaiserR": 1
+    },
+    "targets": {
+      "cheekRaiser_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "CheekSuckL": 1
+    },
+    "targets": {
+      "cheekSuck_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "CheekSuckR": 1
+    },
+    "targets": {
+      "cheekSuck_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "ChinRaiserB": 1
+    },
+    "targets": {
+      "chinRaiser_B": 1
+    }
+  },
+  {
+    "drivers": {
+      "ChinRaiserT": 1
+    },
+    "targets": {
+      "chinRaiser_T": 1
+    }
+  },
+  {
+    "drivers": {
+      "DimplerL": 1
+    },
+    "targets": {
+      "dimpler_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "DimplerR": 1
+    },
+    "targets": {
+      "dimpler_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "EyesClosedL": 1
+    },
+    "targets": {
+      "eyesClosed_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "EyesClosedR": 1
+    },
+    "targets": {
+      "eyesClosed_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "InnerBrowRaiserL": 1
+    },
+    "targets": {
+      "innerBrowRaiser_L": 2,
+      "outerBrowRaiser_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "InnerBrowRaiserR": 1
+    },
+    "targets": {
+      "innerBrowRaiser_R": 2,
+      "outerBrowRaiser_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "JawDrop": 1
+    },
+    "targets": {
+      "jawDrop": 1.3
+    }
+  },
+  {
+    "drivers": {
+      "JawSidewaysLeft": 1
+    },
+    "targets": {
+      "jawSidewaysLeft": 1
+    }
+  },
+  {
+    "drivers": {
+      "JawSidewaysRight": 1
+    },
+    "targets": {
+      "jawSidewaysRight": 1
+    }
+  },
+  {
+    "drivers": {
+      "JawThrust": 1
+    },
+    "targets": {
+      "jawThrust": 1
+    }
+  },
+  {
+    "drivers": {
+      "LidTightenerL": 1
+    },
+    "targets": {
+      "lidTightener_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "LidTightenerR": 1
+    },
+    "targets": {
+      "lidTightener_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipCornerDepressorL": 1
+    },
+    "targets": {
+      "lipCornerDepressor_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipCornerDepressorR": 1
+    },
+    "targets": {
+      "lipCornerDepressor_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipCornerPullerL": 1
+    },
+    "targets": {
+      "cheekRaiser_L": 1,
+      "lidTightener_L": 0.5,
+      "lipCornerPuller_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipCornerPullerR": 1
+    },
+    "targets": {
+      "cheekRaiser_R": 1,
+      "lidTightener_R": 0.5,
+      "lipCornerPuller_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "LowerLipDepressorL": 1
+    },
+    "targets": {
+      "lowerLipDepressor_L": 2
+    }
+  },
+  {
+    "drivers": {
+      "LowerLipDepressorR": 1
+    },
+    "targets": {
+      "lowerLipDepressor_R": 2
+    }
+  },
+  {
+    "drivers": {
+      "LipFunnelerLB": 1
+    },
+    "targets": {
+      "lipFunneler_LB": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipFunnelerLT": 1
+    },
+    "targets": {
+      "lipFunneler_LT": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipFunnelerRB": 1
+    },
+    "targets": {
+      "lipFunneler_RB": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipFunnelerRT": 1
+    },
+    "targets": {
+      "lipFunneler_RT": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipPressorL": 1
+    },
+    "targets": {
+      "lipPressor_L": 2,
+      "lipPressor_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipPressorR": 1
+    },
+    "targets": {
+      "lipPressor_L": 1,
+      "lipPressor_R": 2
+    }
+  },
+  {
+    "drivers": {
+      "LipPuckerL": 1
+    },
+    "targets": {
+      "lipFunneler_LB": 2.5,
+      "lipFunneler_LT": 2.5,
+      "lipPucker_L": 2.5,
+      "lipTightener_L": 0.5
+    }
+  },
+  {
+    "drivers": {
+      "LipPuckerR": 1
+    },
+    "targets": {
+      "lipFunneler_RB": 2.5,
+      "lipFunneler_RT": 2.5,
+      "lipPucker_R": 2.5,
+      "lipTightener_R": 0.5
+    }
+  },
+  {
+    "drivers": {
+      "LipStretcherL": 1
+    },
+    "targets": {
+      "lipStretcher_L": 5
+    }
+  },
+  {
+    "drivers": {
+      "LipStretcherR": 1
+    },
+    "targets": {
+      "lipStretcher_R": 5
+    }
+  },
+  {
+    "drivers": {
+      "LipSuckLB": 1
+    },
+    "targets": {
+      "lipSuck_LB": 1.5
+    }
+  },
+  {
+    "drivers": {
+      "LipSuckLT": 1
+    },
+    "targets": {
+      "lipSuck_LT": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipSuckRB": 1
+    },
+    "targets": {
+      "lipSuck_RB": 1.5
+    }
+  },
+  {
+    "drivers": {
+      "LipSuckRT": 1
+    },
+    "targets": {
+      "lipSuck_RT": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipTightenerL": 1
+    },
+    "targets": {
+      "lipTightener_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipTightenerR": 1
+    },
+    "targets": {
+      "lipTightener_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipsToward": 1
+    },
+    "targets": {
+      "lipsToward_LB": 1,
+      "lipsToward_LT": 1,
+      "lipsToward_RB": 1,
+      "lipsToward_RT": 1
+    }
+  },
+  {
+    "drivers": {
+      "MouthLeft": 1
+    },
+    "targets": {
+      "mouthLeft": 1
+    }
+  },
+  {
+    "drivers": {
+      "MouthRight": 1
+    },
+    "targets": {
+      "mouthRight": 1
+    }
+  },
+  {
+    "drivers": {
+      "NoseWrinklerL": 1
+    },
+    "targets": {
+      "noseWrinkler_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "NoseWrinklerR": 1
+    },
+    "targets": {
+      "noseWrinkler_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "OuterBrowRaiserL": 1
+    },
+    "targets": {
+      "outerBrowRaiser_L": 1,
+      "upperLidRaiser_L": 0.5
+    }
+  },
+  {
+    "drivers": {
+      "OuterBrowRaiserR": 1
+    },
+    "targets": {
+      "outerBrowRaiser_R": 1,
+      "upperLidRaiser_R": 0.5
+    }
+  },
+  {
+    "drivers": {
+      "TongueBackDorsalVelar": 1
+    },
+    "targets": {
+      "tongueBackDorsalVelar": 1
+    }
+  },
+  {
+    "drivers": {
+      "TongueFrontDorsalPalate": 1
+    },
+    "targets": {
+      "tongueFrontDorsalPalate": 1
+    }
+  },
+  {
+    "drivers": {
+      "TongueMidDorsalPalate": 1
+    },
+    "targets": {
+      "tongueMidDorsalPalate": 1
+    }
+  },
+  {
+    "drivers": {
+      "TongueOut": 1
+    },
+    "targets": {
+      "tongueOut": 1
+    }
+  },
+  {
+    "drivers": {
+      "TongueRetreat": 1
+    },
+    "targets": {
+      "tongueRetreat": 1
+    }
+  },
+  {
+    "drivers": {
+      "TongueTipAlveolar": 1
+    },
+    "targets": {
+      "tongueTipAlveolar": 1
+    }
+  },
+  {
+    "drivers": {
+      "TongueTipInterdental": 1
+    },
+    "targets": {
+      "tongueTipInterdental": 1
+    }
+  },
+  {
+    "drivers": {
+      "UpperLidRaiserL": 1
+    },
+    "targets": {
+      "upperLidRaiser_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "UpperLidRaiserR": 1
+    },
+    "targets": {
+      "upperLidRaiser_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "UpperLipRaiserL": 1
+    },
+    "targets": {
+      "upperLipRaiser_L": 1
+    }
+  },
+  {
+    "drivers": {
+      "UpperLipRaiserR": 1
+    },
+    "targets": {
+      "upperLipRaiser_R": 1
+    }
+  },
+  {
+    "drivers": {
+      "LipCornerPullerL": 0.5
+    },
+    "targets": {
+      "cheekRaiser_L": 0.4,
+      "lipCornerPuller_L": 0.5
+    }
+  },
+  {
+    "drivers": {
+      "LipCornerPullerR": 0.5
+    },
+    "targets": {
+      "cheekRaiser_R": 0.4,
+      "lipCornerPuller_R": 0.5
+    }
+  }
+]

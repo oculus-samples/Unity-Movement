@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Oculus.Movement.Utils
+namespace Oculus.Movement.Utils.Deprecated
 {
     /// <summary>
     /// Take screenshots of the specified blendshape mapping.

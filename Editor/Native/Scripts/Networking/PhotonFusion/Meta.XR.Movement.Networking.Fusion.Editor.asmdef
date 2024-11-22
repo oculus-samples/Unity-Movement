@@ -1,0 +1,32 @@
+{
+    "name": "Meta.XR.Movement.Networking.Fusion.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d2761a0af0f567748a72629d4bb18a26",
+        "GUID:d0574574baafe9d4aa78d8df4a5e3e5e",
+        "GUID:93bda9a2bc9dddc43930634fa65d6e42",
+        "GUID:605641bd66474487ca6f2ea7026fe16b",
+        "GUID:e67422dde67a6324a8ced7e5fa3542de",
+        "GUID:0ae00a88486903b48b2cb4d93c1f8729",
+        "GUID:278ead603a03108428fcdc14f26c8cdb",
+        "GUID:1fa491b0e778e1c418fe4f24644e650b",
+        "GUID:2cb78939f95284f468f0471ef69d9f00",
+        "GUID:1baf1ffff1031e948b3b228ab3453251",
+        "GUID:4d449a4732e064d26a3069f2cfd88917",
+        "GUID:a0a9a53e745ee7b4ba4d3319593e2540"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "FUSION2",
+        "FUSION_WEAVER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
