@@ -1,0 +1,1279 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class AddComponentsHelper
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class AddComponentsHelper
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.Utils.AddComponentsHelper">
+  
+  
+  <h1 id="Oculus_Movement_Utils_AddComponentsHelper" data-uid="Oculus.Movement.Utils.AddComponentsHelper" class="text-break">Class AddComponentsHelper
+  </h1>
+  <div class="markdown level0 summary"><p>Has functions that allow adding components via the editor or runtime.
+These functions detect if they are being called in the editor and if so,
+affect the undo state.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">AddComponentsHelper</span></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.Utils.html">Oculus.Movement.Utils</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_Utils_AddComponentsHelper_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class AddComponentsHelper</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper__MOVEMENT_SAMPLES_MENU" data-uid="Oculus.Movement.Utils.AddComponentsHelper._MOVEMENT_SAMPLES_MENU">_MOVEMENT_SAMPLES_MENU</h4>
+  <div class="markdown level1 summary"><p>Prefix for movement samples one-click menus.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const string _MOVEMENT_SAMPLES_MENU = &quot;GameObject/Movement Samples/&quot;</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddBasicAnimationRiggingComponents_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddBasicAnimationRiggingComponents*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddBasicAnimationRiggingComponents_GameObject_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddBasicAnimationRiggingComponents(GameObject,System.Boolean)">AddBasicAnimationRiggingComponents(GameObject, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Adds components necessary for animation rigging to work.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static (RigBuilder, GameObject) AddBasicAnimationRiggingComponents(GameObject mainParent, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">mainParent</span></td>
+        <td><p>Container for animation rigging components.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.ValueTuple</span>&lt;<span class="xref">RigBuilder</span>, <span class="xref">GameObject</span>&gt;</td>
+        <td><p>The rig builder and rig components created.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddBoneTargets_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddBoneTargets*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddBoneTargets_GameObject_Animator_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddBoneTargets(GameObject,Animator,System.Boolean,System.Boolean)">AddBoneTargets(GameObject, Animator, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Adds bone targets to rig object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BoneTarget[] AddBoneTargets(GameObject rigObject, Animator animator, bool isFullBody, bool runtimeInvocation)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">rigObject</span></td>
+        <td><p>Rig object serving as parent for bone targets.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">Animator</span></td>
+        <td><span class="parametername">animator</span></td>
+        <td><p>Animator to obtain target bone.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isFullBody</span></td>
+        <td><p>Indicates if full body (or not).</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">BoneTarget</span>[]</td>
+        <td><p>Array of bone targets added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddCorrectBonesRetargetingProcessor_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddCorrectBonesRetargetingProcessor*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddCorrectBonesRetargetingProcessor_RetargetingLayer_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddCorrectBonesRetargetingProcessor(RetargetingLayer,System.Boolean)">AddCorrectBonesRetargetingProcessor(RetargetingLayer, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Adds retargeting processor that corrects hand bones.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void AddCorrectBonesRetargetingProcessor(RetargetingLayer retargetingLayer, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>Retargeting layer to add to.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddCorrectHandRetargetingProcessor_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddCorrectHandRetargetingProcessor*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddCorrectHandRetargetingProcessor_RetargetingLayer_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddCorrectHandRetargetingProcessor(RetargetingLayer,System.Boolean)">AddCorrectHandRetargetingProcessor(RetargetingLayer, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Add hand correction retargeting processor component to retargeting layer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void AddCorrectHandRetargetingProcessor(RetargetingLayer retargetingLayer, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>Retargeting layer to add to.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddHandDeformationRetargetingProcessor_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddHandDeformationRetargetingProcessor*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddHandDeformationRetargetingProcessor_RetargetingLayer_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddHandDeformationRetargetingProcessor(RetargetingLayer,System.Boolean)">AddHandDeformationRetargetingProcessor(RetargetingLayer, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Add the hand deformation retargeting processor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void AddHandDeformationRetargetingProcessor(RetargetingLayer retargetingLayer, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddJointAdjustments_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddJointAdjustments*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddJointAdjustments_Animator_RetargetingLayer_Oculus_Movement_Utils_RestPoseObjectHumanoid_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddJointAdjustments(Animator,RetargetingLayer,Oculus.Movement.Utils.RestPoseObjectHumanoid)">AddJointAdjustments(Animator, RetargetingLayer, RestPoseObjectHumanoid)</h4>
+  <div class="markdown level1 summary"><p>Adds joint adjustments for an animator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void AddJointAdjustments(Animator animator, RetargetingLayer retargetingLayer, RestPoseObjectHumanoid restPoseHumanoid = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Animator</span></td>
+        <td><span class="parametername">animator</span></td>
+        <td><p>Animator component.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>Retargeting layer component to change adjustments of.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Utils.RestPoseObjectHumanoid.html">RestPoseObjectHumanoid</a></td>
+        <td><span class="parametername">restPoseHumanoid</span></td>
+        <td><p>Optional humanoid rest pose asset used for adjustment calculation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddMainRetargetingComponent_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddMainRetargetingComponent*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddMainRetargetingComponent_GameObject_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddMainRetargetingComponent(GameObject,System.Boolean,System.Boolean)">AddMainRetargetingComponent(GameObject, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Adds main retargeting component and sets it up.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RetargetingLayer AddMainRetargetingComponent(GameObject mainParent, bool isFullBody, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">mainParent</span></td>
+        <td><p>GameObject to add to.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isFullBody</span></td>
+        <td><p>If full body or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><p>RetargetingLayer that was added.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddRetargetingAnimationRig_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddRetargetingAnimationRig*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddRetargetingAnimationRig_RetargetingLayer_RigBuilder_MonoBehaviour___" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddRetargetingAnimationRig(RetargetingLayer,RigBuilder,MonoBehaviour[])">AddRetargetingAnimationRig(RetargetingLayer, RigBuilder, MonoBehaviour[])</h4>
+  <div class="markdown level1 summary"><p>Add the retargeting animation rig.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void AddRetargetingAnimationRig(RetargetingLayer retargetingLayer, RigBuilder rigBuilder, MonoBehaviour[] constraintComponents)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">RigBuilder</span></td>
+        <td><span class="parametername">rigBuilder</span></td>
+        <td><p>The rig builder.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">MonoBehaviour</span>[]</td>
+        <td><span class="parametername">constraintComponents</span></td>
+        <td><p>The constraint components.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_AddRetargetingConstraint_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddRetargetingConstraint*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_AddRetargetingConstraint_GameObject_RetargetingLayer_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.AddRetargetingConstraint(GameObject,RetargetingLayer,System.Boolean,System.Boolean)">AddRetargetingConstraint(GameObject, RetargetingLayer, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Adds retargeting constraint under the rig object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RetargetingAnimationConstraint AddRetargetingConstraint(GameObject rigObject, RetargetingLayer retargetingLayer, bool runtimeInvocation = false, bool setAsLastSibling = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">rigObject</span></td>
+        <td><p>Rig object that will be the parent of the constraint.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>Retargeting layer associated with the constraint.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">setAsLastSibling</span></td>
+        <td><p>Allows adding as last sibling under constraints.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingAnimationConstraint</span></td>
+        <td><p>Retargeting constraint under the rig.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_CheckIfTPose_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.CheckIfTPose*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_CheckIfTPose_Animator_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.CheckIfTPose(Animator)">CheckIfTPose(Animator)</h4>
+  <div class="markdown level1 summary"><p>Given an animator, determine if the avatar is in T-pose or A-pose.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool CheckIfTPose(Animator animator)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Animator</span></td>
+        <td><span class="parametername">animator</span></td>
+        <td><p>The animator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if T-pose.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_DestroyLegacyComponents_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyLegacyComponents*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_DestroyLegacyComponents_GameObject_GameObject_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyLegacyComponents(GameObject,GameObject)">DestroyLegacyComponents(GameObject, GameObject)</h4>
+  <div class="markdown level1 summary"><p>Destroys legacy components on GameObject if they exist.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void DestroyLegacyComponents(GameObject gameObject, GameObject rigObject)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td><p>Main GameObject.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">rigObject</span></td>
+        <td><p>Rig object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_DestroyLegacyComponents_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyLegacyComponents*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_DestroyLegacyComponents__1_GameObject_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyLegacyComponents``1(GameObject,System.Boolean)">DestroyLegacyComponents&lt;T&gt;(GameObject, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Destroy legacy components.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool DestroyLegacyComponents&lt;T&gt;(GameObject gameObject, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td><p>The object to check for the legacy components.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if legacy components were destroyed.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The legacy component type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_DestroyLegacyProcessor_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyLegacyProcessor*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_DestroyLegacyProcessor__1_GameObject_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyLegacyProcessor``1(GameObject,System.Boolean)">DestroyLegacyProcessor&lt;T&gt;(GameObject, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Destroy legacy processors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool DestroyLegacyProcessor&lt;T&gt;(GameObject gameObject, bool runtimeInvocation = false)
+    where T : class</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td><p>The object to check for the legacy processors.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if legacy processors were destroyed.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The legacy processor type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_DestroyTargetTransform_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyTargetTransform*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_DestroyTargetTransform_GameObject_System_String_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.DestroyTargetTransform(GameObject,System.String,System.Boolean,System.Boolean)">DestroyTargetTransform(GameObject, String, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Destroy transform based on name, if any exists. The child can be found recursively.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool DestroyTargetTransform(GameObject mainParent, string nameOfTarget, bool recursiveSearch, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">mainParent</span></td>
+        <td><p>Parent of target transform.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">nameOfTarget</span></td>
+        <td><p>Name of target.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">recursiveSearch</span></td>
+        <td><p>Indicates if recursion should be used or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if destroyed; false if not.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_EnsureFaceDriverComponent_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_EnsureFaceDriverComponent_GameObject_FaceRetargeterComponent_System_Boolean_RigType_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent(GameObject,FaceRetargeterComponent,System.Boolean,RigType)">EnsureFaceDriverComponent(GameObject, FaceRetargeterComponent, Boolean, RigType)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void EnsureFaceDriverComponent(GameObject parentObject, FaceRetargeterComponent faceRetargeter, bool runtimeInvocation, RigType rigType)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">parentObject</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">FaceRetargeterComponent</span></td>
+        <td><span class="parametername">faceRetargeter</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">RigType</span></td>
+        <td><span class="parametername">rigType</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_GetRestPoseObject_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.GetRestPoseObject*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_GetRestPoseObject_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.GetRestPoseObject(System.Boolean)">GetRestPoseObject(Boolean)</h4>
+  <div class="markdown level1 summary"><p>Find and return the reference rest pose humanoid object in the project.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static RestPoseObjectHumanoid GetRestPoseObject(bool isTPose = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isTPose</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Utils.RestPoseObjectHumanoid.html">RestPoseObjectHumanoid</a></td>
+        <td><p>The rest pose humanoid object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EARKitFace_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EARKitFace_GameObject_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace(GameObject,System.Boolean,System.Boolean)">SetUpCharacterForA2EARKitFace(GameObject, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Sets up an ARKit character for A2E face tracking.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetUpCharacterForA2EARKitFace(GameObject gameObject, bool allowDuplicates = true, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td><p>GameObject to add to.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">allowDuplicates</span></td>
+        <td><p>Allow duplicates mapping or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EFace_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EFace_GameObject_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace(GameObject,System.Boolean,System.Boolean)">SetUpCharacterForA2EFace(GameObject, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Sets up a character for A2E face tracking.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetUpCharacterForA2EFace(GameObject gameObject, bool allowDuplicates = true, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td><p>GameObject to add to.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">allowDuplicates</span></td>
+        <td><p>Allow duplicates mapping or not.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td><p>If activated from runtime code. We want to possibly
+support one-click during playmode, so we can&apos;t necessarily use Application.isPlaying.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForARKitFace_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForARKitFace*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForARKitFace_GameObject_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForARKitFace(GameObject,System.Boolean,System.Boolean)">SetUpCharacterForARKitFace(GameObject, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;SetUpCharacterForARKitFace is deprecated; please use SetUpCharacterForA2EARKitFace instead.&quot;)]
+public static void SetUpCharacterForARKitFace(GameObject gameObject, bool allowDuplicates = true, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">allowDuplicates</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForCorrectivesFace_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForCorrectivesFace*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForCorrectivesFace_GameObject_System_Boolean_System_Boolean_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForCorrectivesFace(GameObject,System.Boolean,System.Boolean)">SetUpCharacterForCorrectivesFace(GameObject, Boolean, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;SetUpCharacterForCorrectivesFace is deprecated; please use SetUpCharacterForA2EFace instead.&quot;)]
+public static void SetUpCharacterForCorrectivesFace(GameObject gameObject, bool allowDuplicates = true, bool runtimeInvocation = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">allowDuplicates</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">runtimeInvocation</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_SetupExternalBoneTargets_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetupExternalBoneTargets*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_SetupExternalBoneTargets_RetargetingLayer_System_Boolean_BoneTarget___" data-uid="Oculus.Movement.Utils.AddComponentsHelper.SetupExternalBoneTargets(RetargetingLayer,System.Boolean,BoneTarget[])">SetupExternalBoneTargets(RetargetingLayer, Boolean, BoneTarget[])</h4>
+  <div class="markdown level1 summary"><p>Setup external bone targets.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetupExternalBoneTargets(RetargetingLayer retargetingLayer, bool isFullBody, BoneTarget[] boneTargets)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RetargetingLayer</span></td>
+        <td><span class="parametername">retargetingLayer</span></td>
+        <td><p>The retargeting layer to add to.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isFullBody</span></td>
+        <td><p>True if full body.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">BoneTarget</span>[]</td>
+        <td><span class="parametername">boneTargets</span></td>
+        <td><p>The array of bone targets to setup.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_ValidateChildGameObjectsForFaceMapping_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_ValidateChildGameObjectsForFaceMapping_GameObject_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping(GameObject)">ValidateChildGameObjectsForFaceMapping(GameObject)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ValidateChildGameObjectsForFaceMapping(GameObject gameObject)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_ValidateGameObjectForFaceMapping_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.ValidateGameObjectForFaceMapping*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_ValidateGameObjectForFaceMapping_GameObject_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.ValidateGameObjectForFaceMapping(GameObject)">ValidateGameObjectForFaceMapping(GameObject)</h4>
+  <div class="markdown level1 summary"><p>Validates GameObject for face mapping.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ValidateGameObjectForFaceMapping(GameObject go)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">go</span></td>
+        <td><p>GameObject to check.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.InvalidOperationException</span></td>
+        <td><p>Exception thrown if GameObject fails check.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_Utils_AddComponentsHelper_ValidGameObjectForAnimationRigging_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.ValidGameObjectForAnimationRigging*"></a>
+  <h4 id="Oculus_Movement_Utils_AddComponentsHelper_ValidGameObjectForAnimationRigging_GameObject_" data-uid="Oculus.Movement.Utils.AddComponentsHelper.ValidGameObjectForAnimationRigging(GameObject)">ValidGameObjectForAnimationRigging(GameObject)</h4>
+  <div class="markdown level1 summary"><p>Checks to see if the GameObject can be used for animation rigging or not.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ValidGameObjectForAnimationRigging(GameObject gameObject)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">gameObject</span></td>
+        <td><p>GameObject to check.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.InvalidOperationException</span></td>
+        <td><p>Exception thrown if check fails.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
