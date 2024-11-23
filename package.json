@@ -1,7 +1,7 @@
 {
   "name": "com.meta.movement",
   "displayName": "Meta Movement",
-  "version": "71.0.0",
+  "version": "71.0.1",
   "description": "Contains sample scenes, prefabs, scripts, and art assets for Movement SDK.",
   "unity": "2021.3",
   "unityRelease": "26f1",

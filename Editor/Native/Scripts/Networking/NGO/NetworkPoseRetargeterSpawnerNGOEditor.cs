@@ -1,4 +1,4 @@
-// (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
+// Copyright (c) Meta Platforms, Inc. and affiliates.
 
 #if UNITY_NGO_MODULE_DEFINED
 using Meta.XR.Movement.Networking.Editor;
