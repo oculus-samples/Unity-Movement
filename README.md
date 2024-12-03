@@ -10,7 +10,8 @@ The Unity-Movement package is released under the [Oculus License](https://github
   - 2022.3.11f2 (2022 LTS or newer)
   - Unity 6 or newer
 - v71.0 or newer of the Meta XR SDK. You will need the [Meta XR Core SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-core-sdk-269169) and the [Meta XR Interaction SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
-- A project set up with these [steps](https://developers.meta.com/horizon/documentation/unity/move-overview/#unity-project-setup).
+- A project set up with these [steps](https://developers.meta.com/horizon/documentation/unity/move-unity-getting-started#unity-project-setup).
+
 
 ## Getting Started
 First, ensure that all of the [requirements](#requirements) are met.
@@ -36,7 +37,7 @@ If the new scene or an existing scene doesn’t have a GameObject with the OVRCa
 
 Layer index 10, layer index 11, and the HiddenMesh layer must be present in the project for RecalculateNormals to work correctly.
 
-Some Project Settings can be validated via **Movement->Check Project Settings**. For a more thorough check, please use **Oculus->Tools->Project Setup Tool**.
+Some Project Settings can be validated via **Movement** > **Check Project Settings**. For a more thorough check, please use **Meta** > **Tools** > **Project Setup Tool**.
 
 ## Rendering Quality
 Navigate to your Project Settings (**Edit->Project Settings...**) and click on
@@ -65,7 +66,7 @@ The project contains several sample scenes. To test the samples, they must be im
 
 For more information about body tracking, please refer to [this page](https://developers.meta.com/horizon/documentation/unity/move-body-tracking/).
 
-For more information about the samples, please refer to [this page](https://developers.meta.com/horizon/documentation/unity/move-samples/).
+For more information about the samples, please refer to [this page](https://developers.meta.com/horizon/documentation/unity/body-tracking-samples).
 
 ## Player Settings
 
