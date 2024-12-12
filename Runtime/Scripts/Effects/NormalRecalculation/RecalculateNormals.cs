@@ -54,7 +54,7 @@ namespace Oculus.Movement.Effects
         /// </summary>
         [SerializeField]
         [Tooltip(RecalculateNormalsTooltips.RecalculateIndependently)]
-        protected bool _recalculateIndependently = false;
+        protected bool _recalculateIndependently = true;
 
         /// <summary>
         /// The layer of the duplicate mesh with recalculate normals, should
