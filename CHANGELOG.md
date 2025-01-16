@@ -1,3 +1,9 @@
+## [72.0.0]
+- Updated sample scenes to use OpenXRHands.
+- Fixed readme, documentation links and UI path.
+- Changed Normal recalculator to run independently by default.
+- Added `VisemeDriver.cs` to allow using visemes.
+
 ## [71.0.0]
 - Normal recalculator has been fixed to run on submeshes with index greater than zero.
 - New networking sample shows how to efficiently network body movement by compressing the joint-related movement information for transmission and is compatible with common network providers.
