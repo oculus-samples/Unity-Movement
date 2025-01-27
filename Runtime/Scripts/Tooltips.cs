@@ -2031,4 +2031,14 @@ namespace Oculus.Movement
         public const string GroundingConstraint =
             "Foot grounding constraint.";
     }
+
+    public static class VisemeDriverTooltips
+    {
+        public const string OvrFaceExpression =
+            "OvrFaceExpression component in the scene.";
+        public const string VisemeMapping =
+            "The mapping between the blendshapes and the FaceViseme.";
+        public const string Mesh =
+            "The mesh with viseme-compatible blendshapes.";
+    }
 }
