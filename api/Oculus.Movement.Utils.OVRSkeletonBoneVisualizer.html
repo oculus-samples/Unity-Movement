@@ -1,0 +1,594 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class OVRSkeletonBoneVisualizer
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class OVRSkeletonBoneVisualizer
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer">
+  
+  
+  <h1 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer" class="text-break">Class OVRSkeletonBoneVisualizer
+  </h1>
+  <div class="markdown level0 summary"><p>Allows visualizing bones found in an OVRSkeleton component.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html">BoneVisualizer</a></div>
+    <div class="level2"><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html">BoneVisualizer</a>&lt;<span class="xref">OVRHumanBodyBonesMappings.BodyTrackingBoneId</span>&gt;</div>
+    <div class="level3"><span class="xref">OVRSkeletonBoneVisualizer</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Oculus.Movement.Utils.IListGenerating.html">IListGenerating</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1__visualizationGuideType">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;._visualizationGuideType</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1__maskToVisualize">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;._maskToVisualize</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1__customBoneVisualData">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;._customBoneVisualData</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1__lineRendererPrefab">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;._lineRendererPrefab</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1__axisRendererPrefab">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;._axisRendererPrefab</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1__visualType">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;._visualType</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_IsShowingLines">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.IsShowingLines</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_IsShowingAxes">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.IsShowingAxes</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_OnDisable">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.OnDisable()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_ResetBoneVisuals">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.ResetBoneVisuals()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_Update">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.Update()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_LateUpdate">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.LateUpdate()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_Visualize">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.Visualize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_GenerateList">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.GenerateList()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_UseStandardBones">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.UseStandardBones()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_ClearList">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.ClearList()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_ClearBoneTupleVisualObjects">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.ClearBoneTupleVisualObjects()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_ClearBoneAxisVisualObjects">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.ClearBoneAxisVisualObjects()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_CreateAllBonesMask">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.CreateAllBonesMask()</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_ShouldVisualizeJoint_System_Int32_">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.ShouldVisualizeJoint(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_SetupBoneTupleLineRenderer_Oculus_Movement_Utils_BoneVisualizer__0__BoneTuple_">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.SetupBoneTupleLineRenderer(BoneVisualizer.BoneTuple&lt;&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_GetBoneTransforms_Oculus_Movement_Utils_BoneVisualizer__0__BoneTuple_Transform__Transform__">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.GetBoneTransforms(BoneVisualizer.BoneTuple&lt;&gt;, Transform, Transform)</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_SetUpAxisRenderer_System_Int32_">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.SetUpAxisRenderer(Int32)</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_EnforceCustomLineRendererEnableState_Oculus_Movement_Utils_BoneVisualizer__0__BoneTuple_System_Boolean_">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.EnforceCustomLineRendererEnableState(BoneVisualizer.BoneTuple&lt;&gt;, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.html#Oculus_Movement_Utils_BoneVisualizer_1_EnforceAxisRendererEnableState_System_Int32_System_Boolean_">BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.EnforceAxisRendererEnableState(Int32, Boolean)</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer__LINE_VISUAL_NAME_SUFFIX_TOKEN">BoneVisualizer._LINE_VISUAL_NAME_SUFFIX_TOKEN</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer__CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN">BoneVisualizer._CUSTOM_LINE_VISUAL_NAME_SUFFIX_TOKEN</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer__AXIS_VISUAL_NAME_SUFFIX_TOKEN">BoneVisualizer._AXIS_VISUAL_NAME_SUFFIX_TOKEN</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer__whenToRender">BoneVisualizer._whenToRender</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer__boneTupleToLineRenderer">BoneVisualizer._boneTupleToLineRenderer</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer__boneIdToAxisObject">BoneVisualizer._boneIdToAxisObject</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_OnNewAxis">BoneVisualizer.OnNewAxis</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_OnNewLine">BoneVisualizer.OnNewLine</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_BoneVisualRenderers">BoneVisualizer.BoneVisualRenderers</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_JointVisualTransforms">BoneVisualizer.JointVisualTransforms</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_EnableSkeletonProcessing">BoneVisualizer.EnableSkeletonProcessing</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_SkeletonProcessorLabel">BoneVisualizer.SkeletonProcessorLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_ProcessSkeleton_OVRSkeleton_">BoneVisualizer.ProcessSkeleton(OVRSkeleton)</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.Utils.html">Oculus.Movement.Utils</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class OVRSkeletonBoneVisualizer : BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;, IListGenerating</code></pre>
+  </div>
+  <h3 id="fields">Fields
+  </h3>
+  
+  
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer__ovrSkeletonComp" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer._ovrSkeletonComp">_ovrSkeletonComp</h4>
+  <div class="markdown level1 summary"><p>OVRSkeleton component to visualize bones for.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected OVRSkeleton _ovrSkeletonComp</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRSkeleton</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer__visualizeBindPose" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer._visualizeBindPose">_visualizeBindPose</h4>
+  <div class="markdown level1 summary"><p>Whether to visualize bind pose or not.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool _visualizeBindPose</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_Awake_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.Awake*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_Awake" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.Awake">Awake()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void Awake()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">Oculus.Movement.Utils.BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.Awake()</span></div>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetAvatarBodyPart_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetAvatarBodyPart*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetAvatarBodyPart_System_Int32_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetAvatarBodyPart(System.Int32)">GetAvatarBodyPart(Int32)</h4>
+  <div class="markdown level1 summary"><p>Used with Unity&apos;s <see cref="!:AvatarMask"></see>, which selects specific parts of an avatar</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override AvatarMaskBodyPart GetAvatarBodyPart(int currentBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">currentBone</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">AvatarMaskBodyPart</span></td>
+        <td><p>the <see cref="!:AvatarMaskBodyPart"></see> containing the given bone</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">Oculus.Movement.Utils.BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.GetAvatarBodyPart(System.Int32)</span></div>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetBoneCount_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetBoneCount*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetBoneCount" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetBoneCount">GetBoneCount()</h4>
+  <div class="markdown level1 summary"><p>Should be a constant time function returning the count of possible bone/joints</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override int GetBoneCount()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><p>number of bones/joints in this skeleton</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">Oculus.Movement.Utils.BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.GetBoneCount()</span></div>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetBoneTransform_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetBoneTransform*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetBoneTransform_System_Int32_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetBoneTransform(System.Int32)">GetBoneTransform(Int32)</h4>
+  <div class="markdown level1 summary"><p>Used to resolve a joint when rendering Axis</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override Transform GetBoneTransform(int currentBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">currentBone</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td><p>the <see cref="!:Transform"></see> associated with the given bone ID</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">Oculus.Movement.Utils.BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.GetBoneTransform(System.Int32)</span></div>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetBoneTuple_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetBoneTuple*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_GetBoneTuple_System_Int32_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.GetBoneTuple(System.Int32)">GetBoneTuple(Int32)</h4>
+  <div class="markdown level1 summary"><p>Gets standard begin and end joints of a bone</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.BoneTuple GetBoneTuple(int currentBone)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">currentBone</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.BoneTuple.html">BoneVisualizer.BoneTuple</a>&lt;&gt;</td>
+        <td><p>the default <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.BoneTuple.html">BoneVisualizer&lt;BoneType&gt;.BoneTuple</a> for this bone</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">Oculus.Movement.Utils.BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.GetBoneTuple(System.Int32)</span></div>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_SetBody_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.SetBody*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_SetBody_GameObject_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.SetBody(GameObject)">SetBody(GameObject)</h4>
+  <div class="markdown level1 summary"><p>Can be used by UI to change the source of the skeleton visual data</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void SetBody(GameObject body)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GameObject</span></td>
+        <td><span class="parametername">body</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer.html#Oculus_Movement_Utils_BoneVisualizer_SetBody_GameObject_">BoneVisualizer.SetBody(GameObject)</a></div>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_Start_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.Start*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_Start" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.Start">Start()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void Start()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">Oculus.Movement.Utils.BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.Start()</span></div>
+  
+  
+  <a id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_TryGetBoneTransforms_" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.TryGetBoneTransforms*"></a>
+  <h4 id="Oculus_Movement_Utils_OVRSkeletonBoneVisualizer_TryGetBoneTransforms_Oculus_Movement_Utils_BoneVisualizer_OVRHumanBodyBonesMappings_BodyTrackingBoneId__BoneTuple_Transform__Transform__" data-uid="Oculus.Movement.Utils.OVRSkeletonBoneVisualizer.TryGetBoneTransforms(Oculus.Movement.Utils.BoneVisualizer{OVRHumanBodyBonesMappings.BodyTrackingBoneId}.BoneTuple,Transform@,Transform@)">TryGetBoneTransforms(BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.BoneTuple, out Transform, out Transform)</h4>
+  <div class="markdown level1 summary"><p>Gets both bone transforms of the given <a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.BoneTuple.html">BoneVisualizer&lt;BoneType&gt;.BoneTuple</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override bool TryGetBoneTransforms(BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.BoneTuple tupleItem, out Transform firstJoint, out Transform secondJoint)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.Utils.BoneVisualizer-1.BoneTuple.html">BoneVisualizer.BoneTuple</a>&lt;&gt;</td>
+        <td><span class="parametername">tupleItem</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td><span class="parametername">firstJoint</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td><span class="parametername">secondJoint</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>true if the bones could be retrieved</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">Oculus.Movement.Utils.BoneVisualizer&lt;OVRHumanBodyBonesMappings.BodyTrackingBoneId&gt;.TryGetBoneTransforms(Oculus.Movement.Utils.BoneVisualizer.BoneTuple&lt;&gt;, Transform, Transform)</span></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Oculus.Movement.Utils.IListGenerating.html">IListGenerating</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
