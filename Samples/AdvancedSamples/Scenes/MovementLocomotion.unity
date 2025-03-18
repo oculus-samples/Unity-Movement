@@ -5469,7 +5469,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1279560627}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c30e9d9993049aa489e17b6977aa16af, type: 3}
   m_Name: 
@@ -5482,7 +5482,7 @@ MonoBehaviour:
     m_Bits: 16
   _sphereRadius: 0.02
   _castDistance: 10
-  _handMaterialPropertyBlock: {fileID: 1051683198}
+  _handMaterialPropertyBlocks: []
   _opacity: 0.79
   _outlineOpacity: 1
   _animationSpeed: 5
@@ -7549,7 +7549,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1918037784}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c30e9d9993049aa489e17b6977aa16af, type: 3}
   m_Name: 
@@ -7562,7 +7562,7 @@ MonoBehaviour:
     m_Bits: 16
   _sphereRadius: 0.02
   _castDistance: 10
-  _handMaterialPropertyBlock: {fileID: 1325130751}
+  _handMaterialPropertyBlocks: []
   _opacity: 0.79
   _outlineOpacity: 1
   _animationSpeed: 5

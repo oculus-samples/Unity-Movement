@@ -504,7 +504,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &191670472
 Transform:
   m_ObjectHideFlags: 0
@@ -540,7 +540,7 @@ MonoBehaviour:
     m_Bits: 16
   _sphereRadius: 0.02
   _castDistance: 10
-  _handMaterialPropertyBlock: {fileID: 710213523}
+  _handMaterialPropertyBlocks: []
   _opacity: 0.79
   _outlineOpacity: 1
   _animationSpeed: 5
@@ -3582,7 +3582,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1363434763
 Transform:
   m_ObjectHideFlags: 0
@@ -3618,7 +3618,7 @@ MonoBehaviour:
     m_Bits: 16
   _sphereRadius: 0.02
   _castDistance: 10
-  _handMaterialPropertyBlock: {fileID: 1797386623}
+  _handMaterialPropertyBlocks: []
   _opacity: 0.79
   _outlineOpacity: 1
   _animationSpeed: 5

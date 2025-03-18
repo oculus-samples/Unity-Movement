@@ -1,7 +1,7 @@
 {
   "name": "com.meta.movement",
   "displayName": "Meta Movement",
-  "version": "72.0.0",
+  "version": "74.0.0",
   "description": "Contains sample scenes, prefabs, scripts, and art assets for Movement SDK.",
   "unity": "2021.3",
   "unityRelease": "26f1",
@@ -39,9 +39,9 @@
     "XR"
   ],
   "dependencies": {
-    "com.meta.xr.sdk.core": "72.0.0",
-    "com.meta.xr.sdk.interaction": "72.0.0",
-    "com.meta.xr.sdk.interaction.ovr": "72.0.0",
+    "com.meta.xr.sdk.core": "74.0.0",
+    "com.meta.xr.sdk.interaction": "74.0.0",
+    "com.meta.xr.sdk.interaction.ovr": "74.0.0",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.animation.rigging": "1.2.1",
     "com.unity.burst": "1.4.1"
