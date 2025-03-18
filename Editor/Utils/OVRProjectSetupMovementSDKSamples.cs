@@ -1,7 +1,11 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System.Linq;
+using Meta.XR.Movement.FaceTracking;
+using Meta.XR.Movement.FaceTracking.Samples;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Oculus.Movement.Utils
 {
@@ -15,10 +19,7 @@ namespace Oculus.Movement.Utils
         /// All character and mirrored character layers should exist based on their indices.
         /// That is because the scene assets are assigned based on layer index.
         /// </summary>
-        private static readonly int[] _expectedLayersIndices =
-        {
-            10, 11
-        };
+        private static readonly int[] _expectedLayersIndices = { 10, 11 };
 
         /// <summary>
         /// The HiddenMesh layer is required for RecalculateNormals to function correctly.
@@ -35,7 +36,7 @@ namespace Oculus.Movement.Utils
                 group: _group,
                 platform: BuildTargetGroup.Android,
                 isDone: group => QualitySettings.skinWeights == SkinWeights.FourBones,
-                message: "You should use four skin weights to avoid skinning problems",
+                message: "Four skin weights should be used to avoid skinning problems.",
                 fix: group =>
                 {
                     QualitySettings.skinWeights = SkinWeights.FourBones;
@@ -48,7 +49,8 @@ namespace Oculus.Movement.Utils
                 level: OVRProjectSetup.TaskLevel.Required,
                 group: _group,
                 platform: BuildTargetGroup.Android,
-                isDone: group => OVRRuntimeSettings.Instance.BodyTrackingFidelity == OVRPlugin.BodyTrackingFidelity2.High,
+                isDone: group =>
+                    OVRRuntimeSettings.Instance.BodyTrackingFidelity == OVRPlugin.BodyTrackingFidelity2.High,
                 message: "Body Tracking Fidelity should be set to High.",
                 fix: group =>
                 {
@@ -62,7 +64,8 @@ namespace Oculus.Movement.Utils
                 level: OVRProjectSetup.TaskLevel.Required,
                 group: _group,
                 platform: BuildTargetGroup.Android,
-                isDone: group => OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet == OVRPlugin.BodyJointSet.FullBody,
+                isDone: group =>
+                    OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet == OVRPlugin.BodyJointSet.FullBody,
                 message: "Body Tracking Joint Set should be set to Full Body.",
                 fix: group =>
                 {
@@ -72,13 +75,46 @@ namespace Oculus.Movement.Utils
                 fixMessage: "Set OVRRuntimeSettings.BodyTrackingJointSet = FullBody"
             );
 
+            // Face tracking settings.
+            OVRProjectSetup.AddTask(
+                level: OVRProjectSetup.TaskLevel.Required,
+                group: _group,
+                platform: BuildTargetGroup.Android,
+                isDone: group => FindComponentInScene<FaceDriver>() == null ||
+                                 OVRRuntimeSettings.GetRuntimeSettings().RequestsAudioFaceTracking,
+                message: "The audio to expression feature should be enabled.",
+                fix: group =>
+                {
+                    OVRRuntimeSettings.Instance.RequestsAudioFaceTracking = true;
+                    OVRRuntimeSettings.CommitRuntimeSettings(OVRRuntimeSettings.Instance);
+                },
+                fixMessage: "Set OVRRuntimeSettings.RequestsAudioFaceTracking = true"
+            );
+
+            OVRProjectSetup.AddTask(
+                level: OVRProjectSetup.TaskLevel.Required,
+                group: _group,
+                platform: BuildTargetGroup.Android,
+                isDone: group => FindComponentInScene<VisemeDriver>() == null ||
+                                 OVRRuntimeSettings.GetRuntimeSettings().EnableFaceTrackingVisemesOutput,
+                message: "The visemes feature should be enabled.",
+                fix: group =>
+                {
+                    OVRRuntimeSettings.Instance.RequestsAudioFaceTracking = true;
+                    OVRRuntimeSettings.Instance.EnableFaceTrackingVisemesOutput = true;
+                    OVRRuntimeSettings.CommitRuntimeSettings(OVRRuntimeSettings.Instance);
+                },
+                fixMessage: "Set OVRRuntimeSettings.EnableFaceTrackingVisemesOutput = true"
+            );
+
             // Test layers.
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Recommended,
                 group: _group,
                 platform: BuildTargetGroup.Android,
                 isDone: group => LayerMask.NameToLayer(_hiddenMeshLayerName) != -1,
-                message: $"The layer '{_hiddenMeshLayerName}' needs to exist for Recalculate Normals to function properly.",
+                message:
+                $"The layer '{_hiddenMeshLayerName}' needs to exist for Recalculate Normals to function properly.",
                 fix: group =>
                 {
                     int unusedLayer = -1;
@@ -90,6 +126,7 @@ namespace Oculus.Movement.Utils
                             break;
                         }
                     }
+
                     if (LayerMask.NameToLayer(_hiddenMeshLayerName) == -1)
                     {
                         if (unusedLayer == -1)
@@ -117,6 +154,7 @@ namespace Oculus.Movement.Utils
                             return false;
                         }
                     }
+
                     return true;
                 },
                 message: "Layers 10 and 11 must be indexed for the samples to display correctly.",
@@ -138,7 +176,8 @@ namespace Oculus.Movement.Utils
 
         private static void SetLayerName(int layer, string name)
         {
-            SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAssetAtPath<Object>("ProjectSettings/TagManager.asset"));
+            SerializedObject tagManager =
+                new SerializedObject(AssetDatabase.LoadAssetAtPath<Object>("ProjectSettings/TagManager.asset"));
 
             SerializedProperty it = tagManager.GetIterator();
             while (it.NextVisible(true))
@@ -149,7 +188,15 @@ namespace Oculus.Movement.Utils
                     break;
                 }
             }
+
             tagManager.ApplyModifiedProperties();
+        }
+
+        private static T FindComponentInScene<T>() where T : Component
+        {
+            var scene = SceneManager.GetActiveScene();
+            var rootGameObjects = scene.GetRootGameObjects();
+            return rootGameObjects.FirstOrDefault(go => go.GetComponentInChildren<T>())?.GetComponentInChildren<T>();
         }
     }
 }

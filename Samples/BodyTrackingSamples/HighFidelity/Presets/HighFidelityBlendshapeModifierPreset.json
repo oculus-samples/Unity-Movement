@@ -1,0 +1,306 @@
+{
+  "FaceExpressionModifiers": [
+    {
+      "FaceExpressions": [
+        63
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        12,
+        13
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        14,
+        15
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        16,
+        17
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        18,
+        19
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        20,
+        21
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        28,
+        29
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        59,
+        60
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 0.5
+    },
+    {
+      "FaceExpressions": [
+        24
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        25,
+        26
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        27
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        34,
+        35
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        36,
+        37
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        40,
+        41
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        44,
+        45
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 0.0,
+      "Multiplier": 0.0
+    },
+    {
+      "FaceExpressions": [
+        46,
+        47
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 0.0,
+      "Multiplier": 0.0
+    },
+    {
+      "FaceExpressions": [
+        50
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 0.5
+    },
+    {
+      "FaceExpressions": [
+        51,
+        52
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        8,
+        9
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        30,
+        31
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        32,
+        33
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.2
+    },
+    {
+      "FaceExpressions": [
+        42,
+        43
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        53,
+        54
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        38,
+        39
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        48,
+        49
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        61,
+        62
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 0.5
+    },
+    {
+      "FaceExpressions": [
+        2,
+        3
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 2.0
+    },
+    {
+      "FaceExpressions": [
+        4,
+        5
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        6,
+        7
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        10,
+        11
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        55,
+        56
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.0
+    },
+    {
+      "FaceExpressions": [
+        0,
+        1
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.5
+    },
+    {
+      "FaceExpressions": [
+        22,
+        23
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.5
+    },
+    {
+      "FaceExpressions": [
+        57,
+        58
+      ],
+      "MinValue": 0.0,
+      "MaxValue": 1.0,
+      "Multiplier": 1.5
+    }
+  ]
+}

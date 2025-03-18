@@ -140,7 +140,7 @@ namespace Meta.XR.Movement.FaceTracking
 
         private void UpdateVisemes()
         {
-            if (_mesh == null || _visemeMapping.Length == 0 || _ovrFaceExpressions != null)
+            if (_mesh == null || _visemeMapping.Length == 0 || _ovrFaceExpressions == null)
             {
                 return;
             }
