@@ -1,0 +1,970 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Struct GroundingData
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Struct GroundingData
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.AnimationRigging.GroundingData">
+  
+  
+  <h1 id="Oculus_Movement_AnimationRigging_GroundingData" data-uid="Oculus.Movement.AnimationRigging.GroundingData" class="text-break">Struct GroundingData
+  </h1>
+  <div class="markdown level0 summary"><p>Grounding data used by grounding job.
+TODO: allow for case where rig can be enabled, this means sync transform arrays must not be null by default</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Oculus.Movement.AnimationRigging.IGroundingData.html">IGroundingData</a></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.AnimationRigging.html">Oculus.Movement.AnimationRigging</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_AnimationRigging_GroundingData_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Serializable]
+public struct GroundingData : IGroundingData</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_ComputedOffsets_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.ComputedOffsets*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_ComputedOffsets" data-uid="Oculus.Movement.AnimationRigging.GroundingData.ComputedOffsets">ComputedOffsets</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly bool ComputedOffsets { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_AssignAnimator_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.AssignAnimator*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_AssignAnimator_Animator_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.AssignAnimator(Animator)">AssignAnimator(Animator)</h4>
+  <div class="markdown level1 summary"><p>Assign the Animator component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AssignAnimator(Animator animator)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Animator</span></td>
+        <td><span class="parametername">animator</span></td>
+        <td><p>The Animator to be assigned.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_AssignHips_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.AssignHips*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_AssignHips_Transform_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.AssignHips(Transform)">AssignHips(Transform)</h4>
+  <div class="markdown level1 summary"><p>Assign the hips transform.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AssignHips(Transform hipsTransform)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td><span class="parametername">hipsTransform</span></td>
+        <td><p>The hips transform to be assigned.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_AssignOVRSkeleton_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.AssignOVRSkeleton*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_AssignOVRSkeleton_OVRCustomSkeleton_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.AssignOVRSkeleton(OVRCustomSkeleton)">AssignOVRSkeleton(OVRCustomSkeleton)</h4>
+  <div class="markdown level1 summary"><p>Assign the OVR Skeleton component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AssignOVRSkeleton(OVRCustomSkeleton skeleton)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRCustomSkeleton</span></td>
+        <td><span class="parametername">skeleton</span></td>
+        <td><p>The OVRSkeleton to be assigned.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_ComputeOffsets_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.ComputeOffsets*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_ComputeOffsets" data-uid="Oculus.Movement.AnimationRigging.GroundingData.ComputeOffsets">ComputeOffsets()</h4>
+  <div class="markdown level1 summary"><p>Computes offsets necessary for initialization.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ComputeOffsets()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_FinishedMoving_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.FinishedMoving*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_FinishedMoving" data-uid="Oculus.Movement.AnimationRigging.GroundingData.FinishedMoving">FinishedMoving()</h4>
+  <div class="markdown level1 summary"><p>Returns true if the move progress is lower than the threshold move progress.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool FinishedMoving()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if the joint has finished moving.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_GenerateThresholdMoveProgress_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.GenerateThresholdMoveProgress*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_GenerateThresholdMoveProgress" data-uid="Oculus.Movement.AnimationRigging.GroundingData.GenerateThresholdMoveProgress">GenerateThresholdMoveProgress()</h4>
+  <div class="markdown level1 summary"><p>Generates a new value for the threshold move progress.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void GenerateThresholdMoveProgress()</code></pre>
+  </div>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_IsBoneTransformsDataValid_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.IsBoneTransformsDataValid*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_IsBoneTransformsDataValid" data-uid="Oculus.Movement.AnimationRigging.GroundingData.IsBoneTransformsDataValid">IsBoneTransformsDataValid()</h4>
+  <div class="markdown level1 summary"><p>Indicates if bone transforms are valid or not.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsBoneTransformsDataValid()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if bone transforms are valid, false if not.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_IsValid_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.IsValid*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_IsValid" data-uid="Oculus.Movement.AnimationRigging.GroundingData.IsValid">IsValid()</h4>
+  <div class="markdown level1 summary"><p>Returns true if valid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsValid()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_SetDefaultValues_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.SetDefaultValues*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_SetDefaultValues" data-uid="Oculus.Movement.AnimationRigging.GroundingData.SetDefaultValues">SetDefaultValues()</h4>
+  <div class="markdown level1 summary"><p>Set default values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetDefaultValues()</code></pre>
+  </div>
+  <h3 id="eii">Explicit Interface Implementations
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_ConstraintAnimator_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#ConstraintAnimator*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_ConstraintAnimator" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#ConstraintAnimator">IGroundingData.ConstraintAnimator</h4>
+  <div class="markdown level1 summary"><p>The Animator component for the character.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Animator IGroundingData.ConstraintAnimator { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Animator</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_ConstraintSkeleton_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#ConstraintSkeleton*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_ConstraintSkeleton" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#ConstraintSkeleton">IGroundingData.ConstraintSkeleton</h4>
+  <div class="markdown level1 summary"><p>The original skeleton for the character.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly OVRCustomSkeleton IGroundingData.ConstraintSkeleton { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">OVRCustomSkeleton</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_FootRotationOffset_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#FootRotationOffset*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_FootRotationOffset" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#FootRotationOffset">IGroundingData.FootRotationOffset</h4>
+  <div class="markdown level1 summary"><p>The initial rotation offset for the feet.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Quaternion IGroundingData.FootRotationOffset { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Quaternion</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_FootTarget_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#FootTarget*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_FootTarget" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#FootTarget">IGroundingData.FootTarget</h4>
+  <div class="markdown level1 summary"><p>The foot target for the leg.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Transform IGroundingData.FootTarget { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundLayers_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundLayers*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundLayers" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundLayers">IGroundingData.GroundLayers</h4>
+  <div class="markdown level1 summary"><p>The layers that the raycast will check against for grounding.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly LayerMask IGroundingData.GroundLayers { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">LayerMask</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundOffset_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundOffset*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundOffset" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundOffset">IGroundingData.GroundOffset</h4>
+  <div class="markdown level1 summary"><p>The height offset from the grounded floor to be applied to the foot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly float IGroundingData.GroundOffset { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundRaycastDist_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundRaycastDist*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundRaycastDist" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundRaycastDist">IGroundingData.GroundRaycastDist</h4>
+  <div class="markdown level1 summary"><p>The maximum distance that the raycast will go when checking for grounding.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly float IGroundingData.GroundRaycastDist { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundRaycastHit_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundRaycastHit*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_GroundRaycastHit" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#GroundRaycastHit">IGroundingData.GroundRaycastHit</h4>
+  <div class="markdown level1 summary"><p>The ground raycast hit.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">RaycastHit IGroundingData.GroundRaycastHit { get; set; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">RaycastHit</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Hips_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Hips*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Hips" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Hips">IGroundingData.Hips</h4>
+  <div class="markdown level1 summary"><p>The hips transform.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Transform IGroundingData.Hips { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_HipsTarget_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#HipsTarget*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_HipsTarget" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#HipsTarget">IGroundingData.HipsTarget</h4>
+  <div class="markdown level1 summary"><p>The hips target transform.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Transform IGroundingData.HipsTarget { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_KneeTarget_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#KneeTarget*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_KneeTarget" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#KneeTarget">IGroundingData.KneeTarget</h4>
+  <div class="markdown level1 summary"><p>The knee target for the leg.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Transform IGroundingData.KneeTarget { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Leg_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Leg*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Leg" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Leg">IGroundingData.Leg</h4>
+  <div class="markdown level1 summary"><p>The leg upper transform.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Transform IGroundingData.Leg { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_LegPosOffset_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#LegPosOffset*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_LegPosOffset" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#LegPosOffset">IGroundingData.LegPosOffset</h4>
+  <div class="markdown level1 summary"><p>The initial position offset for the leg.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Vector3 IGroundingData.LegPosOffset { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_LegRotOffset_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#LegRotOffset*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_LegRotOffset" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#LegRotOffset">IGroundingData.LegRotOffset</h4>
+  <div class="markdown level1 summary"><p>The initial rotation offset for the leg.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly Quaternion IGroundingData.LegRotOffset { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Quaternion</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Pair_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Pair*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Pair" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Pair">IGroundingData.Pair</h4>
+  <div class="markdown level1 summary"><p>Optional. The other leg&apos;s grounding constraint, used to check if this leg can move.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly GroundingData IGroundingData.Pair { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Oculus.Movement.AnimationRigging.GroundingData.html">GroundingData</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_PreviousKneePos_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#PreviousKneePos*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_PreviousKneePos" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#PreviousKneePos">IGroundingData.PreviousKneePos</h4>
+  <div class="markdown level1 summary"><p>The previous knee position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Vector3 IGroundingData.PreviousKneePos { get; set; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Progress_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Progress*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_Progress" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#Progress">IGroundingData.Progress</h4>
+  <div class="markdown level1 summary"><p>The amount of move progress.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">float IGroundingData.Progress { set; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_ShouldUpdate_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#ShouldUpdate*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_ShouldUpdate" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#ShouldUpdate">IGroundingData.ShouldUpdate</h4>
+  <div class="markdown level1 summary"><p>If true, update this job.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">bool IGroundingData.ShouldUpdate { get; set; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepCurve_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepCurve*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepCurve" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepCurve">IGroundingData.StepCurve</h4>
+  <div class="markdown level1 summary"><p>The animation curve for evaluating the step height value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly AnimationCurve IGroundingData.StepCurve { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">AnimationCurve</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepDist_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepDist*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepDist" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepDist">IGroundingData.StepDist</h4>
+  <div class="markdown level1 summary"><p>The distance before the step is triggered.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly float IGroundingData.StepDist { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepHeight_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepHeight*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepHeight" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepHeight">IGroundingData.StepHeight</h4>
+  <div class="markdown level1 summary"><p>The height of the step taken.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly float IGroundingData.StepHeight { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepHeightScaleDist_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepHeightScaleDist*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepHeightScaleDist" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepHeightScaleDist">IGroundingData.StepHeightScaleDist</h4>
+  <div class="markdown level1 summary"><p>The maximum distance for the step height to not be scaled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly float IGroundingData.StepHeightScaleDist { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepSpeed_" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepSpeed*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_GroundingData_Oculus_Movement_AnimationRigging_IGroundingData_StepSpeed" data-uid="Oculus.Movement.AnimationRigging.GroundingData.Oculus#Movement#AnimationRigging#IGroundingData#StepSpeed">IGroundingData.StepSpeed</h4>
+  <div class="markdown level1 summary"><p>The speed of the step for the foot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">readonly float IGroundingData.StepSpeed { get; }</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Oculus.Movement.AnimationRigging.IGroundingData.html">IGroundingData</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

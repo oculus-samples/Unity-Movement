@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class AnimationUtilities
+   | Unity-Movement Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class AnimationUtilities
+   | Unity-Movement Documentation ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities">
+  
+  
+  <h1 id="Oculus_Movement_AnimationRigging_AnimationUtilities" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities" class="text-break">Class AnimationUtilities
+  </h1>
+  <div class="markdown level0 summary"><p>Provides convenient algorithms to assist
+with animation rigging work.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">AnimationUtilities</span></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Oculus.Movement.AnimationRigging.html">Oculus.Movement.AnimationRigging</a></h6>
+  <h6><strong>Assembly</strong>: cs.temp.dll.dll</h6>
+  <h5 id="Oculus_Movement_AnimationRigging_AnimationUtilities_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class AnimationUtilities</code></pre>
+  </div>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_AnimationUtilities_GetRotationChange_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.GetRotationChange*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_AnimationUtilities_GetRotationChange_Vector3_Vector3_Vector3_Vector3_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.GetRotationChange(Vector3,Vector3,Vector3,Vector3)">GetRotationChange(Vector3, Vector3, Vector3, Vector3)</h4>
+  <div class="markdown level1 summary"><p>Fix rotation of joint to match new target position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Quaternion GetRotationChange(Vector3 oldJointPosition, Vector3 oldJointTargetPosition, Vector3 newJointPosition, Vector3 newTargetPosition)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td><span class="parametername">oldJointPosition</span></td>
+        <td><p>Old joint position.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td><span class="parametername">oldJointTargetPosition</span></td>
+        <td><p>Old target position.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td><span class="parametername">newJointPosition</span></td>
+        <td><p>New joint position.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td><span class="parametername">newTargetPosition</span></td>
+        <td><p>New joint target position.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Quaternion</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_AnimationUtilities_SolveCCDIK_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.SolveCCDIK*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_AnimationUtilities_SolveCCDIK_Transform___Vector3_System_Single_System_Single_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.SolveCCDIK(Transform[],Vector3,System.Single,System.Single)">SolveCCDIK(Transform[], Vector3, Single, Single)</h4>
+  <div class="markdown level1 summary"><p>Cyclic Coordinate Descent IK algorithm implementation. This rotates each bone in the chain so
+that the effector bone will reach the target position. An example of this usage is rotating the entire arm
+so that the specified hand can match the tracked hand position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool SolveCCDIK(Transform[] bones, Vector3 targetPosition, float tolerance, float maxIterations)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span>[]</td>
+        <td><span class="parametername">bones</span></td>
+        <td><p>The bones in the chain.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td><span class="parametername">targetPosition</span></td>
+        <td><p>The target position.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td><span class="parametername">tolerance</span></td>
+        <td><p>The maximum distance allowed between the effector and target position.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td><span class="parametername">maxIterations</span></td>
+        <td><p>The maximum number of iterations</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if the IK was successful at positioning the effector at the target position.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_AnimationUtilities_SolveFABRIK_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.SolveFABRIK*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_AnimationUtilities_SolveFABRIK_Transform___System_Single___Vector3_System_Single_System_Int32_System_Boolean_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.SolveFABRIK(Transform[],System.Single[],Vector3,System.Single,System.Int32,System.Boolean)">SolveFABRIK(Transform[], Single[], Vector3, Single, Int32, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Runs FABRIK, or Forward And Backward Reaching Inverse Kinematics,
+algorithm on joints so that the end effector moves to the desired
+target, and its children move with it. The joints can be an IK chain
+representing a finger, where the tip moves toward the target and the
+joints behind it are translated as well. Rotations are solved for.
+From: Aristidou A, Lasenby J. FABRIK: A fast, iterative solver for
+the Inverse Kinematics problem. Graphical Models 2011; 73(5): 243–260.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool SolveFABRIK(Transform[] joints, float[] distanceToNextJoint, Vector3 target, float targetTolerance, int maxIterations = 10, bool solveRotations = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Transform</span>[]</td>
+        <td><span class="parametername">joints</span></td>
+        <td><p>Joint transforms.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Single</span>[]</td>
+        <td><span class="parametername">distanceToNextJoint</span></td>
+        <td><p>Distances from current joint to following.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">Vector3</span></td>
+        <td><span class="parametername">target</span></td>
+        <td><p>Target position.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Single</span></td>
+        <td><span class="parametername">targetTolerance</span></td>
+        <td><p>If target is reachable, the max distance between end
+effector and target.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">maxIterations</span></td>
+        <td><p>Max iterations to run.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">solveRotations</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><p>True if successful, false if not.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Oculus_Movement_AnimationRigging_AnimationUtilities_UpdateToAnimatorPose_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.UpdateToAnimatorPose*"></a>
+  <h4 id="Oculus_Movement_AnimationRigging_AnimationUtilities_UpdateToAnimatorPose_Animator_System_Boolean_" data-uid="Oculus.Movement.AnimationRigging.AnimationUtilities.UpdateToAnimatorPose(Animator,System.Boolean)">UpdateToAnimatorPose(Animator, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Update animator to the pose stored in the avatar&apos;s human
+description.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void UpdateToAnimatorPose(Animator sourceAnimator, bool isRuntimeInstance = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Animator</span></td>
+        <td><span class="parametername">sourceAnimator</span></td>
+        <td><p>The animator that contains the human description.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">isRuntimeInstance</span></td>
+        <td><p>If called during runtime.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Unity-Movement Documentation
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
