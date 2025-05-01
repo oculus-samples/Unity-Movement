@@ -1,0 +1,28 @@
+{
+    "name": "Meta.XR.Movement.Tracking.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0c24a43307b4d5146a36b2f2c066d5d3",
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:d2761a0af0f567748a72629d4bb18a26",
+        "GUID:2a230cb87a1d3ba4a98bdc0ddae76e6c",
+        "GUID:f4af9e3560e85174f90917cb2bbcda01"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.meta.xr.sdk.interaction",
+            "expression": "",
+            "define": "INTERACTION_OVR_DEFINED"
+        }
+    ],
+    "noEngineReferences": false
+}

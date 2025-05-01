@@ -1,0 +1,24 @@
+{
+    "name": "Meta.XR.Movement.Tracking",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:2a230cb87a1d3ba4a98bdc0ddae76e6c",
+        "GUID:f4af9e3560e85174f90917cb2bbcda01"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.meta.xr.sdk.interaction",
+            "expression": "",
+            "define": "INTERACTION_OVR_DEFINED"
+        }
+    ],
+    "noEngineReferences": false
+}

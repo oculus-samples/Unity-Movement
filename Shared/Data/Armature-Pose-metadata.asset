@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f19d1e02490929e41b903b049fc91c34, type: 3}
+  m_Name: Armature-Pose-metadata
+  m_EditorClassIdentifier: 
+  _model: {fileID: 5277832601808152396, guid: 01841ff2664437e41a3418592a12de6d, type: 3}
+  _configJson: {fileID: 4900000, guid: 08ad01ce572b6f848a37d4b7354830c7, type: 3}

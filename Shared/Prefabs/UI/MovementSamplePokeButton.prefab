@@ -23,6 +23,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 331782912224557488}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -30,7 +31,6 @@ Transform:
   m_Children:
   - {fileID: 9221139118573929147}
   m_Father: {fileID: 4171210596153234763}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &504153510087592344
 GameObject:
@@ -55,6 +55,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 504153510087592344}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -62,7 +63,6 @@ Transform:
   m_Children:
   - {fileID: 1936170439013713714}
   m_Father: {fileID: 4171210596153234763}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1727897749896898576
 GameObject:
@@ -74,7 +74,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1693971800985305729}
   - component: {fileID: 4479599009514615917}
-  - component: {fileID: 3233904251259423811}
+  - component: {fileID: 406148911549396541}
   m_Layer: 0
   m_Name: BasicPokeButtonReleaseAudio
   m_TagString: Untagged
@@ -89,13 +89,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1727897749896898576}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1406319260258202752}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &4479599009514615917
 AudioSource:
@@ -193,7 +193,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &3233904251259423811
+--- !u!114 &406148911549396541
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,13 +202,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1727897749896898576}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ab2f6af53ca0b840ba2c30a5c45d138, type: 3}
+  m_Script: {fileID: 11500000, guid: 8ed21ba07bec2b44081fa403dfd91498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioSource: {fileID: 0}
+  _audioSource: {fileID: 4479599009514615917}
   _audioClips:
   - {fileID: 8300000, guid: 86dab1222b901b345a9beb6a2da97bff, type: 3}
-  _volume: 0.5
+  _volume: 0.7
   _volumeRandomization:
     _useRandomRange: 0
     _min: 0
@@ -232,7 +232,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2420669260199558667}
   - component: {fileID: 594325813188069607}
-  - component: {fileID: 7547949383124372832}
+  - component: {fileID: 2365245995297488563}
   m_Layer: 0
   m_Name: BasicPokeButtonPressAudio
   m_TagString: Untagged
@@ -247,13 +247,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2445307694402884762}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1406319260258202752}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &594325813188069607
 AudioSource:
@@ -351,7 +351,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &7547949383124372832
+--- !u!114 &2365245995297488563
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -360,13 +360,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2445307694402884762}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ab2f6af53ca0b840ba2c30a5c45d138, type: 3}
+  m_Script: {fileID: 11500000, guid: 8ed21ba07bec2b44081fa403dfd91498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioSource: {fileID: 0}
+  _audioSource: {fileID: 594325813188069607}
   _audioClips:
   - {fileID: 8300000, guid: e8df970625f22804ebccd2e94631be3f, type: 3}
-  _volume: 0.5
+  _volume: 0.7
   _volumeRandomization:
     _useRandomRange: 0
     _min: 0
@@ -411,7 +411,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1936170439013713714}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -438,7 +437,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5839354330806206608, guid: b8f5aeb9c6de7614db2631011b869bc3, type: 2}
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -482,8 +481,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Sample Name
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b8f5aeb9c6de7614db2631011b869bc3, type: 2}
-  m_sharedMaterial: {fileID: -5839354330806206608, guid: b8f5aeb9c6de7614db2631011b869bc3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -577,6 +576,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4171210596153234762}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
@@ -586,7 +586,6 @@ Transform:
   - {fileID: 5838450702997323294}
   - {fileID: 1406319260258202752}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3494393462330821194
 MonoBehaviour:
@@ -750,9 +749,9 @@ MonoBehaviour:
   _whenRelease:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3233904251259423811}
-        m_TargetAssemblyTypeName: Oculus.Movement.Utils.Interaction.InteractionAudioTrigger,
-          Meta.Movement
+      - m_Target: {fileID: 406148911549396541}
+        m_TargetAssemblyTypeName: Meta.XR.Movement.Samples.MovementAudioTrigger,
+          Meta.XR.Movement.Samples
         m_MethodName: PlayAudio
         m_Mode: 1
         m_Arguments:
@@ -772,9 +771,9 @@ MonoBehaviour:
   _whenSelect:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7547949383124372832}
-        m_TargetAssemblyTypeName: Oculus.Movement.Utils.Interaction.InteractionAudioTrigger,
-          Meta.Movement
+      - m_Target: {fileID: 2365245995297488563}
+        m_TargetAssemblyTypeName: Meta.XR.Movement.Samples.MovementAudioTrigger,
+          Meta.XR.Movement.Samples
         m_MethodName: PlayAudio
         m_Mode: 1
         m_Arguments:
@@ -819,6 +818,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6124062343383677172}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -827,7 +827,6 @@ Transform:
   - {fileID: 6781307535824638274}
   - {fileID: 3533162126377251659}
   m_Father: {fileID: 5838450702997323294}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9188117963068193528
 MonoBehaviour:
@@ -878,13 +877,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7080989388379098266}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1936170439013713714}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3062294403978789170
 MeshFilter:
@@ -1051,7 +1050,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     ColorTime: 0.05
   _disabledColorState:
-    Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    Color: {r: 0.2509804, g: 0.2509804, b: 0.2509804, a: 1}
     ColorCurve:
       serializedVersion: 2
       m_Curve:
@@ -1100,6 +1099,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9113080431008026797}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -1108,7 +1108,6 @@ Transform:
   - {fileID: 2420669260199558667}
   - {fileID: 1693971800985305729}
   m_Father: {fileID: 4171210596153234763}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9221139118573929146
 GameObject:
@@ -1136,13 +1135,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9221139118573929146}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5074392215883782687}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4625356660798671994
 MonoBehaviour:

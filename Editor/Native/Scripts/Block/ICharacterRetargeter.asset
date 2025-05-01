@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a8626004e3ff046a416a6600b0f34a, type: 3}
+  m_Name: ICharacterRetargeter
+  m_EditorClassIdentifier: 
+  id: 1735b3a5-6b02-42a3-bbee-e48234afe14b
+  version: 1
+  blockName: Character Retargeter
+  description: 
+  tags:
+    array:
+    - name: New
+    - name: Tracking
+  thumbnail: {fileID: 2800000, guid: f60898585088a594683aa5aed6ba7b0f, type: 3}
+  order: 0
+  prefab: {fileID: 0}
+  selectedGuidedSetupIndex: 0
+  externalBlockDependencies: []
+  dependencies:
+  - e47682b9-c270-40b1-b16d-90b627a5ce1b
+  guidedSetupName: 
+  packageDependencies: []
+  isSingleton: 0
+  usageInstructions: 
+  featureDocumentationName: 
+  featureDocumentationUrl: 

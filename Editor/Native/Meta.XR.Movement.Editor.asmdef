@@ -3,8 +3,12 @@
     "rootNamespace": "",
     "references": [
         "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:d2761a0af0f567748a72629d4bb18a26",
+        "GUID:2a230cb87a1d3ba4a98bdc0ddae76e6c",
+        "GUID:93bda9a2bc9dddc43930634fa65d6e42",
         "GUID:f4af9e3560e85174f90917cb2bbcda01",
-        "GUID:8e76fd86d1fdc9243a341ca50624a575"
+        "GUID:8e76fd86d1fdc9243a341ca50624a575",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [
         "Editor"
@@ -15,6 +19,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.meta.xr.sdk.interaction",
+            "expression": "",
+            "define": "INTERACTION_OVR_DEFINED"
+        }
+    ],
     "noEngineReferences": false
 }

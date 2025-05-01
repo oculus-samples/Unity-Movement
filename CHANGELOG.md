@@ -1,3 +1,8 @@
+## [76.0.0]
+- Replaced retargeting system with a more efficient, data-driven CharacterRetargeter.
+- Added powerful and easy-to-use tooling system to create retargeted characters.
+- Revised body tracking, networking, ISDK, hip pinning and locomotion scenes to use new retargeting system.
+
 ## [74.0.0]
 - Fixed MovementBodyTrackingForFitness scene so that the UI in the scene is visible to cameras.
 - Updated Project Setup Tool to enable audio-based face tracking when using A2E, and enable face tracking visemes output when using visemes.
