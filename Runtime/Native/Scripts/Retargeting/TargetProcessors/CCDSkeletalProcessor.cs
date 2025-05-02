@@ -177,8 +177,7 @@ namespace Meta.XR.Movement.Retargeting
             // Push end effector to target. We need to know what the local position of the target
             // is based on the last recomputed world positions of the IK chain after CCD has
             // modified them.
-            var targetLocalPosition = GetTargetRelativeToEffectorParent(endEffectorParentIndex, targetPose,
-                targetPositionLerped, rootScale);
+            var targetLocalPosition = targetPoseLocal[endEffectorTargetIndex].Position;
             var localEndEffectorRotation =
                 Quaternion.Inverse(targetPose[endEffectorParentIndex].Orientation) * endEffectorRotation;
             targetPoseLocal[endEffectorTargetIndex] =
