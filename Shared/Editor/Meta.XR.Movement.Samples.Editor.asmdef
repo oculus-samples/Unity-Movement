@@ -1,0 +1,16 @@
+{
+    "name": "Meta.XR.Movement.Samples.Editor",
+    "rootNamespace": "",
+    "references": ["GUID:05f3ea442cba2994293b0b3cd60188e4"],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

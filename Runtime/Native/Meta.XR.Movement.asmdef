@@ -2,7 +2,9 @@
     "name": "Meta.XR.Movement",
     "rootNamespace": "",
     "references": [
-        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30"
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:2665a8d13d1b3f18800f46e256720795",
+        "GUID:2a230cb87a1d3ba4a98bdc0ddae76e6c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -11,6 +13,17 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.burst",
+            "expression": "",
+            "define": "UNITY_BURST_DEFINED"
+        },
+        {
+            "name": "com.meta.xr.sdk.interaction",
+            "expression": "",
+            "define": "INTERACTION_OVR_DEFINED"
+        }
+    ],
     "noEngineReferences": false
 }

@@ -1,10 +1,19 @@
 {
-  "name": "com.meta.movement",
-  "displayName": "Meta Movement",
-  "version": "74.0.0",
-  "description": "Contains sample scenes, prefabs, scripts, and art assets for Movement SDK.",
-  "unity": "2021.3",
-  "unityRelease": "26f1",
+  "name": "com.meta.xr.sdk.movement",
+  "displayName": "Meta XR Movement SDK",
+  "version": "76.0.0",
+  "unity": "2022.3",
+  "unityRelease": "15f1",
+  "keywords": [
+    "Meta",
+    "Oculus",
+    "Movement",
+    "Retargeting",
+    "SDK",
+    "OVR",
+    "Samples"
+  ],
+  "description": "This package allows Movement SDK to perform retargeting with data from OVRPlugin, and contains sample scenes using the OVR player rig.",
   "samples":[
     {
       "displayName": "Face Tracking Samples",
@@ -27,23 +36,11 @@
     "url": "https://developer.oculus.com/"
   },
   "documentationUrl": "https://developer.oculus.com/documentation/unity/move-overview/",
+  "changelogUrl": "https://developer.oculus.com/downloads/package/meta-xr-movement-sdk/",
   "licensesUrl": "https://developer.oculus.com/licenses/oculussdk",
-  "licenseMessage": "By adding or using this package you agree to the terms and conditions of the Meta Platforms Technologies SDK License Agreement: https://developer.oculus.com/licenses/oculussdk",
-  "keywords": [
-    "Meta",
-    "Oculus",
-    "OVR",
-    "SDK",
-    "Quest",
-    "Movement",
-    "XR"
-  ],
   "dependencies": {
-    "com.meta.xr.sdk.core": "74.0.0",
-    "com.meta.xr.sdk.interaction": "74.0.0",
-    "com.meta.xr.sdk.interaction.ovr": "74.0.0",
+    "com.unity.burst": "1.8.18",
     "com.unity.textmeshpro": "3.0.6",
-    "com.unity.animation.rigging": "1.2.1",
-    "com.unity.burst": "1.4.1"
+    "com.unity.ugui": "1.0.0"
   }
 }

@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: RobotArms
   m_Shader: {fileID: 4800000, guid: 525663d260145d9458ce774a4fa0f04b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _SPECULAR_AFFECT_BY_NDOTL
   m_InvalidKeywords: []
@@ -18,6 +20,7 @@ Material:
   m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -42,7 +45,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 60e0c8f5771619140a559c0e64a838c2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -74,9 +77,9 @@ Material:
     - _DstBlend: 0
     - _EmissionStrength: 1
     - _GlossMapScale: 1
-    - _Glossiness: 0.8
+    - _Glossiness: 0.7
     - _GlossyReflections: 1
-    - _Metallic: 0.865
+    - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
@@ -91,7 +94,7 @@ Material:
     - _VertexDisplShadows: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.25882348, g: 0.57647055, b: 0.8980392, a: 0.4627451}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DiffuseWrapColor: {r: 1, g: 0.29999998, b: 0.19999996, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
