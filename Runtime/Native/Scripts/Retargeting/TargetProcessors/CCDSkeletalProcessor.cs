@@ -1,7 +1,5 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-// (c) Meta Platforms, Inc. and affiliates.
-
 using Meta.XR.Movement.Retargeting.IK;
 using System;
 using Unity.Collections;
