@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
@@ -47,6 +48,11 @@ namespace Meta.XR.Movement.Networking
             get => _applyData;
             set => _applyData = value;
         }
+
+        /// <summary>
+        /// Indicates how many bytes were received last.
+        /// </summary>
+        public Action<int> BytesReceived;
 
         /// <summary>
         /// The network config used by this network character handler.
@@ -240,6 +246,8 @@ namespace Meta.XR.Movement.Networking
             data.CopyTo(_streamedData[_currentStreamIndex]);
             _currentStreamIndex++;
             _dataReadCount++;
+
+            BytesReceived?.Invoke(data.Length);
 
             if (_dataReadCount >= _spawnDelay / _networkCharacterRetargeter.IntervalToSendData)
             {
