@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
 
 using System.Linq;
 using Meta.XR.Movement.FaceTracking;
@@ -13,14 +13,8 @@ namespace Meta.XR.Movement
     /// Add project setup validation tasks for MovementSDK Samples.
     /// </summary>
     [InitializeOnLoad]
-    internal static class OVRProjectSetupMovementSDKSamplesTasks
+    internal static class MovementSDKProjectSetupTasks
     {
-        /// <summary>
-        /// All character and mirrored character layers should exist based on their indices.
-        /// That is because the scene assets are assigned based on layer index.
-        /// </summary>
-        private static readonly int[] _expectedLayersIndices = { 10, 11 };
-
         /// <summary>
         /// The HiddenMesh layer is required for RecalculateNormals to function correctly.
         /// </summary>
@@ -28,13 +22,13 @@ namespace Meta.XR.Movement
 
         private const OVRProjectSetup.TaskGroup _group = OVRProjectSetup.TaskGroup.Features;
 
-        static OVRProjectSetupMovementSDKSamplesTasks()
+        static MovementSDKProjectSetupTasks()
         {
             // Skin weights settings.
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Recommended,
                 group: _group,
-                platform: BuildTargetGroup.Android,
+                platform: BuildTargetGroup.Unknown,
                 isDone: group => QualitySettings.skinWeights == SkinWeights.FourBones,
                 message: "Four skin weights should be used to avoid skinning problems.",
                 fix: group =>
@@ -48,7 +42,7 @@ namespace Meta.XR.Movement
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Required,
                 group: _group,
-                platform: BuildTargetGroup.Android,
+                platform: BuildTargetGroup.Unknown,
                 isDone: group =>
                     OVRRuntimeSettings.Instance.BodyTrackingFidelity == OVRPlugin.BodyTrackingFidelity2.High,
                 message: "Body Tracking Fidelity should be set to High.",
@@ -63,7 +57,7 @@ namespace Meta.XR.Movement
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Required,
                 group: _group,
-                platform: BuildTargetGroup.Android,
+                platform: BuildTargetGroup.Unknown,
                 isDone: group =>
                     OVRRuntimeSettings.GetRuntimeSettings().BodyTrackingJointSet == OVRPlugin.BodyJointSet.FullBody,
                 message: "Body Tracking Joint Set should be set to Full Body.",
@@ -79,7 +73,7 @@ namespace Meta.XR.Movement
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Required,
                 group: _group,
-                platform: BuildTargetGroup.Android,
+                platform: BuildTargetGroup.Unknown,
                 isDone: group => FindComponentInScene<FaceDriver>() == null ||
                                  OVRRuntimeSettings.GetRuntimeSettings().RequestsAudioFaceTracking,
                 message: "The audio to expression feature should be enabled.",
@@ -95,8 +89,9 @@ namespace Meta.XR.Movement
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Recommended,
                 group: _group,
-                platform: BuildTargetGroup.Android,
-                isDone: group => LayerMask.NameToLayer(_hiddenMeshLayerName) != -1,
+                platform: BuildTargetGroup.Unknown,
+                isDone: group => FindComponentInScene<RecalculateNormals>() == null ||
+                                  LayerMask.NameToLayer(_hiddenMeshLayerName) != -1,
                 message:
                 $"The layer '{_hiddenMeshLayerName}' needs to exist for Recalculate Normals to function properly.",
                 fix: group =>
@@ -124,37 +119,6 @@ namespace Meta.XR.Movement
                     }
                 },
                 fixMessage: $"Set an unused layer to '{_hiddenMeshLayerName}'."
-            );
-            OVRProjectSetup.AddTask(
-                level: OVRProjectSetup.TaskLevel.Recommended,
-                group: _group,
-                platform: BuildTargetGroup.Android,
-                isDone: group =>
-                {
-                    foreach (var layerIndex in _expectedLayersIndices)
-                    {
-                        if (string.IsNullOrEmpty(LayerMask.LayerToName(layerIndex)))
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                },
-                message: "Layers 10 and 11 must be indexed for the samples to display correctly.",
-                fix: group =>
-                {
-                    foreach (var expectedLayerIndex in _expectedLayersIndices)
-                    {
-                        if (string.IsNullOrEmpty(LayerMask.LayerToName(expectedLayerIndex)))
-                        {
-                            // Default layer names.
-                            string newLayerName = expectedLayerIndex == 10 ? "Character" : "MirroredCharacter";
-                            SetLayerName(expectedLayerIndex, newLayerName);
-                        }
-                    }
-                },
-                fixMessage: "Set layers 10 and 11 to be valid layers."
             );
         }
 
