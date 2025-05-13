@@ -198,6 +198,7 @@ namespace Meta.XR.Movement.Retargeting
                 RootScale = rootScale
             };
             job.Schedule().Complete();
+            parentIndices.Dispose();
             return targetPoseWorld;
         }
 

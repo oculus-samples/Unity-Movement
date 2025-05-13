@@ -237,6 +237,7 @@ namespace Meta.XR.Movement.Networking
 
             var worldPose = _skeletonRetargeter.GetWorldPoseFromLocalPose(bodyPose);
             _skeletonRetargeter.RetargetedPose.CopyFrom(worldPose);
+            worldPose.Dispose();
         }
 
         protected void OnValidate()
