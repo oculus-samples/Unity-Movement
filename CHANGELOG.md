@@ -1,3 +1,17 @@
+## [76.0.1]
+
+### Added
+
+- Mac and Linux libraries.
+
+### Fixed
+
+- Hip pinning scene target changed to tracked anchors to prevent tracking invalid hands.
+- Addressed CCD stretching arm stretching bug.
+- Resolved protential race condition in NetworkCharacterBehaviorNGO.
+- Dispose TempJob arrays.
+- Fixed project setup tool requirements for all platforms.
+
 ## [76.0.0]
 - Replaced retargeting system with a more efficient, data-driven CharacterRetargeter.
 - Added powerful and easy-to-use tooling system to create retargeted characters.
