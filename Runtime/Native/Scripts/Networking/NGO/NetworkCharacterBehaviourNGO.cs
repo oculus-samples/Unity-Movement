@@ -96,13 +96,21 @@ namespace Meta.XR.Movement.Networking.NGO
                 UpdateClientIds();
             }
 
+            // If this is our character.
             if (IsOwner)
             {
-                _characterScale.Value = _characterHandler.Character.transform.localScale.x;
+                if (_characterHandler.Character != null)
+                {
+                    _characterScale.Value = _characterHandler.Character.transform.localScale.x;
+                }
             }
+            // If this another player's character.
             else
             {
-                _characterHandler.Character.transform.localScale = Vector3.one * _characterScale.Value;
+                if (_characterHandler.Character != null)
+                {
+                    _characterHandler.Character.transform.localScale = Vector3.one * _characterScale.Value;
+                }
                 return;
             }
 
