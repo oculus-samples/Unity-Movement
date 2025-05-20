@@ -3,7 +3,6 @@
 using Meta.XR.Movement.Retargeting.IK;
 using System;
 using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static Meta.XR.Movement.MSDKUtility;
@@ -141,7 +140,12 @@ namespace Meta.XR.Movement.Retargeting
 
             // Get the current world pose as provided by other processors.
             var rootScale = _characterRetargeter.RootScale();
-            var targetPose = ComputeWorldPoses(ref targetPoseLocal, rootScale);
+            var targetPose = IKUtilities.ComputeWorldPoses(
+                _parentJointIndicesTarget,
+                ref targetPoseLocal,
+                rootScale,
+                _characterRetargeter.transform.position,
+                _characterRetargeter.transform.rotation);
             var rootPose = new Pose(targetPose[chainRootIndex].Position, targetPose[chainRootIndex].Orientation);
             var targetPosition = ccdData.Target.position;
             var endEffectorTargetIndex = ikChain[lastChainIndex];
@@ -170,7 +174,12 @@ namespace Meta.XR.Movement.Retargeting
             }
 
             targetPose.Dispose();
-            targetPose = ComputeWorldPoses(ref targetPoseLocal, rootScale);
+            targetPose = IKUtilities.ComputeWorldPoses(
+                _parentJointIndicesTarget,
+                ref targetPoseLocal,
+                rootScale,
+                _characterRetargeter.transform.position,
+                _characterRetargeter.transform.rotation);
 
             // Push end effector to target. We need to know what the local position of the target
             // is based on the last recomputed world positions of the IK chain after CCD has
@@ -181,25 +190,6 @@ namespace Meta.XR.Movement.Retargeting
             targetPoseLocal[endEffectorTargetIndex] =
                 new NativeTransform(localEndEffectorRotation, targetLocalPosition);
             targetPose.Dispose();
-        }
-
-        private NativeArray<NativeTransform> ComputeWorldPoses(
-            ref NativeArray<NativeTransform> targetPoseLocal,
-            Vector3 rootScale)
-        {
-            var targetPoseWorld = new NativeArray<NativeTransform>(targetPoseLocal.Length, Allocator.TempJob);
-            using var parentIndices = new NativeArray<int>(_parentJointIndicesTarget, Allocator.TempJob);
-
-            var job = new SkeletonJobs.ConvertLocalToWorldPoseJob
-            {
-                LocalPose = targetPoseLocal,
-                WorldPose = targetPoseWorld,
-                ParentIndices = parentIndices,
-                RootScale = rootScale
-            };
-            job.Schedule().Complete();
-            parentIndices.Dispose();
-            return targetPoseWorld;
         }
 
         private NativeArray<NativeTransform> GetIKChainEndFirst(TargetJointIndex[] ikChain,

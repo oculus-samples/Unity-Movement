@@ -235,7 +235,7 @@ namespace Meta.XR.Movement.Networking
                 return;
             }
 
-            var worldPose = _skeletonRetargeter.GetWorldPoseFromLocalPose(bodyPose);
+            var worldPose = _skeletonRetargeter.GetWorldPoseFromLocalPose(bodyPose, transform.position, transform.rotation);
             _skeletonRetargeter.RetargetedPose.CopyFrom(worldPose);
             worldPose.Dispose();
         }

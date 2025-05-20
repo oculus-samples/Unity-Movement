@@ -376,8 +376,13 @@ namespace Meta.XR.Movement.Retargeting
         /// Converts a local space pose to a world space pose.
         /// </summary>
         /// <param name="localPose">The local space pose to convert.</param>
+        /// <param name="rootPosition">Root position, optional.</param>
+        /// <param name="rootRotation">Root rotation, optional.</param>
         /// <returns>A new NativeArray containing the converted world space pose.</returns>
-        public NativeArray<NativeTransform> GetWorldPoseFromLocalPose(NativeArray<NativeTransform> localPose)
+        public NativeArray<NativeTransform> GetWorldPoseFromLocalPose(
+            NativeArray<NativeTransform> localPose,
+            Vector3? rootPosition = null,
+            Quaternion? rootRotation = null)
         {
             var worldPose = new NativeArray<NativeTransform>(localPose.Length, TempJob);
             var job = new SkeletonJobs.ConvertLocalToWorldPoseJob
@@ -385,7 +390,9 @@ namespace Meta.XR.Movement.Retargeting
                 LocalPose = localPose,
                 WorldPose = worldPose,
                 ParentIndices = _nativeTargetParentIndices,
-                RootScale = Vector3.one
+                RootScale = Vector3.one,
+                RootPosition = rootPosition.HasValue ? rootPosition.Value : Vector3.zero,
+                RootRotation = rootRotation.HasValue ? rootRotation.Value : Quaternion.identity
             };
             job.Schedule().Complete();
             return worldPose;

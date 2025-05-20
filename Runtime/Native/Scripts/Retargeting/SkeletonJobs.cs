@@ -169,6 +169,18 @@ namespace Meta.XR.Movement.Retargeting
             public Vector3 RootScale;
 
             /// <summary>
+            /// Root position.
+            /// </summary>
+            [ReadOnly]
+            public Vector3 RootPosition;
+
+            /// <summary>
+            /// Rooot rotation.
+            /// </summary>
+            [ReadOnly]
+            public Quaternion RootRotation;
+
+            /// <summary>
             /// Output array for the converted world space poses.
             /// </summary>
             public NativeArray<NativeTransform> WorldPose;
@@ -184,8 +196,8 @@ namespace Meta.XR.Movement.Retargeting
                     {
                         // Root joint - local is already world
                         WorldPose[i] = new NativeTransform(
-                            LocalPose[i].Orientation,
-                            Vector3.Scale(LocalPose[i].Position, RootScale),
+                            RootRotation * LocalPose[i].Orientation,
+                            RootPosition + RootRotation * Vector3.Scale(LocalPose[i].Position, RootScale),
                             LocalPose[i].Scale);
                     }
                     else
