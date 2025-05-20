@@ -41,6 +41,8 @@ namespace Meta.XR.Movement.Retargeting.Editor
                     return property.FindPropertyRelative("_locomotionProcessor");
                 case TargetProcessor.ProcessorType.CCDIK:
                     return property.FindPropertyRelative("_ccdProcessor");
+                case TargetProcessor.ProcessorType.Custom:
+                    return property.FindPropertyRelative("_customProcessor");
                 default:
                     return null;
             }

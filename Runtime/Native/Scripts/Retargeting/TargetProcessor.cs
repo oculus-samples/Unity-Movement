@@ -25,7 +25,8 @@ namespace Meta.XR.Movement.Retargeting
             Animation,
             HipPinning,
             Locomotion,
-            CCDIK
+            CCDIK,
+            Custom
         }
 
         /// <summary>

@@ -53,6 +53,12 @@ namespace Meta.XR.Movement.Retargeting
         protected CCDSkeletalProcessor _ccdProcessor;
 
         /// <summary>
+        /// A user-defined, custom processor.
+        /// </summary>
+        [SerializeField]
+        protected CustomProcessor _customProcessor;
+
+        /// <summary>
         /// Returns the current <see cref="TargetProcessor"/> based on the current type
         /// saved.
         /// </summary>
@@ -71,6 +77,8 @@ namespace Meta.XR.Movement.Retargeting
                     return _locomotionProcessor;
                 case TargetProcessor.ProcessorType.CCDIK:
                     return _ccdProcessor;
+                case TargetProcessor.ProcessorType.Custom:
+                    return _customProcessor;
                 default:
                     return null;
             }
