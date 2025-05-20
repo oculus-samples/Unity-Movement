@@ -1331,7 +1331,7 @@ namespace Meta.XR.Movement
             public static extern Result metaMovementSDK_getJointIndex(
                 ulong handle,
                 SkeletonType skeletonType,
-                in string jointName,
+                IntPtr jointName,
                 out int jointIndex);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -2249,16 +2249,46 @@ namespace Meta.XR.Movement
         /// <param name="jointName">The name of the joint to find.</param>
         /// <param name="jointIndex">Output parameter that receives the joint index.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetJointIndex(ulong handle, SkeletonType skeletonType, in string jointName,
+        public static bool GetJointIndex(
+            ulong handle,
+            SkeletonType skeletonType,
+            in string jointName,
             out int jointIndex)
         {
-            Result success;
-            using (new ProfilerScope(nameof(GetParentJointIndex)))
+            Result result = Result.Failure;
+            using (new ProfilerScope(nameof(GetJointIndex)))
             {
-                success = Api.metaMovementSDK_getJointIndex(handle, skeletonType, jointName, out jointIndex);
+                // Convert the string to a byte array and allocate memory for it.
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jointName == null ? String.Empty : jointName);
+                IntPtr currentString = IntPtr.Zero;
+                try
+                {
+                    currentString = Marshal.AllocHGlobal(bytes.Length + 1);
+                }
+                catch (Exception exception)
+                {
+                    jointIndex = -1;
+                    Debug.LogError($"GetJointIndex allocation exception: {exception}.");
+                    return false;
+                }
+                try
+                {
+                    // Copy the bytes into the allocated memory
+                    Marshal.Copy(bytes, 0, currentString, bytes.Length);
+                    // Set the last byte to zero (null terminator)
+                    Marshal.WriteByte(currentString, bytes.Length, 0);
+                    result = Api.metaMovementSDK_getJointIndex(handle, skeletonType, currentString, out jointIndex);
+                }
+                catch (Exception exception)
+                {
+                    jointIndex = -1;
+                    Debug.LogError($"GetJointIndex exception: {exception}.");
+                }
+
+                Marshal.FreeHGlobal(currentString);
             }
 
-            return success == Result.Success;
+            return result == Result.Success;
         }
 
         /// <summary>
