@@ -302,7 +302,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8156316538343237965, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
       propertyPath: _sourceProcessorContainers.Array.data[0]._isdkProcessor._maxDisplacementDistance
-      value: 0.05
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8156316538343237965, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
       propertyPath: _sourceProcessorContainers.Array.data[0]._isdkProcessor._moveHandBackToOriginalPosition

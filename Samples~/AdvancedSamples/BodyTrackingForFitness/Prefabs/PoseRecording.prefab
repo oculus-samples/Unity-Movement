@@ -1700,6 +1700,7 @@ MonoBehaviour:
   _thickness: 0.005
   _bodyPoseTransforms: {fileID: 7740590149159541950}
   _data: {fileID: 11400000, guid: 31e13d54c12f97045b6138d36f9e361c, type: 2}
+  _indexesToIgnoreDraw: 0c00000011000000
   _defaultColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &3247805813392417389
 GameObject:
