@@ -1,10 +1,12 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Meta.XR.Movement.Retargeting;
 using Meta.XR.Movement.Retargeting.Editor;
+using Unity.Collections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -77,7 +79,8 @@ namespace Meta.XR.Movement.Editor
             var rootJoint = retargeter.JointPairs[0].Joint;
             if (rootJoint.localScale != Vector3.one)
             {
-                Debug.LogWarning("Character joints must be uniform scale for retargeting! Setting root joint scale to uniform scale.");
+                Debug.LogWarning(
+                    "Character joints must be uniform scale for retargeting! Setting root joint scale to uniform scale.");
                 rootJoint.localScale = Vector3.one;
             }
 
@@ -107,7 +110,8 @@ namespace Meta.XR.Movement.Editor
             var asset = PrefabUtility.GetCorrespondingObjectFromOriginalSource(activeObject);
             if (asset == null)
             {
-                Debug.LogError("Selected object isn't linked to a project asset.");
+                Debug.LogError(
+                    "Selected object isn't linked to a project asset. Please create a prefab from the object, and try again on the created prefab.");
                 return;
             }
 
@@ -118,8 +122,8 @@ namespace Meta.XR.Movement.Editor
             var characterRetargeter = GetOrAddComponent<CharacterRetargeter>(activeObject);
             characterRetargeter.ConfigAsset = metadataObj.ConfigJson;
             CharacterRetargeterConfigEditor.LoadConfig(new SerializedObject(characterRetargeter), characterRetargeter);
-            var ovrBody = GetOrAddComponent<OVRBody>(activeObject);
-            ovrBody.ProvidedSkeletonType = OVRPlugin.BodyJointSet.FullBody;
+            var dataProvider = GetOrAddComponent<MetaSourceDataProvider>(activeObject);
+            dataProvider.ProvidedSkeletonType = OVRPlugin.BodyJointSet.FullBody;
             Undo.RecordObject(activeObject, "Add skeleton retargeting");
             using var serializedObject = new SerializedObject(characterRetargeter);
             serializedObject.ApplyModifiedProperties();
@@ -206,7 +210,8 @@ namespace Meta.XR.Movement.Editor
             var prefab = PrefabUtility.GetCorrespondingObjectFromSource(target);
             if (prefab == null)
             {
-                Debug.LogError("Selected object isn't linked to a project asset.");
+                Debug.LogError(
+                    "Selected object isn't linked to a project asset. Please create a prefab from the object, and try again on the created prefab.");
                 return;
             }
 
@@ -253,25 +258,32 @@ namespace Meta.XR.Movement.Editor
                     prefabAssetPath = AssetDatabase.GetAssetPath(prefab);
                 }
             }
+
             if (string.IsNullOrEmpty(assetPath))
             {
+                string directoryPath;
+                string defaultFileName;
+
                 if (string.IsNullOrEmpty(prefabAssetPath))
                 {
-                    assetPath = EditorUtility.SaveFilePanelInProject(
-                        "Save Retargeting Config",
-                        targetObject.name,
-                        "json",
-                        "Save Retargeting Config");
+                    directoryPath = Application.dataPath;
+                    defaultFileName = targetObject.name;
                 }
                 else
                 {
-                    assetPath = EditorUtility.SaveFilePanelInProject(
-                        "Save Retargeting Config",
-                        targetObject.name,
-                        "json",
-                        "Save Retargeting Config",
-                        prefabAssetPath);
+                    // Construct full path and split into directory/file
+                    var fullPath = Application.dataPath.Replace("Assets", "") + prefabAssetPath;
+                    directoryPath = Path.GetDirectoryName(fullPath);
+                    defaultFileName = Path.GetFileNameWithoutExtension(fullPath);
                 }
+
+                assetPath = EditorUtility.SaveFilePanelInProject(
+                    "Save Retargeting Config",
+                    defaultFileName,
+                    "json",
+                    "Save Retargeting Config",
+                    directoryPath);
+
                 if (string.IsNullOrEmpty(assetPath))
                 {
                     return null;
@@ -385,6 +397,7 @@ namespace Meta.XR.Movement.Editor
             {
                 comp = go.AddComponent<T>();
             }
+
             return comp;
         }
 
@@ -400,6 +413,7 @@ namespace Meta.XR.Movement.Editor
                 Debug.LogError("Cannot retrieve RetargetingBodyData if the asset name is null or empty.");
                 return null;
             }
+
             var guids = AssetDatabase.FindAssets(assetName);
             if (guids == null || guids.Length == 0)
             {
@@ -409,6 +423,64 @@ namespace Meta.XR.Movement.Editor
 
             var pathToAsset = AssetDatabase.GUIDToAssetPath(guids[0]);
             return AssetDatabase.LoadAssetAtPath<SkeletonData>(pathToAsset);
+        }
+
+        /// <summary>
+        /// Gets a processor from a CharacterRetargeter at the index specified in the property path.
+        /// </summary>
+        /// <typeparam name="T">The type of processor to get.</typeparam>
+        /// <param name="property">The serialized property containing the processor.</param>
+        /// <param name="isSourceProcessor">Whether the processor is a source processor (true) or target processor (false).</param>
+        /// <param name="processor">The processor if found, otherwise null.</param>
+        /// <returns>True if the processor was found, otherwise false.</returns>
+        public static bool TryGetProcessorAtPropertyPathIndex<T>(SerializedProperty property, bool isSourceProcessor,
+            out T processor) where T : class
+        {
+            processor = null;
+            var retargeter = Selection.activeGameObject?.GetComponent<CharacterRetargeter>();
+            if (retargeter == null)
+            {
+                Debug.LogError("Cannot find CharacterRetargeter component on the selected GameObject.");
+                return false;
+            }
+
+            int indexOfSerializedProperty = MSDKUtilityHelper.GetIndexFromPropertyPath(property.propertyPath);
+            var sourceContainers = retargeter.SourceProcessorContainers;
+            var targetContainers = retargeter.TargetProcessorContainers;
+            int numProcessors = isSourceProcessor ? sourceContainers.Length : targetContainers.Length;
+
+            if (indexOfSerializedProperty < 0 || indexOfSerializedProperty >= numProcessors)
+            {
+                Debug.LogError($"Index of serialized processor is invalid: {indexOfSerializedProperty}. " +
+                               $"Valid range is 0-{numProcessors - 1}.");
+                return false;
+            }
+
+            if (isSourceProcessor)
+            {
+                var sourceCurrentProcessor = sourceContainers[indexOfSerializedProperty].GetCurrentProcessor();
+                if (sourceCurrentProcessor is not T sourceTypedProcessor)
+                {
+                    Debug.LogError($"Processor at {indexOfSerializedProperty} is not of type {typeof(T).Name}.");
+                    return false;
+                }
+
+                processor = sourceTypedProcessor;
+                return true;
+            }
+            else
+            {
+                var currentTargetProcessor = targetContainers[indexOfSerializedProperty].GetCurrentProcessor();
+                if (currentTargetProcessor is not T typedProcessor)
+                {
+                    Debug.LogError($"Processor at {indexOfSerializedProperty} is not of type {typeof(T).Name}.");
+                    return false;
+                }
+
+                processor = typedProcessor;
+            }
+
+            return true;
         }
 
         private static void EnterAlignmentScene(string assetPath, string customDataSourceName = null)

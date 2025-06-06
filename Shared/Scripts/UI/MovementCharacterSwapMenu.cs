@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using TMPro;
 using UnityEngine;
@@ -22,6 +22,9 @@ namespace Meta.XR.Movement.Samples
 
         [SerializeField]
         protected TMP_Text _currentCharacterName;
+
+        [SerializeField, InspectorButton("SwapToNextCharacter")]
+        protected bool _toggleButton;
 
         private int _currentCharacterIndex;
 

@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Unity.Burst;
 using Unity.Collections;
@@ -6,8 +6,9 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using UnityEngine;
 using static Meta.XR.Movement.MSDKUtility;
-using static OVRPlugin;
-using static OVRSkeleton;
+using static Meta.XR.Movement.Retargeting.SkeletonData;
+using static Unity.Collections.Allocator;
+using static Unity.Collections.NativeArrayOptions;
 
 namespace Meta.XR.Movement.Retargeting
 {
@@ -22,7 +23,7 @@ namespace Meta.XR.Movement.Retargeting
         /// transform the entire set of poses.
         /// </summary>
         [BurstCompile]
-        public struct UpdateSourcePoseJob : IJob
+        private struct UpdateSourcePoseJob : IJob
         {
             /// <summary>
             /// Offset to apply to the source poses.
@@ -34,13 +35,13 @@ namespace Meta.XR.Movement.Retargeting
             /// Input pose rotations to read from.
             /// </summary>
             [ReadOnly]
-            public NativeArray<Quatf> InputPoseRotations;
+            public NativeArray<OVRPlugin.Quatf> InputPoseRotations;
 
             /// <summary>
             /// Input pose translations to read from.
             /// </summary>
             [ReadOnly]
-            public NativeArray<Vector3f> InputPoseTranslations;
+            public NativeArray<OVRPlugin.Vector3f> InputPoseTranslations;
 
             /// <summary>
             /// Output poses to write to.
@@ -72,7 +73,7 @@ namespace Meta.XR.Movement.Retargeting
         /// Computes local poses from the world poses provided.
         /// </summary>
         [BurstCompile]
-        public struct ComputeLocalFromWorldPosesJob : IJob
+        private struct ComputeLocalFromWorldPosesJob : IJob
         {
             /// <summary>
             /// World poses to read from.
@@ -138,8 +139,8 @@ namespace Meta.XR.Movement.Retargeting
                 Vector3 toPosition,
                 Quaternion toRotation)
             {
-                Pose result = new Pose();
-                Quaternion inverseFromRot = Quaternion.Inverse(fromRotation);
+                var result = new Pose();
+                var inverseFromRot = Quaternion.Inverse(fromRotation);
                 result.position = inverseFromRot * (toPosition - fromPosition);
                 result.rotation = inverseFromRot * toRotation;
                 return result;
@@ -147,10 +148,10 @@ namespace Meta.XR.Movement.Retargeting
         }
 
         private static OVRCameraRig _ovrCameraRig;
+        private static OVRPlugin.Skeleton2 _skeleton;
+        private static OVRSkeleton.SkeletonPoseData _data;
         private static NativeArray<NativeTransform> _outputPoses;
-        private static BodyState _currentBodyState;
         private static float _timestamp;
-        private static SkeletonPoseData _data;
 
         /// <summary>
         /// Get current body tracking frame data.
@@ -159,17 +160,17 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="trackerPositionsWorldSpace">Gets tracker positions in world space.</param>
         /// <returns>Latest available <see cref="MSDKUtility.FrameData"/>.</returns>
         public static FrameData GetCurrentFrameData(
-            IOVRSkeletonDataProvider dataProvider,
+            OVRSkeleton.IOVRSkeletonDataProvider dataProvider,
             bool trackerPositionsWorldSpace)
         {
             var skeletonPoseData = dataProvider.GetSkeletonPoseData();
             // provider doesn't give us fidelity, so we have to fetch it ourselves
-            BodyState bodyState = new BodyState();
-            BodyTrackingFidelity2 fidelity2 = BodyTrackingFidelity2.Low;
-            if (!GetBodyState4(Step.Render,
+            OVRPlugin.BodyState bodyState = new OVRPlugin.BodyState();
+            OVRPlugin.BodyTrackingFidelity2 fidelity2 = OVRPlugin.BodyTrackingFidelity2.Low;
+            if (!OVRPlugin.GetBodyState4(OVRPlugin.Step.Render,
                     dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody
-                        ? BodyJointSet.FullBody
-                        : BodyJointSet.UpperBody, ref bodyState))
+                        ? OVRPlugin.BodyJointSet.FullBody
+                        : OVRPlugin.BodyJointSet.UpperBody, ref bodyState))
             {
                 fidelity2 = bodyState.Fidelity;
             }
@@ -229,28 +230,16 @@ namespace Meta.XR.Movement.Retargeting
             return frameData;
         }
 
-        private static (Vector3, Quaternion) TransformPositionAndRotationToWorld(
-            Transform worldTransform,
-            Vector3 position,
-            Quaternion rotation)
-        {
-            position = worldTransform.TransformPoint(position);
-            rotation = worldTransform.rotation * rotation;
-            return (position, rotation);
-        }
-
         /// <summary>
         /// Gets poses from the tracker. Checks against expected pose count.
         /// </summary>
-        /// <param name="expectedPoseCount">Expected pose count.</param>
-        /// <param name="dataProvider">Skeleton data provider.</param>
+        /// <param name="dataProvider">Data provider.</param>
         /// <param name="offset"></param>
         /// <param name="skeletonChangeCount"></param>
         /// <param name="validPoses"></param>
         /// <returns></returns>
         public static NativeArray<NativeTransform> GetPosesFromTheTracker(
-            int expectedPoseCount,
-            IOVRSkeletonDataProvider dataProvider,
+            OVRSkeleton.IOVRSkeletonDataProvider dataProvider,
             Pose offset,
             out int skeletonChangeCount,
             out bool validPoses)
@@ -262,50 +251,13 @@ namespace Meta.XR.Movement.Retargeting
                 return _outputPoses;
             }
 
+            var allPoses = GetPosesFromTheTracker(dataProvider, offset);
             _timestamp = Time.time;
-            var allPoses = GetPosesFromTheTracker(dataProvider, offset, ref _currentBodyState);
+            _outputPoses = new NativeArray<NativeTransform>(allPoses.Length, Temp);
+            _outputPoses.CopyFrom(allPoses);
             validPoses = _data.IsDataValid;
             skeletonChangeCount = _data.SkeletonChangedCount;
-
-            _outputPoses = new NativeArray<NativeTransform>(allPoses.Length, Allocator.Temp);
-            _outputPoses.CopyFrom(allPoses);
             allPoses.Dispose();
-
-            if (_outputPoses.Length != expectedPoseCount)
-            {
-                Debug.LogWarning($"Pose count mismatch! Tracker: {_outputPoses.Length}, " +
-                                 $"expected from config: {expectedPoseCount}.");
-            }
-
-            // Don't return more poses than requested.
-            if (_outputPoses.Length > expectedPoseCount)
-            {
-                // only provide a subset
-                var subsetPoses = new NativeArray<NativeTransform>(expectedPoseCount, Allocator.Temp,
-                    NativeArrayOptions.UninitializedMemory);
-                for (var i = 0; i < expectedPoseCount; i++)
-                {
-                    subsetPoses[i] = _outputPoses[i];
-                }
-
-                return subsetPoses;
-            }
-
-            // If tracker has too few transforms, then provide default transforms for extras
-            if (_outputPoses.Length < expectedPoseCount)
-            {
-                var subsetPoses = new NativeArray<NativeTransform>(expectedPoseCount, Allocator.Temp,
-                    NativeArrayOptions.UninitializedMemory);
-                for (var i = 0; i < expectedPoseCount; i++)
-                {
-                    subsetPoses[i] = i >= allPoses.Length
-                        ? new NativeTransform(Quaternion.identity, Vector3.zero, Vector3.one)
-                        : _outputPoses[i];
-                }
-
-                return subsetPoses;
-            }
-
             return _outputPoses;
         }
 
@@ -314,25 +266,20 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         /// <param name="dataProvider">Data provider to provide transforms.</param>
         /// <param name="offset">Offset to apply.</param>
-        /// <param name="bodyState">Body state.</param>
         /// <returns>Tracker poses.</returns>
         public static NativeArray<NativeTransform> GetPosesFromTheTracker(
-            IOVRSkeletonDataProvider dataProvider,
-            Pose offset,
-            ref BodyState bodyState)
+            OVRSkeleton.IOVRSkeletonDataProvider dataProvider,
+            Pose offset)
         {
+            // Get body tracking data
             _data = dataProvider.GetSkeletonPoseData();
+            var isFullBody = dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody;
 
+            // If data isn't valid, just provide default poses
             if (!_data.IsDataValid)
             {
-                // if none available, just provide invalid poses for now so that
-                // body snapshot code works
-                var numBonesSpec = dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody
-                    ? (int)OVRPlugin.BoneId.FullBody_End
-                    : (int)OVRPlugin.BoneId.Body_End;
-
-                var invalidPoses = new NativeArray<NativeTransform>(numBonesSpec,
-                    Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                var numBonesSpec = isFullBody ? (int)FullBodyTrackingBoneId.End : (int)BodyTrackingBoneId.End;
+                var invalidPoses = new NativeArray<NativeTransform>(numBonesSpec, TempJob, UninitializedMemory);
                 for (var i = 0; i < numBonesSpec; i++)
                 {
                     invalidPoses[i] = NativeTransform.Identity();
@@ -341,29 +288,10 @@ namespace Meta.XR.Movement.Retargeting
                 return invalidPoses;
             }
 
-
-            var bodyStateBoneCount = 0;
-            if (GetBodyState4(Step.Render,
-                    dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody
-                        ? BodyJointSet.FullBody
-                        : BodyJointSet.UpperBody, ref bodyState))
-            {
-                // TODO: get body state does not set joint set. that should be fixed
-                // for now rely on the joint counts returned from the joint set.
-                bodyStateBoneCount = bodyState.JointLocations.Length;
-            }
-
-            var numPoses = _data.BoneTranslations.Length;
-            if (numPoses > bodyStateBoneCount)
-            {
-                Debug.LogWarning($"The number of valid tracker poses available is {bodyStateBoneCount}, " +
-                                 $"less than what is requested ({numPoses}). The remainder will use the first " +
-                                 $"joint's transform values.");
-            }
-
+            // Convert to native arrays
             var boneTranslations = GetBoneTranslations(_data.BoneTranslations);
             var boneRotations = GetBoneRotations(_data.BoneRotations);
-            var sourcePoses = new NativeArray<NativeTransform>(numPoses, Allocator.TempJob);
+            var sourcePoses = new NativeArray<NativeTransform>(_data.BoneTranslations.Length, TempJob);
             var job = new UpdateSourcePoseJob
             {
                 Offset = offset,
@@ -380,22 +308,29 @@ namespace Meta.XR.Movement.Retargeting
         /// <summary>
         /// Returns the bind pose.
         /// </summary>
-        /// <param name="expectedPoseCount">Expected pose count.</param>
-        /// <param name="skeleton">The skeleton containing the bind pose data.</param>
+        /// <param name="dataProvider">Data provider.</param>
         /// <returns></returns>
-        public static NativeArray<NativeTransform> GetBindPoses(int expectedPoseCount, ref Skeleton2 skeleton)
+        public static NativeArray<NativeTransform> GetBindPoses(
+            OVRSkeleton.IOVRSkeletonDataProvider dataProvider)
         {
-            var sourcePoses = new NativeArray<NativeTransform>(expectedPoseCount, Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            if (OVRPlugin.GetSkeleton2(OVRPlugin.SkeletonType.FullBody, ref skeleton))
+            var sourcePoses = new NativeArray<NativeTransform>(0, Temp, UninitializedMemory);
+            var skeletonType = dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody
+                ? OVRPlugin.SkeletonType.FullBody
+                : OVRPlugin.SkeletonType.Body;
+            if (!OVRPlugin.GetSkeleton2(skeletonType, ref _skeleton))
             {
-                var numBones = skeleton.Bones.Length;
-                for (var i = 0; i < numBones; i++)
-                {
-                    var skeletonPose = skeleton.Bones[i].Pose;
-                    sourcePoses[i] = new NativeTransform(skeletonPose.Orientation.FromFlippedZQuatf(),
-                        skeletonPose.Position.FromFlippedZVector3f(), Vector3.one);
-                }
+                return sourcePoses;
+            }
+
+            var numBones = _skeleton.Bones.Length;
+            sourcePoses = new NativeArray<NativeTransform>(numBones, Temp, UninitializedMemory);
+            for (var i = 0; i < numBones; i++)
+            {
+                var skeletonPose = _skeleton.Bones[i].Pose;
+                sourcePoses[i] = new NativeTransform(
+                    skeletonPose.Orientation.FromFlippedZQuatf(),
+                    skeletonPose.Position.FromFlippedZVector3f(),
+                    Vector3.one);
             }
 
             return sourcePoses;
@@ -414,9 +349,9 @@ namespace Meta.XR.Movement.Retargeting
             // don't modify the original poses; we need to have an untouched array of world positions
             // that we compute local poses from
             var localPoses = new NativeArray<NativeTransform>(trackerPosesWorldSpace.Length,
-                Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                TempJob, UninitializedMemory);
             var parentIndicesNativeArray = new NativeArray<int>(parentIndices.Length,
-                Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                TempJob, UninitializedMemory);
             for (int i = 0; i < parentIndices.Length; i++)
             {
                 parentIndicesNativeArray[i] = parentIndices[i];
@@ -440,8 +375,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="parentPose">Parent pose.</param>
         /// <param name="childPose">Child pose.</param>
         /// <returns>Native transform representing the child transform.</returns>
-        public static NativeTransform GetChildTransformAffectedByParent(
-            Pose parentPose, Pose childPose)
+        public static NativeTransform GetChildTransformAffectedByParent(Pose parentPose, Pose childPose)
         {
             Matrix4x4 parentMatrix = Matrix4x4.TRS(parentPose.position, parentPose.rotation, Vector3.one);
             Vector3 finalPosition = parentMatrix.MultiplyPoint3x4(childPose.position);
@@ -512,8 +446,10 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="inputTrackingPosition">Input tracking position.</param>
         /// <param name="inputTrackingRotation">Input tracking rotation.</param>
         /// <param name="isLeftSide">If left side or not.</param>
-        public static void ProvideInputTrackingState(out bool isHandTracked,
-            out Vector3 inputTrackingPosition, out Quaternion inputTrackingRotation,
+        public static void ProvideInputTrackingState(
+            out bool isHandTracked,
+            out Vector3 inputTrackingPosition,
+            out Quaternion inputTrackingRotation,
             bool isLeftSide)
         {
             OVRPlugin.HandState handState = new OVRPlugin.HandState();
@@ -578,6 +514,16 @@ namespace Meta.XR.Movement.Retargeting
             return _ovrCameraRig.trackingSpace;
         }
 
+        private static (Vector3, Quaternion) TransformPositionAndRotationToWorld(
+            Transform worldTransform,
+            Vector3 position,
+            Quaternion rotation)
+        {
+            position = worldTransform.TransformPoint(position);
+            rotation = worldTransform.rotation * rotation;
+            return (position, rotation);
+        }
+
         /// <summary>
         /// Multiplies two poses.
         /// </summary>
@@ -590,32 +536,33 @@ namespace Meta.XR.Movement.Retargeting
             result.rotation = a.rotation * b.rotation;
         }
 
-        private static NativeArray<Quatf> GetBoneRotations(Quatf[] boneRotations)
+        private static NativeArray<OVRPlugin.Quatf> GetBoneRotations(OVRPlugin.Quatf[] boneRotations)
         {
             unsafe
             {
-                var rotations = new NativeArray<Quatf>(boneRotations.Length, Allocator.TempJob,
-                    NativeArrayOptions.UninitializedMemory);
+                var rotations = new NativeArray<OVRPlugin.Quatf>(boneRotations.Length, TempJob,
+                    UninitializedMemory);
                 fixed (void* boneRotationsPtr = boneRotations)
                 {
                     UnsafeUtility.MemCpy(NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(rotations),
-                        boneRotationsPtr, boneRotations.Length * (long)UnsafeUtility.SizeOf<Quatf>());
+                        boneRotationsPtr, boneRotations.Length * (long)UnsafeUtility.SizeOf<OVRPlugin.Quatf>());
                 }
 
                 return rotations;
             }
         }
 
-        private static NativeArray<Vector3f> GetBoneTranslations(Vector3f[] boneTranslations)
+        private static NativeArray<OVRPlugin.Vector3f> GetBoneTranslations(OVRPlugin.Vector3f[] boneTranslations)
         {
             unsafe
             {
-                var translations = new NativeArray<Vector3f>(boneTranslations.Length, Allocator.TempJob,
-                    NativeArrayOptions.UninitializedMemory);
+                var translations = new NativeArray<OVRPlugin.Vector3f>(boneTranslations.Length, TempJob,
+                    UninitializedMemory);
                 fixed (void* boneTranslationsPtr = boneTranslations)
                 {
                     UnsafeUtility.MemCpy(NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(translations),
-                        boneTranslationsPtr, boneTranslations.Length * (long)UnsafeUtility.SizeOf<Vector3f>());
+                        boneTranslationsPtr,
+                        boneTranslations.Length * (long)UnsafeUtility.SizeOf<OVRPlugin.Vector3f>());
                 }
 
                 return translations;

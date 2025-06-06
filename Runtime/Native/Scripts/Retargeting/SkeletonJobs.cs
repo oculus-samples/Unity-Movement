@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Unity.Burst;
 using Unity.Collections;

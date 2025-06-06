@@ -52,16 +52,33 @@ PrefabInstance:
       propertyPath: m_Name
       value: HighFidelityCharacter
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 1060791494281435755, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4896686615184772609, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 5866666021909216657, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3268941693225299840}
+      addedObject: {fileID: 6967857622750169929}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6967857622750169929}
+      addedObject: {fileID: -2148279449728116217}
   m_SourcePrefab: {fileID: 100100000, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
 --- !u!4 &2293418108117387 stripped
 Transform:
@@ -363,19 +380,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}
   m_PrefabInstance: {fileID: 7022202128860870490}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3268941693225299840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7904580889813928459}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 274835e4e2feae04b87f0d000555f8a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _providedSkeletonType: 1
 --- !u!114 &6967857622750169929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1499,15 +1503,33 @@ MonoBehaviour:
     ShapeName: bls_mouth.jawDrop25
     ShapeIndex: 6
   _debugDrawSourceSkeleton: 0
+  _debugDrawSourceSkeletonColor: {r: 1, g: 1, b: 1, a: 1}
   _debugDrawTargetSkeleton: 0
-  _retargetingHandler:
+  _debugDrawTargetSkeletonColor: {r: 0, g: 1, b: 0, a: 1}
+  _skeletonRetargeter:
     _retargetingBehavior: 0
-    _currentScale: 1
+    _hideLowerBodyWhenUpperBodyTracking: 1
+    _hideLegScale: {x: 0.5, y: 1, z: 1}
     _applyScale: 1
+    _currentScale: 1
     _headScaleFactor: 0.95
-    _scaleRange: {x: 0.5, y: 1.5}
+    _scaleRange: {x: 0.8, y: 1.2}
   _sourceProcessorContainers: []
   _targetProcessorContainers: []
+--- !u!114 &-2148279449728116217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7904580889813928459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be3ebb6547662534aaef8337c5627f3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _providedSkeletonType: 1
+  _validBodyTrackingDelay: 0.25
 --- !u!4 &8149119689849317753 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1181247737847504419, guid: 13a9e7de67f3edd49bac705b6e3190d5, type: 3}

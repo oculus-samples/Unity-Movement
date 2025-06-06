@@ -1,7 +1,7 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Meta.XR.Movement.Retargeting.Editor
 {

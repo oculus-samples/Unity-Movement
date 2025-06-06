@@ -1,4 +1,4 @@
-// (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using Unity.Collections;
@@ -13,6 +13,12 @@ namespace Meta.XR.Movement.Retargeting
     [Serializable]
     public class CustomProcessor : TargetProcessor
     {
+        public CustomProcessorBehavior CustomBehaviour
+        {
+            get => _customBehavior;
+            set => _customBehavior = value;
+        }
+
         /// <summary>
         /// Component that is associated with custom processor implementation.
         /// </summary>

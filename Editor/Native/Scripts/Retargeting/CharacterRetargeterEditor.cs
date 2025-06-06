@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using UnityEditor;
 
@@ -16,7 +16,6 @@ namespace Meta.XR.Movement.Retargeting.Editor
         private SerializedProperty _debugDrawTargetSkeleton;
         private SerializedProperty _debugDrawTargetSkeletonColor;
         private SerializedProperty _skeletonRetargeter;
-        private SerializedProperty _validBodyTrackingDelay;
 
         private SerializedProperty _sourceProcessorContainers;
         private SerializedProperty _targetProcessorContainers;
@@ -30,7 +29,6 @@ namespace Meta.XR.Movement.Retargeting.Editor
             _debugDrawTargetSkeleton = serializedObject.FindProperty("_debugDrawTargetSkeleton");
             _debugDrawTargetSkeletonColor = serializedObject.FindProperty("_debugDrawTargetSkeletonColor");
             _skeletonRetargeter = serializedObject.FindProperty("_skeletonRetargeter");
-            _validBodyTrackingDelay = serializedObject.FindProperty("_validBodyTrackingDelay");
             _sourceProcessorContainers = serializedObject.FindProperty("_sourceProcessorContainers");
             _targetProcessorContainers = serializedObject.FindProperty("_targetProcessorContainers");
         }
@@ -58,6 +56,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
                 EditorGUILayout.PropertyField(_debugDrawSourceSkeletonColor);
                 EditorGUI.indentLevel--;
             }
+
             EditorGUILayout.PropertyField(_debugDrawTargetSkeleton);
             if (_debugDrawTargetSkeleton.boolValue)
             {
@@ -69,10 +68,36 @@ namespace Meta.XR.Movement.Retargeting.Editor
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Retargeting", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_skeletonRetargeter);
-            EditorGUILayout.PropertyField(_validBodyTrackingDelay);
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(_sourceProcessorContainers);
             EditorGUILayout.PropertyField(_targetProcessorContainers);
+
+            // Enforce a skeleton data provider on the object.
+            var retargeter = target as CharacterRetargeter;
+            if (retargeter == null)
+            {
+                return;
+            }
+
+            var dataProvider = retargeter.GetComponent<ISourceDataProvider>();
+            var ovrBodies = retargeter.GetComponentsInChildren<OVRBody>();
+            if (ovrBodies is { Length: > 0 })
+            {
+                if (dataProvider == null)
+                {
+                    retargeter.gameObject.AddComponent<MetaSourceDataProvider>();
+                }
+                else
+                {
+                    foreach (var ovrBody in ovrBodies)
+                    {
+                        if (ovrBody is not ISourceDataProvider)
+                        {
+                            DestroyImmediate(ovrBody);
+                        }
+                    }
+                }
+            }
         }
     }
 }

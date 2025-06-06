@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4755192900336154934}
   - component: {fileID: 356269603960210516}
   m_Layer: 0
-  m_Name: CharactersMenu
+  m_Name: CharacterSpawnMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52,6 +52,7 @@ MonoBehaviour:
   _highFidelityCharacterToSpawn: {fileID: 7904580889813928459, guid: 8f60065df164ffa40b77cad3c7dc805e, type: 3}
   _spawnParent: {fileID: 0}
   _spawnOffset: {x: -1, y: 0, z: 0}
+  _spawnButton: 0
 --- !u!1 &8751418975657857256
 GameObject:
   m_ObjectHideFlags: 0

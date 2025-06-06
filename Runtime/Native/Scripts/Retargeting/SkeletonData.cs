@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Linq;
@@ -187,7 +187,6 @@ namespace Meta.XR.Movement.Retargeting
             End = OVRPlugin.BoneId.Body_End,
 
             // add new bones here
-
             NoOverride = OVRPlugin.BoneId.Body_End + 1,
             Remove = OVRPlugin.BoneId.Body_End + 2
         };

@@ -1,11 +1,10 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Jobs;
-using static OVRSkeleton;
 using static Meta.XR.Movement.MSDKUtility;
 
 namespace Meta.XR.Movement.Retargeting
@@ -22,25 +21,14 @@ namespace Meta.XR.Movement.Retargeting
         public bool IsValid => _isValid;
 
         /// <summary>
-        /// If retargeted data was applied to the character.
-        /// </summary>
-        public bool HasValidRetargetedData => _skeletonRetargeter.IsValid;
-
-        /// <summary>
         /// Retargeting handle.
         /// </summary>
         public ulong RetargetingHandle => _skeletonRetargeter?.NativeHandle ?? 0;
 
         /// <summary>
-        /// The data provider.
-        /// </summary>
-        public IOVRSkeletonDataProvider DataProvider => _dataProvider;
-
-        /// <summary>
         /// Source processor containers.
         /// </summary>
         public SourceProcessorContainer[] SourceProcessorContainers => _sourceProcessorContainers;
-
 
         /// <summary>
         /// Source processor containers.
@@ -48,9 +36,9 @@ namespace Meta.XR.Movement.Retargeting
         public TargetProcessorContainer[] TargetProcessorContainers => _targetProcessorContainers;
 
         /// <summary>
-        /// The retargeting.
+        /// The skeleton retargeter.
         /// </summary>
-        public SkeletonRetargeter Retargeting
+        public SkeletonRetargeter SkeletonRetargeter
         {
             get => _skeletonRetargeter;
             set => _skeletonRetargeter = value;
@@ -84,10 +72,9 @@ namespace Meta.XR.Movement.Retargeting
         }
 
         /// <summary>
-        /// Returns the last source poses cached, after they have been
-        /// affected by any processors enabled.
+        /// Set to true if the retargeter is valid or not.
         /// </summary>
-        public NativeTransform[] LastSourcePosesCached => _lastSourcePosesCached;
+        public bool RetargeterValid => _isValid && _skeletonRetargeter.IsInitialized;
 
         /// <summary>
         /// Whether to draw debug visualization for the source skeleton.
@@ -120,12 +107,6 @@ namespace Meta.XR.Movement.Retargeting
         protected SkeletonRetargeter _skeletonRetargeter = new();
 
         /// <summary>
-        /// The delay in seconds before body tracking data is considered valid for retargeting.
-        /// </summary>
-        [SerializeField]
-        protected float _validBodyTrackingDelay = 0.25f;
-
-        /// <summary>
         /// Array of source processor containers that modify the source skeleton data.
         /// </summary>
         [SerializeField]
@@ -137,33 +118,26 @@ namespace Meta.XR.Movement.Retargeting
         [SerializeField]
         protected TargetProcessorContainer[] _targetProcessorContainers;
 
-        // OVRSkeleton.
-        private IOVRSkeletonDataProvider _dataProvider;
-        private OVRPlugin.Skeleton2 _skeleton = new();
-        private int _skeletalChangedCount = -1;
-        private int _currentSkeletalChangeCount = -1;
-        private float _currentValidBodyTrackingTime;
+        // Skeleton data provider.
+        private ISourceDataProvider _dataProvider;
+        private string _currentManifestation;
         private bool _isValid;
+        private bool _isCalibrated;
 
         // Jobs.
         protected Transform _debugDrawTransform;
         private JobHandle _convertPoseJobHandle;
         private JobHandle _applyPoseJobHandle;
 
-        private NativeTransform[] _lastSourcePosesCached;
-
         /// <summary>
         /// Initializes the character retargeter by finding required components and validating configuration.
         /// </summary>
         public virtual void Awake()
         {
-            _dataProvider = gameObject.GetComponent<IOVRSkeletonDataProvider>();
+            _dataProvider = gameObject.GetComponent<ISourceDataProvider>();
             _debugDrawTransform = transform;
             Assert.IsNotNull(_config, "Must have a reference to a config; none are defined.");
-            Assert.IsNotNull(_dataProvider);
-            Assert.IsTrue(_dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.Body ||
-                          _dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody,
-                "Data provider must be configured to use body tracking.");
+            Assert.IsNotNull(_dataProvider, "Must have a skeleton data provider; none are on this gameObject.");
         }
 
         /// <summary>
@@ -180,35 +154,17 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         public virtual void Update()
         {
-            var sourcePose = SkeletonUtilities.GetPosesFromTheTracker(
-                _skeletonRetargeter.SourceJointCount, _dataProvider, Pose.identity,
-                out _currentSkeletalChangeCount,
-                out _isValid);
-            if (!_isValid || !_skeletonRetargeter.IsValid)
+            var sourcePose = _dataProvider.GetSkeletonPose();
+            _currentManifestation = _dataProvider.GetManifestation();
+            _isValid = _dataProvider.IsPoseValid();
+            if (!RetargeterValid)
             {
-                return;
-            }
-
-            // Wait some time for the body tracking data to be accurate before retargeting.
-            if (_currentValidBodyTrackingTime < _validBodyTrackingDelay)
-            {
-                _currentValidBodyTrackingTime += Time.deltaTime;
                 return;
             }
 
             // Perform retargeting.
             UpdateSkeletalTPose();
             CalculatePose(sourcePose);
-
-            int posesTotal = sourcePose.Length;
-            if (_lastSourcePosesCached == null || _lastSourcePosesCached.Length != sourcePose.Length)
-            {
-                _lastSourcePosesCached = new NativeTransform[posesTotal];
-            }
-            for (int i = 0; i < posesTotal; i++)
-            {
-                _lastSourcePosesCached[i] = sourcePose[i];
-            }
         }
 
         /// <summary>
@@ -216,7 +172,7 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         public virtual void LateUpdate()
         {
-            if (!_skeletonRetargeter.IsValid || !_skeletonRetargeter.AppliedPose)
+            if (!_skeletonRetargeter.IsInitialized || !_skeletonRetargeter.AppliedPose)
             {
                 return;
             }
@@ -230,23 +186,6 @@ namespace Meta.XR.Movement.Retargeting
         public virtual void OnDestroy()
         {
             Dispose();
-        }
-
-        /// <summary>
-        /// Returns the root scale.
-        /// </summary>
-        /// <returns>Root scale.</returns>
-        public Vector3 RootScale()
-        {
-            if (_skeletonRetargeter == null || !_skeletonRetargeter.RetargetedPose.IsCreated ||
-                !_skeletonRetargeter.ApplyScale)
-            {
-                return Vector3.one;
-            }
-
-            var rootJointIndex = _skeletonRetargeter.RootJointIndex;
-            var rootScale = _skeletonRetargeter.RetargetedPose[rootJointIndex].Scale;
-            return rootScale;
         }
 
         /// <summary>
@@ -280,11 +219,24 @@ namespace Meta.XR.Movement.Retargeting
         {
             _skeletonRetargeter?.Dispose();
             _skeletonRetargeter = null;
-            _skeletonRetargeter = null;
             if (_joints.isCreated)
             {
                 _joints.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Calibrate the retargeter to be fixed to the last source T-Pose.
+        /// </summary>
+        public void Calibrate()
+        {
+            if (!_isValid)
+            {
+                return;
+            }
+
+            UpdateSkeletalTPose(true);
+            _isCalibrated = true;
         }
 
         /// <summary>
@@ -293,13 +245,19 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="sourcePose">The source pose to retarget.</param>
         public void CalculatePose(NativeArray<NativeTransform> sourcePose)
         {
+            // If calibrated, match the pose.
+            if (_isCalibrated)
+            {
+                _skeletonRetargeter.Align(sourcePose);
+            }
+
             // Run processors with source pose and retargeting target pose data.
             foreach (var processor in _sourceProcessorContainers)
             {
                 processor.GetCurrentProcessor()?.ProcessSkeleton(sourcePose);
             }
 
-            _skeletonRetargeter.Update(sourcePose);
+            _skeletonRetargeter.Update(sourcePose, _currentManifestation);
             foreach (var targetProcessorContainer in _targetProcessorContainers)
             {
                 targetProcessorContainer?.GetCurrentProcessor()?.UpdatePose(ref _skeletonRetargeter.RetargetedPose);
@@ -315,7 +273,7 @@ namespace Meta.XR.Movement.Retargeting
             };
             _convertPoseJobHandle = job.Schedule();
 
-            if (!_skeletonRetargeter.IsValid)
+            if (!_skeletonRetargeter.IsInitialized)
             {
                 return;
             }
@@ -332,17 +290,18 @@ namespace Meta.XR.Movement.Retargeting
         public void UpdatePose()
         {
             _convertPoseJobHandle.Complete();
-
             // Run processors with current pose and retargeted target pose data if the character is non-zero.
             var currentPose = GetCurrentBodyPose(JointType.NoWorldSpace);
             foreach (var targetProcessorContainer in _targetProcessorContainers)
             {
-                targetProcessorContainer?.GetCurrentProcessor()
-                    ?.LateUpdatePose(ref currentPose, ref _skeletonRetargeter.RetargetedPoseLocal);
+                targetProcessorContainer?.GetCurrentProcessor()?.LateUpdatePose(
+                    ref currentPose,
+                    ref _skeletonRetargeter.RetargetedPoseLocal);
             }
+
             currentPose.Dispose();
 
-            if (!_skeletonRetargeter.IsValid)
+            if (!_skeletonRetargeter.IsInitialized)
             {
                 return;
             }
@@ -361,32 +320,93 @@ namespace Meta.XR.Movement.Retargeting
         public void UpdateTPose(NativeArray<NativeTransform> sourcePose)
         {
             UpdateSourceReferenceTPose(_skeletonRetargeter.NativeHandle, sourcePose);
-            _skeletonRetargeter.UpdateScale(sourcePose);
+            _skeletonRetargeter.UpdateSourceReferencePose(sourcePose, _currentManifestation);
         }
 
-        private void UpdateSkeletalTPose()
+        /// <summary>
+        /// Gets a processor of the specified type from the source processor containers.
+        /// </summary>
+        /// <typeparam name="T">The type of processor to get.</typeparam>
+        /// <returns>The processor of the specified type if found, otherwise null.</returns>
+        public T GetSourceProcessor<T>() where T : class
         {
-            if (_currentSkeletalChangeCount == _skeletalChangedCount)
+            var containers = SourceProcessorContainers;
+            foreach (var container in containers)
+            {
+                if (container?.GetCurrentProcessor() is T processor)
+                {
+                    return processor;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a processor of the specified type from the target processor containers.
+        /// </summary>
+        /// <typeparam name="T">The type of processor to get.</typeparam>
+        /// <returns>The processor of the specified type if found, otherwise null.</returns>
+        public T GetTargetProcessor<T>() where T : class
+        {
+            var containers = TargetProcessorContainers;
+            foreach (var container in containers)
+            {
+                if (container?.GetCurrentProcessor() is T processor)
+                {
+                    return processor;
+                }
+            }
+
+            return null;
+        }
+
+        private void UpdateSkeletalTPose(bool forceUpdate = false)
+        {
+            if (!forceUpdate && (_isCalibrated || !_dataProvider.IsNewTPoseAvailable()))
             {
                 return;
             }
 
-            var sourcePose = SkeletonUtilities.GetBindPoses(_skeletonRetargeter.SourceJointCount, ref _skeleton);
-            _skeletalChangedCount = _currentSkeletalChangeCount;
+            var sourcePose = _dataProvider.GetSkeletonTPose();
             UpdateTPose(sourcePose);
         }
 
         private void ApplyPose()
         {
             // Apply scale first.
-            var rootJointIndex = _skeletonRetargeter.RootJointIndex;
-            var headJointIndex = _skeletonRetargeter.HeadJointIndex;
-            var rootScale = _skeletonRetargeter.RetargetedPose[rootJointIndex].Scale;
-            var headScale = _skeletonRetargeter.RetargetedPose[headJointIndex].Scale;
-            if (_skeletonRetargeter.ApplyScale && transform.localScale != rootScale)
+            if (_skeletonRetargeter.ApplyScale && transform.localScale != _skeletonRetargeter.RootScale)
             {
-                transform.localScale = rootScale;
-                _joints[headJointIndex].localScale = headScale;
+                transform.localScale = _skeletonRetargeter.RootScale;
+                _joints[_skeletonRetargeter.HeadJointIndex].localScale = _skeletonRetargeter.HeadScale;
+            }
+
+            // Hide the lower body by setting the scale of the leg joints to zero.
+            if (_skeletonRetargeter.HideLowerBodyWhenUpperBodyTracking)
+            {
+                if (_dataProvider != null &&
+                    _dataProvider.GetManifestation() == MetaSourceDataProvider.HalfBodyManifestation)
+                {
+                    // Check only a single joint.
+                    if (_joints[_skeletonRetargeter.LeftUpperLegJointIndex].localScale !=
+                        _skeletonRetargeter.HideLegScale)
+                    {
+                        _joints[_skeletonRetargeter.LeftUpperLegJointIndex].localScale =
+                            _skeletonRetargeter.HideLegScale;
+                        _joints[_skeletonRetargeter.RightUpperLegJointIndex].localScale =
+                            _skeletonRetargeter.HideLegScale;
+                        _joints[_skeletonRetargeter.LeftLowerLegJointIndex].localScale = Vector3.zero;
+                        _joints[_skeletonRetargeter.RightLowerLegJointIndex].localScale = Vector3.zero;
+                    }
+                }
+                else if (_joints[_skeletonRetargeter.LeftUpperLegJointIndex].localScale ==
+                         _skeletonRetargeter.HideLegScale)
+                {
+                    _joints[_skeletonRetargeter.LeftUpperLegJointIndex].localScale = Vector3.one;
+                    _joints[_skeletonRetargeter.RightUpperLegJointIndex].localScale = Vector3.one;
+                    _joints[_skeletonRetargeter.LeftLowerLegJointIndex].localScale = Vector3.one;
+                    _joints[_skeletonRetargeter.RightLowerLegJointIndex].localScale = Vector3.one;
+                }
             }
 
             // Create job to apply the pose.

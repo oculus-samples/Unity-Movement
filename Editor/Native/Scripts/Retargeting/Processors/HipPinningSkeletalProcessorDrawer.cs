@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using UnityEditor;
 using UnityEngine;
@@ -107,14 +107,28 @@ namespace Meta.XR.Movement.Retargeting.Editor
             }
 
             var elementVerticalSpacing = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-            float height = elementVerticalSpacing * (_hipPinningDataIndex + 3);
+            float height = 0f;
 
-            // Add height for indented properties
-            for (var i = _hipPinningDataIndex; i < _propertiesToDraw.Length; i++)
-            {
-                var prop = property.FindPropertyRelative(_propertiesToDraw[i].propertyName);
-                height += EditorGUI.GetPropertyHeight(prop, true);
-            }
+            // Add height for standard properties before hip pinning data
+            height += elementVerticalSpacing * _hipPinningDataIndex;
+
+            // Add height for hip target property
+            var hipTargetProp = property.FindPropertyRelative(_propertiesToDraw[_hipPinningDataIndex].propertyName);
+            height += EditorGUI.GetPropertyHeight(hipTargetProp, true);
+
+            // Add height for "Hip Pinning Left Leg Data" label
+            height += EditorGUIUtility.singleLineHeight;
+
+            // Add height for left data property
+            var leftDataProp = property.FindPropertyRelative(_propertiesToDraw[_hipPinningDataIndex + 1].propertyName);
+            height += EditorGUI.GetPropertyHeight(leftDataProp, true);
+
+            // Add height for "Hip Pinning Right Leg Data" label
+            height += EditorGUIUtility.singleLineHeight;
+
+            // Add height for right data property
+            var rightDataProp = property.FindPropertyRelative(_propertiesToDraw[_hipPinningDataIndex + 2].propertyName);
+            height += EditorGUI.GetPropertyHeight(rightDataProp, true);
 
             return height;
         }

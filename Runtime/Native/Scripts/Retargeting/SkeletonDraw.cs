@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -81,6 +81,15 @@ namespace Meta.XR.Movement.Retargeting
         }
 
         /// <summary>
+        /// Gets or sets whether to draw labels for the joints.
+        /// </summary>
+        public bool DrawLabels
+        {
+            get => _drawLabels;
+            set => _drawLabels = value;
+        }
+
+        /// <summary>
         /// The color used for drawing the skeleton.
         /// </summary>
         [SerializeField]
@@ -109,6 +118,12 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         [SerializeField]
         private Vector3[] _childPositions;
+
+        /// <summary>
+        /// Array of joint indices to ignore when drawing the skeleton.
+        /// </summary>
+        [SerializeField]
+        private bool[] _runtimeIndexesToIgnore;
 
         /// <summary>
         /// Array of parent joint names.
@@ -311,83 +326,54 @@ namespace Meta.XR.Movement.Retargeting
             _pivotDrawMesh.RecalculateBounds();
         }
 
-
         /// <summary>
         /// Draws the skeleton using the current positions and settings.
         /// </summary>
         public void Draw()
         {
+            if (_lineDrawMesh == null || _drawMaterial == null ||
+                _parentPositions == null || _childPositions == null ||
+                _parentPositions.Length == 0 || _childPositions.Length == 0 ||
+                _parentPositions.Length != _childPositions.Length)
+            {
+                return;
+            }
+
             _drawMaterial.color = TintColor;
-
-            if (_lineDrawMesh == null || _drawMaterial == null)
-            {
-                return;
-            }
-
             _drawMaterial.SetPass(0);
-
-            // Draw from model
-            if (_parentPositions == null || _childPositions == null ||
-                _parentPositions.Length == 0 || _childPositions.Length == 0)
-            {
-                return;
-            }
 
             for (var i = 0; i < _parentPositions.Length; i++)
             {
-                if (i >= _childPositions.Length)
+                if (_indexesToIgnore.Contains(i) || _runtimeIndexesToIgnore[i])
                 {
-                    return;
+                    continue;
                 }
 
-                if (_parentPositions[i].sqrMagnitude <= float.Epsilon)
+                var lineMesh = _customLineMesh?.ElementAtOrDefault(i) ?? _lineDrawMesh;
+                var pivotMesh = _customPivotMesh?.ElementAtOrDefault(i) ?? _pivotDrawMesh;
+
+                if (lineMesh != null && pivotMesh != null)
                 {
-                    if (_parentObjects is { Length: > 0 })
+                    var lineTransform =
+                        CalculateTransformMatrixBetweenPoints(_parentPositions[i], _childPositions[i]);
+                    var pivotTransform =
+                        Matrix4x4.TRS(_parentPositions[i], Quaternion.identity, Vector3.one * LineThickness * 1.5f);
+                    if (Application.isPlaying)
                     {
-                        HandleMouseClick(i, _parentObjects[i], _parentPositions[i], _childPositions[i]);
+                        Graphics.RenderMesh(_renderParams, lineMesh, 0, lineTransform);
+                        Graphics.RenderMesh(_renderParams, pivotMesh, 0, pivotTransform);
                     }
-
-                    continue;
+                    else
+                    {
+                        Graphics.DrawMeshNow(lineMesh, lineTransform);
+                        Graphics.DrawMeshNow(pivotMesh, pivotTransform);
+                    }
                 }
-
-                if (_indexesToIgnore.Contains(i))
-                {
-                    continue;
-                }
-
-                var lineDrawTransformMatrix =
-                    CalculateTransformMatrixBetweenPoints(_parentPositions[i], _childPositions[i]);
-                var pivotDrawTransformMatrix =
-                    Matrix4x4.TRS(_parentPositions[i], Quaternion.identity, Vector3.one * LineThickness * 1.5f);
-                var lineMeshToUse = _customLineMesh != null && _customLineMesh[i] != null
-                    ? _customLineMesh[i]
-                    : _lineDrawMesh;
-                var pivotMeshToUse = _customPivotMesh != null && _customPivotMesh[i] != null
-                    ? _customPivotMesh[i]
-                    : _pivotDrawMesh;
-
-                if (Application.isPlaying)
-                {
-                    Graphics.RenderMesh(_renderParams, lineMeshToUse, 0, lineDrawTransformMatrix);
-                    Graphics.RenderMesh(_renderParams, pivotMeshToUse, 0, pivotDrawTransformMatrix);
-                }
-                else
-                {
-                    Graphics.DrawMeshNow(lineMeshToUse, lineDrawTransformMatrix);
-                    Graphics.DrawMeshNow(pivotMeshToUse, pivotDrawTransformMatrix);
-                }
-
 
                 if (_parentObjects != null && i < _parentObjects.Length)
                 {
                     HandleMouseClick(i, _parentObjects[i], _parentPositions[i], _childPositions[i]);
                 }
-#if UNITY_EDITOR
-                if (_drawLabels && _childNames != null && i < _childNames.Length)
-                {
-                    Handles.Label(_childPositions[i], _childNames[i]);
-                }
-#endif
             }
         }
 
@@ -395,57 +381,64 @@ namespace Meta.XR.Movement.Retargeting
         /// Loads joints of a skeleton to be visualized. Allows filtering
         /// out bones that should not visualized via an optional delegate.
         /// </summary>
-        /// <param name="jointCount">Number of joints.</param>
-        /// <param name="parentIndices">Parent indices of joints.</param>
-        /// <param name="pose">Joint poses.</param>
-        /// <param name="filterDelegate">Delegate to filter out joints that should not
-        /// be visualized.</param>
-        /// <summary>
-        /// Loads joints of a skeleton to be visualized with an optional filter delegate.
-        /// </summary>
         /// <param name="jointCount">Number of joints in the skeleton.</param>
         /// <param name="parentIndices">Array of parent indices for each joint.</param>
         /// <param name="pose">Array of joint poses.</param>
         /// <param name="filterDelegate">Optional delegate to filter out joints that should not be visualized.</param>
-        public void LoadDraw(int jointCount, int[] parentIndices,
+        public void LoadDraw(
+            int jointCount,
+            int[] parentIndices,
             NativeArray<NativeTransform> pose,
             AllowBoneVisualDelegate filterDelegate = null)
         {
-            if (_parentPositions == null || _parentPositions.Length != jointCount)
+            if (_parentPositions?.Length != jointCount)
             {
                 _parentPositions = new Vector3[jointCount];
             }
 
-            if (_childPositions == null || _childPositions.Length != jointCount)
+            if (_childPositions?.Length != jointCount)
             {
                 _childPositions = new Vector3[jointCount];
             }
 
-            if (_customLineMesh == null || _customLineMesh.Length != jointCount)
+            if (_runtimeIndexesToIgnore?.Length != jointCount)
             {
+                _runtimeIndexesToIgnore = new bool[jointCount];
+            }
+
+            if (_customLineMesh?.Length != jointCount)
+            {
+                _customLineMesh?.ToList().ForEach(CleanUpMesh);
                 _customLineMesh = new Mesh[jointCount];
             }
 
-            if (_customPivotMesh == null || _customPivotMesh.Length != jointCount)
+            if (_customPivotMesh?.Length != jointCount)
             {
+                _customPivotMesh?.ToList().ForEach(CleanUpMesh);
                 _customPivotMesh = new Mesh[jointCount];
             }
 
             for (var i = 0; i < jointCount; i++)
             {
+                var childPose = pose[i];
                 var parentIndex = parentIndices[i];
-                bool delegatePasses =
-                    filterDelegate == null || filterDelegate(i);
+                var delegatePasses = filterDelegate == null || filterDelegate(i);
                 if (parentIndex < 0 || !delegatePasses)
                 {
                     _parentPositions[i] = Vector3.zero;
+                    _runtimeIndexesToIgnore[i] = true;
                 }
                 else
                 {
-                    _parentPositions[i] = pose[parentIndex].Position;
+                    var parentPose = pose[parentIndex];
+                    if (parentPose.Scale == Vector3.zero)
+                    {
+                        _runtimeIndexesToIgnore[i] = true;
+                    }
+                    _parentPositions[i] = parentPose.Position;
                 }
 
-                _childPositions[i] = pose[i].Position;
+                _childPositions[i] = childPose.Position;
             }
         }
 
@@ -457,13 +450,50 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="pose">Array of joint poses.</param>
         /// <param name="jointNames">Array of joint names.</param>
         /// <param name="joints">Array of joint transforms.</param>
-        public void LoadDraw(int jointCount, int[] parentIndices,
-            NativeTransform[] pose, string[] jointNames, Transform[] joints)
+        public void LoadDraw(
+            int jointCount,
+            int[] parentIndices,
+            NativeTransform[] pose,
+            string[] jointNames,
+            Transform[] joints)
         {
-            _parentPositions = new Vector3[jointCount];
-            _childPositions = new Vector3[jointCount];
-            _parentNames = new string[jointCount];
-            _childNames = new string[jointCount];
+            if (_parentPositions?.Length != jointCount)
+            {
+                _parentPositions = new Vector3[jointCount];
+            }
+
+            if (_childPositions?.Length != jointCount)
+            {
+                _childPositions = new Vector3[jointCount];
+            }
+
+            if (_runtimeIndexesToIgnore?.Length != jointCount)
+            {
+                _runtimeIndexesToIgnore = new bool[jointCount];
+            }
+
+            if (_customLineMesh?.Length != jointCount)
+            {
+                _customLineMesh?.ToList().ForEach(CleanUpMesh);
+                _customLineMesh = new Mesh[jointCount];
+            }
+
+            if (_customPivotMesh?.Length != jointCount)
+            {
+                _customPivotMesh?.ToList().ForEach(CleanUpMesh);
+                _customPivotMesh = new Mesh[jointCount];
+            }
+
+            if (_parentNames?.Length != jointCount)
+            {
+                _parentNames = new string[jointCount];
+            }
+
+            if (_childNames?.Length != jointCount)
+            {
+                _childNames = new string[jointCount];
+            }
+
             for (var i = 0; i < jointCount; i++)
             {
                 var parentIndex = parentIndices[i];

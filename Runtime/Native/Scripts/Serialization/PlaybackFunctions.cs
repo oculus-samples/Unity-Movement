@@ -1,6 +1,7 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
+using System.Globalization;
 using System.IO;
 using Unity.Collections;
 using UnityEditor;
@@ -67,10 +68,11 @@ namespace Meta.XR.Movement.Playback
                 {
                     throw new Exception("Could not deserialize start header from file!");
                 }
-                if (startHeader.DataVersion != expectedDataVersion.ToString())
+                var expectedDataVersionString = expectedDataVersion.ToString(CultureInfo.InvariantCulture);
+                if (startHeader.DataVersion != expectedDataVersionString)
                 {
                     throw new Exception($"Data version of file is {startHeader.DataVersion}, " +
-                        $"does not match reader's version of {expectedDataVersion}.");
+                        $"does not match reader's version of {expectedDataVersionString}.");
                 }
 
                 // go through all snapshots and record byte offsets. This will allow scrubbing.

@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Retargeting.IK;
 using System;
@@ -139,7 +139,7 @@ namespace Meta.XR.Movement.Retargeting
             }
 
             // Get the current world pose as provided by other processors.
-            var rootScale = _characterRetargeter.RootScale();
+            var rootScale = _characterRetargeter.SkeletonRetargeter.RootScale;
             var targetPose = IKUtilities.ComputeWorldPoses(
                 _parentJointIndicesTarget,
                 ref targetPoseLocal,

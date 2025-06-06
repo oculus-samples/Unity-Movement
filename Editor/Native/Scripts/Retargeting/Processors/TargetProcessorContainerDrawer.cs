@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using UnityEditor;
 using UnityEngine;
@@ -17,6 +17,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
             var rect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
             EditorGUI.PropertyField(rect, property.FindPropertyRelative("_currentProcessorType"),
                 new GUIContent("Type"));
+
             rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             var processorProperty = GetProcessorTypeProperty(property);
             if (processorProperty != null)
@@ -35,12 +36,14 @@ namespace Meta.XR.Movement.Retargeting.Editor
                     return property.FindPropertyRelative("_twistProcessor");
                 case TargetProcessor.ProcessorType.Animation:
                     return property.FindPropertyRelative("_animationProcessor");
-                case TargetProcessor.ProcessorType.HipPinning:
-                    return property.FindPropertyRelative("_hipPinningProcessor");
                 case TargetProcessor.ProcessorType.Locomotion:
                     return property.FindPropertyRelative("_locomotionProcessor");
                 case TargetProcessor.ProcessorType.CCDIK:
                     return property.FindPropertyRelative("_ccdProcessor");
+                case TargetProcessor.ProcessorType.HandIK:
+                    return property.FindPropertyRelative("_handProcessor");
+                case TargetProcessor.ProcessorType.HipPinning:
+                    return property.FindPropertyRelative("_hipPinningProcessor");
                 case TargetProcessor.ProcessorType.Custom:
                     return property.FindPropertyRelative("_customProcessor");
                 default:

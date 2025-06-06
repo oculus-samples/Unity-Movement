@@ -769,7 +769,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f51477cda5e694449be8238a4f5516f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _networkConfig: {fileID: 4852450239114790530}
+  _networkCharacterRetargeter: {fileID: 0}
   _applyData: 1
   _spawnDelay: 0.5
 --- !u!114 &4852450239114790530
@@ -897,88 +897,14 @@ MonoBehaviour:
   _debugDrawSourceSkeletonColor: {r: 1, g: 1, b: 1, a: 1}
   _debugDrawTargetSkeleton: 0
   _debugDrawTargetSkeletonColor: {r: 1, g: 1, b: 1, a: 1}
-  _retargetingHandler:
+  _skeletonRetargeter:
     _retargetingBehavior: 0
     _currentScale: 1
     _applyScale: 1
     _headScaleFactor: 0.95
-    _scaleRange: {x: 0.5, y: 1.5}
+    _scaleRange: {x: 0.8, y: 1.2}
   _sourceProcessorContainers: []
-  _targetProcessorContainers:
-  - _currentProcessorType: 1
-    _twistProcessor:
-      _weight: 1
-      _sourceIndex: 16
-      _targetData:
-      - Index:
-          Index: 15
-        Weight: 0.5
-      _twistForwardAxis: {x: 0, y: 1, z: 0}
-      _twistUpAxis: {x: 1, y: 0, z: 0}
-    _animationProcessor:
-      _weight: 0
-      _animBlendIndices: []
-    _hipPinningProcessor:
-      _weight: 0
-      _hipPinningObject: {fileID: 0}
-      _hipPinningTargetParent: {fileID: 0}
-      _hipPinningTarget: {fileID: 0}
-      _hipPinningThreshold: 0.3
-    _twoBoneIKProcessor:
-      _weight: 0
-      _ikTarget: {fileID: 0}
-      _rootJoint: {fileID: 0}
-      _midJoint: {fileID: 0}
-      _endJoint: {fileID: 0}
-      _iterations: 0
-      _threshold: 0
-    _locomotionProcessor:
-      _weight: 1
-      _firstPersonLocomotor: {fileID: 0}
-      _cameraRig: {fileID: 0}
-      _animator: {fileID: 0}
-      _animatorVerticalParam: Vertical
-      _animatorHorizontalParam: Horizontal
-      _animationSpeed: 2
-      _movementSpeed: 5
-      _decayDistanceThreshold: 0.25
-  - _currentProcessorType: 1
-    _twistProcessor:
-      _weight: 1
-      _sourceIndex: 37
-      _targetData:
-      - Index:
-          Index: 36
-        Weight: 0.5
-      _twistForwardAxis: {x: 0, y: -1, z: 0}
-      _twistUpAxis: {x: -1, y: 0, z: 0}
-    _animationProcessor:
-      _weight: 0
-      _animBlendIndices: []
-    _hipPinningProcessor:
-      _weight: 0
-      _hipPinningObject: {fileID: 0}
-      _hipPinningTargetParent: {fileID: 0}
-      _hipPinningTarget: {fileID: 0}
-      _hipPinningThreshold: 0.3
-    _twoBoneIKProcessor:
-      _weight: 0
-      _ikTarget: {fileID: 0}
-      _rootJoint: {fileID: 0}
-      _midJoint: {fileID: 0}
-      _endJoint: {fileID: 0}
-      _iterations: 0
-      _threshold: 0
-    _locomotionProcessor:
-      _weight: 1
-      _firstPersonLocomotor: {fileID: 0}
-      _cameraRig: {fileID: 0}
-      _animator: {fileID: 0}
-      _animatorVerticalParam: Vertical
-      _animatorHorizontalParam: Horizontal
-      _animationSpeed: 2
-      _movementSpeed: 5
-      _decayDistanceThreshold: 0.25
+  _targetProcessorContainers: []
   _ownership: 1
   _compressionType: 0
   _useDeltaCompression: 1

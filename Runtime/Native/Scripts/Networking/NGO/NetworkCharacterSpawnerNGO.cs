@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 #if META_PLATFORM_SDK_DEFINED
 using Meta.XR.MultiplayerBlocks.Shared;

@@ -1,25 +1,25 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
+using Oculus.Interaction;
 using Oculus.Interaction.Locomotion;
 #endif
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Meta.XR.Movement.Retargeting
 {
     [System.Serializable]
     public class LocomotionSkeletalProcessor : TargetProcessor
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <summary>
-        /// Gets or sets the FirstPersonLocomotor component used for locomotion events.
+        /// Gets or sets the ILocomotionEventHandler component used for locomotion events.
         /// </summary>
-        public FirstPersonLocomotor FirstPersonLocomotor
+        public ILocomotionEventHandler LocomotionEventHandler
         {
-            get => _firstPersonLocomotor;
-            set => _firstPersonLocomotor = value;
+            get => _locomotionEventHandler;
+            set => _locomotionEventHandler = value;
         }
 #endif
 
@@ -41,9 +41,28 @@ namespace Meta.XR.Movement.Retargeting
             set => _animator = value;
         }
 
-#if INTERACTION_OVR_DEFINED
-        [SerializeField]
-        private FirstPersonLocomotor _firstPersonLocomotor;
+        public string AnimatorVerticalParam
+        {
+            get => _animatorVerticalParam;
+            set => _animatorVerticalParam = value;
+        }
+
+        public string AnimatorHorizontalParam
+        {
+            get => _animatorVerticalParam;
+            set => _animatorVerticalParam = value;
+        }
+
+        public float AnimationSpeed
+        {
+            get => _animationSpeed;
+            set => _animationSpeed = value;
+        }
+
+#if ISDK_DEFINED
+        [SerializeField, Interface(typeof(ILocomotionEventHandler))]
+        private Object _locomotionEventHandlerObject;
+        private ILocomotionEventHandler _locomotionEventHandler;
 #endif
 
         [SerializeField]
@@ -53,13 +72,13 @@ namespace Meta.XR.Movement.Retargeting
         private Animator _animator;
 
         [SerializeField]
-        private string _animatorVerticalParam = "Vertical";
+        private string _animatorVerticalParam;
 
         [SerializeField]
-        private string _animatorHorizontalParam = "Horizontal";
+        private string _animatorHorizontalParam;
 
         [SerializeField]
-        private float _animationSpeed = 2.0f;
+        private float _animationSpeed;
 
         private static int _verticalHash;
         private static int _horizontalHash;
@@ -74,20 +93,21 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="retargeter">The character retargeter that owns this processor.</param>
         public override void Initialize(CharacterRetargeter retargeter)
         {
-#if INTERACTION_OVR_DEFINED
-            Assert.IsNotNull(_firstPersonLocomotor);
-            _firstPersonLocomotor.WhenLocomotionEventHandled += OnWhenLocomotionEventHandled;
+#if ISDK_DEFINED
+            if (_locomotionEventHandlerObject != null)
+            {
+                _locomotionEventHandler = (ILocomotionEventHandler)_locomotionEventHandlerObject;
+                _locomotionEventHandler.WhenLocomotionEventHandled += OnWhenLocomotionEventHandled;
+            }
 #endif
+            _characterRetargeter = retargeter.transform;
+            if (_animator == null)
+            {
+                return;
+            }
             _verticalHash = Animator.StringToHash(_animatorVerticalParam);
             _horizontalHash = Animator.StringToHash(_animatorHorizontalParam);
-            _characterRetargeter = retargeter.transform;
-            foreach (var processor in retargeter.TargetProcessorContainers)
-            {
-                if (processor.GetCurrentProcessor() is AnimationSkeletalProcessor animProcessor)
-                {
-                    _animProcessor = animProcessor;
-                }
-            }
+            _animProcessor = retargeter.GetTargetProcessor<AnimationSkeletalProcessor>();
         }
 
         /// <summary>
@@ -95,8 +115,11 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         public override void Destroy()
         {
-#if INTERACTION_OVR_DEFINED
-            _firstPersonLocomotor.WhenLocomotionEventHandled -= OnWhenLocomotionEventHandled;
+#if ISDK_DEFINED
+            if (_locomotionEventHandler != null)
+            {
+                _locomotionEventHandler.WhenLocomotionEventHandled -= OnWhenLocomotionEventHandled;
+            }
 #endif
         }
 
@@ -121,6 +144,10 @@ namespace Meta.XR.Movement.Retargeting
                 Quaternion.RotateTowards(_rotationalVelocity, Quaternion.identity,
                     360f * _animationSpeed * Time.deltaTime);
 
+            if (_animProcessor == null || _animator == null)
+            {
+                return;
+            }
             var animationWeight = _animProcessor.Weight;
             if (!_animator.enabled && animationWeight > 0.0f)
             {
@@ -147,7 +174,7 @@ namespace Meta.XR.Movement.Retargeting
         {
         }
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         private void OnWhenLocomotionEventHandled(LocomotionEvent locomotionEvent, Pose pose)
         {
             _velocity = locomotionEvent.Translation != LocomotionEvent.TranslationType.Absolute

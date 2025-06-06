@@ -38323,6 +38323,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9100000, guid: f138d28f925fa6442b115318a86915ef, type: 2}
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._currentProcessorType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[4]._currentProcessorType
       value: 5
       objectReference: {fileID: 0}
@@ -38367,6 +38371,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._locomotionProcessor._cameraRig
+      value: 
+      objectReference: {fileID: 522735482}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._locomotionProcessor._cameraRig
+      value: 
+      objectReference: {fileID: 522735482}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[3]._locomotionProcessor._cameraRig
       value: 
       objectReference: {fileID: 522735482}
@@ -38376,10 +38388,6 @@ PrefabInstance:
       objectReference: {fileID: 522735482}
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[4]._twoBoneIKProcessor._iterations
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
-      propertyPath: _sourceProcessorContainers.Array.data[0]._isdkProcessor._isFoldoutExpanded
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
@@ -38411,12 +38419,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 899433003}
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._locomotionProcessor._animationSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[4]._locomotionProcessor._animationSpeed
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._animationProcessor._isFoldoutExpanded
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._animationProcessor._isFoldoutExpanded
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._locomotionProcessor._isFoldoutExpanded
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._locomotionProcessor._isFoldoutExpanded
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._locomotionProcessor._firstPersonLocomotor
@@ -38437,6 +38461,58 @@ PrefabInstance:
     - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[4]._locomotionProcessor._decayDistanceThreshold
       value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._animationProcessor._animBlendIndices.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._locomotionProcessor._locomotionEventHandlerObject
+      value: 
+      objectReference: {fileID: 5568758619599458414}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._locomotionProcessor._locomotionEventHandlerObject
+      value: 
+      objectReference: {fileID: 5568758619599458414}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[3]._locomotionProcessor._locomotionEventHandlerObject
+      value: 
+      objectReference: {fileID: 5568758619599458414}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[0].Index
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[1].Index
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[2].Index
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[3].Index
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[4].Index
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[5].Index
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[6].Index
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[7].Index
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3750397122103947461, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._animationProcessor._animBlendIndices.Array.data[8].Index
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4635135126694577254, guid: 286d7e2005861d341a0a94d7f615675a, type: 3}
       propertyPath: m_LocalPosition.x

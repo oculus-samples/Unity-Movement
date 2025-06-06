@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using UnityEngine;
@@ -163,11 +163,6 @@ namespace Meta.XR.Movement.Retargeting.Editor
         private static void FillIndices(CharacterRetargeter retargeter, KnownJointType jointType,
             SerializedProperty property)
         {
-            if (retargeter == null)
-            {
-                return;
-            }
-
             CreateOrUpdateHandle(retargeter.Config, out var handle);
             GetJointIndexByKnownJointType(handle, SkeletonType.TargetSkeleton, jointType, out var sourceIndex);
             GetParentJointIndexes(handle, SkeletonType.TargetSkeleton, out var parentIndices);

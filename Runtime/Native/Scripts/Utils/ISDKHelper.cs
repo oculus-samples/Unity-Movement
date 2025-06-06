@@ -1,7 +1,7 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Input;
 #endif
 using UnityEngine;
@@ -13,7 +13,7 @@ namespace Meta.XR.Movement.Retargeting
     /// </summary>
     public class ISDKHelper : MonoBehaviour
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <summary>
         /// Structure containing references to hand components and processors.
         /// </summary>

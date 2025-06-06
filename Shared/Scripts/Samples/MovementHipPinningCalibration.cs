@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Retargeting;
 using UnityEngine;
@@ -26,14 +26,7 @@ namespace Meta.XR.Movement.Samples
 
         private void Start()
         {
-            foreach (var processor in _retargeter.TargetProcessorContainers)
-            {
-                if (processor.CurrentProcessorType == TargetProcessor.ProcessorType.HipPinning)
-                {
-                    _hipPinningProcessor = processor.GetCurrentProcessor() as HipPinningSkeletalProcessor;
-                }
-            }
-
+            _hipPinningProcessor = _retargeter.GetTargetProcessor<HipPinningSkeletalProcessor>();
             if (_hipPinningProcessor != null)
             {
                 _hipPinningProcessor.OnExitHipPinningArea += OnExitHipPinningArea;
@@ -53,16 +46,7 @@ namespace Meta.XR.Movement.Samples
         private void ResetCalibrationMenuScene()
         {
             _hipPinningProcessor.HideHipPinningObject();
-
-            foreach (var processor in _retargeter.TargetProcessorContainers)
-            {
-                if (processor.CurrentProcessorType == TargetProcessor.ProcessorType.HipPinning)
-                {
-                    var hipPinningProcessor = (HipPinningSkeletalProcessor)processor.GetCurrentProcessor();
-                    hipPinningProcessor.Weight = 0.0f;
-                }
-            }
-
+            _hipPinningProcessor.Weight = 0.0f;
             _calibrateMenu.SetActive(true);
         }
 
@@ -78,16 +62,7 @@ namespace Meta.XR.Movement.Samples
         {
             _hipPinningProcessor.CalibrateHipPinningObjectPosition(new Vector3(1, 0, 1));
             _hipPinningProcessor.ShowHipPinningObject();
-
-            foreach (var processor in _retargeter.TargetProcessorContainers)
-            {
-                if (processor.CurrentProcessorType == TargetProcessor.ProcessorType.HipPinning)
-                {
-                    var hipPinningProcessor = (HipPinningSkeletalProcessor)processor.GetCurrentProcessor();
-                    hipPinningProcessor.Weight = 1.0f;
-                }
-            }
-
+            _hipPinningProcessor.Weight = 1.0f;
             _calibrateMenu.SetActive(false);
         }
     }

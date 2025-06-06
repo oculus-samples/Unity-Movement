@@ -23653,7 +23653,15 @@ MonoBehaviour:
   resetHmdPoseOnRelease: 1
   resetHmdPoseByMiddleMouseButton: 1
   activateKeys: 3201000031010000
+  activateKeyBindings:
+  - <Keyboard>/leftCtrl
+  - <Keyboard>/rightCtrl
+  - <Keyboard>/f1
   pitchKeys: 3401000033010000
+  pitchKeyBindings:
+  - <Keyboard>/leftAlt
+  - <Keyboard>/rightAlt
+  - <Keyboard>/f2
 --- !u!114 &2062269061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23715,6 +23723,32 @@ MonoBehaviour:
   launchSimultaneousHandsControllersOnStartup: 0
   isInsightPassthroughEnabled: 0
   shouldBoundaryVisibilityBeSuppressed: 0
+  isImmersiveDebuggerEnabled: 0
+  expandFeatureFidelitySystemPropertySheet: 0
+  featureFidelitySystemActivated: 0
+  handTrackingFeatureFidelityGroup:
+    targetFeatureEnabled: -1
+    targetFeatureFidelity: -1
+  keyboardTrackingFeatureFidelityGroup:
+    targetFeatureEnabled: -1
+    targetFeatureFidelity: -1
+  eyeTrackingFeatureFidelityGroup:
+    targetFeatureEnabled: -1
+    targetFeatureFidelity: -1
+  faceTrackingFeatureFidelityGroup:
+    targetFeatureEnabled: -1
+    targetFeatureFidelity: -1
+  bodyTrackingFeatureFidelityGroup:
+    targetFeatureEnabled: -1
+    targetFeatureFidelity: -1
+  passthroughFeatureFidelityGroup:
+    targetFeatureEnabled: -1
+    targetFeatureFidelity: -1
+  gaseBasedFoveatedRenderingFeatureFidelityGroup:
+    targetFeatureEnabled: -1
+    targetFeatureFidelity: -1
+  handTrackingFeatureEnabled: 0
+  handTrackingFeatureFidelity: 0
   requestBodyTrackingPermissionOnStartup: 1
   requestFaceTrackingPermissionOnStartup: 0
   requestEyeTrackingPermissionOnStartup: 0
@@ -23733,6 +23767,8 @@ MonoBehaviour:
   SimultaneousHandsAndControllersEnabled: 0
   _readOnlyWideMotionModeHandPosesEnabled: 0
   wideMotionModeHandPosesEnabled: 0
+  _readOnlyBodyFusionHandPosesEnabled: 0
+  bodyFusionHandPosesEnabled: 0
   dynamicResolutionVersion: 1
 --- !u!114 &2062269062
 MonoBehaviour:
@@ -25337,6 +25373,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2119847541}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._targetHips
+      value: 
+      objectReference: {fileID: 2119847543}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._isFoldoutExpanded
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._targetHips
+      value: 
+      objectReference: {fileID: 2119847543}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._isFoldoutExpanded
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._targetHips
       value: 
       objectReference: {fileID: 2119847543}
@@ -25373,6 +25425,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2119847541}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._hipPinningObject
+      value: 
+      objectReference: {fileID: 1831169839}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._hipPinningObject
+      value: 
+      objectReference: {fileID: 1831169839}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._hipPinningObject
       value: 
       objectReference: {fileID: 1831169839}
@@ -25389,9 +25449,29 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1831169839}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
-      propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._isFoldoutExpanded
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._isFoldoutExpanded
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[3]._hipPinningProcessor._isFoldoutExpanded
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._leftData.TargetFoot
+      value: 
+      objectReference: {fileID: 324755899}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._leftData.TargetHint
+      value: 
+      objectReference: {fileID: 2119847542}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._leftData.TargetFoot
+      value: 
+      objectReference: {fileID: 324755899}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._leftData.TargetHint
+      value: 
+      objectReference: {fileID: 2119847542}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._leftData.TargetFoot
       value: 
@@ -25417,6 +25497,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2119847542}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._rightData.TargetFoot
+      value: 
+      objectReference: {fileID: 1009674806}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._rightData.TargetHint
+      value: 
+      objectReference: {fileID: 2119847541}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._rightData.TargetFoot
+      value: 
+      objectReference: {fileID: 1009674806}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._rightData.TargetHint
+      value: 
+      objectReference: {fileID: 2119847541}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._rightData.TargetFoot
       value: 
       objectReference: {fileID: 1009674806}
@@ -25441,17 +25537,33 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2119847541}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._ccdData.Array.data[0].Target
+      value: 
+      objectReference: {fileID: 1467336568}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._ccdData.Array.data[0].Target
+      value: 
+      objectReference: {fileID: 1419136270}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._hipPinningTargetLogic
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[3]._ccdProcessor._ccdData.Array.data[0].Target
       value: 
-      objectReference: {fileID: 1467336568}
+      objectReference: {fileID: 1419136270}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[4]._ccdProcessor._ccdData.Array.data[0].Target
       value: 
       objectReference: {fileID: 1419136270}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._hipPinningTargetParent
+      value: 
+      objectReference: {fileID: 1831169838}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._hipPinningTargetParent
+      value: 
+      objectReference: {fileID: 1831169838}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._hipPinningTargetParent
       value: 
@@ -25464,6 +25576,26 @@ PrefabInstance:
       propertyPath: _targetProcessorContainers.Array.data[4]._hipPinningProcessor._hipPinningTargetParent
       value: 
       objectReference: {fileID: 1831169838}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[3]._ccdProcessor._ccdData.Array.data[0].IKChain.Array.data[0].Index
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[3]._ccdProcessor._ccdData.Array.data[0].IKChain.Array.data[1].Index
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[3]._ccdProcessor._ccdData.Array.data[0].IKChain.Array.data[2].Index
+      value: 37
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832036326866209653, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _processorAnchors.Array.data[0].Anchor
+      value: 
+      objectReference: {fileID: 1467336568}
+    - target: {fileID: 8832036326866209653, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _processorAnchors.Array.data[1].Anchor
+      value: 
+      objectReference: {fileID: 1419136270}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

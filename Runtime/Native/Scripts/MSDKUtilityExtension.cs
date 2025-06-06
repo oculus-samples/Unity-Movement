@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -264,11 +264,10 @@ namespace Meta.XR.Movement
         /// Get skeleton mapping entries as a temp native array.
         /// </summary>
         /// <param name="handle">The handle to get the joints from.</param>
-        /// <param name="skeletonType">The type of skeleton to get the info from.</param>
         /// <param name="tPoseType">The t-pose type.</param>
         /// <param name="mappingEntriesArray">The mapping entries array.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetSkeletonMappingEntries(ulong handle, SkeletonType skeletonType,
+        public static bool GetSkeletonMappingEntries(ulong handle,
             SkeletonTPoseType tPoseType,
             out NativeArray<JointMappingEntry> mappingEntriesArray)
         {
@@ -278,13 +277,13 @@ namespace Meta.XR.Movement
                 unsafe
                 {
                     int numMappings = 0;
-                    success = Api.metaMovementSDK_getSkeletonMappingEntries(handle, skeletonType, tPoseType, null,
+                    success = Api.metaMovementSDK_getSkeletonMappingEntries(handle, tPoseType, null,
                         out numMappings);
                     if (success == Result.Success && numMappings > 0)
                     {
                         mappingEntriesArray = new NativeArray<JointMappingEntry>(numMappings, Allocator.Temp,
                             UninitializedMemory);
-                        success = Api.metaMovementSDK_getSkeletonMappingEntries(handle, skeletonType, tPoseType,
+                        success = Api.metaMovementSDK_getSkeletonMappingEntries(handle, tPoseType,
                             mappingEntriesArray.GetPtr(), out numMappings);
                     }
                     else

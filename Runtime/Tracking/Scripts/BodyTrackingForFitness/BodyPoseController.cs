@@ -1,8 +1,8 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections.Generic;
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction;
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Body.PoseDetection;
@@ -20,11 +20,11 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
     /// <see cref="Pose"/> list.
     /// </summary>
     public class BodyPoseController : MonoBehaviour
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 , IBodyPose, IBody
 #endif
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         private static class BodyPoseControllerTooltips
         {
             public const string SourceDataObject =

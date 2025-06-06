@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Unity.Burst;
 using Unity.Collections;
@@ -35,16 +35,26 @@ namespace Meta.XR.Movement.Retargeting
 
             public void Execute()
             {
-                // Blend the hips separately, using the root and hips information.
-                var sourceHipsPose = SourcePose[0];
-                if (HipsIndex != -1)
+                // Blend the hips separately if hips are blended, using the root and hips information.
+                var isHips = false;
+                for (var i = 0; i < BlendIndices.Length; i++)
                 {
-                    sourceHipsPose = SourcePose[HipsIndex];
-                    var targetHipsPose = TargetPose[HipsIndex];
+                    if (BlendIndices[i].Index != HipsIndex)
+                    {
+                        continue;
+                    }
+
+                    isHips = true;
+                    break;
+                }
+
+                var sourceHipsPose = SourcePose[HipsIndex];
+                var targetHipsPose = TargetPose[HipsIndex];
+                if (isHips)
+                {
                     var hipsHeight = sourceHipsPose.Position.y - TargetPose[RootIndex].Position.y;
                     sourceHipsPose.Position = new Vector3(
                         targetHipsPose.Position.x, hipsHeight, targetHipsPose.Position.z);
-                    sourceHipsPose.Orientation = targetHipsPose.Orientation;
                 }
 
                 // Blend the rest of the body.
@@ -57,7 +67,7 @@ namespace Meta.XR.Movement.Retargeting
                         continue;
                     }
 
-                    var source = i == HipsIndex ? sourceHipsPose : SourcePose[i];
+                    var source = i == HipsIndex && isHips ? sourceHipsPose : SourcePose[i];
                     target.Orientation = Quaternion.Slerp(target.Orientation, source.Orientation, Weight);
                     target.Position = Vector3.Lerp(target.Position, source.Position, Weight);
                     TargetPose[i] = target;
@@ -97,6 +107,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <inheritdoc />
         public override void Destroy()
         {
+            _nativeBlendIndices.Dispose();
         }
 
         /// <inheritdoc />

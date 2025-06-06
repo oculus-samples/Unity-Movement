@@ -1,7 +1,7 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Retargeting;
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Body.PoseDetection;
 using Oculus.Interaction;
@@ -30,7 +30,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
             return parentIndex;
         }
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <summary>
         /// Gets joint pose local relative to its praent, assuming root is available.
         /// </summary>

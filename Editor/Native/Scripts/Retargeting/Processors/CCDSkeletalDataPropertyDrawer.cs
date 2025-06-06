@@ -1,5 +1,6 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+using Meta.XR.Movement.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -45,7 +46,6 @@ namespace Meta.XR.Movement.Retargeting.Editor
                 EditorGUI.PropertyField(propertyRect, serializedProperty, serializedLabel);
                 if (i == chainIndex)
                 {
-
                     var chainPropertyHeight = EditorGUI.GetPropertyHeight(serializedProperty, true);
                     propertyRect.y += chainPropertyHeight;
                 }
@@ -80,39 +80,20 @@ namespace Meta.XR.Movement.Retargeting.Editor
             return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
 
-        private void RunInitialize(SerializedProperty topLevelProperty)
+        private void RunInitialize(SerializedProperty property)
         {
-            var retargeter = Selection.activeGameObject.GetComponent<CharacterRetargeter>();
-
-            if (retargeter != null)
+            if (MSDKUtilityEditor.TryGetProcessorAtPropertyPathIndex<CCDSkeletalProcessor>(
+                    property, false, out var ccdProcessor))
             {
-                int numProcessors = retargeter.TargetProcessorContainers.Length;
-                int indexOfSerializedProperty = MSDKUtilityHelper.GetIndexFromPropertyPath(topLevelProperty.propertyPath);
-                if (indexOfSerializedProperty < 0 || indexOfSerializedProperty >= numProcessors)
-                {
-                    Debug.LogError($"Index of serialized processor is invalid: {indexOfSerializedProperty}. " +
-                                   $"Valid range is 0-{numProcessors - 1}.");
-                }
-                else
-                {
-                    var currentProcessor =
-                        retargeter.TargetProcessorContainers[indexOfSerializedProperty].GetCurrentProcessor();
-                    if (currentProcessor is not CCDSkeletalProcessor ccdProcessor)
-                    {
-                        Debug.LogError($"Processor at {indexOfSerializedProperty} is not an CCD processor.");
-                    }
-                    else
-                    {
-                        var subProperty = topLevelProperty.FindPropertyRelative(_ikChainName);
-                        // cut out the first occurence of []
-                        var subPropertyPath = subProperty.propertyPath;
-                        subPropertyPath = subPropertyPath.Substring(subPropertyPath.IndexOf(']') + 1);
-                        int indexOfSubProperty = MSDKUtilityHelper.GetIndexFromPropertyPath(subPropertyPath);
-                        ccdProcessor.CCDData[indexOfSubProperty].MaxIterations = 5;
-                        ccdProcessor.CCDData[indexOfSubProperty].Tolerance = 1e-6f;
-                        EditorUtility.SetDirty(retargeter);
-                    }
-                }
+                var retargeter = Selection.activeGameObject.GetComponent<CharacterRetargeter>();
+                Undo.RecordObject(retargeter, "Update CCD processor");
+                var subProperty = property.FindPropertyRelative(_ikChainName);
+                // Cut out the first occurence of []
+                var subPropertyPath = subProperty.propertyPath;
+                subPropertyPath = subPropertyPath.Substring(subPropertyPath.IndexOf(']') + 1);
+                int indexOfSubProperty = MSDKUtilityHelper.GetIndexFromPropertyPath(subPropertyPath);
+                ccdProcessor.CCDData[indexOfSubProperty].MaxIterations = 5;
+                ccdProcessor.CCDData[indexOfSubProperty].Tolerance = 1e-6f;
             }
         }
     }

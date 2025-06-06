@@ -22,7 +22,12 @@
         {
             "name": "com.meta.xr.sdk.interaction",
             "expression": "",
-            "define": "INTERACTION_OVR_DEFINED"
+            "define": "ISDK_DEFINED"
+        },
+        {
+            "name": "com.meta.xr.sdk.interaction",
+            "expression": "74.0.0",
+            "define": "ISDK_74_OR_NEWER"
         }
     ],
     "noEngineReferences": false

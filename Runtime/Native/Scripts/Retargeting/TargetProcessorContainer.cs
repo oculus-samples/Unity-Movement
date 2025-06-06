@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using UnityEngine;
@@ -35,12 +35,6 @@ namespace Meta.XR.Movement.Retargeting
         protected AnimationSkeletalProcessor _animationProcessor;
 
         /// <summary>
-        /// Reference to the hip pinning skeletal processor implementation that handles hip position constraints.
-        /// </summary>
-        [SerializeField]
-        protected HipPinningSkeletalProcessor _hipPinningProcessor;
-
-        /// <summary>
         /// Reference to the locomotion skeletal processor implementation that handles movement and foot placement.
         /// </summary>
         [SerializeField]
@@ -51,6 +45,18 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         [SerializeField]
         protected CCDSkeletalProcessor _ccdProcessor;
+
+        /// <summary>
+        /// Reference to the hand skeletal processor implementation that handles custom hands.
+        /// </summary>
+        [SerializeField]
+        protected HandSkeletalProcessor _handProcessor;
+
+        /// <summary>
+        /// Reference to the hip pinning skeletal processor implementation that handles hip position constraints.
+        /// </summary>
+        [SerializeField]
+        protected HipPinningSkeletalProcessor _hipPinningProcessor;
 
         /// <summary>
         /// A user-defined, custom processor.
@@ -71,12 +77,14 @@ namespace Meta.XR.Movement.Retargeting
                     return _twistProcessor;
                 case TargetProcessor.ProcessorType.Animation:
                     return _animationProcessor;
-                case TargetProcessor.ProcessorType.HipPinning:
-                    return _hipPinningProcessor;
                 case TargetProcessor.ProcessorType.Locomotion:
                     return _locomotionProcessor;
                 case TargetProcessor.ProcessorType.CCDIK:
                     return _ccdProcessor;
+                case TargetProcessor.ProcessorType.HandIK:
+                    return _handProcessor;
+                case TargetProcessor.ProcessorType.HipPinning:
+                    return _hipPinningProcessor;
                 case TargetProcessor.ProcessorType.Custom:
                     return _customProcessor;
                 default:

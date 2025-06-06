@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -77,7 +77,7 @@ namespace Meta.XR.Movement.Editor
             PerformArmScaling(source, target);
 
             // 2. Match wrists.
-            JointMappingUtility.PerformWristMatching(source, target);
+            PerformWristMatching(source, target);
 
             // 3. Align fingers based on wrist to middle.
             foreach (var wristType in new[] { KnownJointType.LeftWrist, KnownJointType.RightWrist })
@@ -198,6 +198,130 @@ namespace Meta.XR.Movement.Editor
         }
 
         /// <summary>
+        /// Aligns finger bones between source and target skeletons.
+        /// </summary>
+        /// <param name="win">The editor window.</param>
+        /// <param name="startBoneIds">The array of starting bone IDs for fingers.</param>
+        /// <param name="endBoneIds">The array of ending bone IDs for fingers.</param>
+        /// <param name="wristType">The wrist joint type.</param>
+        public static void PerformFingerMatching(MSDKUtilityEditorWindow win,
+            FullBodyTrackingBoneId[] startBoneIds,
+            FullBodyTrackingBoneId[] endBoneIds,
+            KnownJointType wristType)
+        {
+            var fingerNames = new[]
+            {
+                new[] { "thumb" },
+                new[] { "index" },
+                new[] { "middle" },
+                new[] { "ring" },
+                new[] { "pinky" }
+            };
+            var startNameExtensions = new[]
+            {
+                "metacarpal", "proximal", "1", "2"
+            };
+            var endNameExtensions = new[]
+            {
+                "distal", "3", "4"
+            };
+
+            var startBones = new List<Transform>();
+            var endBones = new List<Transform>();
+            var wrist = GetTargetTransformFromKnownJoint(win.TargetInfo, wristType);
+            var wristBones = wrist.GetAllChildren();
+            foreach (var fingerNameSet in fingerNames)
+            {
+                foreach (var fingerName in fingerNameSet)
+                {
+                    var startBonesToCheck = startNameExtensions.Select(e => fingerName + e);
+                    var endBonesToCheck = endNameExtensions.Select(e => fingerName + e);
+                    var startBone =
+                        MSDKUtilityHelper.FindClosestMatches(wristBones.ToArray(), startBonesToCheck.ToArray())[0]
+                            .Item1;
+                    var endBone =
+                        MSDKUtilityHelper.FindClosestMatches(wristBones.ToArray(), endBonesToCheck.ToArray())[0]
+                            .Item1;
+                    startBones.Add(startBone);
+                    endBones.Add(endBone);
+                }
+            }
+
+            for (var i = 0; i < startBoneIds.Length; i++)
+            {
+                var startPos = win.SourceInfo.ReferencePose[(int)startBoneIds[i]].Position;
+                var endPos = win.SourceInfo.ReferencePose[(int)endBoneIds[i]].Position;
+                var startBone = startBones[i];
+                var endBone = endBones[i];
+                Undo.RecordObject(startBone, "Match Fingers");
+                startBone.position = startPos;
+
+                var targetDirection = endPos - startPos;
+                var targetLength = targetDirection.magnitude;
+                targetDirection.Normalize();
+                var currentDirection = endBone.position - startBone.position;
+                var currentLength = currentDirection.magnitude;
+                currentDirection.Normalize();
+
+                var scaleFactor = targetLength / currentLength;
+                var rotation = Quaternion.FromToRotation(currentDirection, targetDirection);
+                startBone.rotation = rotation * startBone.rotation;
+                UpdateTPoseData(win.TargetInfo);
+                ApplyScalingToJointIndexAndChildren(win.TargetInfo,
+                    Array.IndexOf(win.TargetInfo.JointNames, startBone.name), scaleFactor);
+                UpdateTPoseData(win.TargetInfo);
+            }
+        }
+
+        /// <summary>
+        /// Aligns wrist joints between source and target skeletons.
+        /// </summary>
+        /// <param name="source">The source skeleton configuration.</param>
+        /// <param name="target">The target skeleton configuration.</param>
+        public static void PerformWristMatching(MSDKUtilityEditorConfig source, MSDKUtilityEditorConfig target)
+        {
+            // Rotate to match left/right hand.
+            var sourceRightHand = source.ReferencePose[(int)FullBodyTrackingBoneId.RightHandWrist];
+            var sourceLeftHand = source.ReferencePose[(int)FullBodyTrackingBoneId.LeftHandWrist];
+            var leftArmIndex = GetKnownJointIndex(target, KnownJointType.LeftUpperArm);
+            var rightArmIndex = GetKnownJointIndex(target, KnownJointType.RightUpperArm);
+
+            var leftUpperArm = target.SkeletonJoints[leftArmIndex];
+            var leftHand =
+                target.SkeletonJoints[GetKnownJointIndex(target, KnownJointType.LeftWrist)];
+            leftUpperArm.rotation =
+                GetBestRotation(leftUpperArm, leftHand, sourceLeftHand.Position);
+
+            var rightUpperArm = target.SkeletonJoints[rightArmIndex];
+            var rightHand =
+                target.SkeletonJoints[GetKnownJointIndex(target, KnownJointType.RightWrist)];
+            rightUpperArm.rotation =
+                GetBestRotation(rightUpperArm, rightHand, sourceRightHand.Position);
+
+            UpdateTPoseData(target);
+        }
+
+        /// <summary>
+        /// Performs automatic alignment between source and target skeletons.
+        /// </summary>
+        /// <param name="win">The editor window.</param>
+        public static void AutoAlignment(MSDKUtilityEditorWindow win)
+        {
+            win.TargetInfo.SkeletonTPoseType = win.Step switch
+            {
+                MSDKUtilityEditorConfig.EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
+                MSDKUtilityEditorConfig.EditorStep.MaxTPose => SkeletonTPoseType.MaxTPose,
+                _ => win.TargetInfo.SkeletonTPoseType
+            };
+
+            win.ModifyConfig(false, true);
+            if (win.FileReader.IsPlaying)
+            {
+                win.OpenPlaybackFile(win.CurrentPreviewPose);
+            }
+        }
+
+        /// <summary>
         /// Sets the target skeleton to a T-pose configuration.
         /// </summary>
         /// <param name="source">The source configuration.</param>
@@ -263,7 +387,6 @@ namespace Meta.XR.Movement.Editor
                 }
             }
         }
-
 
         /// <summary>
         /// Scales the arms of the target skeleton to match the source skeleton.

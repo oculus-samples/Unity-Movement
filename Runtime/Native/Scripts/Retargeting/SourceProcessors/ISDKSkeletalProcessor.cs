@@ -1,6 +1,6 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Input;
 #endif
@@ -17,7 +17,7 @@ namespace Meta.XR.Movement.Retargeting
     [System.Serializable]
     public class ISDKSkeletalProcessor : SourceProcessor
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <summary>
         /// Named tuple data structure for mapping between Body and Hand indices.
         /// </summary>
@@ -240,7 +240,7 @@ namespace Meta.XR.Movement.Retargeting
         [Range(0.0f, 1.0f)]
         protected float _maxDisplacementDistance = 0.05f;
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         private HandBodyJointPair[] _jointPairsLeft;
         private HandBodyJointPair[] _jointPairsRight;
         private IHand _iHandLeft, _iHandRight;
@@ -252,7 +252,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <inheritdoc />
         public override void Initialize(CharacterRetargeter characterRetargeter)
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             SetupHand(_leftHand, out _iHandLeft, out _jointPairsLeft);
             SetupHand(_rightHand, out _iHandRight, out _jointPairsRight);
 #endif
@@ -261,13 +261,13 @@ namespace Meta.XR.Movement.Retargeting
         /// <inheritdoc cref="SourceProcessor.ProcessSkeleton(NativeArray{NativeTransform})"/>
         public override void ProcessSkeleton(NativeArray<NativeTransform> trackerPoses)
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             AdjustBodyPosesBasedOnHand(_iHandLeft, _jointPairsLeft, trackerPoses, BodyJointId.Body_LeftArmLower);
             AdjustBodyPosesBasedOnHand(_iHandRight, _jointPairsRight, trackerPoses, BodyJointId.Body_RightArmLower);
 #endif
         }
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         private void SetupHand(GameObject handObject, out IHand handInterface, out HandBodyJointPair[] jointPairs)
         {
             handInterface = null;
@@ -338,7 +338,8 @@ namespace Meta.XR.Movement.Retargeting
 
                 var isdkRotation = isdkPose.rotation;
                 var sourceRotation = bone.Orientation;
-                var result = Quaternion.Slerp(sourceRotation, isdkRotation, lerpValue);
+                var slerpedRotation = Quaternion.Slerp(sourceRotation, isdkRotation, lerpValue);
+                bone.Orientation = slerpedRotation;
                 trackerPoses[joint] = bone;
             }
         }

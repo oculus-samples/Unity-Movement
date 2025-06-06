@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +11,12 @@ namespace Meta.XR.Movement.Samples
     /// </summary>
     public class MovementCharacterSpawnMenu : MonoBehaviour
     {
+        /// <summary>
+        /// The reference OVRBody to get the joint set from.
+        /// </summary>
+        [SerializeField]
+        protected OVRBody _ovrBody;
+
         /// <summary>
         /// Stylized character prefab to spawn.
         /// </summary>
@@ -34,6 +40,12 @@ namespace Meta.XR.Movement.Samples
         /// </summary>
         [SerializeField]
         protected Vector3 _spawnOffset = new Vector3(-1.0f, 0.0f, 0.0f);
+
+        [SerializeField, InspectorButton("AddStylizedCharacter")]
+        private bool _spawnStylizedButton;
+
+        [SerializeField, InspectorButton("AddHighFidelityCharacter")]
+        private bool _spawnHighFidelityButton;
 
         private class SpawnMetadata
         {
@@ -87,7 +99,9 @@ namespace Meta.XR.Movement.Samples
                 Debug.LogWarning("Reached the limit of characters to spawn.");
                 return;
             }
-            GameObject newCharacter = Instantiate(_stylizedCharacterToSpawn);
+            var newCharacter = Instantiate(_stylizedCharacterToSpawn);
+            newCharacter.SetActive(true);
+            newCharacter.GetComponent<OVRBody>().ProvidedSkeletonType = _ovrBody.ProvidedSkeletonType;
             AdjustSpawnedCharacterTransform(newCharacter, true, _currentSpawnOffset);
             _currentSpawnOffset += _spawnOffset;
             _charactersSpawned.Add(new SpawnMetadata(true, newCharacter));
@@ -103,7 +117,9 @@ namespace Meta.XR.Movement.Samples
                 Debug.LogWarning("Reached the limit of characters to spawn.");
                 return;
             }
-            GameObject newCharacter = Instantiate(_highFidelityCharacterToSpawn);
+            var newCharacter = Instantiate(_highFidelityCharacterToSpawn);
+            newCharacter.SetActive(true);
+            newCharacter.GetComponent<OVRBody>().ProvidedSkeletonType = _ovrBody.ProvidedSkeletonType;
             AdjustSpawnedCharacterTransform(newCharacter, true, _currentSpawnOffset);
             _currentSpawnOffset += _spawnOffset;
             _charactersSpawned.Add(new SpawnMetadata(true, newCharacter));
@@ -118,7 +134,7 @@ namespace Meta.XR.Movement.Samples
             {
                 return;
             }
-            int lastCharacterIndex = _charactersSpawned.Count - 1;
+            var lastCharacterIndex = _charactersSpawned.Count - 1;
             var isLastCharacterParented = _charactersSpawned[lastCharacterIndex].IsParentedCharacter;
             Destroy(_charactersSpawned[lastCharacterIndex].SpawnedObject);
             _charactersSpawned.RemoveAt(lastCharacterIndex);

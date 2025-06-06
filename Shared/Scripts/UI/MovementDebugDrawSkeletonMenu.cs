@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Retargeting;
 using UnityEngine;
@@ -16,6 +16,12 @@ namespace Meta.XR.Movement.Samples
 
         [SerializeField]
         private CharacterRetargeter[] _retargeters;
+
+        [SerializeField, InspectorButton("ToggleSourceSkeletonDraw")]
+        private bool _toggleSourceButton;
+
+        [SerializeField, InspectorButton("ToggleTargetSkeletonDraw")]
+        private bool _toggleTargetButton;
 
         private void Awake()
         {
@@ -38,7 +44,7 @@ namespace Meta.XR.Movement.Samples
         {
             foreach (var retargeter in _retargeters)
             {
-                retargeter.DebugDrawSourceSkeleton = true;
+                retargeter.DebugDrawSourceSkeleton = !retargeter.DebugDrawSourceSkeleton;
             }
         }
 
@@ -46,7 +52,7 @@ namespace Meta.XR.Movement.Samples
         {
             foreach (var retargeter in _retargeters)
             {
-                retargeter.DebugDrawTargetSkeleton = true;
+                retargeter.DebugDrawTargetSkeleton = !retargeter.DebugDrawTargetSkeleton;
             }
         }
 

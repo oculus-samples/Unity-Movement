@@ -1,9 +1,9 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.IO;
 using Meta.XR.Movement.Retargeting;
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Body.PoseDetection;
 using Oculus.Interaction.Collections;
@@ -23,7 +23,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
     [CustomEditor(typeof(BodyPoseController))]
     public class BodyPoseControllerEditor : UnityEditor.Editor
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <summary>
         /// Internal wrapper for treating <see cref="IBodyPose"/> as <see cref="IBody"/>, for
         /// <see cref="ScriptableObject"/> serialization.

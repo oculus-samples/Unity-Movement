@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Linq;
@@ -27,6 +27,7 @@ namespace Meta.XR.Movement.Editor
             get => _window;
             set => _window = value;
         }
+
         /// <summary>
         /// Gets or sets the character in the scene view.
         /// </summary>
@@ -35,6 +36,7 @@ namespace Meta.XR.Movement.Editor
             get => _sceneViewCharacter;
             set => _sceneViewCharacter = value;
         }
+
         /// <summary>
         /// Gets the skeleton draw for the source T-pose.
         /// </summary>
@@ -58,10 +60,10 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Gets or sets the preview character retargeter.
         /// </summary>
-        public CharacterRetargeter PreviewRetargeter
+        public CharacterRetargeter Retargeter
         {
-            get => _previewRetargeter;
-            set => _previewRetargeter = value;
+            get => _retargeter;
+            set => _retargeter = value;
         }
 
         [SerializeField]
@@ -71,7 +73,7 @@ namespace Meta.XR.Movement.Editor
         private GameObject _sceneViewCharacter;
 
         [SerializeField]
-        private CharacterRetargeter _previewRetargeter;
+        private CharacterRetargeter _retargeter;
 
         private Vector3 _previewPosition = Vector3.forward;
 
@@ -104,24 +106,24 @@ namespace Meta.XR.Movement.Editor
         public void InstantiatePreviewCharacterRetargeter()
         {
             // Instantiate preview character.
-            if (_previewRetargeter != null)
+            if (_retargeter != null)
             {
-                DestroyImmediate(_previewRetargeter.gameObject);
+                DestroyImmediate(_retargeter.gameObject);
             }
 
             var previewCharacter = Instantiate(_sceneViewCharacter);
             previewCharacter.name = "Preview-" + _sceneViewCharacter.name;
             previewCharacter.transform.position = _previewPosition;
             SceneManager.MoveGameObjectToScene(previewCharacter, _window.PreviewStage.scene);
-            _previewRetargeter = previewCharacter.AddComponent<CharacterRetargeter>();
-            _previewRetargeter.ConfigAsset = _window.UtilityConfig.EditorMetadataObject.ConfigJson;
-            CharacterRetargeterConfigEditor.LoadConfig(new SerializedObject(_previewRetargeter), _previewRetargeter);
-            _previewRetargeter.Retargeting.ApplyScale = true;
-            _previewRetargeter.Retargeting.ScaleRange = new Vector2(0.5f, 2.0f);
-            _previewRetargeter.Start();
+            _retargeter = previewCharacter.AddComponent<CharacterRetargeter>();
+            _retargeter.ConfigAsset = _window.UtilityConfig.EditorMetadataObject.ConfigJson;
+            CharacterRetargeterConfigEditor.LoadConfig(new SerializedObject(_retargeter), _retargeter);
+            _retargeter.SkeletonRetargeter.ApplyScale = true;
+            _retargeter.SkeletonRetargeter.ScaleRange = new Vector2(0.5f, 2.0f);
+            _retargeter.Start();
 
-            var serializedConfig = new SerializedObject(_previewRetargeter);
-            CharacterRetargeterConfigEditor.LoadConfig(serializedConfig, _previewRetargeter);
+            var serializedConfig = new SerializedObject(_retargeter);
+            CharacterRetargeterConfigEditor.LoadConfig(serializedConfig, _retargeter);
         }
 
         /// <summary>
@@ -138,25 +140,21 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Updates the target draw.
         /// </summary>
-        /// <param name="previewRetargeter">The preview character retargeter.</param>
-        /// <param name="utilityConfig">The utility configuration.</param>
-        /// <param name="editorMetadataObject">The editor metadata object.</param>
-        /// <param name="source">The source configuration.</param>
-        /// <param name="target">The target configuration.</param>
-        public void UpdateTargetDraw(CharacterRetargeter previewRetargeter, MSDKUtilityEditorConfig utilityConfig, MSDKUtilityEditorMetadata editorMetadataObject, MSDKUtilityEditorConfig source, MSDKUtilityEditorConfig target)
+        public void UpdateTargetDraw(MSDKUtilityEditorWindow win)
         {
-            if (TargetSkeletonDrawTPose == null || target == null)
+            if (TargetSkeletonDrawTPose == null || win.TargetInfo == null)
             {
                 return;
             }
 
-            if (_window.Overlay.ShouldAutoUpdateMappings)
+            JointAlignmentUtility.UpdateTPoseData(win.TargetInfo);
+            if (win.Step != MSDKUtilityEditorConfig.EditorStep.Configuration &&
+                win.Step != MSDKUtilityEditorConfig.EditorStep.Review)
             {
-                JointMappingUtility.UpdateJointMapping(_window, previewRetargeter, this, utilityConfig, editorMetadataObject, source, target);
+                _window.ModifyConfig(_window.Overlay.ShouldAutoUpdateMappings, false);
             }
 
-            JointAlignmentUtility.UpdateTPoseData(target);
-            LoadDraw(TargetSkeletonDrawTPose, target);
+            LoadDraw(TargetSkeletonDrawTPose, win.TargetInfo);
         }
 
         /// <summary>
@@ -185,30 +183,34 @@ namespace Meta.XR.Movement.Editor
                 MSDKUtilityEditorConfig.EditorStep.MaxTPose => 1.0f,
                 _ => _window.UtilityConfig.ScaleSize / 100.0f
             };
-            var scale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo, _window.Step switch
-            {
-                MSDKUtilityEditorConfig.EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
-                MSDKUtilityEditorConfig.EditorStep.MaxTPose => SkeletonTPoseType.MaxTPose,
-                _ => SkeletonTPoseType.UnscaledTPose
-            });
+            var scale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo,
+                _window.Step switch
+                {
+                    MSDKUtilityEditorConfig.EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
+                    MSDKUtilityEditorConfig.EditorStep.MaxTPose => SkeletonTPoseType.MaxTPose,
+                    _ => SkeletonTPoseType.UnscaledTPose
+                });
             if (_window.Step == MSDKUtilityEditorConfig.EditorStep.Review)
             {
-                var minPoseScale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo, SkeletonTPoseType.MinTPose);
-                var maxPoseScale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo, SkeletonTPoseType.MaxTPose);
+                var minPoseScale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo,
+                    SkeletonTPoseType.MinTPose);
+                var maxPoseScale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo,
+                    SkeletonTPoseType.MaxTPose);
                 scale = Mathf.Lerp(minPoseScale, maxPoseScale, _window.UtilityConfig.ScaleSize / 100.0f);
             }
 
             CalculateSkeletonTPoseByRef(_window.SourceInfo.ConfigHandle, SkeletonType.SourceSkeleton,
                 JointRelativeSpaceType.RootOriginRelativeSpace, scalePercentage, ref sourceTPose);
-            MSDKUtilityHelper.ScaleSkeletonPose(_window.SourceInfo.ConfigHandle, SkeletonType.SourceSkeleton, ref sourcePose, scale);
+            MSDKUtilityHelper.ScaleSkeletonPose(_window.SourceInfo.ConfigHandle, SkeletonType.SourceSkeleton,
+                ref sourcePose, scale);
 
             // Run preview retargeter.
-            _previewRetargeter.DebugDrawSourceSkeleton = _window.Overlay.ShouldDrawPreview;
-            _previewRetargeter.DebugDrawTargetSkeleton = _window.Overlay.ShouldDrawPreview;
-            _previewRetargeter.DebugDrawTransform = _previewRetargeter.transform;
-            _previewRetargeter.UpdateTPose(sourceTPose);
-            _previewRetargeter.CalculatePose(sourcePose);
-            _previewRetargeter.UpdatePose();
+            _retargeter.DebugDrawSourceSkeleton = _window.Overlay.ShouldDrawPreview;
+            _retargeter.DebugDrawTargetSkeleton = _window.Overlay.ShouldDrawPreview;
+            _retargeter.DebugDrawTransform = _retargeter.transform;
+            _retargeter.UpdateTPose(sourceTPose);
+            _retargeter.CalculatePose(sourcePose);
+            _retargeter.UpdatePose();
         }
 
         /// <summary>
@@ -216,12 +218,12 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void DestroyPreviewCharacterRetargeter()
         {
-            if (_previewRetargeter == null)
+            if (_retargeter == null)
             {
                 return;
             }
 
-            DestroyImmediate(_previewRetargeter.gameObject);
+            DestroyImmediate(_retargeter.gameObject);
             if (_window.FileReader.IsPlaying)
             {
                 _window.FileReader.ClosePlaybackFile();
@@ -239,6 +241,11 @@ namespace Meta.XR.Movement.Editor
             if (target.SkeletonJoints == null || target.SkeletonJoints.Length != targetJointCount)
             {
                 target.SkeletonJoints = new Transform[targetJointCount];
+            }
+
+            if (_sceneViewCharacter == null)
+            {
+                return;
             }
 
             var rootSearchTransform = _sceneViewCharacter.transform;
@@ -291,9 +298,7 @@ namespace Meta.XR.Movement.Editor
         /// <param name="target">The target configuration.</param>
         public void ReloadCharacter(MSDKUtilityEditorConfig target)
         {
-            if (_sceneViewCharacter == null ||
-                target.SkeletonJoints.Length == 0 ||
-                target.SkeletonJoints[0] == null)
+            if (_sceneViewCharacter == null || target.SkeletonJoints.Length == 0 || target.SkeletonJoints[0] == null)
             {
                 return;
             }
@@ -318,6 +323,11 @@ namespace Meta.XR.Movement.Editor
             {
                 var joint = target.SkeletonJoints[i];
                 var tPose = target.ReferencePose[i];
+                if (joint == null)
+                {
+                    return;
+                }
+
                 joint.localScale = tPose.Scale;
             }
 
@@ -333,42 +343,6 @@ namespace Meta.XR.Movement.Editor
                 var tPose = target.ReferencePose[i];
                 Undo.RecordObject(joint, "Reload Character");
                 joint.SetPositionAndRotation(tPose.Position, tPose.Orientation);
-            }
-        }
-
-        /// <summary>
-        /// Scales the character.
-        /// </summary>
-        /// <param name="source">The source configuration.</param>
-        /// <param name="target">The target configuration.</param>
-        /// <param name="scaleCharacter">Whether to scale the character.</param>
-        public void ScaleCharacter(MSDKUtilityEditorConfig source, MSDKUtilityEditorConfig target, bool scaleCharacter)
-        {
-            // 1. Align Y-axis.
-            var tPoseType = _window.Step switch
-            {
-                MSDKUtilityEditorConfig.EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
-                MSDKUtilityEditorConfig.EditorStep.MaxTPose => SkeletonTPoseType.MaxTPose,
-                _ => SkeletonTPoseType.UnscaledTPose
-            };
-            var yScaleRatio = JointAlignmentUtility.GetDesiredScale(source, target, tPoseType, true);
-            if (scaleCharacter)
-            {
-                var root = JointAlignmentUtility.GetTargetTransformFromKnownJoint(target, KnownJointType.Root);
-                Undo.RecordObject(root, "Scale Character");
-                _sceneViewCharacter.transform.localScale *= yScaleRatio;
-                JointAlignmentUtility.UpdateTPoseData(target);
-            }
-            else
-            {
-                for (var i = 0; i < target.ReferencePose.Length; i++)
-                {
-                    var joint = target.ReferencePose[i];
-                    joint.Position *= yScaleRatio;
-                    target.ReferencePose[i] = joint;
-                }
-
-                ReloadCharacter(target);
             }
         }
     }
