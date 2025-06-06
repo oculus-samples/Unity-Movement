@@ -2,11 +2,11 @@
 Unity-Movement is a package that uses OpenXR’s tracking layer APIs to expose Body Tracking (BT), Eye Tracking (ET), and Face Tracking (FT) capabilities. With this package, developers can leverage tracking to populate VR environments with custom avatars that bring the expressiveness of users into the virtual environments that they create.
 
 ### License
-The Unity-Movement package is released under the [Oculus License](https://github.com/oculus-samples/Unity-Movement/blob/main/LICENSE). The MIT License applies to only certain, clearly marked documents. If an individual file does not indicate which license it is subject to, then the Oculus License applies.
+The Unity-Movement package is released under the [Oculus License](https://github.com/oculus-samples/Unity-Movement/blob/main/LICENSE.md). The MIT License applies to only certain, clearly marked documents. If an individual file does not indicate which license it is subject to, then the Oculus License applies.
 
 ### Requirements
 - Unity 2022.3.15f1 or newer.
-- v76.0 or newer of the Meta XR SDK. You will need the [Meta XR Core SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-core-sdk-269169) and the [Meta XR Interaction SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
+- v77.0 or newer of the Meta XR SDK. You will need the [Meta XR Core SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-core-sdk-269169) and the [Meta XR Interaction SDK](https://assetstore.unity.com/packages/tools/integration/meta-xr-interaction-sdk-265014) packages found [on this page](https://assetstore.unity.com/publishers/25353).
 - A project set up with these [steps](https://developer.oculus.com/documentation/unity/move-overview/#unity-project-setup).
 
 ## Getting Started
@@ -14,10 +14,10 @@ First, ensure that all of the [requirements](#requirements) are met.
 
 Then, bring this package into the project.
 - In Package Manager, click on the add button below the window title and select **Add package from git URL…**, using this URL: https://github.com/oculus-samples/Unity-Movement.git
-- To grab a specific version of the package, append the version number with a # to the git URL (i.e. https://github.com/oculus-samples/Unity-Movement.git#1.2.0)
+- To grab a specific version of the package, append the version number with a # to the git URL (i.e. https://github.com/oculus-samples/Unity-Movement.git#v74.0.0)
 - Alternatively, in package manager, click on the add button below the window title and select **Add package from disk...**, using the package.json located after unzipping one of the releases here: https://github.com/oculus-samples/Unity-Movement/releases
 
-The sample scenes are located under the **Samples/Scenes** folder.
+The sample scenes are located under the **Samples~/Scenes** folder. For detailed information, please visit the [related page](https://developers.meta.com/horizon/documentation/unity/move-unity-getting-started).
 
 ## Unity Setup
 
@@ -56,17 +56,13 @@ nearby without experiencing poor quality.
 ## Samples
 
 The project contains several sample scenes. To test the samples, they must be imported into the project's Assets folder:
-- Select the "Meta Movement" package in the package manager. Once selected, expand the Samples section and import the desired sample scenes.
+- Select the "Meta XR Movement SDK" package in the package manager. Once selected, expand the Samples section and import the desired sample scenes.
 <br>
 
 
 For more information about body tracking, please refer to [this page](https://developer.oculus.com/documentation/unity/move-body-tracking/).
 
 For more information about the samples, please refer to the [body samples page](https://developers.meta.com/horizon/documentation/unity/body-tracking-samples) and [face samples page](https://developers.meta.com/horizon/documentation/unity/face-tracking-samples).
-
-## Player Settings
-
-Make sure that the color space is set to Linear.
 
 ## Build Settings
 
@@ -77,4 +73,5 @@ The documentation for this package can be found [here](https://developer.oculus.
 The API reference for this package can be found [here](https://oculus-samples.github.io/Unity-Movement/).
 
 ## License
-Unity-Movement is subject to the [Oculus SDK License Agreement](https://developer.oculus.com/licenses/oculussdk/), as found in the LICENSE file.
+Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved. Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at https://developer.oculus.com/licenses/oculussdk/
+Files from [Unity]{https://unity.com/legal/licenses/unity-companion-license} and [SchemingDeveloper]{https://github.com/oculus-samples/Unity-Movement/blob/main/Runtime/Tracking/ThirdParty/SchemingDeveloper/LICENSE.txt} are licensed under their respective licensing terms.
