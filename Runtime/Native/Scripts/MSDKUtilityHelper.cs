@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,89 @@ namespace Meta.XR.Movement
     /// </summary>
     public static class MSDKUtilityHelper
     {
+
+        public static readonly string[] AutoMapExcludedJointNames =
+        {
+            "LeftHandPalm",
+            "LeftHandWristTwist",
+            "RightHandPalm",
+            "RightHandWristTwist"
+        };
+
+        public static readonly string[] HalfBodyManifestationJointNames =
+        {
+            "Root",
+            "Hips",
+            "SpineLower",
+            "SpineMiddle",
+            "SpineUpper",
+            "Chest",
+            "Neck",
+            "Head",
+            "LeftShoulder",
+            "LeftScapula",
+            "LeftArmUpper",
+            "LeftArmLower",
+            "LeftHandWristTwist",
+            "RightShoulder",
+            "RightScapula",
+            "RightArmUpper",
+            "RightArmLower",
+            "RightHandWristTwist",
+            "LeftHandPalm",
+            "LeftHandWrist",
+            "LeftHandThumbMetacarpal",
+            "LeftHandThumbProximal",
+            "LeftHandThumbDistal",
+            "LeftHandThumbTip",
+            "LeftHandIndexMetacarpal",
+            "LeftHandIndexProximal",
+            "LeftHandIndexIntermediate",
+            "LeftHandIndexDistal",
+            "LeftHandIndexTip",
+            "LeftHandMiddleMetacarpal",
+            "LeftHandMiddleProximal",
+            "LeftHandMiddleIntermediate",
+            "LeftHandMiddleDistal",
+            "LeftHandMiddleTip",
+            "LeftHandRingMetacarpal",
+            "LeftHandRingProximal",
+            "LeftHandRingIntermediate",
+            "LeftHandRingDistal",
+            "LeftHandRingTip",
+            "LeftHandLittlePinkyMetacarpal",
+            "LeftHandLittlePinkyProximal",
+            "LeftHandLittlePinkyIntermediate",
+            "LeftHandLittlePinkyDistal",
+            "LeftHandLittlePinkyTip",
+            "RightHandPalm",
+            "RightHandWrist",
+            "RightHandThumbMetacarpal",
+            "RightHandThumbProximal",
+            "RightHandThumbDistal",
+            "RightHandThumbTip",
+            "RightHandIndexMetacarpal",
+            "RightHandIndexProximal",
+            "RightHandIndexIntermediate",
+            "RightHandIndexDistal",
+            "RightHandIndexTip",
+            "RightHandMiddleMetacarpal",
+            "RightHandMiddleProximal",
+            "RightHandMiddleIntermediate",
+            "RightHandMiddleDistal",
+            "RightHandMiddleTip",
+            "RightHandRingMetacarpal",
+            "RightHandRingProximal",
+            "RightHandRingIntermediate",
+            "RightHandRingDistal",
+            "RightHandRingTip",
+            "RightHandLittlePinkyMetacarpal",
+            "RightHandLittlePinkyProximal",
+            "RightHandLittlePinkyIntermediate",
+            "RightHandLittlePinkyDistal",
+            "RightHandLittlePinkyTip"
+        };
+
         private static readonly string[] _sourceKnownJoints =
         {
             "Root",
@@ -38,13 +121,13 @@ namespace Meta.XR.Movement
             new[] { "hips", "pelvis", "spine0", "root" },
             new[]
             {
-                "rightupperarm", "upperarmright", "upperarmr", "rupperarm", "rightarm", "armright", "rightshoulder",
-                "shoulderright", "shoulderr", "rshoulder", "armr"
+                "rightupperarm", "upperarmright", "upperarmr", "rupperarm", "rightarm", "rightarmupper", "armright",
+                "rightshoulder", "shoulderright", "shoulderr", "rshoulder", "armr"
             },
             new[]
             {
-                "leftupperarm", "upperarmleft", "upperarml", "lupperarm", "leftarm", "armleft", "shoulderleft",
-                "shoulderleft", "shoulderl", "lshoulder", "arml"
+                "leftupperarm", "upperarmleft", "upperarml", "lupperarm", "leftarm", "leftarmupper", "armleft",
+                "leftshoulder", "shoulderleft", "shoulderl", "lshoulder", "arml"
             },
             new[]
             {
@@ -55,11 +138,22 @@ namespace Meta.XR.Movement
             new[] { "neck" },
             new[]
             {
-                "rightupperleg", "rightupleg", "rightleg", "rightlegupper", "rightlegup", "thighr", "legr", "rleg"
+                "rightupperleg", "rightupleg", "rightleg", "rightlegupper", "rightlegup", "thighr", "legr", "rleg",
+                "rhip"
             },
-            new[] { "leftupperleg", "leftupleg", "leftleg", "leftlegupper", "leftlegup", "thighl", "legl", "lleg" },
-            new[] { "rightfootankle", "rightfoot", "rightankle", "footright", "ankleright", "footr", "rfoot" },
-            new[] { "leftfootankle", "leftfoot", "leftankle", "footleft", "ankleleft", "footl", "lfoot" },
+            new[]
+            {
+                "leftupperleg", "leftupleg", "leftleg", "leftlegupper", "leftlegup", "thighl", "legl", "lleg", "lhip"
+            },
+            new[]
+            {
+                "rightfootankle", "rightfoot", "rightankle", "footright", "ankleright", "footr", "rfoot", "rankle",
+                "ankler"
+            },
+            new[]
+            {
+                "leftfootankle", "leftfoot", "leftankle", "footleft", "ankleleft", "footl", "lfoot", "lankle", "anklel"
+            },
         };
 
         /// <summary>
@@ -83,7 +177,7 @@ namespace Meta.XR.Movement
                 NativeArrayOptions.UninitializedMemory);
             var sourceMaxTPose = new NativeArray<NativeTransform>(sourceData.Joints.Length, Allocator.Temp,
                 NativeArrayOptions.UninitializedMemory);
-            for (int i = 0; i < sourceData.Joints.Length; i++)
+            for (var i = 0; i < sourceData.Joints.Length; i++)
             {
                 sourceMinTPose[i] = sourceData.TPoseMin[i];
                 sourceMaxTPose[i] = sourceData.TPoseMax[i];
@@ -103,47 +197,55 @@ namespace Meta.XR.Movement
             }
 
             var minMappings =
-                new NativeArray<JointMapping>(0, Allocator.Temp,
-                    NativeArrayOptions.UninitializedMemory);
+                new NativeArray<JointMapping>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var minMappingEntries =
-                new NativeArray<JointMappingEntry>(0, Allocator.Temp,
-                    NativeArrayOptions.UninitializedMemory);
+                new NativeArray<JointMappingEntry>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var maxMappings =
-                new NativeArray<JointMapping>(0, Allocator.Temp,
-                    NativeArrayOptions.UninitializedMemory);
+                new NativeArray<JointMapping>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var maxMappingEntries =
-                new NativeArray<JointMappingEntry>(0, Allocator.Temp,
-                    NativeArrayOptions.UninitializedMemory);
+                new NativeArray<JointMappingEntry>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var targetKnownJoints = FindKnownJoints(targetData);
 
             // 3. Function calls here, then return the retargetingConfigJson variable
-            if (CreateOrUpdateUtilityConfig(
-                    configName,
-                    Array.Empty<string>(),
-                    sourceData.Joints,
-                    sourceData.ParentJoints,
-                    _sourceKnownJoints,
-                    sourceMinTPose,
-                    sourceMaxTPose,
-                    targetBlendshapeNames,
-                    targetData.Joints,
-                    targetData.ParentJoints,
-                    targetKnownJoints,
-                    targetUnscaledTPose,
-                    targetMinTPose,
-                    targetMaxTPose,
-                    minMappings,
-                    minMappingEntries,
-                    maxMappings,
-                    maxMappingEntries,
-                    out var configHandle))
+            ConfigInitParams initParams = new ConfigInitParams();
+            initParams.SourceSkeleton.JointNames = sourceData.Joints;
+            initParams.SourceSkeleton.ParentJointNames = sourceData.ParentJoints;
+            initParams.SourceSkeleton.OptionalKnownSourceJointNamesById = _sourceKnownJoints;
+            initParams.SourceSkeleton.OptionalAutoMapExcludedJointNames = AutoMapExcludedJointNames;
+            initParams.SourceSkeleton.OptionalManifestationNames = new[] { MetaSourceDataProvider.HalfBodyManifestation };
+            initParams.SourceSkeleton.OptionalManifestationJointCounts = new[] { (int)SkeletonData.BodyTrackingBoneId.End };
+            initParams.SourceSkeleton.OptionalManifestationJointNames = HalfBodyManifestationJointNames;
+            initParams.SourceSkeleton.MinTPose = sourceMinTPose;
+            initParams.SourceSkeleton.MaxTPose = sourceMaxTPose;
+
+            initParams.TargetSkeleton.BlendShapeNames = targetBlendshapeNames;
+            initParams.TargetSkeleton.JointNames = targetData.Joints;
+            initParams.TargetSkeleton.ParentJointNames = targetData.ParentJoints;
+            initParams.TargetSkeleton.OptionalKnownSourceJointNamesById = targetKnownJoints;
+            initParams.TargetSkeleton.MinTPose = targetMinTPose;
+            initParams.TargetSkeleton.MaxTPose = targetMaxTPose;
+            initParams.TargetSkeleton.UnscaledTPose = targetUnscaledTPose;
+
+            initParams.MinMappings.Mappings = minMappings;
+            initParams.MinMappings.MappingEntries = minMappingEntries;
+            initParams.MaxMappings.Mappings = maxMappings;
+            initParams.MaxMappings.MappingEntries = maxMappingEntries;
+
+            if (!CreateOrUpdateUtilityConfig(configName, initParams, out var configHandle))
             {
-                WriteConfigDataToJson(configHandle, out var retargetingConfigJson);
-                DestroyHandle(configHandle);
-                return retargetingConfigJson;
+                return "";
             }
 
-            return "";
+            // 4. Try to auto align.
+            AlignTargetToSource(configName, AlignmentFlags.All, configHandle, SkeletonType.SourceSkeleton,
+                configHandle, out configHandle);
+
+            // 5. Try to auto map.
+            GenerateMappings(configHandle, AutoMappingFlags.EmptyFlag);
+
+            WriteConfigDataToJson(configHandle, out var retargetingConfigJson);
+            DestroyHandle(configHandle);
+            return retargetingConfigJson;
         }
 
         /// <summary>
@@ -169,15 +271,15 @@ namespace Meta.XR.Movement
             else
             {
                 // 1. Try to find hips manually by string matching.
-                var hipsName = _knownJointNames[(int)KnownJointType.Hips];
-                hips = SearchForJointWithNameInChildren(target.transform, hipsName);
+                var hipsNames = _knownJointNames[(int)KnownJointType.Hips];
+                hips = SearchForJointWithNameInChildren(target.transform, hipsNames, 3);
 
                 // 2. If we can't find the hips by string matching, look for the legs and infer that the hips
                 // is the parent of the legs.
                 if (hips == null)
                 {
-                    var legsName = new[] { "UpperLeg", "UpLeg", "Leg" };
-                    var leg = SearchForJointWithNameInChildren(target.transform, legsName);
+                    var legNames = _knownJointNames[(int)KnownJointType.LeftUpperLeg];
+                    var leg = SearchForJointWithNameInChildren(target.transform, legNames, 1);
                     if (leg != null)
                     {
                         hips = leg.parent;
@@ -255,6 +357,11 @@ namespace Meta.XR.Movement
             // Assume root joint is the parent of the hips joint.
             GetJointIndexByKnownJointType(handle, SkeletonType.TargetSkeleton, KnownJointType.Hips,
                 out var hipsJointIndex);
+            if (hipsJointIndex == -1)
+            {
+                return;
+            }
+
             var hipsJoint = root.FindChildRecursive(jointNames[hipsJointIndex]);
             if (hipsJoint == null)
             {
@@ -435,7 +542,7 @@ namespace Meta.XR.Movement
             return -1;
         }
 
-        private static Transform SearchForJointWithNameInChildren(Transform parent, string[] searchNames)
+        private static Transform SearchForJointWithNameInChildren(Transform parent, string[] searchNames, int expectedChildCount)
         {
             var queue = new Queue<Transform>();
             queue.Enqueue(parent);
@@ -444,8 +551,9 @@ namespace Meta.XR.Movement
                 var current = queue.Dequeue();
                 if (searchNames.Any(searchString => current.name.ToLower().Contains(searchString.ToLower())))
                 {
-                    // Ensure whatever joint we're returning doesn't have a skinned mesh renderer.
-                    if (current.GetComponent<SkinnedMeshRenderer>() == null)
+                    // Ensure whatever joint we're returning doesn't have a skinned mesh renderer and has the minimum
+                    // specified child count.
+                    if (current.GetComponent<SkinnedMeshRenderer>() == null && current.childCount >= expectedChildCount)
                     {
                         return current;
                     }

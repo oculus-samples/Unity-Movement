@@ -1,8 +1,8 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections;
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Body.PoseDetection;
 using Oculus.Interaction.Collections;
@@ -16,7 +16,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
     /// setting up it's associated <see cref="Oculus.Interaction.Input.DataSource{TData}"/>.
     /// </summary>
     public class OVRBodyPose : OVRBody
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         , IBodyPose, IBody, ISkeletonMapping
 #endif
     {
@@ -25,7 +25,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
         /// </summary>
         private int _iterationNumber;
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 
         /// <inheritdoc cref="IBodyPose.SkeletonMapping"/>
         public ISkeletonMapping SkeletonMapping => this;
@@ -48,7 +48,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
         /// <inheritdoc cref="IBody.CurrentDataVersion"/>
         public int CurrentDataVersion => _iterationNumber;
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <inheritdoc cref="ISkeletonMapping.Joints"/>
         public IEnumerableHashSet<BodyJointId> Joints => FullBodySkeletonTPose.TPose.Joints;
 #endif
@@ -67,7 +67,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
         }
 
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <inheritdoc cref="ISkeletonMapping.TryGetParentJointId"/>
         public bool TryGetParentJointId(BodyJointId jointId, out BodyJointId parent) =>
             FullBodySkeletonTPose.TPose.TryGetParentJointId(jointId, out parent);
@@ -97,7 +97,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
         }
 #endif
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <inheritdoc cref="IBodyPose.GetJointPoseLocal"/>
         public bool GetJointPoseLocal(BodyJointId bodyJointId, out Pose pose) =>
             FullBodySkeletonTPose.GetJointPoseLocalIfFromRootIsKnown(this, bodyJointId, out pose);

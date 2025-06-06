@@ -1,11 +1,11 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using UnityEditor;
 using UnityEngine;
 
 namespace Meta.XR.Movement.BodyTrackingForFitness
 {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
     /// <summary>
     /// Used to simplify drawing of a
     /// <see cref="BodyPoseAlignmentDetector.AlignmentState"/> element.

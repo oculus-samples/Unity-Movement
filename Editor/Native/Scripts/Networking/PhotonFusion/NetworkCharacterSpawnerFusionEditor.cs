@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 #if FUSION_WEAVER && FUSION2
 using Meta.XR.Movement.Networking.Editor;

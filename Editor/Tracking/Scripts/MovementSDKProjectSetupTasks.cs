@@ -1,4 +1,4 @@
-// (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System.Linq;
 using Meta.XR.Movement.FaceTracking;
@@ -40,7 +40,7 @@ namespace Meta.XR.Movement
 
             // Body tracking settings.
             OVRProjectSetup.AddTask(
-                level: OVRProjectSetup.TaskLevel.Required,
+                level: OVRProjectSetup.TaskLevel.Recommended,
                 group: _group,
                 platform: BuildTargetGroup.Unknown,
                 isDone: group =>
@@ -55,7 +55,7 @@ namespace Meta.XR.Movement
             );
 
             OVRProjectSetup.AddTask(
-                level: OVRProjectSetup.TaskLevel.Required,
+                level: OVRProjectSetup.TaskLevel.Recommended,
                 group: _group,
                 platform: BuildTargetGroup.Unknown,
                 isDone: group =>

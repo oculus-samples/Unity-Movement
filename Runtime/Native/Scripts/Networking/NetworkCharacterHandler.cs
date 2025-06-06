@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Meta.XR.Movement.Networking
     /// This component is agnostic of any networking framework, and uses configuration
     /// data for the APIs to send/receive data.
     /// </summary>
-    [DefaultExecutionOrder(500)]
+    [DefaultExecutionOrder(100)]
     public class NetworkCharacterHandler : MonoBehaviour, INetworkCharacterHandler
     {
         /// <summary>
@@ -208,6 +208,11 @@ namespace Meta.XR.Movement.Networking
                 {
                     continue;
                 }
+                // Don't serialize if retargeter doesn't have useful data.
+                if (!_networkCharacterRetargeter.RetargeterValid)
+                {
+                    continue;
+                }
 
                 var lastAck = _clientsLastAck.GetValueOrDefault(clientId, -1);
 
@@ -391,7 +396,6 @@ namespace Meta.XR.Movement.Networking
             {
                 lastAck = -1;
             }
-
             var bodyPose = _networkCharacterRetargeter.GetCurrentBodyPose(Retargeting.JointType.NoWorldSpace);
             var facePose = _networkCharacterRetargeter.GetCurrentFacePose();
             var bodyIndicesToSerialize =

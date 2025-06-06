@@ -1,15 +1,13 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Meta.XR.Movement.Retargeting;
-using Meta.XR.Movement.Utils;
 using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 using static Meta.XR.Movement.MSDKUtility;
-using static Meta.XR.Movement.MSDKUtilityHelper;
 
 namespace Meta.XR.Movement.Editor
 {
@@ -189,11 +187,6 @@ namespace Meta.XR.Movement.Editor
         /// <param name="tPoseType">The type of T-pose.</param>
         public void Initialize(string configJson, SkeletonType skeletonType, SkeletonTPoseType tPoseType)
         {
-            if (ConfigHandle != INVALID_HANDLE)
-            {
-                DestroyHandle(ConfigHandle);
-            }
-
             // Read config data first.
             CreateOrUpdateHandle(configJson, out ConfigHandle);
             GetConfigName(ConfigHandle, out ConfigName);
@@ -212,14 +205,40 @@ namespace Meta.XR.Movement.Editor
             GetSkeletonTPoseByRef(ConfigHandle, skeletonType, tPoseType,
                 JointRelativeSpaceType.RootOriginRelativeSpace, ref tPose);
             GetParentJointIndexesByRef(ConfigHandle, skeletonType, ref parentIndices);
-            GetSkeletonMappings(ConfigHandle, skeletonType, tPoseType, out var jointMappings);
-            GetSkeletonMappingEntries(ConfigHandle, skeletonType, tPoseType, out var jointMappingEntries);
+            GetSkeletonMappings(ConfigHandle, tPoseType, out var jointMappings);
+            GetSkeletonMappingEntries(ConfigHandle, tPoseType, out var jointMappingEntries);
             JointMappings = jointMappings.ToArray();
             JointMappingEntries = jointMappingEntries.ToArray();
             ReferencePose = tPose.ToArray();
             ParentIndices = parentIndices.ToArray();
         }
 
+        public void Initialize(ulong handle, SkeletonType skeletonType, SkeletonTPoseType tPoseType)
+        {
+            ConfigHandle = handle;
+            GetConfigName(ConfigHandle, out ConfigName);
+            GetBlendShapeNames(ConfigHandle, skeletonType, out BlendshapeNames);
+            GetSkeletonInfo(ConfigHandle, skeletonType, out SkeletonInfo);
+            GetJointNames(ConfigHandle, skeletonType, out JointNames);
+            GetParentJointNames(ConfigHandle, skeletonType, out ParentJointNames);
+            GetKnownJointNames(ConfigHandle, skeletonType, out KnownJointNames);
+            SkeletonTPoseType = tPoseType;
+
+            // Fill out runtime data.
+            var count = SkeletonInfo.JointCount;
+            var tPose = new NativeArray<NativeTransform>(count, Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory);
+            var parentIndices = new NativeArray<int>(count, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            GetSkeletonTPoseByRef(ConfigHandle, skeletonType, tPoseType,
+                JointRelativeSpaceType.RootOriginRelativeSpace, ref tPose);
+            GetParentJointIndexesByRef(ConfigHandle, skeletonType, ref parentIndices);
+            GetSkeletonMappings(ConfigHandle, tPoseType, out var jointMappings);
+            GetSkeletonMappingEntries(ConfigHandle, tPoseType, out var jointMappingEntries);
+            JointMappings = jointMappings.ToArray();
+            JointMappingEntries = jointMappingEntries.ToArray();
+            ReferencePose = tPose.ToArray();
+            ParentIndices = parentIndices.ToArray();
+        }
 
         /**********************************************************
          *
@@ -231,16 +250,10 @@ namespace Meta.XR.Movement.Editor
         /// Saves the configuration.
         /// </summary>
         /// <param name="win">The editor window.</param>
-        /// <param name="previewRetargeter">The character retargeter for preview.</param>
-        /// <param name="previewer">The editor previewer.</param>
-        /// <param name="utilityConfig">The utility configuration.</param>
-        /// <param name="editorMetadataObject">The editor metadata object.</param>
         /// <param name="doDialogue">Whether to show a confirmation dialogue.</param>
-        public static void SaveConfig(MSDKUtilityEditorWindow win, CharacterRetargeter previewRetargeter,
-            MSDKUtilityEditorPreviewer previewer, MSDKUtilityEditorConfig utilityConfig,
-            MSDKUtilityEditorMetadata editorMetadataObject, bool doDialogue = true)
+        public static void SaveConfig(MSDKUtilityEditorWindow win, bool doDialogue)
         {
-            if (utilityConfig.EditorMetadataObject.ConfigJson != null)
+            if (win.EditorMetadataObject.ConfigJson != null)
             {
                 if (doDialogue)
                 {
@@ -252,11 +265,11 @@ namespace Meta.XR.Movement.Editor
                     }
                 }
 
-                var textAsset = utilityConfig.EditorMetadataObject.ConfigJson;
+                var textAsset = win.EditorMetadataObject.ConfigJson;
                 var path = AssetDatabase.GetAssetPath(textAsset);
                 WriteConfigDataToJson(win.TargetInfo.ConfigHandle, out var data);
                 File.WriteAllText(path, data);
-                AssetDatabase.SaveAssetIfDirty(utilityConfig.EditorMetadataObject.ConfigJson);
+                AssetDatabase.SaveAssetIfDirty(win.EditorMetadataObject.ConfigJson);
                 AssetDatabase.Refresh();
                 EditorUtility.SetDirty(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
                 AssetDatabase.SaveAssets();
@@ -264,29 +277,29 @@ namespace Meta.XR.Movement.Editor
             else
             {
                 // Create new json since the json config is missing.
-                CreateConfig(win, previewRetargeter, previewer, utilityConfig, editorMetadataObject,
-                    utilityConfig.MetadataAssetPath, false);
+                CreateConfig(win, false);
             }
         }
 
         /// <summary>
-        /// Updates the configuration.
+        /// Updates the configuration with information from the stored unity objects.
         /// </summary>
         /// <param name="win">The editor window.</param>
-        /// <param name="previewRetargeter">The character retargeter for preview.</param>
-        /// <param name="previewer">The editor previewer.</param>
-        /// <param name="utilityConfig">The utility configuration.</param>
-        /// <param name="editorMetadataObject">The editor metadata object.</param>
         /// <param name="saveConfig">Whether to save the configuration after updating.</param>
-        /// <param name="updateReferenceTPose">Whether to update the reference T-pose.</param>
-        public static void UpdateConfig(MSDKUtilityEditorWindow win, CharacterRetargeter previewRetargeter,
-            MSDKUtilityEditorPreviewer previewer, MSDKUtilityEditorConfig utilityConfig,
-            MSDKUtilityEditorMetadata editorMetadataObject, bool saveConfig, bool updateReferenceTPose)
+        /// <param name="updateMappings"></param>
+        /// <param name="performAlignment"></param>
+        public static void UpdateConfig(
+            MSDKUtilityEditorWindow win,
+            bool saveConfig,
+            bool updateMappings,
+            bool performAlignment)
         {
             var source = win.SourceInfo;
             var target = win.TargetInfo;
+
             // First, update our data.
             JointAlignmentUtility.UpdateTPoseData(target);
+
             // Let's update out the current config by creating a new handle with the current Unity information.
             var sourceMinTPose =
                 new NativeArray<NativeTransform>(source.SkeletonInfo.JointCount, Allocator.Temp,
@@ -320,14 +333,14 @@ namespace Meta.XR.Movement.Editor
                 JointRelativeSpaceType.RootOriginRelativeSpace, ref targetMaxTPose);
 
             // Mappings.
-            GetSkeletonMappings(target.ConfigHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.MinTPose,
+            GetSkeletonMappings(target.ConfigHandle, SkeletonTPoseType.MinTPose,
                 out var minJointMapping);
-            GetSkeletonMappings(target.ConfigHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.MaxTPose,
+            GetSkeletonMappings(target.ConfigHandle, SkeletonTPoseType.MaxTPose,
                 out var maxJointMapping);
-            GetSkeletonMappingEntries(target.ConfigHandle, SkeletonType.TargetSkeleton,
+            GetSkeletonMappingEntries(target.ConfigHandle,
                 SkeletonTPoseType.MinTPose,
                 out var minJointMappingEntries);
-            GetSkeletonMappingEntries(target.ConfigHandle, SkeletonType.TargetSkeleton,
+            GetSkeletonMappingEntries(target.ConfigHandle,
                 SkeletonTPoseType.MaxTPose,
                 out var maxJointMappingEntries);
 
@@ -337,6 +350,7 @@ namespace Meta.XR.Movement.Editor
                 targetUnscaledTPose.CopyFrom(target.ReferencePose);
             }
 
+            // Update mappings by using current mappings
             var numOfMappings = target.JointMappings.Length;
             var numOfMappingEntries = target.JointMappingEntries.Length;
             switch (target.SkeletonTPoseType)
@@ -398,61 +412,15 @@ namespace Meta.XR.Movement.Editor
                     break;
             }
 
-            // Update reference T-Pose; this is only required while the scaling doesn't allow for rotation changes
-            if (updateReferenceTPose)
-            {
-                // Instantiate reference T-Pose.
-                var tempTPose = new GameObject();
-                for (var i = 0; i < target.SkeletonInfo.JointCount; i++)
-                {
-                    var pose = new GameObject
-                    {
-                        name = target.JointNames[i]
-                    };
-                    pose.transform.SetPositionAndRotation(targetUnscaledTPose[i].Position,
-                        targetUnscaledTPose[i].Orientation);
-                    pose.transform.SetParent(tempTPose.transform);
-                }
-
-                for (var i = 0; i < target.SkeletonInfo.JointCount; i++)
-                {
-                    GetParentJointIndex(target.ConfigHandle, SkeletonType.TargetSkeleton, i, out var parentIndex);
-                    if (parentIndex == -1)
-                    {
-                        continue;
-                    }
-
-                    var child = FindChildRecursiveExact(tempTPose.transform, target.JointNames[i]);
-                    var parent = FindChildRecursiveExact(tempTPose.transform, target.JointNames[parentIndex]);
-                    child.transform.SetParent(parent);
-                }
-
-                // Update orientations.
-                for (var i = 0; i < target.SkeletonInfo.JointCount; i++)
-                {
-                    if (target.ReferencePose[i].Orientation == targetUnscaledTPose[i].Orientation)
-                    {
-                        continue;
-                    }
-
-                    var tar = FindChildRecursiveExact(tempTPose.transform, target.JointNames[i]);
-                    tar.rotation = target.ReferencePose[i].Orientation;
-                }
-
-                // Update unscaled T-Pose data.
-                for (var i = 0; i < target.SkeletonInfo.JointCount; i++)
-                {
-                    var tar = FindChildRecursiveExact(tempTPose.transform, target.JointNames[i]);
-                    targetUnscaledTPose[i] = new NativeTransform(tar.rotation, tar.position);
-                }
-
-                DestroyImmediate(tempTPose);
-            }
-
             // Update target known joint names with transform references.
             for (var i = 0; i < (int)KnownJointType.KnownJointCount; i++)
             {
-                target.KnownJointNames[i] = target.KnownSkeletonJoints[i].name;
+                if (target.KnownSkeletonJoints[i] == null)
+                {
+                    continue;
+                }
+
+                target.KnownJointNames[i] = i == 0 ? "root" : target.KnownSkeletonJoints[i]?.name;
             }
 
             for (var i = 0; i < targetMinTPose.Length; i++)
@@ -469,29 +437,66 @@ namespace Meta.XR.Movement.Editor
                 targetMaxTPose[i] = pose;
             }
 
-            CreateOrUpdateUtilityConfig(source.ConfigName,
-                source.BlendshapeNames,
-                source.JointNames,
-                source.ParentJointNames,
-                source.KnownJointNames,
-                sourceMinTPose, sourceMaxTPose,
-                target.BlendshapeNames,
-                target.JointNames,
-                target.ParentJointNames, target.KnownJointNames,
-                targetUnscaledTPose, targetMinTPose, targetMaxTPose,
-                minJointMapping, minJointMappingEntries,
-                maxJointMapping, maxJointMappingEntries,
-                out var newConfigHandle);
+            var initParams = new ConfigInitParams();
+            initParams.SourceSkeleton.BlendShapeNames = source.BlendshapeNames;
+            initParams.SourceSkeleton.JointNames = source.JointNames;
+            initParams.SourceSkeleton.ParentJointNames = source.ParentJointNames;
+            initParams.SourceSkeleton.OptionalKnownSourceJointNamesById = source.KnownJointNames;
+            initParams.SourceSkeleton.OptionalAutoMapExcludedJointNames = MSDKUtilityHelper.AutoMapExcludedJointNames;
+            initParams.SourceSkeleton.OptionalManifestationNames =
+                new[] { MetaSourceDataProvider.HalfBodyManifestation };
+            initParams.SourceSkeleton.OptionalManifestationJointCounts =
+                new[] { (int)SkeletonData.BodyTrackingBoneId.End };
+            initParams.SourceSkeleton.OptionalManifestationJointNames =
+                MSDKUtilityHelper.HalfBodyManifestationJointNames;
+            initParams.SourceSkeleton.MinTPose = sourceMinTPose;
+            initParams.SourceSkeleton.MaxTPose = sourceMaxTPose;
+
+            initParams.TargetSkeleton.BlendShapeNames = target.BlendshapeNames;
+            initParams.TargetSkeleton.JointNames = target.JointNames;
+            initParams.TargetSkeleton.ParentJointNames = target.ParentJointNames;
+            initParams.TargetSkeleton.OptionalKnownSourceJointNamesById = target.KnownJointNames;
+            initParams.TargetSkeleton.MinTPose = targetMinTPose;
+            initParams.TargetSkeleton.MaxTPose = targetMaxTPose;
+            initParams.TargetSkeleton.UnscaledTPose = targetUnscaledTPose;
+
+            initParams.MinMappings.Mappings = minJointMapping;
+            initParams.MinMappings.MappingEntries = minJointMappingEntries;
+            initParams.MaxMappings.Mappings = maxJointMapping;
+            initParams.MaxMappings.MappingEntries = maxJointMappingEntries;
+
+            if (!CreateOrUpdateUtilityConfig(source.ConfigName, initParams, out var newConfigHandle))
+            {
+                Debug.LogError("Was unable to create or update the config with data. Re-using old handle.");
+                newConfigHandle = target.ConfigHandle;
+            }
+            win.UtilityConfig.Handles.Add(newConfigHandle);
+
+            if (performAlignment)
+            {
+                AlignTargetToSource(source.ConfigName,
+                    AlignmentFlags.All,
+                    newConfigHandle,
+                    SkeletonType.SourceSkeleton,
+                    newConfigHandle,
+                    out newConfigHandle);
+            }
+
+            if (updateMappings)
+            {
+                GenerateMappings(newConfigHandle, AutoMappingFlags.EmptyFlag);
+            }
+
             target.ConfigHandle = source.ConfigHandle = newConfigHandle;
             if (saveConfig)
             {
-                SaveConfig(win, previewRetargeter, previewer, utilityConfig, editorMetadataObject, false);
-                LoadConfig(win, previewRetargeter, previewer, utilityConfig);
+                SaveConfig(win, false);
+                LoadConfig(win);
             }
             else
             {
                 WriteConfigDataToJson(newConfigHandle, out var jsonConfigData);
-                LoadConfig(win, previewRetargeter, previewer, utilityConfig, jsonConfigData);
+                LoadConfig(win, jsonConfigData);
             }
         }
 
@@ -499,14 +504,10 @@ namespace Meta.XR.Movement.Editor
         /// Loads the configuration.
         /// </summary>
         /// <param name="win">The editor window.</param>
-        /// <param name="previewRetargeter">The character retargeter for preview.</param>
-        /// <param name="previewer">The editor previewer.</param>
-        /// <param name="utilityConfig">The utility configuration.</param>
         /// <param name="customConfig">Optional custom configuration JSON string.</param>
-        public static void LoadConfig(MSDKUtilityEditorWindow win, CharacterRetargeter previewRetargeter,
-            MSDKUtilityEditorPreviewer previewer, MSDKUtilityEditorConfig utilityConfig, string customConfig = null)
+        public static void LoadConfig(MSDKUtilityEditorWindow win, string customConfig = null)
         {
-            LoadConfig(win, previewRetargeter, previewer, utilityConfig, utilityConfig.Step switch
+            LoadConfig(win, win.UtilityConfig.Step switch
             {
                 EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
                 EditorStep.MaxTPose => SkeletonTPoseType.MaxTPose,
@@ -518,25 +519,23 @@ namespace Meta.XR.Movement.Editor
         /// Loads the configuration with a specific T-pose type.
         /// </summary>
         /// <param name="win">The editor window.</param>
-        /// <param name="previewRetargeter">The character retargeter for preview.</param>
-        /// <param name="previewer">The editor previewer.</param>
-        /// <param name="utilityConfig">The utility configuration.</param>
         /// <param name="targetTPoseType">The target T-pose type.</param>
         /// <param name="customConfig">Optional custom configuration JSON string.</param>
-        public static void LoadConfig(MSDKUtilityEditorWindow win, CharacterRetargeter previewRetargeter,
-            MSDKUtilityEditorPreviewer previewer, MSDKUtilityEditorConfig utilityConfig,
-            SkeletonTPoseType targetTPoseType, string customConfig = null)
+        public static void LoadConfig(MSDKUtilityEditorWindow win,
+            SkeletonTPoseType targetTPoseType,
+            string customConfig = null)
         {
             var source = win.SourceInfo;
             var target = win.TargetInfo;
+
             // Create new config to be cached; this is destructive.
-            var config = utilityConfig.EditorMetadataObject.ConfigJson.text;
+            var config = win.UtilityConfig.EditorMetadataObject.ConfigJson.text;
             if (!string.IsNullOrEmpty(customConfig))
             {
                 config = customConfig;
             }
 
-            var tPoseType = utilityConfig.Step switch
+            var tPoseType = win.UtilityConfig.Step switch
             {
                 EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
                 EditorStep.MaxTPose => SkeletonTPoseType.MaxTPose,
@@ -546,37 +545,34 @@ namespace Meta.XR.Movement.Editor
             target.Initialize(config, SkeletonType.TargetSkeleton, targetTPoseType);
 
             // Store created handles.
-            utilityConfig.Handles.Add(source.ConfigHandle);
-            utilityConfig.Handles.Add(target.ConfigHandle);
+            win.UtilityConfig.Handles.Add(source.ConfigHandle);
+            win.UtilityConfig.Handles.Add(target.ConfigHandle);
 
             // Setup preview.
-            if (previewRetargeter != null)
+            if (win.Previewer.Retargeter != null)
             {
-                previewRetargeter.Setup(config);
+                win.Previewer.Retargeter.Setup(config);
             }
 
             // Setup scale.
-            if (!utilityConfig.CurrentlyEditing && !utilityConfig.SetTPose)
+            if (!win.UtilityConfig.CurrentlyEditing && !win.UtilityConfig.SetTPose)
             {
-                JointAlignmentUtility.LoadScale(target, utilityConfig);
+                JointAlignmentUtility.LoadScale(target, win.UtilityConfig);
             }
 
-            previewer.AssociateSceneCharacter(target);
-            previewer.ReloadCharacter(target);
+            win.Previewer.AssociateSceneCharacter(target);
+            win.Previewer.ReloadCharacter(target);
         }
 
         /// <summary>
         /// Resets the configuration.
         /// </summary>
         /// <param name="win">The editor window.</param>
-        /// <param name="previewRetargeter">The character retargeter for preview.</param>
-        /// <param name="previewer">The editor previewer.</param>
-        /// <param name="utilityConfig">The utility configuration.</param>
         /// <param name="customConfig">Optional custom configuration JSON string.</param>
         /// <param name="displayDialogue">Whether to display a confirmation dialogue.</param>
-        public static void ResetConfig(MSDKUtilityEditorWindow win, CharacterRetargeter previewRetargeter,
-            MSDKUtilityEditorPreviewer previewer, MSDKUtilityEditorConfig utilityConfig, string customConfig = null,
-            bool displayDialogue = true)
+        public static void ResetConfig(MSDKUtilityEditorWindow win,
+            bool displayDialogue,
+            string customConfig = null)
         {
             if (displayDialogue && !EditorUtility.DisplayDialog("Reset Configuration",
                     "Reset the configuration file?\n\nWarning: Resetting the configuration will discard all changes made.",
@@ -587,24 +583,17 @@ namespace Meta.XR.Movement.Editor
 
             win.SourceInfo = CreateInstance<MSDKUtilityEditorConfig>();
             win.TargetInfo = CreateInstance<MSDKUtilityEditorConfig>();
-            LoadConfig(win, previewRetargeter, previewer, utilityConfig, SkeletonTPoseType.UnscaledTPose,
-                customConfig);
+            LoadConfig(win, SkeletonTPoseType.UnscaledTPose, customConfig);
         }
 
         /// <summary>
         /// Creates a new configuration.
         /// </summary>
         /// <param name="win">The editor window.</param>
-        /// <param name="previewRetargeter">The character retargeter for preview.</param>
-        /// <param name="previewer">The editor previewer.</param>
-        /// <param name="utilityConfig">The utility configuration.</param>
-        /// <param name="editorMetadataObject">The editor metadata object.</param>
-        /// <param name="metadataAssetPath">The path to the metadata asset.</param>
         /// <param name="displayDialogue">Whether to display a confirmation dialogue.</param>
         /// <param name="customData">Optional custom skeleton data.</param>
-        public static void CreateConfig(MSDKUtilityEditorWindow win, CharacterRetargeter previewRetargeter,
-            MSDKUtilityEditorPreviewer previewer, MSDKUtilityEditorConfig utilityConfig,
-            MSDKUtilityEditorMetadata editorMetadataObject, string metadataAssetPath, bool displayDialogue = true,
+        public static void CreateConfig(MSDKUtilityEditorWindow win,
+            bool displayDialogue,
             SkeletonData customData = null)
         {
             if (displayDialogue && !EditorUtility.DisplayDialog("Create Configuration",
@@ -615,27 +604,27 @@ namespace Meta.XR.Movement.Editor
             }
 
             var configPath = string.Empty;
-            if (editorMetadataObject == null)
+            if (win.EditorMetadataObject == null)
             {
                 var originalAsset =
-                    AssetDatabase.LoadAssetAtPath(metadataAssetPath, typeof(GameObject)) as GameObject;
-                editorMetadataObject = MSDKUtilityEditorMetadata.FindMetadataObject(originalAsset);
-                configPath = Path.ChangeExtension(AssetDatabase.GetAssetPath(editorMetadataObject), ".json");
+                    AssetDatabase.LoadAssetAtPath(win.UtilityConfig.MetadataAssetPath,
+                        typeof(GameObject)) as GameObject;
+                win.EditorMetadataObject = MSDKUtilityEditorMetadata.FindMetadataObject(originalAsset);
+                configPath = Path.ChangeExtension(AssetDatabase.GetAssetPath(win.EditorMetadataObject), ".json");
             }
-            else if (editorMetadataObject.ConfigJson != null)
+            else if (win.EditorMetadataObject.ConfigJson != null)
             {
-                configPath = AssetDatabase.GetAssetPath(editorMetadataObject.ConfigJson);
+                configPath = AssetDatabase.GetAssetPath(win.EditorMetadataObject.ConfigJson);
             }
 
-            editorMetadataObject.ConfigJson =
+            win.EditorMetadataObject.ConfigJson =
                 MSDKUtilityEditor.CreateRetargetingConfig(
                     MSDKUtilityEditor.GetSkeletonRetargetingData("OVRSkeletonRetargetingData"),
-                    editorMetadataObject.Model,
+                    win.EditorMetadataObject.Model,
                     customData, configPath);
-            EditorUtility.SetDirty(editorMetadataObject);
+            EditorUtility.SetDirty(win.EditorMetadataObject);
             AssetDatabase.SaveAssets();
-            ResetConfig(win, previewRetargeter, previewer, utilityConfig, editorMetadataObject.ConfigJson.text,
-                false);
+            ResetConfig(win, false, win.EditorMetadataObject.ConfigJson.text);
         }
 
         /// <summary>

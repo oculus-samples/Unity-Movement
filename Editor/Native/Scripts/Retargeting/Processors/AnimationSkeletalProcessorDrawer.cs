@@ -1,9 +1,10 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using Meta.XR.Movement.Editor;
 using UnityEditor;
+using UnityEngine;
 
 namespace Meta.XR.Movement.Retargeting.Editor
 {
@@ -47,72 +48,46 @@ namespace Meta.XR.Movement.Retargeting.Editor
 
             // Draw properties
             var elementVerticalSpacing = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            float currentY = position.y;
+
+            // Draw non-array properties first
             for (var i = 0; i < _propertiesToDraw.Length; i++)
             {
-                var propertyRect = new Rect(position.x,
-                    position.y + elementVerticalSpacing * i,
-                    position.width, EditorGUIUtility.singleLineHeight);
-
-                if (_propertiesToDraw[i].propertyName == _arrayName)
-                {
-                    DrawArray(propertyRect, arrayProperty);
-                }
-                else
+                if (_propertiesToDraw[i].propertyName != _arrayName)
                 {
                     var serializedProperty = property.FindPropertyRelative(_propertiesToDraw[i].propertyName);
                     var serializedLabel = _propertiesToDraw[i].label;
+                    var propertyRect = new Rect(position.x, currentY, position.width, EditorGUIUtility.singleLineHeight);
                     EditorGUI.PropertyField(propertyRect, serializedProperty, serializedLabel);
+                    currentY += elementVerticalSpacing;
                 }
             }
 
+            // Draw array property
+            var arrayRect = new Rect(position.x, currentY, position.width, EditorGUI.GetPropertyHeight(arrayProperty, true));
+            EditorGUI.PropertyField(arrayRect, arrayProperty, includeChildren: true);
+            currentY += EditorGUI.GetPropertyHeight(arrayProperty, true);
+
+            // Draw button
             var buttonRect = new Rect(
                 position.x,
-                position.y + elementVerticalSpacing * (_propertiesToDraw.Length + arrayProperty.arraySize + 2),
+                currentY,
                 position.width,
                 EditorGUIUtility.singleLineHeight);
-            if (GUI.Button(buttonRect, "Update anim blend indices with lower body"))
+            if (GUI.Button(buttonRect, "Update blend indices to lower body"))
             {
-                var retargeter = Selection.activeGameObject.GetComponent<CharacterRetargeter>();
-                if (retargeter != null)
+                if (MSDKUtilityEditor.TryGetProcessorAtPropertyPathIndex<AnimationSkeletalProcessor>(
+                    property, false, out var animSkeletalProcessor))
                 {
-                    int numProcessors = retargeter.TargetProcessorContainers.Length;
-
-                    // Only operate on the serialized property at our index. Otherwise, we might
-                    // run setup on multiple.
-                    int indexOfSerializedProperty =
-                        MSDKUtilityHelper.GetIndexFromPropertyPath(property.propertyPath);
-                    if (indexOfSerializedProperty < 0 || indexOfSerializedProperty >= numProcessors)
-                    {
-                        Debug.LogError(
-                            $"Index of serialized processor is invalid: {indexOfSerializedProperty}. " +
-                            $"Valid range is 0-{numProcessors - 1}.");
-                    }
-                    else
-                    {
-                        var currentProcessor =
-                            retargeter.TargetProcessorContainers[indexOfSerializedProperty]
-                                .GetCurrentProcessor();
-                        if (currentProcessor is not AnimationSkeletalProcessor animSkeletalProcessor)
-                        {
-                            Debug.LogError(
-                                $"Processor at {indexOfSerializedProperty} is not an animation processor.");
-                        }
-                        else
-                        {
-                            FindLowerBodyIndices(retargeter, animSkeletalProcessor);
-                        }
-                        EditorUtility.SetDirty(retargeter);
-                    }
+                    var retargeter = Selection.activeGameObject.GetComponent<CharacterRetargeter>();
+                    Undo.RecordObject(retargeter, "Update animation blend indices processor");
+                    FindLowerBodyIndices(retargeter, animSkeletalProcessor);
                 }
             }
 
             EditorGUI.EndProperty();
         }
 
-        private static void DrawArray(Rect rect, SerializedProperty property)
-        {
-            EditorGUI.PropertyField(rect, property, includeChildren: true);
-        }
 
         /// <inheritdoc cref="PropertyDrawer.GetPropertyHeight"/>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -122,12 +97,25 @@ namespace Meta.XR.Movement.Retargeting.Editor
                 return 0.0f;
             }
 
-            var height = EditorGUIUtility.singleLineHeight;
-            height += EditorGUIUtility.singleLineHeight * _propertiesToDraw.Length +
-                      EditorGUIUtility.standardVerticalSpacing * _propertiesToDraw.Length;
-            var blendIndicesProperty = property.FindPropertyRelative(_arrayName);
-            height += (blendIndicesProperty.arraySize + 2f) *
-                      (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+            var elementVerticalSpacing = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            var height = 0f;
+
+            // Add height for non-array properties
+            for (var i = 0; i < _propertiesToDraw.Length; i++)
+            {
+                if (_propertiesToDraw[i].propertyName != _arrayName)
+                {
+                    height += elementVerticalSpacing;
+                }
+            }
+
+            // Add height for array property
+            var arrayProperty = property.FindPropertyRelative(_arrayName);
+            arrayProperty.isExpanded = true;
+            height += EditorGUI.GetPropertyHeight(arrayProperty, true);
+
+            // Add height for the button
+            height += elementVerticalSpacing;
 
             return height;
         }

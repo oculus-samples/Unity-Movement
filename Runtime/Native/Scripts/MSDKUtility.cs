@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Runtime.CompilerServices;
@@ -18,6 +18,67 @@ namespace Meta.XR.Movement
     /// </summary>
     public abstract partial class MSDKUtility
     {
+        public static class UnmanagedMarshalFunctions
+        {
+            public static IntPtr MarshalStringArrayToUnmanagedPtr(string[] managedStringArrayStrings)
+            {
+                if (managedStringArrayStrings == null || managedStringArrayStrings.Length <= 0)
+                {
+                    return IntPtr.Zero;
+                }
+
+                // Allocate memory for the array of pointers
+                IntPtr nativeStringArray = Marshal.AllocHGlobal(managedStringArrayStrings.Length * IntPtr.Size);
+                try
+                {
+                    // Iterate over each string in the array
+                    for (int i = 0; i < managedStringArrayStrings.Length; i++)
+                    {
+                        // Convert the string to a byte array
+                        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(managedStringArrayStrings[i] == null
+                            ? ""
+                            : managedStringArrayStrings[i]);
+                        // Allocate memory for the current string
+                        IntPtr currentString = Marshal.AllocHGlobal(bytes.Length + 1); // +1 for null terminator
+                        try
+                        {
+                            // Copy the bytes into the allocated memory
+                            Marshal.Copy(bytes, 0, currentString, bytes.Length);
+                            // Set the last byte to zero (null terminator)
+                            Marshal.WriteByte(currentString, bytes.Length, 0);
+                            // Store the pointer to the current string in the array
+                            Marshal.WriteIntPtr(nativeStringArray, i * IntPtr.Size, currentString);
+                        }
+                        catch
+                        {
+                            // Free the memory for the current string if an exception occurs
+                            Marshal.FreeHGlobal(currentString);
+                            throw;
+                        }
+                    }
+                }
+                catch
+                {
+                    Marshal.FreeHGlobal(nativeStringArray);
+                    return IntPtr.Zero;
+                }
+
+                return nativeStringArray;
+            }
+
+            public static bool FreeUnmanagedObject(ref IntPtr unmanagedObject)
+            {
+                if (unmanagedObject != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(unmanagedObject);
+                    unmanagedObject = IntPtr.Zero;
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
         /// <summary>
         /// Invalid Handle value.
         /// </summary>
@@ -179,8 +240,83 @@ namespace Meta.XR.Movement
 
             /// <summary>
             /// Joint mapping behavior with twist calculation.
+            /// Aligned parent to twist joint for orientation
             /// </summary>
             Twist = 1,
+
+            /// <summary>
+            /// Joint mapping behavior with twist calculation
+            /// aligned from the twist joint to it's children
+            /// Used for joints that are mapped, but also twist
+            /// based on orientation of the target rig.
+            /// </summary>
+            ChildAlignedTwist = 2,
+
+            /// <summary>
+            /// Editor-only placeholder value.
+            /// </summary>
+            Invalid = -1,
+        }
+
+        /// <summary>
+        /// Flags that modify the behavior of the Alignment process.
+        /// Parameter for Alignment API - Instructs Alignment function which operations to apply
+        /// </summary>
+        [Flags]
+        public enum AlignmentFlags : byte
+        {
+            None = 0,
+
+            /// <summary>
+            /// Applies re-orientation of the skeletons to ensure the same facing
+            /// </summary>
+            ReorientToSourceFacing = 1 << 0,
+
+            /// <summary>
+            /// Re-orients Limbs to match source pose (Rotations only)
+            /// </summary>
+            LimbRotations = 1 << 1,
+
+            /// <summary>
+            /// Re-orients Hands and Fingers match source pose (Rotations only)
+            /// </summary>
+            HandAndFingerRotations = 1 << 2,
+
+            /// <summary>
+            /// Proportionally scales the character to align wrist height
+            /// </summary>
+            ProportionalScalingToHeight = 1 << 3,
+
+            /// <summary>
+            /// Scales/Stretches limbs to match the scale/proportion of the source rig (deformation)
+            /// </summary>
+            LimbDeformationMatchSourceProportion = 1 << 4,
+
+            /// <summary>
+            /// Scales/Stretches hands/finger to match the scale/proportion of the source rig (hand deformation)
+            /// </summary>
+            MatchHandAndFingerPoseWithDeformation = 1 << 5,
+
+            /// <summary>
+            /// Enum value composed of all flags set to true.
+            /// </summary>
+            All = ReorientToSourceFacing |
+                  LimbRotations |
+                  HandAndFingerRotations |
+                  ProportionalScalingToHeight |
+                  LimbDeformationMatchSourceProportion |
+                  MatchHandAndFingerPoseWithDeformation,
+        }
+
+        /// <summary>
+        /// Flags that modify the behavior of the AutoMapping process.
+        /// Parameter for Automapping API - Instructs AutoMapper to ignore TwistJoints and not process their mappings
+        /// </summary>
+        [Flags]
+        public enum AutoMappingFlags : byte
+        {
+            EmptyFlag = 0,
+            SkipTwistJoints = 1 << 0,
         }
 
         /// <summary>
@@ -189,6 +325,7 @@ namespace Meta.XR.Movement
         /// </summary>
         public enum KnownJointType
         {
+            Unknown = -1,
             Root = 0,
             Hips = 1,
             RightUpperArm = 2,
@@ -495,6 +632,43 @@ namespace Meta.XR.Movement
         }
 
         /// <summary>
+        /// Represents a definition of a twist joint with the target jointIndex and the two joints used to influence the twist.
+        /// Ratio defines the relative ratio of influence between the start and end influence joint index.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential), Serializable]
+        public struct TwistJointDefinition
+        {
+            /// <summary>
+            /// The index of the target twist joint (in the target skeleton).
+            /// </summary>
+            public int TwistJointIndex;
+
+            /// <summary>
+            /// The index of source influence start index (either source or target skeleton depending on usage)
+            /// </summary>
+            public int InfluenceStartJointIndex;
+
+            /// <summary>
+            /// The index of source influence end index (either source or target skeleton depending on usage)
+            /// Must be the same skeleton (source or target) as the Influence start joint index.
+            /// </summary>
+            public int InfluenceEndJointIndex;
+
+            /// <summary>
+            /// The ratio of influence between the start and end (ie - value we base our lerp(start, end, ratio).
+            /// </summary>
+            public float Ratio;
+
+            public override string ToString()
+            {
+                return $"TwistJointIndex({TwistJointIndex}) " +
+                       $"InfluenceStartJointIndex({InfluenceStartJointIndex}) " +
+                       $"InfluenceEndJointIndex({InfluenceEndJointIndex}) " +
+                       $"Ratio({Ratio})";
+            }
+        }
+
+        /// <summary>
         /// Represents a single entry in a joint mapping, defining how a specific joint should be mapped.
         /// </summary>
         [StructLayout(LayoutKind.Sequential), Serializable]
@@ -555,6 +729,29 @@ namespace Meta.XR.Movement
                        $"Type({Type}) " +
                        $"Behavior({Behavior}) " +
                        $"EntriesCount({EntriesCount})";
+            }
+        }
+
+        public struct JointMappingDefinition
+        {
+            public NativeArray<JointMapping> Mappings;
+            public NativeArray<JointMappingEntry> MappingEntries;
+        }
+
+        [StructLayout(LayoutKind.Sequential), Serializable]
+        private struct JointMappingDefinitionUnmanaged
+        {
+            public int MappingsCount;
+            public int mappingEntryCount;
+            public unsafe JointMapping* Mappings;
+            public unsafe JointMappingEntry* MappingEntries;
+
+            public unsafe JointMappingDefinitionUnmanaged(JointMappingDefinition safeParams)
+            {
+                MappingsCount = safeParams.Mappings.IsCreated ? safeParams.Mappings.Length : 0;
+                mappingEntryCount = safeParams.MappingEntries.IsCreated ? safeParams.MappingEntries.Length : 0;
+                Mappings = safeParams.Mappings.IsCreated ? safeParams.Mappings.GetPtr() : null;
+                MappingEntries = safeParams.MappingEntries.IsCreated ? safeParams.MappingEntries.GetPtr() : null;
             }
         }
 
@@ -759,6 +956,162 @@ namespace Meta.XR.Movement
                 return $"Up({Up.x:F3},{Up.y:F3},{Up.z:F3}), " +
                        $"Forward({Forward.x:F3},{Forward.y:F3},{Forward.z:F3}, " +
                        $"Right({Right.x:F3},{Right.y:F3},{Right.z:F3})";
+            }
+        }
+
+        /// <summary>
+        /// Contains Initialization Parameters for a Skeleton
+        /// </summary>
+        public struct SkeletonInitParams
+        {
+            public string[] BlendShapeNames;
+            public string[] JointNames;
+            public string[] ParentJointNames;
+            public NativeArray<NativeTransform> MinTPose;
+            public NativeArray<NativeTransform> MaxTPose;
+            public NativeArray<NativeTransform> UnscaledTPose;
+
+            public string[] OptionalKnownSourceJointNamesById;
+
+            public string[] OptionalAutoMapExcludedJointNames;
+
+            // Number of manifestations in the name and joint counts arrays
+            public string[] OptionalManifestationNames;
+
+            // Array of integers
+            public int[] OptionalManifestationJointCounts;
+
+            // Buffer of all Manifestation joint names in order of manifestations
+            public string[] OptionalManifestationJointNames;
+        }
+
+        /// <summary>
+        /// Unmanaged Structure for containing Initialization Parameters for a Skeleton
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential), Serializable]
+        private struct SkeletonInitParamsUnmanaged : IDisposable
+        {
+            public int BlendShapeCount;
+            public int JointCount;
+
+            public IntPtr BlendShapeNames;
+            public IntPtr JointNames;
+            public IntPtr ParentJointNames;
+
+            public unsafe NativeTransform* MinTPose;
+            public unsafe NativeTransform* MaxTPose;
+            public unsafe NativeTransform* UnscaledTPose;
+
+            public IntPtr optional_KnownSourceJointNamesById;
+
+            public int optional_AutoMapExcludedJointCount;
+
+            public IntPtr optional_AutoMapExcludedJointNames;
+
+            // Number of manifestations in the name and joint counts arrays
+            public int optional_ManifestationCount;
+
+            public IntPtr optional_ManifestationNames;
+
+            // Array of integers
+            public IntPtr optional_ManifestationJointCounts;
+
+            // Buffer of all Manifestation joint names in order of manifestations
+            public IntPtr optional_ManifestationJointNames;
+
+            public unsafe SkeletonInitParamsUnmanaged(SkeletonInitParams safeParams)
+            {
+                BlendShapeCount = safeParams.BlendShapeNames?.Length ?? 0;
+                JointCount = safeParams.JointNames?.Length ?? 0;
+                BlendShapeNames =
+                    UnmanagedMarshalFunctions.MarshalStringArrayToUnmanagedPtr(safeParams.BlendShapeNames);
+                JointNames = UnmanagedMarshalFunctions.MarshalStringArrayToUnmanagedPtr(safeParams.JointNames);
+                ParentJointNames =
+                    UnmanagedMarshalFunctions.MarshalStringArrayToUnmanagedPtr(safeParams.ParentJointNames);
+                MinTPose = safeParams.MinTPose.IsCreated ? safeParams.MinTPose.GetPtr() : null;
+                MaxTPose = safeParams.MaxTPose.IsCreated ? safeParams.MaxTPose.GetPtr() : null;
+                UnscaledTPose = safeParams.UnscaledTPose.IsCreated ? safeParams.UnscaledTPose.GetPtr() : null;
+                optional_KnownSourceJointNamesById =
+                    UnmanagedMarshalFunctions.MarshalStringArrayToUnmanagedPtr(safeParams
+                        .OptionalKnownSourceJointNamesById);
+                optional_AutoMapExcludedJointCount = safeParams.OptionalAutoMapExcludedJointNames?.Length ?? 0;
+                optional_AutoMapExcludedJointNames =
+                    UnmanagedMarshalFunctions.MarshalStringArrayToUnmanagedPtr(safeParams
+                        .OptionalAutoMapExcludedJointNames);
+                optional_ManifestationCount = safeParams.OptionalManifestationNames?.Length ?? 0;
+                optional_ManifestationNames =
+                    UnmanagedMarshalFunctions.MarshalStringArrayToUnmanagedPtr(safeParams.OptionalManifestationNames);
+
+
+                optional_ManifestationJointCounts = IntPtr.Zero;
+
+                if (safeParams.OptionalManifestationJointCounts != null)
+                {
+                    optional_ManifestationJointCounts =
+                        Marshal.AllocHGlobal(safeParams.OptionalManifestationJointCounts.Length * sizeof(int));
+                    Marshal.Copy(safeParams.OptionalManifestationJointCounts, 0, optional_ManifestationJointCounts,
+                        safeParams.OptionalManifestationJointCounts.Length);
+                }
+
+                optional_ManifestationJointNames =
+                    UnmanagedMarshalFunctions.MarshalStringArrayToUnmanagedPtr(safeParams
+                        .OptionalManifestationJointNames);
+            }
+
+            public void Dispose()
+            {
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref BlendShapeNames);
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref JointNames);
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref ParentJointNames);
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref optional_KnownSourceJointNamesById);
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref optional_AutoMapExcludedJointNames);
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref optional_ManifestationNames);
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref optional_ManifestationJointCounts);
+                UnmanagedMarshalFunctions.FreeUnmanagedObject(ref optional_ManifestationJointNames);
+            }
+        }
+
+        /// <summary>
+        /// Contains Initialization Parameters for defining a configuration
+        /// </summary>
+        public struct ConfigInitParams
+        {
+            // Skeleton Data
+            public SkeletonInitParams SourceSkeleton;
+            public SkeletonInitParams TargetSkeleton;
+
+            // Mapping Data
+            public JointMappingDefinition MinMappings;
+            public JointMappingDefinition MaxMappings;
+        }
+
+        /// <summary>
+        /// Unmanaged Structure containing Parameters for defining a configuration
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential), Serializable]
+        private struct ConfigInitParamsUnmanaged : IDisposable
+        {
+            // Skeleton Data
+            public SkeletonInitParamsUnmanaged SourceSkeleton;
+            public SkeletonInitParamsUnmanaged TargetSkeleton;
+
+            // Mapping Data
+            public JointMappingDefinitionUnmanaged MinMappings;
+            public JointMappingDefinitionUnmanaged MaxMappings;
+
+            public ConfigInitParamsUnmanaged(ConfigInitParams safeParams)
+            {
+                SourceSkeleton = new SkeletonInitParamsUnmanaged(safeParams.SourceSkeleton);
+                TargetSkeleton = new SkeletonInitParamsUnmanaged(safeParams.TargetSkeleton);
+
+                MinMappings = new JointMappingDefinitionUnmanaged(safeParams.MinMappings);
+                MaxMappings = new JointMappingDefinitionUnmanaged(safeParams.MaxMappings);
+            }
+
+            public void Dispose()
+            {
+                SourceSkeleton.Dispose();
+                TargetSkeleton.Dispose();
             }
         }
 
@@ -1178,44 +1531,16 @@ namespace Meta.XR.Movement
             public static extern Result metaMovementSDK_destroy(ulong handle);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern unsafe Result metaMovementSDK_createOrUpdateSimpleUtilityConfig(
+            public static extern Result metaMovementSDK_createOrUpdateSimpleUtilityConfig(
                 string configName,
                 SkeletonType skeletonType,
-                string[] blendShapeNames,
-                string[] jointNames,
-                string[] parentJointNames,
-                string[] knownJointNamesById,
-                NativeTransform* restPose,
-                int blendShapeCount,
-                int jointCount,
+                ref SkeletonInitParamsUnmanaged initParamsUnmanaged,
                 out ulong handle);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern unsafe Result metaMovementSDK_createOrUpdateUtilityConfig(
+            public static extern Result metaMovementSDK_createOrUpdateUtilityConfig(
                 string configName,
-                string[] sourceBlendshapeNames,
-                string[] sourceJointNames,
-                string[] sourceParentJointNames,
-                string[] sourceKnownJoints,
-                NativeTransform* sourceMinTPose,
-                NativeTransform* sourceMaxTPose,
-                int sourceBlendShapeCount,
-                int sourceJointCount,
-                string[] targetBlendshapeNames,
-                string[] targetJointNames,
-                string[] targetParentJointNames,
-                string[] targetKnownJoints,
-                NativeTransform* targetUnscaledTPose,
-                NativeTransform* targetMinTPose,
-                NativeTransform* targetMaxTPose,
-                int targetBlendShapeCount,
-                int targetJointCount,
-                JointMapping* minJointMapping,
-                JointMappingEntry* minJointMappingEntries,
-                int minJointMappingCount,
-                JointMapping* maxJointMapping,
-                JointMappingEntry* maxJointMappingEntries,
-                int maxJointMappingCount,
+                ref ConfigInitParamsUnmanaged initParamsUnmanaged,
                 out ulong handle);
 
             /**********************************************************
@@ -1234,9 +1559,7 @@ namespace Meta.XR.Movement
                 out int inOutBufferSize);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern unsafe Result metaMovementSDK_getVersion(
-                ulong handle,
-                out double version);
+            public static extern Result metaMovementSDK_getVersion(ulong handle, out double version);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_getSkeletonInfo(
@@ -1292,7 +1615,6 @@ namespace Meta.XR.Movement
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_getSkeletonMappings(
                 ulong handle,
-                SkeletonType skeletonType,
                 SkeletonTPoseType tPoseType,
                 JointMapping* outMappingData,
                 out int inOutNumMappings);
@@ -1300,7 +1622,6 @@ namespace Meta.XR.Movement
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_getSkeletonMappingEntries(
                 ulong handle,
-                SkeletonType skeletonType,
                 SkeletonTPoseType tPoseType,
                 JointMappingEntry* outMappingEntryData,
                 out int inOutNumEntries);
@@ -1331,7 +1652,7 @@ namespace Meta.XR.Movement
             public static extern Result metaMovementSDK_getJointIndex(
                 ulong handle,
                 SkeletonType skeletonType,
-                in string jointName,
+                string jointName,
                 out int jointIndex);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -1368,7 +1689,7 @@ namespace Meta.XR.Movement
             public static extern unsafe Result metaMovementSDK_getJointsInManifestation(
                 ulong handle,
                 SkeletonType skeletonType,
-                in string manifestationName,
+                string manifestationName,
                 int* outJointIndexList,
                 out int inOutJointCount);
 
@@ -1399,9 +1720,7 @@ namespace Meta.XR.Movement
                 ulong handle,
                 NativeTransform* inTransformData,
                 int inNumJoints,
-                [MarshalAs(UnmanagedType.LPStr)]
                 string manifestation);
-
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_retargetFromSourceFrameData(
@@ -1411,9 +1730,7 @@ namespace Meta.XR.Movement
                 int inNumSourceJoints,
                 NativeTransform* outRetargetedTargetTransformData,
                 out int inOutNumTargetJoints,
-                [MarshalAs(UnmanagedType.LPStr)]
                 string sourceManifestation,
-                [MarshalAs(UnmanagedType.LPStr)]
                 string targetOutputManifestation);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -1423,7 +1740,7 @@ namespace Meta.XR.Movement
                 JointRelativeSpaceType outJointSpaceType,
                 NativeTransform* outTransformData,
                 out int inOutNumJoints,
-                in string manifestation);
+                string manifestation);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_getLastRetargetedMappingData(
@@ -1463,6 +1780,20 @@ namespace Meta.XR.Movement
                 int jointCount,
                 NativeTransform* inOutTransformData);
 
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern Result metaMovementSDK_alignTargetToSource(
+                string configName,
+                AlignmentFlags alignmentBehavior,
+                ulong sourceConfigHandle,
+                SkeletonType sourceSkeletonType,
+                ulong targetConfigHandle,
+                out ulong handle);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern Result metaMovementSDK_generateMappings(
+                ulong handle,
+                AutoMappingFlags autoMappingBehaviorFlags);
+
             /**********************************************************
              *
              *               Serialization Functions
@@ -1501,27 +1832,33 @@ namespace Meta.XR.Movement
                 int numberOfFaceIndices);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern unsafe Result metaMovementSDK_serializeSnapshot(ulong handle, void* outBuffer,
+            public static extern unsafe Result metaMovementSDK_serializeSnapshot(
+                ulong handle,
+                void* outBuffer,
                 out int inOutBufferSizeBytes);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_provideFrameData(ulong handle, FrameData frameData);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_serializeStartHeader(StartHeader startHeader,
+            public static extern Result metaMovementSDK_serializeStartHeader(
+                in StartHeader startHeader,
                 ref StartHeaderSerializedBytes headerBytes);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_deserializeStartHeader(out StartHeader startHeader,
-                StartHeaderSerializedBytes headerBytes);
+            public static extern Result metaMovementSDK_deserializeStartHeader(
+                out StartHeader startHeader,
+                in StartHeaderSerializedBytes headerBytes);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_serializeEndHeader(EndHeader endHeader,
+            public static extern Result metaMovementSDK_serializeEndHeader(
+                in EndHeader endHeader,
                 ref EndHeaderSerializedBytes headerBytes);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_deserializeEndHeader(out EndHeader endHeader,
-                EndHeaderSerializedBytes headerBytes);
+            public static extern Result metaMovementSDK_deserializeEndHeader(
+                out EndHeader endHeader,
+                in EndHeaderSerializedBytes headerBytes);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_provideSkeletonPose(
@@ -1549,8 +1886,7 @@ namespace Meta.XR.Movement
                 ref FrameData frameData);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_resetInterpolators(
-                ulong handle);
+            public static extern Result metaMovementSDK_resetInterpolators(ulong handle);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_getInterpolatedSkeletonPose(
@@ -1606,7 +1942,6 @@ namespace Meta.XR.Movement
                 int jointCount,
                 out Extents outExtents);
 
-
         }
 
         #region Unity API
@@ -1641,22 +1976,14 @@ namespace Meta.XR.Movement
         /// Use this method when you need to define a single skeleton without mapping to another skeleton.
         /// </summary>
         /// <param name="configName">The name of the config.</param>
-        /// <param name="skeletonType">The type of skeleton (source or target).</param>
-        /// <param name="blendShapeNames">Array of blend shape names for the skeleton.</param>
-        /// <param name="jointNames">Array of joint names for the skeleton.</param>
-        /// <param name="parentJointNames">Array of parent joint names for each joint.</param>
-        /// <param name="knownJointNamesById">Array of known joint names indexed by their ID.</param>
-        /// <param name="restPose">The rest pose for the skeleton.</param>
-        /// <param name="handle">Output handle that can be used to access the resulting config.</param>
+        /// <param name="skeletonType">The type (Source or Target) of the skeleton to create in this config.</param>
+        /// <param name="initParams">Initialization parameters to define the skeleton.</param>
+        /// <param name="handle">The handle that can be used for accessing the resulting config.</param>
         /// <returns>True if the function was successfully executed.</returns>
         public static bool CreateOrUpdateSimpleUtilityConfig(
             string configName,
             SkeletonType skeletonType,
-            string[] blendShapeNames,
-            string[] jointNames,
-            string[] parentJointNames,
-            string[] knownJointNamesById,
-            NativeArray<NativeTransform> restPose,
+            SkeletonInitParams initParams,
             out ulong handle)
         {
             Result success;
@@ -1664,17 +1991,19 @@ namespace Meta.XR.Movement
             {
                 unsafe
                 {
-                    success = Api.metaMovementSDK_createOrUpdateSimpleUtilityConfig(
-                        configName,
-                        skeletonType,
-                        blendShapeNames,
-                        jointNames,
-                        parentJointNames,
-                        knownJointNamesById,
-                        restPose.GetPtr(),
-                        blendShapeNames.Length,
-                        jointNames.Length,
-                        out handle);
+                    SkeletonInitParamsUnmanaged initParamsUnmanaged = new SkeletonInitParamsUnmanaged(initParams);
+                    try
+                    {
+                        success = Api.metaMovementSDK_createOrUpdateSimpleUtilityConfig(
+                            configName,
+                            skeletonType,
+                            ref initParamsUnmanaged,
+                            out handle);
+                    }
+                    finally
+                    {
+                        initParamsUnmanaged.Dispose();
+                    }
                 }
             }
 
@@ -1688,77 +2017,28 @@ namespace Meta.XR.Movement
         /// Use this method when you need to define a complete retargeting setup between two different skeletons.
         /// </summary>
         /// <param name="configName">The name of the config.</param>
-        /// <param name="sourceBlendshapeNames">An array of source blendshape names.</param>
-        /// <param name="sourceJointNames">An array of source joint names.</param>
-        /// <param name="sourceParentJointNames">An array of source parent joint names.</param>
-        /// <param name="sourceKnownJointNames">An array of source known joint names.</param>
-        /// <param name="sourceMinTPose">The source min T-pose.</param>
-        /// <param name="sourceMaxTPose">The source max T-pose</param>
-        /// <param name="targetBlendshapeNames">An array of target blendshape names.</param>
-        /// <param name="targetJointNames">An array of target joint names.</param>
-        /// <param name="targetParentJointNames">An array of target parent joint names.</param>
-        /// <param name="targetKnownJointNames">An array of target known joint names.</param>
-        /// <param name="targetUnscaledTPose">The target unscaled T-pose.</param>
-        /// <param name="targetMinTPose">The target min T-pose.</param>
-        /// <param name="targetMaxTPose">The target max T-pose.</param>
-        /// <param name="minJointMapping">The joint mapping for the minimum pose.</param>
-        /// <param name="minJointMappingEntries">The mapping entries for the joint mapping.</param>
-        /// <param name="maxJointMapping">The joint mapping for the maximum pose.</param>
-        /// <param name="maxJointMappingEntries">The mapping entries for the joint mapping.</param>
+        /// <param name="initParams">Initialization parameters to define the skeleton.</param>
         /// <param name="handle">The handle that can be used for accessing the resulting config.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool CreateOrUpdateUtilityConfig(
-            string configName,
-            string[] sourceBlendshapeNames,
-            string[] sourceJointNames,
-            string[] sourceParentJointNames,
-            string[] sourceKnownJointNames,
-            NativeArray<NativeTransform> sourceMinTPose,
-            NativeArray<NativeTransform> sourceMaxTPose,
-            string[] targetBlendshapeNames,
-            string[] targetJointNames,
-            string[] targetParentJointNames,
-            string[] targetKnownJointNames,
-            NativeArray<NativeTransform> targetUnscaledTPose,
-            NativeArray<NativeTransform> targetMinTPose,
-            NativeArray<NativeTransform> targetMaxTPose,
-            NativeArray<JointMapping> minJointMapping,
-            NativeArray<JointMappingEntry> minJointMappingEntries,
-            NativeArray<JointMapping> maxJointMapping,
-            NativeArray<JointMappingEntry> maxJointMappingEntries,
-            out ulong handle)
+        public static bool CreateOrUpdateUtilityConfig(string configName, ConfigInitParams initParams, out ulong handle)
         {
             Result success;
             using (new ProfilerScope(nameof(CreateOrUpdateUtilityConfig)))
             {
                 unsafe
                 {
-                    success = Api.metaMovementSDK_createOrUpdateUtilityConfig(
-                        configName,
-                        sourceBlendshapeNames,
-                        sourceJointNames,
-                        sourceParentJointNames,
-                        sourceKnownJointNames,
-                        sourceMinTPose.GetPtr(),
-                        sourceMaxTPose.GetPtr(),
-                        sourceBlendshapeNames.Length,
-                        sourceJointNames.Length,
-                        targetBlendshapeNames,
-                        targetJointNames,
-                        targetParentJointNames,
-                        targetKnownJointNames,
-                        targetUnscaledTPose.GetPtr(),
-                        targetMinTPose.GetPtr(),
-                        targetMaxTPose.GetPtr(),
-                        targetBlendshapeNames.Length,
-                        targetJointNames.Length,
-                        minJointMapping.GetPtr(),
-                        minJointMappingEntries.GetPtr(),
-                        minJointMapping.Length,
-                        maxJointMapping.GetPtr(),
-                        maxJointMappingEntries.GetPtr(),
-                        maxJointMapping.Length,
-                        out handle);
+                    ConfigInitParamsUnmanaged initParamsUnmanaged = new ConfigInitParamsUnmanaged(initParams);
+                    try
+                    {
+                        success = Api.metaMovementSDK_createOrUpdateUtilityConfig(
+                            configName,
+                            ref initParamsUnmanaged,
+                            out handle);
+                    }
+                    finally
+                    {
+                        initParamsUnmanaged.Dispose();
+                    }
                 }
             }
 
@@ -2064,7 +2344,9 @@ namespace Meta.XR.Movement
         /// <param name="jointIndexArray">Reference to an array that will be filled with parent joint indices.
         /// For each joint at index i, jointIndexArray[i] will contain the index of its parent joint.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetParentJointIndexesByRef(ulong handle, SkeletonType skeletonType,
+        public static bool GetParentJointIndexesByRef(
+            ulong handle,
+            SkeletonType skeletonType,
             ref NativeArray<int> jointIndexArray)
         {
             Result success;
@@ -2088,11 +2370,14 @@ namespace Meta.XR.Movement
         /// </summary>
         /// <param name="handle">The handle to get the T-pose from.</param>
         /// <param name="skeletonType">The type of skeleton to get the T-pose for.</param>
-        /// <param name="tposeType">The specific T-pose type to retrieve (current, min, max, or unscaled).</param>
+        /// <param name="tPoseType">The specific T-pose type to retrieve (current, min, max, or unscaled).</param>
         /// <param name="jointSpaceType">The coordinate space to express the transforms in.</param>
         /// <param name="transformArray">Reference to an array that will be filled with the T-pose transforms.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetSkeletonTPoseByRef(ulong handle, SkeletonType skeletonType, SkeletonTPoseType tposeType,
+        public static bool GetSkeletonTPoseByRef(
+            ulong handle,
+            SkeletonType skeletonType,
+            SkeletonTPoseType tPoseType,
             JointRelativeSpaceType jointSpaceType,
             ref NativeArray<NativeTransform> transformArray)
         {
@@ -2102,7 +2387,7 @@ namespace Meta.XR.Movement
                 unsafe
                 {
                     var transformArrayLength = transformArray.Length;
-                    success = Api.metaMovementSDK_getSkeletonTPose(handle, skeletonType, tposeType, jointSpaceType,
+                    success = Api.metaMovementSDK_getSkeletonTPose(handle, skeletonType, tPoseType, jointSpaceType,
                         transformArray.GetPtr(), out transformArrayLength);
                 }
             }
@@ -2121,8 +2406,11 @@ namespace Meta.XR.Movement
         /// <param name="delta">The blend factor between min (0.0) and max (1.0) T-poses.</param>
         /// <param name="transformArray">Reference to an array that will be filled with the calculated T-pose transforms.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool CalculateSkeletonTPoseByRef(ulong handle, SkeletonType skeletonType,
-            JointRelativeSpaceType jointSpaceType, float delta,
+        public static bool CalculateSkeletonTPoseByRef(
+            ulong handle,
+            SkeletonType skeletonType,
+            JointRelativeSpaceType jointSpaceType,
+            float delta,
             ref NativeArray<NativeTransform> transformArray)
         {
             Result success;
@@ -2150,8 +2438,11 @@ namespace Meta.XR.Movement
         /// <param name="height">The target height in meters.</param>
         /// <param name="transformArray">Reference to an array that will be filled with the calculated T-pose transforms.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool CalculateSkeletonTPoseAtHeightByRef(ulong handle, SkeletonType skeletonType,
-            JointRelativeSpaceType jointSpaceType, float height,
+        public static bool CalculateSkeletonTPoseAtHeightByRef(
+            ulong handle,
+            SkeletonType skeletonType,
+            JointRelativeSpaceType jointSpaceType,
+            float height,
             ref NativeArray<NativeTransform> transformArray)
         {
             Result success;
@@ -2174,11 +2465,12 @@ namespace Meta.XR.Movement
         /// Joint mappings define how joints in one skeleton correspond to joints in another skeleton.
         /// </summary>
         /// <param name="handle">The handle to get the mappings from.</param>
-        /// <param name="skeletonType">The type of skeleton to get the mappings for.</param>
         /// <param name="tPoseType">The specific T-pose type to retrieve mappings for.</param>
         /// <param name="mappingsArray">Output array that receives the joint mappings.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetSkeletonMappings(ulong handle, SkeletonType skeletonType, SkeletonTPoseType tPoseType,
+        public static bool GetSkeletonMappings(
+            ulong handle,
+            SkeletonTPoseType tPoseType,
             out NativeArray<JointMapping> mappingsArray)
         {
             Result success;
@@ -2186,13 +2478,13 @@ namespace Meta.XR.Movement
             {
                 unsafe
                 {
-                    success = Api.metaMovementSDK_getSkeletonMappings(handle, skeletonType, tPoseType, null,
+                    success = Api.metaMovementSDK_getSkeletonMappings(handle, tPoseType, null,
                         out var numMappings);
                     if (success == Result.Success && numMappings > 0)
                     {
                         mappingsArray = new NativeArray<JointMapping>(numMappings, Allocator.Temp,
                             NativeArrayOptions.UninitializedMemory);
-                        success = Api.metaMovementSDK_getSkeletonMappings(handle, skeletonType, tPoseType,
+                        success = Api.metaMovementSDK_getSkeletonMappings(handle, tPoseType,
                             mappingsArray.GetPtr(), out numMappings);
                     }
                     else
@@ -2249,16 +2541,19 @@ namespace Meta.XR.Movement
         /// <param name="jointName">The name of the joint to find.</param>
         /// <param name="jointIndex">Output parameter that receives the joint index.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetJointIndex(ulong handle, SkeletonType skeletonType, in string jointName,
+        public static bool GetJointIndex(
+            ulong handle,
+            SkeletonType skeletonType,
+            string jointName,
             out int jointIndex)
         {
-            Result success;
-            using (new ProfilerScope(nameof(GetParentJointIndex)))
+            Result result;
+            using (new ProfilerScope(nameof(GetJointIndex)))
             {
-                success = Api.metaMovementSDK_getJointIndex(handle, skeletonType, jointName, out jointIndex);
+                result = Api.metaMovementSDK_getJointIndex(handle, skeletonType, jointName, out jointIndex);
             }
 
-            return success == Result.Success;
+            return result == Result.Success;
         }
 
         /// <summary>
@@ -2270,8 +2565,11 @@ namespace Meta.XR.Movement
         /// <param name="knownJointType">The known joint type to find.</param>
         /// <param name="jointIndex">Output parameter that receives the joint index.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetJointIndexByKnownJointType(ulong handle, SkeletonType skeletonType,
-            KnownJointType knownJointType, out int jointIndex)
+        public static bool GetJointIndexByKnownJointType(
+            ulong handle,
+            SkeletonType skeletonType,
+            KnownJointType knownJointType,
+            out int jointIndex)
         {
             Result success;
             using (new ProfilerScope(nameof(GetParentJointIndex)))
@@ -2292,7 +2590,10 @@ namespace Meta.XR.Movement
         /// <param name="jointIndex">The index of the joint to find the parent for.</param>
         /// <param name="parentJointIndex">Output parameter that receives the parent joint index.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetParentJointIndex(ulong handle, SkeletonType skeletonType, int jointIndex,
+        public static bool GetParentJointIndex(
+            ulong handle,
+            SkeletonType skeletonType,
+            int jointIndex,
             out int parentJointIndex)
         {
             Result success;
@@ -2314,7 +2615,9 @@ namespace Meta.XR.Movement
         /// <param name="skeletonType">The type of skeleton to get the manifestation names from.</param>
         /// <param name="manifestationNames">Output array that receives the manifestation names.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetManifestationNames(ulong handle, SkeletonType skeletonType,
+        public static bool GetManifestationNames(
+            ulong handle,
+            SkeletonType skeletonType,
             out string[] manifestationNames)
         {
             Result success;
@@ -2367,22 +2670,20 @@ namespace Meta.XR.Movement
             {
                 unsafe
                 {
-                    int jointIndexListSize = 0;
                     success = Api.metaMovementSDK_getJointsInManifestation(
-                        handle, skeletonType, in manifestationName, null, out jointIndexListSize);
+                        handle, skeletonType, manifestationName, null, out var jointIndexListSize);
                     if (success == Result.Success && jointIndexListSize > 0)
                     {
-                        jointIndexList =
-                            new NativeArray<int>(jointIndexListSize, Allocator.Temp,
-                                NativeArrayOptions.UninitializedMemory);
+                        jointIndexList = new NativeArray<int>(jointIndexListSize, Allocator.Temp,
+                            NativeArrayOptions.UninitializedMemory);
                         success = Api.metaMovementSDK_getJointsInManifestation(
-                            handle, skeletonType, in manifestationName, jointIndexList.GetPtr(),
+                            handle, skeletonType, manifestationName, jointIndexList.GetPtr(),
                             out jointIndexListSize);
                     }
                     else
                     {
-                        jointIndexList =
-                            new NativeArray<int>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                        jointIndexList = new NativeArray<int>(0, Allocator.Temp,
+                            NativeArrayOptions.UninitializedMemory);
                     }
                 }
             }
@@ -2407,7 +2708,7 @@ namespace Meta.XR.Movement
         /// <returns>True if the function was successfully executed.</returns>
         public static bool UpdateSourceReferenceTPose(
             ulong handle,
-            in NativeArray<NativeTransform> sourceTPose,
+            NativeArray<NativeTransform> sourceTPose,
             string manifestation = null)
         {
             Result success;
@@ -2415,8 +2716,11 @@ namespace Meta.XR.Movement
             {
                 unsafe
                 {
-                    success = Api.metaMovementSDK_updateSourceReferenceTPose(handle, sourceTPose.GetPtr(),
-                        sourceTPose.Length, manifestation);
+                    success = Api.metaMovementSDK_updateSourceReferenceTPose(
+                        handle,
+                        sourceTPose.GetPtr(),
+                        sourceTPose.Length,
+                        manifestation);
                 }
             }
 
@@ -2430,10 +2734,11 @@ namespace Meta.XR.Movement
         /// <param name="handle">The handle to use for retargeting.</param>
         /// <param name="retargetingBehaviorInfo">A structure of settings that control how retargeting is performed.</param>
         /// <param name="sourceFramePose">Array of transforms representing the current pose of the source skeleton.</param>
+        /// <param name="numSourceJoints">The number of source joints. This should be the length of the sourceFramePose, unless using manifestations.</param>
         /// <param name="targetRetargetedPose">Reference to an array that will receive the retargeted pose for the target skeleton.</param>
         /// <param name="sourceManifestation">Optional name of a manifestation in the source skeleton to retarget from.
         /// If null or empty, the entire skeleton is used.</param>
-        /// <param name="targetOutputManifestation">Optional name of a manifestation in the target skeleton to retarget to.
+        /// <param name="targetManifestation">Optional name of a manifestation in the target skeleton to retarget to.
         /// If null or empty, the entire skeleton is used.</param>
         /// <returns>True if the function was successfully executed.</returns>
         public static bool RetargetFromSourceFrameData(
@@ -2442,24 +2747,40 @@ namespace Meta.XR.Movement
             NativeArray<NativeTransform> sourceFramePose,
             ref NativeArray<NativeTransform> targetRetargetedPose,
             string sourceManifestation = null,
-            string targetOutputManifestation = null)
+            string targetManifestation = null)
         {
-            Result success;
+            Result success = Result.Success;
             using (new ProfilerScope(nameof(RetargetFromSourceFrameData)))
             {
                 unsafe
                 {
-                    var numSourceJoints = sourceFramePose.Length;
-                    var numTargetJoints = targetRetargetedPose.Length;
-                    success = Api.metaMovementSDK_retargetFromSourceFrameData(
-                        handle,
-                        retargetingBehaviorInfo,
-                        sourceFramePose.GetPtr(),
-                        numSourceJoints,
-                        targetRetargetedPose.GetPtr(),
-                        out numTargetJoints,
-                        sourceManifestation,
-                        targetOutputManifestation);
+                    int numSourceJoints = sourceFramePose.Length;
+                    // If we have a manifestion, update our length to match
+                    // our manifestation joint count.
+                    if (sourceManifestation != null)
+                    {
+                        success = Api.metaMovementSDK_getJointsInManifestation(
+                            handle, SkeletonType.SourceSkeleton, sourceManifestation, null, out numSourceJoints);
+
+                        if (success == Result.Success && numSourceJoints > sourceFramePose.Length)
+                        {
+                            success = Result.Failure;
+                        }
+                    }
+
+                    if (success == Result.Success)
+                    {
+                        var numTargetJoints = targetRetargetedPose.Length;
+                        success = Api.metaMovementSDK_retargetFromSourceFrameData(
+                            handle,
+                            retargetingBehaviorInfo,
+                            sourceFramePose.GetPtr(),
+                            numSourceJoints,
+                            targetRetargetedPose.GetPtr(),
+                            out numTargetJoints,
+                            sourceManifestation,
+                            targetManifestation);
+                    }
                 }
             }
 
@@ -2482,9 +2803,9 @@ namespace Meta.XR.Movement
             SkeletonType skeletonType,
             JointRelativeSpaceType jointSpaceType,
             ref NativeArray<NativeTransform> transformArray,
-            string manifestation = default(string))
+            string manifestation = null)
         {
-            Result success;
+            Result success = Result.Failure;
             using (new ProfilerScope(nameof(GetLastProcessedFramePose)))
             {
                 unsafe
@@ -2655,6 +2976,67 @@ namespace Meta.XR.Movement
                         height,
                         inOutTransformData.Length,
                         inOutTransformData.GetPtr());
+                }
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Scales a pose to a specific height.
+        /// This is useful for adapting a pose to match a target character's height.
+        /// </summary>
+        /// <param name="configName">The name of the new config to be created</param>
+        /// <param name="alignmentBehavior">Flags used to instruct operations to process.</param>
+        /// <param name="sourceConfigHandle">The config handle with the source skeleton definition</param>
+        /// <param name="sourceSkeletonType">Skeleton Type to pull the source skeleton from in the sourceConfigHandle data</param>
+        /// <param name="targetConfigHandle">The config handle with the source skeleton definition (Assumed to be the Target skeleton)</param>
+        /// <param name="handle">The out parameter used to communicate the new handle with the source skeleton aligned to the target skeleton.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool AlignTargetToSource(
+            string configName,
+            AlignmentFlags alignmentBehavior,
+            ulong sourceConfigHandle,
+            SkeletonType sourceSkeletonType,
+            ulong targetConfigHandle,
+            out ulong handle)
+        {
+            Result success;
+            using (new ProfilerScope(nameof(AlignTargetToSource)))
+            {
+                unsafe
+                {
+                    success = Api.metaMovementSDK_alignTargetToSource(
+                        configName,
+                        alignmentBehavior,
+                        sourceConfigHandle,
+                        sourceSkeletonType,
+                        targetConfigHandle,
+                        out handle);
+                }
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Generates a joint mapping between the source and target skeletons defined in the config.
+        /// </summary>
+        /// <param name="handle">A valid handle of a config containing a Target skeleton aligned to a source skeleton.</param>
+        /// <param name="autoMappingBehavior">Flags used to the automapper how to process the request.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool GenerateMappings(
+            ulong handle,
+            AutoMappingFlags autoMappingBehavior)
+        {
+            Result success;
+            using (new ProfilerScope(nameof(GenerateMappings)))
+            {
+                unsafe
+                {
+                    success = Api.metaMovementSDK_generateMappings(
+                        handle,
+                        autoMappingBehavior);
                 }
             }
 
@@ -2927,7 +3309,8 @@ namespace Meta.XR.Movement
         /// <param name="outputBodyPose">Reference to an array that will be filled with the deserialized body pose transforms.</param>
         /// <param name="outputFacePose">Reference to an array that will be filled with the deserialized face pose blendshape weights.</param>
         /// <returns>True if deserialization was successful.</returns>
-        public static bool DeserializeSkeletonAndFace(ulong handle,
+        public static bool DeserializeSkeletonAndFace(
+            ulong handle,
             NativeArray<byte> data,
             out double timestamp,
             out SerializationCompressionType compressionType,
@@ -2964,7 +3347,8 @@ namespace Meta.XR.Movement
         /// <param name="outputBodyTrackingPose">Reference to an array that will be filled with the deserialized body tracking pose transforms.</param>
         /// <param name="frameData">Reference to a FrameData structure that will be filled with metadata about the frame.</param>
         /// <returns>True if deserialization was successful.</returns>
-        public static bool DeserializeSkeletonAndFace(UInt64 handle,
+        public static bool DeserializeSkeletonAndFace(
+            ulong handle,
             NativeArray<byte> data,
             out double timestamp,
             out SerializationCompressionType compressionType,
@@ -3051,7 +3435,9 @@ namespace Meta.XR.Movement
         /// <param name="interpolatedFacePose">Reference to an array that will be filled with the interpolated blendshape weights.</param>
         /// <param name="time">The timestamp to interpolate to, in seconds since the recording's epoch.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetInterpolatedFace(ulong handle, SkeletonType skeletonType,
+        public static bool GetInterpolatedFace(
+            ulong handle,
+            SkeletonType skeletonType,
             ref NativeArray<float> interpolatedFacePose,
             double time)
         {
@@ -3082,7 +3468,9 @@ namespace Meta.XR.Movement
         /// <param name="outputTransform">Reference to a transform that will be filled with the interpolated tracker pose.</param>
         /// <param name="time">The timestamp to interpolate to, in seconds since the recording's epoch.</param>
         /// <returns>True if the function was successfully executed.</returns>
-        public static bool GetInterpolatedJointPose(ulong handle, TrackerJointType trackerJointType,
+        public static bool GetInterpolatedJointPose(
+            ulong handle,
+            TrackerJointType trackerJointType,
             ref NativeTransform outputTransform,
             double time)
         {

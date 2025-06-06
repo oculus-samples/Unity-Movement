@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using TMPro;
 using UnityEngine;
@@ -8,21 +8,18 @@ using static OVRPlugin;
 namespace Meta.XR.Movement.Samples
 {
     /// <summary>
-    /// Allows setting body tracking fidelity.
+    /// Allows toggling body tracking fidelity.
     /// </summary>
     public class MovementBodyTrackingFidelityToggle : MonoBehaviour
     {
-        /// <summary>
-        /// The current body tracking fidelity set.
-        /// </summary>
-        [SerializeField]
-        protected BodyTrackingFidelity2 _currentFidelity = BodyTrackingFidelity2.Low;
-
         /// <summary>
         /// The text to update after body tracking fidelity is changed.
         /// </summary>
         [SerializeField]
         protected TMP_Text _worldText;
+
+        [SerializeField, InspectorButton("SwapFidelity")]
+        private bool _toggleButton;
 
         private const string _lowFidelity = "Three-point BT";
         private const string _highFidelity = "IOBT";
@@ -34,7 +31,7 @@ namespace Meta.XR.Movement.Samples
 
         private void Start()
         {
-            EnforceFidelity();
+            UpdateText();
         }
 
         /// <summary>
@@ -42,16 +39,16 @@ namespace Meta.XR.Movement.Samples
         /// </summary>
         public void SwapFidelity()
         {
-            _currentFidelity = _currentFidelity == BodyTrackingFidelity2.Low ?
-                BodyTrackingFidelity2.High : BodyTrackingFidelity2.Low;
-            EnforceFidelity();
+            var desiredFidelity = OVRBody.Fidelity == BodyTrackingFidelity2.Low
+                ? BodyTrackingFidelity2.High
+                : BodyTrackingFidelity2.Low;
+            OVRBody.Fidelity = desiredFidelity;
+            UpdateText();
         }
 
-        private void EnforceFidelity()
+        private void UpdateText()
         {
-            RequestBodyTrackingFidelity(_currentFidelity);
-            _worldText.text = _currentFidelity == BodyTrackingFidelity2.Low ?
-                _lowFidelity : _highFidelity;
+            _worldText.text = OVRBody.Fidelity == BodyTrackingFidelity2.Low ? _lowFidelity : _highFidelity;
         }
     }
 }

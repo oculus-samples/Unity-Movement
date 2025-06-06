@@ -1,7 +1,7 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System.Collections.Generic;
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Body.Input;
 #endif
 using UnityEngine;
@@ -13,7 +13,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
     /// </summary>
     public static class BoneGroup
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         /// <summary>
         /// Bones that can be mostly derived from positioning of other bones
         /// </summary>

@@ -1,6 +1,7 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 using static Meta.XR.Movement.MSDKUtility;
 
@@ -458,6 +459,38 @@ namespace Meta.XR.Movement.Retargeting.IK
                 bone.rotation = parentBone.rotation * poses[i].rotation;
                 parentBone = bone;
             }
+        }
+
+        /// <summary>
+        /// Computes world poses.
+        /// </summary>
+        /// <param name="parentJointIndices">Parent joint indices.</param>
+        /// <param name="targetPoses">Target poses.</param>
+        /// <param name="rootScale">Root scale.</param>
+        /// <param name="rootPosition">Root position, optional.</param>
+        /// <param name="rootRotation">Root rotation, optional.</param>
+        /// <returns></returns>
+        public static NativeArray<NativeTransform> ComputeWorldPoses(
+            int[] parentJointIndices,
+            ref NativeArray<NativeTransform> targetPoses,
+            Vector3 rootScale,
+            Vector3? rootPosition = null,
+            Quaternion? rootRotation = null)
+        {
+            var targetPoseWorld = new NativeArray<NativeTransform>(targetPoses.Length, Allocator.TempJob);
+            using var parentIndices = new NativeArray<int>(parentJointIndices, Allocator.TempJob);
+
+            var job = new SkeletonJobs.ConvertLocalToWorldPoseJob
+            {
+                LocalPose = targetPoses,
+                WorldPose = targetPoseWorld,
+                ParentIndices = parentIndices,
+                RootScale = rootScale,
+                RootPosition = rootPosition.HasValue ? rootPosition.Value : Vector3.zero,
+                RootRotation = rootRotation.HasValue ? rootRotation.Value : Quaternion.identity
+            };
+            job.Schedule().Complete();
+            return targetPoseWorld;
         }
     }
 }

@@ -1,0 +1,66 @@
+name: 🐛 Bug Report
+description: Report a reproducible bug or regression.
+title: '[BUG] '
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for taking the time to report an issue!
+  - type: input
+    id: version
+    attributes:
+      label: Unity version
+      placeholder: 2022.3.15f1
+    validations:
+      required: true
+  - type: input
+    id: core-version
+    attributes:
+      label: Meta XR Core SDK version
+      placeholder: v74
+    validations:
+      required: true
+  - type: input
+    id: OS
+    attributes:
+      label: Which OS are you using?
+      placeholder: Windows 10, 11, MacOS, Linux, etc.
+    validations:
+      required: true
+  - type: checkboxes
+    id: where
+    attributes:
+      label: Where does the issue occur?
+      options:
+        - label: In Unity Editor
+          required: false
+        - label: In Quest builds
+          required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: The list of steps that reproduce the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        For in-editor bugs, paste the logs from the "Console" window in the Unity Editor.
+        For on-device Quest bugs, paste the output of `adb logcat -s "Unity"`
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional info
+      description: Please provide screenshots, a video, or any other relevant information.

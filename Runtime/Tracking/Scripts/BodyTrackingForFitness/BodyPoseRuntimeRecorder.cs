@@ -1,8 +1,8 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using System.Collections;
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction;
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Body.PoseDetection;
@@ -18,11 +18,11 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
     /// </summary>
     ///
     public class BodyPoseRuntimeRecorder : MonoBehaviour
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         , IBodyPose, ISkeletonMapping
 #endif
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         private static class BodyPoseRuntimeRecorderTooltips
         {
             public const string Source = "What body pose to record from";

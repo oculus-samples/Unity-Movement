@@ -1,6 +1,6 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Body.Input;
 #endif
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
     /// </summary>
     public enum BodyBoneName
     {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
         None = BodyJointId.Invalid,
         [InspectorName("Root")] Root = BodyJointId.Body_Root,
         [InspectorName("Hips")] Hips = BodyJointId.Body_Hips,

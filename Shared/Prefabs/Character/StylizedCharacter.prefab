@@ -1366,7 +1366,7 @@ PrefabInstance:
       addedObject: {fileID: 8156316538343237965}
     - targetCorrespondingSourceObject: {fileID: 5277832601808152396, guid: 01841ff2664437e41a3418592a12de6d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -6773661961828820899}
+      addedObject: {fileID: 5439724897015377498}
   m_SourcePrefab: {fileID: 100100000, guid: 01841ff2664437e41a3418592a12de6d, type: 3}
 --- !u!4 &174696498468577385 stripped
 Transform:
@@ -1523,113 +1523,17 @@ MonoBehaviour:
   _debugDrawSourceSkeletonColor: {r: 1, g: 1, b: 1, a: 1}
   _debugDrawTargetSkeleton: 0
   _debugDrawTargetSkeletonColor: {r: 0, g: 1, b: 0, a: 1}
-  _retargetingHandler:
+  _skeletonRetargeter:
     _retargetingBehavior: 0
-    _currentScale: 1
+    _hideLowerBodyWhenUpperBodyTracking: 1
+    _hideLegScale: {x: 1, y: 0.5, z: 1}
     _applyScale: 1
+    _currentScale: 1
     _headScaleFactor: 0.95
-    _scaleRange: {x: 0.5, y: 1.5}
+    _scaleRange: {x: 0.8, y: 1.2}
   _sourceProcessorContainers: []
-  _targetProcessorContainers:
-  - _currentProcessorType: 1
-    _twistProcessor:
-      _weight: 1
-      _isFoldoutExpanded: 0
-      _sourceIndex: 16
-      _targetData:
-      - Index:
-          Index: 15
-        Weight: 0.5
-      _twistForwardAxis: {x: 0, y: 1, z: 0}
-      _twistUpAxis: {x: 1, y: 0, z: 0}
-    _animationProcessor:
-      _weight: 0
-      _isFoldoutExpanded: 1
-      _animBlendIndices: []
-    _hipPinningProcessor:
-      _weight: 0
-      _isFoldoutExpanded: 1
-      _hipPinningThreshold: 0.3
-      _hipPinningObject: {fileID: 0}
-      _hipPinningTargetParent: {fileID: 0}
-      _targetHips: {fileID: 0}
-      _leftData:
-        TargetFoot: {fileID: 0}
-        TargetHint: {fileID: 0}
-        LegIndexes: []
-        MidLegIndex:
-          Index: 0
-        LegBones: []
-      _rightData:
-        TargetFoot: {fileID: 0}
-        TargetHint: {fileID: 0}
-        LegIndexes: []
-        MidLegIndex:
-          Index: 0
-        LegBones: []
-    _locomotionProcessor:
-      _weight: 1
-      _isFoldoutExpanded: 1
-      _firstPersonLocomotor: {fileID: 0}
-      _cameraRig: {fileID: 0}
-      _animator: {fileID: 0}
-      _animatorVerticalParam: Vertical
-      _animatorHorizontalParam: Horizontal
-      _animationSpeed: 2
-    _ccdProcessor:
-      _weight: 1
-      _isFoldoutExpanded: 1
-      _ccdData: []
-  - _currentProcessorType: 1
-    _twistProcessor:
-      _weight: 1
-      _isFoldoutExpanded: 0
-      _sourceIndex: 37
-      _targetData:
-      - Index:
-          Index: 36
-        Weight: 0.5
-      _twistForwardAxis: {x: 0, y: -1, z: 0}
-      _twistUpAxis: {x: -1, y: 0, z: 0}
-    _animationProcessor:
-      _weight: 0
-      _isFoldoutExpanded: 1
-      _animBlendIndices: []
-    _hipPinningProcessor:
-      _weight: 0
-      _isFoldoutExpanded: 1
-      _hipPinningThreshold: 0.3
-      _hipPinningObject: {fileID: 0}
-      _hipPinningTargetParent: {fileID: 0}
-      _targetHips: {fileID: 0}
-      _leftData:
-        TargetFoot: {fileID: 0}
-        TargetHint: {fileID: 0}
-        LegIndexes: []
-        MidLegIndex:
-          Index: 0
-        LegBones: []
-      _rightData:
-        TargetFoot: {fileID: 0}
-        TargetHint: {fileID: 0}
-        LegIndexes: []
-        MidLegIndex:
-          Index: 0
-        LegBones: []
-    _locomotionProcessor:
-      _weight: 1
-      _isFoldoutExpanded: 1
-      _firstPersonLocomotor: {fileID: 0}
-      _cameraRig: {fileID: 0}
-      _animator: {fileID: 0}
-      _animatorVerticalParam: Vertical
-      _animatorHorizontalParam: Horizontal
-      _animationSpeed: 2
-    _ccdProcessor:
-      _weight: 1
-      _isFoldoutExpanded: 1
-      _ccdData: []
---- !u!114 &-6773661961828820899
+  _targetProcessorContainers: []
+--- !u!114 &5439724897015377498
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1638,10 +1542,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1019368882090018644}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 274835e4e2feae04b87f0d000555f8a4, type: 3}
+  m_Script: {fileID: 11500000, guid: be3ebb6547662534aaef8337c5627f3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _providedSkeletonType: 1
+  _validBodyTrackingDelay: 0.25
 --- !u!4 &1125569144956322345 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5225852861087425073, guid: 01841ff2664437e41a3418592a12de6d, type: 3}

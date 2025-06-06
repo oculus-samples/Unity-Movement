@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Retargeting;
 using Unity.Collections;
@@ -131,7 +131,7 @@ namespace Meta.XR.Movement.Networking
         /// The interval to send data at.
         /// </summary>
         [SerializeField]
-        private float _intervalToSendData = 0.08f;
+        private float _intervalToSendData = 0.083333f;
 
         /// <summary>
         /// The interval to sync data at.
@@ -143,13 +143,13 @@ namespace Meta.XR.Movement.Networking
         /// The difference in position for data to get sent.
         /// </summary>
         [SerializeField]
-        private float _positionThreshold = 0.001f;
+        private float _positionThreshold = 0.01f;
 
         /// <summary>
         /// The difference in rotation in degrees for data to get sent.
         /// </summary>
         [SerializeField]
-        private float _rotationAngleThreshold = 0.01f;
+        private float _rotationAngleThreshold = 1.00f;
 
         /// <summary>
         /// The difference in the blendshape weight for data to get sent.
@@ -193,6 +193,8 @@ namespace Meta.XR.Movement.Networking
         [SerializeField]
         private GameObject[] _objectsToHideUntilValid;
 
+        private bool _hasValidDebugPose = false;
+
         public override void Awake()
         {
             base.Awake();
@@ -221,7 +223,7 @@ namespace Meta.XR.Movement.Networking
             }
             else if (_ownership == Ownership.Client)
             {
-                if (_debugDrawTargetSkeleton)
+                if (_debugDrawTargetSkeleton && _hasValidDebugPose)
                 {
                     _skeletonRetargeter.DrawDebugTargetPose(_debugDrawTransform, _debugDrawTargetSkeletonColor, true);
                 }
@@ -234,7 +236,7 @@ namespace Meta.XR.Movement.Networking
             {
                 return;
             }
-
+            _hasValidDebugPose = true;
             var worldPose = _skeletonRetargeter.GetWorldPoseFromLocalPose(bodyPose);
             _skeletonRetargeter.RetargetedPose.CopyFrom(worldPose);
             worldPose.Dispose();

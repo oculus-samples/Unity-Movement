@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using Unity.Collections;
@@ -21,11 +21,13 @@ namespace Meta.XR.Movement.Retargeting
         public enum ProcessorType
         {
             None = 0,
-            Twist,
-            Animation,
-            HipPinning,
-            Locomotion,
-            CCDIK
+            Twist = 1,
+            Animation = 2,
+            Locomotion = 3,
+            CCDIK = 4,
+            HandIK = 5,
+            HipPinning = 6,
+            Custom
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Retargeting;
 using Meta.XR.Movement.Utils;
@@ -25,13 +25,7 @@ namespace Meta.XR.Movement.Samples
 
         private void Awake()
         {
-            foreach (var processor in _retargeter.TargetProcessorContainers)
-            {
-                if (processor.CurrentProcessorType == TargetProcessor.ProcessorType.HipPinning)
-                {
-                    _hipPinningProcessor = processor.GetCurrentProcessor() as HipPinningSkeletalProcessor;
-                }
-            }
+            _hipPinningProcessor = _retargeter.GetTargetProcessor<HipPinningSkeletalProcessor>();
 
             if (_hipPinningProcessor != null)
             {

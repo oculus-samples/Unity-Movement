@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
 using Oculus.Movement.Utils;
@@ -36,7 +36,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
 
         private bool IsShowingRefreshButton()
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             return Target.BodyPose != null;
 #else
             return false;
@@ -47,7 +47,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
 
         private bool IsAbleToSave()
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             return Target.BoneContainer != null;
 #else
             return false;
@@ -56,7 +56,7 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
 
         private void Refresh()
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             Target.RefreshHierarchyDuringEditor();
 #endif
             EditorTransformAwareness.RefreshSystem();
@@ -64,14 +64,14 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
 
         private void RefreshTPose()
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             Target.RefreshTPose();
 #endif
         }
 
         private void SaveAsset()
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             BodyPoseControllerEditor.SaveAsset(Target);
 #endif
         }

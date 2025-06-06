@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Retargeting;
 using TMPro;
@@ -33,6 +33,9 @@ namespace Meta.XR.Movement.Samples
         [SerializeField]
         private TMP_Text _worldText;
 
+        [SerializeField, InspectorButton("SwapAnimState")]
+        private bool _toggleButton;
+
         private const string _animOffText = "Anim off";
         private const string _animOnText = "Anim on";
         private AnimationSkeletalProcessor[] _processors;
@@ -50,15 +53,8 @@ namespace Meta.XR.Movement.Samples
             _processors = new AnimationSkeletalProcessor[_retargeters.Length];
             foreach (var retargeter in _retargeters)
             {
-                foreach (var processor in retargeter.TargetProcessorContainers)
-                {
-                    if (processor.CurrentProcessorType != TargetProcessor.ProcessorType.Animation)
-                    {
-                        continue;
-                    }
-                    _processors[processorIndex] = processor.GetCurrentProcessor() as AnimationSkeletalProcessor;
-                    processorIndex++;
-                }
+                _processors[processorIndex] = retargeter.GetTargetProcessor<AnimationSkeletalProcessor>();
+                processorIndex++;
             }
         }
 

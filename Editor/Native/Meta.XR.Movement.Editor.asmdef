@@ -23,7 +23,7 @@
         {
             "name": "com.meta.xr.sdk.interaction",
             "expression": "",
-            "define": "INTERACTION_OVR_DEFINED"
+            "define": "ISDK_DEFINED"
         }
     ],
     "noEngineReferences": false

@@ -1,4 +1,4 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System.Linq;
 using UnityEditor;
@@ -26,6 +26,11 @@ namespace Meta.XR.Movement.Samples
                 platform: BuildTargetGroup.Unknown,
                 isDone: group =>
                 {
+                    if (FindComponentInScene<MovementSceneLoader>() == null)
+                    {
+                        return true;
+                    }
+
                     foreach (var layerIndex in _expectedLayersIndices)
                     {
                         if (string.IsNullOrEmpty(LayerMask.LayerToName(layerIndex)))
@@ -34,7 +39,7 @@ namespace Meta.XR.Movement.Samples
                         }
                     }
 
-                    return FindComponentInScene<MovementSceneLoader>() != null;
+                    return true;
                 },
                 message: "Layers 10 and 11 must be indexed for the samples to display correctly.",
                 fix: group =>

@@ -1,10 +1,11 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
 using Oculus.Interaction.Locomotion;
 #endif
-using UnityEngine;
+using Meta.XR.Movement.Editor;
 using UnityEditor;
+using UnityEngine;
 
 namespace Meta.XR.Movement.Retargeting.Editor
 {
@@ -17,7 +18,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
         private static readonly (string propertyName, GUIContent label)[] _propertiesToDraw =
         {
             ("_weight", new GUIContent("Weight")),
-            ("_firstPersonLocomotor", new GUIContent("First Person Locomotor")),
+            ("_locomotionEventHandlerObject", new GUIContent("Locomotor Event Handler")),
             ("_cameraRig", new GUIContent("Camera Rig")),
             ("_animator", new GUIContent("Animator")),
             ("_animatorVerticalParam", new GUIContent("Animator Vertical Parameter")),
@@ -74,38 +75,23 @@ namespace Meta.XR.Movement.Retargeting.Editor
 
         private void RunSetup(SerializedProperty property)
         {
-#if INTERACTION_OVR_DEFINED
-            var retargeter = Selection.activeGameObject.GetComponent<CharacterRetargeter>();
-            var locomotor = Object.FindObjectOfType<FirstPersonLocomotor>();
-
-            if (retargeter != null && locomotor != null)
+#if ISDK_DEFINED
+#if ISDK_74_OR_NEWER
+            var locomotor = Object.FindFirstObjectByType<FirstPersonLocomotor>();
+#else
+            var locomotor = Object.FindFirstObjectByType<PlayerLocomotor>();
+#endif
+            if (locomotor != null && MSDKUtilityEditor.TryGetProcessorAtPropertyPathIndex<LocomotionSkeletalProcessor>(
+                    property, false, out var locomotionProcessor))
             {
-                int numProcessors = retargeter.TargetProcessorContainers.Length;
-
-                // Only operate on the serialized property at our index. Otherwise, we might
-                // run setup on multiple.
-                int indexOfSerializedProperty = MSDKUtilityHelper.GetIndexFromPropertyPath(property.propertyPath);
-                if (indexOfSerializedProperty < 0 || indexOfSerializedProperty >= numProcessors)
-                {
-                    Debug.LogError($"Index of serialized processor is invalid: {indexOfSerializedProperty}. " +
-                                   $"Valid range is 0-{numProcessors - 1}.");
-                }
-                else
-                {
-                    var currentProcessor =
-                        retargeter.TargetProcessorContainers[indexOfSerializedProperty].GetCurrentProcessor();
-                    if (currentProcessor is not LocomotionSkeletalProcessor locomotionProcessor)
-                    {
-                        Debug.LogError($"Processor at {indexOfSerializedProperty} is not a Locomotion processor.");
-                    }
-                    else
-                    {
-                        locomotionProcessor.FirstPersonLocomotor = locomotor;
-                        locomotionProcessor.CameraRig = Object.FindObjectOfType<OVRCameraRig>().transform;
-                        locomotionProcessor.Animator = retargeter.GetComponent<Animator>();
-                        EditorUtility.SetDirty(retargeter);
-                    }
-                }
+                var retargeter = Selection.activeGameObject.GetComponent<CharacterRetargeter>();
+                Undo.RecordObject(retargeter, "Update locomotion processor");
+                locomotionProcessor.LocomotionEventHandler = locomotor;
+                locomotionProcessor.CameraRig = Object.FindFirstObjectByType<OVRCameraRig>().transform;
+                locomotionProcessor.Animator = retargeter.GetComponent<Animator>();
+                locomotionProcessor.AnimatorVerticalParam = "Vertical";
+                locomotionProcessor.AnimatorHorizontalParam = "Horizontal";
+                locomotionProcessor.AnimationSpeed = 2.0f;
             }
             else
             {

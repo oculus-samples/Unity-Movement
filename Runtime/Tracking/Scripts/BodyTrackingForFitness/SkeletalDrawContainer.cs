@@ -1,8 +1,8 @@
-// Copyright (c) Meta Platforms, Inc. and affiliates.
+// Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+using System.Collections.Generic;
 using Meta.XR.Movement.BodyTrackingForFitness;
 using Meta.XR.Movement.Retargeting;
-using Meta.XR.Movement.Utils;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -38,19 +38,26 @@ namespace Meta.XR.Movement.Fitness
         protected SkeletonData _data;
 
         /// <summary>
+        /// The indexes to ignore when doing skeleton draw.
+        /// </summary>
+        [SerializeField]
+        protected List<int> _indexesToIgnoreDraw;
+
+        /// <summary>
         /// Use this to change the color.
         /// </summary>
         [SerializeField]
         protected Color _defaultColor = Color.white;
 
         private readonly SkeletonDraw _skeletalDraw = new();
-        private int[] _parentIndices;
         private NativeArray<MSDKUtility.NativeTransform> _nativePose;
+        private int[] _parentIndices;
 
         private void Awake()
         {
             Assert.IsNotNull(_bodyPoseTransforms);
             _skeletalDraw.InitDraw(_defaultColor, _thickness);
+            _skeletalDraw.IndexesToIgnore = _indexesToIgnoreDraw;
         }
 
         private void Start()
@@ -60,7 +67,7 @@ namespace Meta.XR.Movement.Fitness
 
         private void InitializeParentIndices()
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             _parentIndices = new int[_bodyPoseTransforms.BoneTransforms.Count];
             for (int i = 0; i < _parentIndices.Length; i++)
             {
@@ -79,7 +86,7 @@ namespace Meta.XR.Movement.Fitness
 
         private void UpdateCollections()
         {
-#if INTERACTION_OVR_DEFINED
+#if ISDK_DEFINED
             var boneTransforms = _bodyPoseTransforms.BoneTransforms;
             if (!_nativePose.IsCreated || _nativePose.Length != boneTransforms.Count)
             {
