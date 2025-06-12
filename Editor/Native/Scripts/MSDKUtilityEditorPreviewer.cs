@@ -4,7 +4,6 @@ using System;
 using System.Linq;
 using Meta.XR.Movement.Retargeting.Editor;
 using Meta.XR.Movement.Retargeting;
-using Meta.XR.Movement.Utils;
 using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
@@ -276,6 +275,15 @@ namespace Meta.XR.Movement.Editor
                 out var rootJoint);
             target.SkeletonJoints[index] = rootJoint;
 
+            // In the case we don't have a root, create one for previewing
+            if (_sceneViewCharacter.transform == rootJoint && _window.PreviewStage.scene.IsValid())
+            {
+                var previewCharacterParent = new GameObject("PreviewCharacter");
+                SceneManager.MoveGameObjectToScene(previewCharacterParent, _window.PreviewStage.scene);
+                _sceneViewCharacter.transform.parent = previewCharacterParent.transform;
+                _sceneViewCharacter = previewCharacterParent;
+            }
+
             // Associate known joints.
             target.KnownSkeletonJoints = new Transform[(int)KnownJointType.KnownJointCount];
             for (var i = KnownJointType.Root; i < KnownJointType.KnownJointCount; i++)
@@ -325,7 +333,7 @@ namespace Meta.XR.Movement.Editor
                 var tPose = target.ReferencePose[i];
                 if (joint == null)
                 {
-                    return;
+                    continue;
                 }
 
                 joint.localScale = tPose.Scale;
@@ -341,6 +349,11 @@ namespace Meta.XR.Movement.Editor
 
                 var joint = target.SkeletonJoints[i];
                 var tPose = target.ReferencePose[i];
+                if (joint == null)
+                {
+                    continue;
+                }
+
                 Undo.RecordObject(joint, "Reload Character");
                 joint.SetPositionAndRotation(tPose.Position, tPose.Orientation);
             }

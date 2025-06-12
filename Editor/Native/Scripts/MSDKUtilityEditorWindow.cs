@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Meta.XR.Movement.Recording;
-using Meta.XR.Movement.Retargeting;
 using UnityEditor;
 using UnityEditor.Overlays;
 using UnityEditor.SceneManagement;
@@ -267,6 +266,7 @@ namespace Meta.XR.Movement.Editor
         private bool _validatedConfigFinish;
         private bool _displayedConfig;
         private bool _initialized;
+        private Vector2 _scrollPosition;
 
         // Styling settings.
         private const int _buttonSizeHeight = 28;
@@ -276,12 +276,12 @@ namespace Meta.XR.Movement.Editor
         private const int _buttonPadding = 6;
 
         // UI Colors
-        private static readonly Color _primaryColor = new Color(0.0f, 0.47f, 0.95f, 1.0f);
-        private static readonly Color _backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.05f);
+        private static readonly Color _primaryColor = new(0.0f, 0.47f, 0.95f, 1.0f);
+        private static readonly Color _backgroundColor = new(0.15f, 0.15f, 0.15f, 0.05f);
         private static readonly Color _cardBackgroundColor = new Color(1f, 1f, 1f, 0.03f);
-        private static readonly Color _borderColor = new Color(0f, 0f, 0f, 0.2f);
-        private static readonly Color _headerBackgroundColor = new Color(0.0f, 0.47f, 0.95f, 0.1f);
-        private static readonly Color _buttonHoverColor = new Color(0.0f, 0.47f, 0.95f, 0.2f);
+        private static readonly Color _borderColor = new(0f, 0f, 0f, 0.2f);
+        private static readonly Color _headerBackgroundColor = new(0.0f, 0.47f, 0.95f, 0.1f);
+        private static readonly Color _buttonHoverColor = new(0.0f, 0.47f, 0.95f, 0.2f);
 
         private readonly FullBodyTrackingBoneId[] _leftStartBoneIds =
         {
@@ -516,8 +516,17 @@ namespace Meta.XR.Movement.Editor
 
         private void CreateRootGUI()
         {
-            // Get and clear the root element
+            // Get the root element
             var root = rootVisualElement;
+
+            // Store current scroll position if there's a ScrollView
+            var existingScrollView = root.Q<ScrollView>();
+            if (existingScrollView != null)
+            {
+                _scrollPosition = existingScrollView.scrollOffset;
+            }
+
+            // Clear the root element
             root.Clear();
 
             // Apply global styles to the root element
@@ -535,6 +544,16 @@ namespace Meta.XR.Movement.Editor
                     paddingRight = 10
                 }
             };
+
+            // Store reference to the scroll view to manage scroll position
+            scrollView.RegisterCallback<GeometryChangedEvent>(evt =>
+            {
+                // Restore scroll position after layout is complete
+                if (_scrollPosition != Vector2.zero)
+                {
+                    scrollView.scrollOffset = _scrollPosition;
+                }
+            });
 
             // Create transform editor container
             var transformContainer = new IMGUIContainer(DrawTransformEditor)
@@ -555,6 +574,11 @@ namespace Meta.XR.Movement.Editor
             if (_debugging)
             {
                 var debugSection = DebugConfigSection();
+                if (debugSection == null)
+                {
+                    return;
+                }
+
                 debugSection.style.marginBottom = 16;
                 scrollView.Add(debugSection);
             }
@@ -588,6 +612,7 @@ namespace Meta.XR.Movement.Editor
             {
                 return;
             }
+
             retargetingSection.style.paddingTop = 0;
             mainContentCard.Add(retargetingSection);
 
@@ -643,6 +668,7 @@ namespace Meta.XR.Movement.Editor
                     "Next" or "Done" => new Color(0.1f, 0.6f, 0.3f, 0.7f),
                     "Previous" => new Color(0.2f, 0.2f, 0.2f, 0.8f),
                     "Pose character to T-Pose" => new Color(_primaryColor.r, _primaryColor.g, _primaryColor.b, 0.1f),
+                    "Load original T-Pose" => new Color(_primaryColor.r, _primaryColor.g, _primaryColor.b, 0.1f),
                     "Validate and save config" => new Color(0.1f, 0.6f, 0.3f, 0.7f),
                     _ => new Color(0, 0, 0, 0)
                 };
@@ -654,7 +680,7 @@ namespace Meta.XR.Movement.Editor
                 button.style.backgroundColor = originalColor;
 
                 // Add hover effect - only apply if button is enabled
-                button.RegisterCallback<MouseEnterEvent>(evt =>
+                button.RegisterCallback<MouseEnterEvent>(_ =>
                 {
                     if (button.enabledSelf)
                     {
@@ -663,9 +689,9 @@ namespace Meta.XR.Movement.Editor
                 });
 
                 // Restore original color on mouse exit
-                button.RegisterCallback<MouseLeaveEvent>(evt =>
+                button.RegisterCallback<MouseLeaveEvent>(_ =>
                 {
-                    if (buttonOriginalColors.TryGetValue(button, out Color color))
+                    if (buttonOriginalColors.TryGetValue(button, out var color))
                     {
                         button.style.backgroundColor = color;
                     }
@@ -778,9 +804,20 @@ namespace Meta.XR.Movement.Editor
             };
             configAssetField.RegisterValueChangedCallback(e =>
             {
-                EditorMetadataObject.ConfigJson = configAssetField.value as TextAsset;
-                EditorUtility.SetDirty(EditorMetadataObject);
-                AssetDatabase.SaveAssets();
+                int choice = EditorUtility.DisplayDialogComplex("Change Config",
+                    "Change configuration file?",
+                    "Yes", "No", "Cancel");
+                if (choice == 0)
+                {
+                    EditorMetadataObject.ConfigJson = configAssetField.value as TextAsset;
+                    EditorUtility.SetDirty(EditorMetadataObject);
+                    AssetDatabase.SaveAssets();
+                }
+                else
+                {
+                    configAssetField.SetValueWithoutNotify(EditorMetadataObject.ConfigJson);
+                }
+
             });
 
             // Create action buttons
@@ -921,7 +958,8 @@ namespace Meta.XR.Movement.Editor
                 // Slider with constraints to prevent overflow
                 var scaleSlider = new Slider(0f, 100f)
                 {
-                    style = {
+                    style =
+                    {
                         flexGrow = 1,
                         flexShrink = 1,
                         minWidth = 80,
@@ -934,7 +972,8 @@ namespace Meta.XR.Movement.Editor
                 var scaleValue = new IntegerField
                 {
                     value = Mathf.RoundToInt(_utilityConfig.ScaleSize),
-                    style = {
+                    style =
+                    {
                         width = 60,
                         minWidth = 60,
                         maxWidth = 60,
@@ -1387,7 +1426,18 @@ namespace Meta.XR.Movement.Editor
                 {
                     var removeJointButton = new Button(() =>
                     {
-                        var data = MSDKUtilityEditor.CreateRetargetingData(_sceneViewCharacter, _target);
+                        // Store current scroll position before removing the joint
+                        var scrollView = rootVisualElement.Q<ScrollView>();
+                        if (scrollView != null)
+                        {
+                            _scrollPosition = scrollView.scrollOffset;
+                        }
+
+                        var knownRoot = _target.KnownSkeletonJoints[(int)KnownJointType.Root];
+                        var data = MSDKUtilityEditor.CreateRetargetingData(knownRoot == null
+                                ? _sceneViewCharacter.transform
+                                : knownRoot,
+                            _target);
                         data.RemoveJoint(jointName);
                         CreateConfig(this, false, data);
                         CreateGUI();
@@ -1458,13 +1508,27 @@ namespace Meta.XR.Movement.Editor
             root.Add(CreateHeaderLabel("Known Joints", 12));
             root.Add(knownJointsContainer);
 
-            // Add T-Pose button with improved styling
-            var tPoseButton = new Button(() =>
+            // Add Original Source Pose button
+            var originalPoseButton = new Button(LoadOriginalSourcePose)
             {
-                JointAlignmentUtility.SetToTPose(_source, _target);
-                JointAlignmentUtility.UpdateTPoseData(_target);
-                _previewer.ReloadCharacter(_target);
-            })
+                text = "Load original T-Pose",
+                style =
+                {
+                    paddingTop = _buttonPadding,
+                    paddingBottom = _buttonPadding,
+                    backgroundColor = new Color(_primaryColor.r, _primaryColor.g, _primaryColor.b, 0.1f),
+                    borderTopLeftRadius = 3,
+                    borderTopRightRadius = 3,
+                    borderBottomLeftRadius = 3,
+                    borderBottomRightRadius = 3,
+                    marginTop = 8,
+                    marginBottom = 4
+                }
+            };
+            root.Add(originalPoseButton);
+
+            // Add T-Pose button
+            var tPoseButton = new Button(SetToTPose)
             {
                 text = "Pose character to T-Pose",
                 style =
@@ -1477,14 +1541,13 @@ namespace Meta.XR.Movement.Editor
                     borderBottomLeftRadius = 3,
                     borderBottomRightRadius = 3,
                     marginTop = 8,
-                    marginBottom = 8
+                    marginBottom = 4
                 }
             };
             root.Add(tPoseButton);
 
             // Add navigation buttons
             root.Add(PreviousNextSteps(true, false, false, EditorMetadataObject.ConfigJson != null));
-
             return root;
         }
 
@@ -1720,7 +1783,6 @@ namespace Meta.XR.Movement.Editor
             return button;
         }
 
-
         private VisualElement CreateRightJointEntryContainer()
         {
             return new VisualElement
@@ -1915,8 +1977,65 @@ namespace Meta.XR.Movement.Editor
             _previewer.ReloadCharacter(_target);
         }
 
-        private void InitializeSkeletonDraws()
+        private void LoadOriginalSourcePose()
         {
+            // Get the prefab asset that the scene character originates from
+            var sourceAsset = EditorMetadataObject.Model;
+            if (sourceAsset == null)
+            {
+                EditorUtility.DisplayDialog("Error", "This character doesn't have a source prefab asset.", "OK");
+                return;
+            }
+
+            // Get all transforms from both the source asset and the scene character
+            var sourceTransforms = sourceAsset.GetComponentsInChildren<Transform>();
+            var sceneTransforms = _sceneViewCharacter.GetComponentsInChildren<Transform>();
+
+            // Create a dictionary to quickly look up scene transforms by name
+            var sceneTransformMap = new Dictionary<string, Transform>();
+            foreach (var transform in sceneTransforms)
+            {
+                sceneTransformMap[transform.name] = transform;
+            }
+
+            // Copy transform data from source to scene character
+            foreach (var t in sceneTransforms)
+            {
+                Undo.RecordObject(t, "Load Original Source Pose");
+            }
+
+            foreach (var sourceTransform in sourceTransforms)
+            {
+                if (!sceneTransformMap.TryGetValue(sourceTransform.name, out var sceneTransform))
+                {
+                    continue;
+                }
+
+                // Copy local position, rotation and scale
+                sceneTransform.localPosition = sourceTransform.localPosition;
+                sceneTransform.localRotation = sourceTransform.localRotation;
+                sceneTransform.localScale = sourceTransform.localScale;
+            }
+
+            // Update the target draw and reload the character
+            _previewer.UpdateTargetDraw(this);
+            _previewer.ReloadCharacter(_target);
+        }
+
+        private void SetToTPose()
+        {
+            // Align target to source, which will update the T-Pose.
+            AlignTargetToSource(_source.ConfigName,
+                AlignmentFlags.All,
+                _configHandle,
+                SkeletonType.SourceSkeleton,
+                _configHandle,
+                out var newConfigHandle);
+            GetSkeletonTPose(newConfigHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.UnscaledTPose,
+                JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
+            tPose.CopyTo(_target.ReferencePose);
+            _utilityConfig.Handles.Add(newConfigHandle);
+            _previewer.ReloadCharacter(_target);
         }
 
         private void RemoveExistingOverlays()
@@ -2011,11 +2130,11 @@ namespace Meta.XR.Movement.Editor
                 LoadConfig(this);
             }
 
-            ValidateMSDKUtilityEditorInfo(_previewer, _previewer.TargetSkeletonDrawTPose, _target);
+            Validate(_previewer, _previewer.TargetSkeletonDrawTPose, _target);
 
             if (Step >= EditorStep.MinTPose)
             {
-                ValidateMSDKUtilityEditorInfo(_previewer, _previewer.SourceSkeletonDrawTPose, _source);
+                Validate(_previewer, _previewer.SourceSkeletonDrawTPose, _source);
             }
         }
 

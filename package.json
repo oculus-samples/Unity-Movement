@@ -1,7 +1,7 @@
 {
   "name": "com.meta.xr.sdk.movement",
   "displayName": "Meta XR Movement SDK",
-  "version": "77.0.0",
+  "version": "77.0.1",
   "unity": "2022.3",
   "unityRelease": "15f1",
   "keywords": [

@@ -84,8 +84,8 @@ namespace Meta.XR.Movement.Editor
                     paddingBottom = 2,
                     paddingLeft = 4,
                     paddingRight = 4,
-                    minWidth = 230,
-                    maxWidth = 230
+                    minWidth = 240,
+                    maxWidth = 240
                 }
             };
 

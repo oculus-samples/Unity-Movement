@@ -25357,6 +25357,18 @@ PrefabInstance:
       value: StylizedCharacterHipPinning
       objectReference: {fileID: 0}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _skeletonRetargeter._scaleRange.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _skeletonRetargeter._scaleRange.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._weight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[3]._ccdProcessor._weight
       value: 1
       objectReference: {fileID: 0}
@@ -25364,6 +25376,18 @@ PrefabInstance:
       propertyPath: _targetProcessorContainers.Array.data[4]._ccdProcessor._weight
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _sourceProcessorContainers.Array.data[0]._isdkProcessor._leftHand
+      value: 
+      objectReference: {fileID: 1863607546}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _sourceProcessorContainers.Array.data[0]._isdkProcessor._cameraRig
+      value: 
+      objectReference: {fileID: 2062269062}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _sourceProcessorContainers.Array.data[0]._isdkProcessor._rightHand
+      value: 
+      objectReference: {fileID: 1695004887}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[3]._twoBoneIKProcessor._poleTarget
       value: 
@@ -25378,7 +25402,7 @@ PrefabInstance:
       objectReference: {fileID: 2119847543}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._isFoldoutExpanded
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._targetHips
@@ -25386,7 +25410,7 @@ PrefabInstance:
       objectReference: {fileID: 2119847543}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._isFoldoutExpanded
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._targetHips
@@ -25539,11 +25563,11 @@ PrefabInstance:
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._ccdData.Array.data[0].Target
       value: 
-      objectReference: {fileID: 1467336568}
+      objectReference: {fileID: 205652339}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._ccdData.Array.data[0].Target
       value: 
-      objectReference: {fileID: 1419136270}
+      objectReference: {fileID: 676065713}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._hipPinningTargetLogic
       value: 

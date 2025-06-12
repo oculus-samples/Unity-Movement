@@ -56,6 +56,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
             EditorGUILayout.LabelField("Configuration", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
             {
+
                 EditorGUILayout.PropertyField(_config);
                 if (_config.objectReferenceValue != null)
                 {
@@ -81,6 +82,10 @@ namespace Meta.XR.Movement.Retargeting.Editor
             var targetType = typeof(MSDKUtilityEditorMetadata);
             var guids = AssetDatabase.FindAssets($"t:{nameof(MSDKUtilityEditorMetadata)}");
             var metadataObjects = new List<MSDKUtilityEditorMetadata>();
+            var metadataAssets = new List<MSDKUtilityEditorMetadata>();
+            string metadataAssetPath = "";
+            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(config.gameObject);
+            var modelAssetPath = AssetDatabase.GetAssetPath(prefab);
             foreach (var guid in guids)
             {
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
@@ -94,16 +99,32 @@ namespace Meta.XR.Movement.Retargeting.Editor
                 {
                     metadataObjects.Add(asset);
                 }
+                else if (asset?.Model && AssetDatabase.GetAssetPath(asset.Model) == modelAssetPath)
+                {
+                    metadataAssets.Add(asset);
+                    metadataAssetPath = assetPath;
+                }
             }
 
+            if (metadataAssets.Count != 0)
+            {
+                bool confirmed = EditorUtility.DisplayDialog("Error", $"The config isn't linked to a config scriptable object. Opening config at {metadataAssetPath}", "Ok");
+                if (confirmed)
+                {
+                    MSDKUtilityEditor.CreateAlignmentScene(metadataAssets[0].Model);
+                }
+                return;
+            }
             if (metadataObjects.Count == 0)
             {
                 Debug.LogError("The config isn't linked to a config scriptable object!");
                 return;
             }
-
-            var targetAsset = metadataObjects[0].Model;
-            MSDKUtilityEditor.CreateAlignmentScene(targetAsset);
+            else
+            {
+                var targetAsset = metadataObjects[0].Model;
+                MSDKUtilityEditor.CreateAlignmentScene(targetAsset);
+            }
         }
 
         /// <summary>

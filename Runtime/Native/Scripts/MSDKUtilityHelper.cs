@@ -16,7 +16,6 @@ namespace Meta.XR.Movement
     /// </summary>
     public static class MSDKUtilityHelper
     {
-
         public static readonly string[] AutoMapExcludedJointNames =
         {
             "LeftHandPalm",
@@ -138,12 +137,13 @@ namespace Meta.XR.Movement
             new[] { "neck" },
             new[]
             {
-                "rightupperleg", "rightupleg", "rightleg", "rightlegupper", "rightlegup", "thighr", "legr", "rleg",
-                "rhip"
+                "rightupperleg", "rightupleg", "rightleg", "rightlegupper", "rightlegup", "rthigh", "thighr", "legr",
+                "rleg", "rhip"
             },
             new[]
             {
-                "leftupperleg", "leftupleg", "leftleg", "leftlegupper", "leftlegup", "thighl", "legl", "lleg", "lhip"
+                "leftupperleg", "leftupleg", "leftleg", "leftlegupper", "leftlegup", "lthigh", "thighl", "legl", "lleg",
+                "lhip"
             },
             new[]
             {
@@ -207,13 +207,15 @@ namespace Meta.XR.Movement
             var targetKnownJoints = FindKnownJoints(targetData);
 
             // 3. Function calls here, then return the retargetingConfigJson variable
-            ConfigInitParams initParams = new ConfigInitParams();
+            var initParams = new ConfigInitParams();
             initParams.SourceSkeleton.JointNames = sourceData.Joints;
             initParams.SourceSkeleton.ParentJointNames = sourceData.ParentJoints;
             initParams.SourceSkeleton.OptionalKnownSourceJointNamesById = _sourceKnownJoints;
             initParams.SourceSkeleton.OptionalAutoMapExcludedJointNames = AutoMapExcludedJointNames;
-            initParams.SourceSkeleton.OptionalManifestationNames = new[] { MetaSourceDataProvider.HalfBodyManifestation };
-            initParams.SourceSkeleton.OptionalManifestationJointCounts = new[] { (int)SkeletonData.BodyTrackingBoneId.End };
+            initParams.SourceSkeleton.OptionalManifestationNames =
+                new[] { MetaSourceDataProvider.HalfBodyManifestation };
+            initParams.SourceSkeleton.OptionalManifestationJointCounts =
+                new[] { (int)SkeletonData.BodyTrackingBoneId.End };
             initParams.SourceSkeleton.OptionalManifestationJointNames = HalfBodyManifestationJointNames;
             initParams.SourceSkeleton.MinTPose = sourceMinTPose;
             initParams.SourceSkeleton.MaxTPose = sourceMaxTPose;
@@ -242,7 +244,6 @@ namespace Meta.XR.Movement
 
             // 5. Try to auto map.
             GenerateMappings(configHandle, AutoMappingFlags.EmptyFlag);
-
             WriteConfigDataToJson(configHandle, out var retargetingConfigJson);
             DestroyHandle(configHandle);
             return retargetingConfigJson;
@@ -253,16 +254,11 @@ namespace Meta.XR.Movement
         /// </summary>
         /// <param name="target">The target game object to get mappings for.</param>
         /// <param name="isOvrSkeleton">True if we should also include the root in the mapping.</param>
-        /// <param name="previousRootName">The previous name of the root prior to being renamed.</param>
         /// <returns>The dictionary of child parent joint transform mappings.</returns>
-        public static Dictionary<Transform, Transform> GetChildParentJointMapping(GameObject target, bool isOvrSkeleton,
-            out string previousRootName)
+        public static Dictionary<Transform, Transform> GetChildParentJointMapping(Transform target, bool isOvrSkeleton)
         {
-            // Start with looking for the hips for body tracking.
-            Transform hips;
-            previousRootName = string.Empty;
-
             // First, check if an animator exists so that we can get the hips.
+            Transform hips;
             var animator = target.GetComponent<Animator>();
             if (animator != null && animator.avatar != null && animator.avatar.isHuman)
             {
@@ -272,14 +268,14 @@ namespace Meta.XR.Movement
             {
                 // 1. Try to find hips manually by string matching.
                 var hipsNames = _knownJointNames[(int)KnownJointType.Hips];
-                hips = SearchForJointWithNameInChildren(target.transform, hipsNames, 3);
+                hips = SearchForJointWithNameInChildren(target, hipsNames, 3);
 
                 // 2. If we can't find the hips by string matching, look for the legs and infer that the hips
                 // is the parent of the legs.
                 if (hips == null)
                 {
                     var legNames = _knownJointNames[(int)KnownJointType.LeftUpperLeg];
-                    var leg = SearchForJointWithNameInChildren(target.transform, legNames, 1);
+                    var leg = SearchForJointWithNameInChildren(target, legNames, 1);
                     if (leg != null)
                     {
                         hips = leg.parent;
@@ -294,44 +290,18 @@ namespace Meta.XR.Movement
                     }
                 }
             }
-
             if (hips == null)
             {
                 Debug.LogError("Could not find hips to start with!");
                 return null;
             }
 
-            // Once we have the hips, let's find all child transforms and create a dictionary mapping.
-            if (isOvrSkeleton)
-            {
-                hips = hips.parent;
-            }
+            // Assign root after finding hips
+            var root = hips.parent;
 
+            // Once we have the root, let's find all child transforms and create a dictionary mapping.
             var jointMapping = new Dictionary<Transform, Transform>();
-            if (!isOvrSkeleton)
-            {
-                var root = hips.parent;
-                if (jointMapping.TryAdd(root, null))
-                {
-                    previousRootName = root.name;
-                    root.name = "root";
-                }
-            }
-
-            FillJointMapping(true, hips, ref jointMapping);
-
-            // The first entry should be the root joint if it wasn't added already - only for target skeletons.
-            if (!isOvrSkeleton)
-            {
-                if (jointMapping.ContainsKey(hips))
-                {
-                    jointMapping[hips] = hips.parent;
-                }
-            }
-            else
-            {
-                previousRootName = hips.name;
-            }
+            FillJointMapping(true, root, ref jointMapping);
 
             return jointMapping;
         }
@@ -452,11 +422,12 @@ namespace Meta.XR.Movement
         {
             // Remove shared prefix and suffix from joints array
             var trimmedJoints = TrimSharedPrefixAndSuffix(transforms.Select(n => n.name).ToArray());
-            var matches = new List<(Transform, float)>();
-            foreach (var targetJoint in namesToMatch)
+            var matches = new List<(Transform, float, int)>(); // Added index to track position in namesToMatch
+            for (int i = 0; i < namesToMatch.Length; i++)
             {
+                var targetJoint = namesToMatch[i];
                 var matched = false;
-                var bestMatch = (default(Transform), 0.0f);
+                var bestMatch = (default(Transform), 0.0f, i);
                 foreach (var joint in trimmedJoints)
                 {
                     // Get the corresponding transform for the current joint
@@ -473,7 +444,7 @@ namespace Meta.XR.Movement
                     // If the similarity is above the threshold, add it to the matches list and mark it as matched
                     if (similarity >= threshold)
                     {
-                        matches.Add((jointTransform, similarity));
+                        matches.Add((jointTransform, similarity, i));
                         matched = true;
                         break;
                     }
@@ -481,7 +452,7 @@ namespace Meta.XR.Movement
                     // Pick the most similar match.
                     if (similarity > bestMatch.Item2)
                     {
-                        bestMatch = (jointTransform, similarity);
+                        bestMatch = (jointTransform, similarity, i);
                     }
                 }
 
@@ -497,9 +468,37 @@ namespace Meta.XR.Movement
                 }
             }
 
-            // Sort the matches by their similarity in descending order.
-            // If multiple matches are of the same similarity, the priority is the order of the known joint names.
-            return matches.OrderByDescending(x => x.Item2).ToList();
+            // Group matches by similarity within 5% of each other
+            var groupedMatches = new List<(Transform, float)>();
+            var processedMatches = new List<(Transform, float, int)>(matches);
+
+            while (processedMatches.Count > 0)
+            {
+                // Find the match with the highest similarity
+                var bestMatch = processedMatches.OrderByDescending(x => x.Item2).First();
+                var similarMatches = processedMatches
+                    .Where(m => Math.Abs(m.Item2 - bestMatch.Item2) <= 5.0f)
+                    .ToList();
+
+                // If multiple matches are within 5%, prioritize by order in namesToMatch (lower index = higher priority)
+                if (similarMatches.Count > 1)
+                {
+                    var prioritizedMatch = similarMatches.OrderBy(m => m.Item3).First();
+                    groupedMatches.Add((prioritizedMatch.Item1, prioritizedMatch.Item2));
+                }
+                else
+                {
+                    groupedMatches.Add((bestMatch.Item1, bestMatch.Item2));
+                }
+
+                // Remove processed matches
+                foreach (var match in similarMatches)
+                {
+                    processedMatches.Remove(match);
+                }
+            }
+
+            return groupedMatches;
         }
 
         public static void ScaleSkeletonPose(UInt64 handle, SkeletonType skeletonType,
@@ -542,34 +541,34 @@ namespace Meta.XR.Movement
             return -1;
         }
 
-        private static Transform SearchForJointWithNameInChildren(Transform parent, string[] searchNames, int expectedChildCount)
+        private static Transform SearchForJointWithNameInChildren(Transform parent, string[] searchNames,
+            int expectedChildCount)
         {
-            var queue = new Queue<Transform>();
-            queue.Enqueue(parent);
-            while (queue.Count > 0)
-            {
-                var current = queue.Dequeue();
-                if (searchNames.Any(searchString => current.name.ToLower().Contains(searchString.ToLower())))
-                {
-                    // Ensure whatever joint we're returning doesn't have a skinned mesh renderer and has the minimum
-                    // specified child count.
-                    if (current.GetComponent<SkinnedMeshRenderer>() == null && current.childCount >= expectedChildCount)
-                    {
-                        return current;
-                    }
-                }
+            // Get all children transforms
+            var allTransforms = new List<Transform> { parent };
+            allTransforms.AddRange(parent.GetAllChildren());
 
-                foreach (Transform child in current)
-                {
-                    queue.Enqueue(child);
-                }
+            // Filter out transforms with skinned mesh renderers or insufficient child count
+            var validTransforms = allTransforms
+                .Where(t => t.GetComponent<SkinnedMeshRenderer>() == null && t.childCount >= expectedChildCount)
+                .ToArray();
+
+            if (validTransforms.Length == 0)
+            {
+                return null;
             }
 
-            return null;
+            // Use FindClosestMatches to find the best match based on Levenshtein distance
+            var matches = FindClosestMatches(validTransforms, searchNames);
+
+            // Return the best match if any was found
+            return matches.Count > 0 ? matches[0].Item1 : null;
         }
 
-        private static void FillJointMapping(bool isRoot,
-            Transform target, ref Dictionary<Transform, Transform> jointMapping)
+        private static void FillJointMapping(
+            bool isRoot,
+            Transform target,
+            ref Dictionary<Transform, Transform> jointMapping)
         {
             var targetChildCount = target.childCount;
             jointMapping.Add(target, isRoot ? null : target.parent);
@@ -583,8 +582,8 @@ namespace Meta.XR.Movement
         private static string[] FindKnownJoints(SkeletonData data)
         {
             var knownJoints = new string[(int)KnownJointType.KnownJointCount];
-            knownJoints[0] = "root";
             var matchPercentages = new float[knownJoints.Length];
+            knownJoints[0] = data.Joints[0];
 
             for (var i = KnownJointType.Hips; i < KnownJointType.KnownJointCount; i++)
             {
@@ -655,15 +654,23 @@ namespace Meta.XR.Movement
             return knownJoints;
         }
 
-        private static List<(string, float)> FindClosestMatches(
+        /// <summary>
+        /// Find the closest matches for each name in namesToMatch and sorts them by similarity.
+        /// </summary>
+        /// <param name="names">The names to search.</param>
+        /// <param name="namesToMatch">The names to match.</param>
+        /// <param name="threshold">The name similarity threshold.</param>
+        /// <returns>List of closest matches.</returns>
+        public static List<(string, float)> FindClosestMatches(
             string[] names, string[] namesToMatch, float threshold = 90f)
         {
             // Remove shared prefix and suffix from joints array
             var trimmedJoints = TrimSharedPrefixAndSuffix(names);
-            var matches = new List<(string, float)>();
-            foreach (var targetJoint in namesToMatch)
+            var matches = new List<(string, float, int)>(); // Added index to track position in namesToMatch
+            for (int i = 0; i < namesToMatch.Length; i++)
             {
-                var bestMatch = (string.Empty, 0.0f);
+                var targetJoint = namesToMatch[i];
+                var bestMatch = (string.Empty, 0.0f, i);
                 foreach (var joint in trimmedJoints)
                 {
                     // Calculate the similarity between the target joint and the current joint
@@ -673,13 +680,13 @@ namespace Meta.XR.Movement
                     // If the similarity is above the threshold, add it to the matches list and mark it as matched
                     if (similarity >= threshold)
                     {
-                        matches.Add((joint.Key, similarity));
+                        matches.Add((joint.Key, similarity, i));
                     }
 
                     // Pick the most similar match.
                     if (similarity > bestMatch.Item2)
                     {
-                        bestMatch = (joint.Key, similarity);
+                        bestMatch = (joint.Key, similarity, i);
                     }
                 }
 
@@ -690,9 +697,37 @@ namespace Meta.XR.Movement
                 }
             }
 
-            // Sort the matches by their similarity in descending order.
-            // If multiple matches are of the same similarity, the priority is the order of the known joint names.
-            return matches.OrderByDescending(x => x.Item2).ToList();
+            // Group matches by similarity within 5% of each other
+            var groupedMatches = new List<(string, float)>();
+            var processedMatches = new List<(string, float, int)>(matches);
+
+            while (processedMatches.Count > 0)
+            {
+                // Find the match with the highest similarity
+                var bestMatch = processedMatches.OrderByDescending(x => x.Item2).First();
+                var similarMatches = processedMatches
+                    .Where(m => Math.Abs(m.Item2 - bestMatch.Item2) <= 5.0f)
+                    .ToList();
+
+                // If multiple matches are within 5%, prioritize by order in namesToMatch (lower index = higher priority)
+                if (similarMatches.Count > 1)
+                {
+                    var prioritizedMatch = similarMatches.OrderBy(m => m.Item3).First();
+                    groupedMatches.Add((prioritizedMatch.Item1, prioritizedMatch.Item2));
+                }
+                else
+                {
+                    groupedMatches.Add((bestMatch.Item1, bestMatch.Item2));
+                }
+
+                // Remove processed matches
+                foreach (var match in similarMatches)
+                {
+                    processedMatches.Remove(match);
+                }
+            }
+
+            return groupedMatches;
         }
 
         private static Dictionary<string, string> TrimSharedPrefixAndSuffix(string[] joints)

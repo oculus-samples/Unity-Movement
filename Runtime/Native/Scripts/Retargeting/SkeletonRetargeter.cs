@@ -197,6 +197,7 @@ namespace Meta.XR.Movement.Retargeting
                 (int)SkeletonData.FullBodyTrackingBoneId.RightHandWristTwist
             }
         };
+
         private SkeletonDraw _targetSkeletonDraw = new();
         private ulong _nativeHandle = INVALID_HANDLE;
         private bool _isInitialized;
@@ -347,6 +348,7 @@ namespace Meta.XR.Movement.Retargeting
                 _sourcePose.Dispose();
                 _sourcePose = new NativeArray<NativeTransform>(sourcePose, Persistent);
             }
+
             _sourcePose.CopyFrom(sourcePose);
 
             // Run retargeting.
@@ -408,6 +410,12 @@ namespace Meta.XR.Movement.Retargeting
 
             // Scale is uniform.
             _currentScale = jointPoseWithScale[0].Scale.x;
+
+            // Specific case handling for when the root scale is less than range of values due to invalid setup
+            if (_currentScale < 0.20f)
+            {
+                _currentScale *= 10f;
+            }
         }
 
         /// <summary>
@@ -415,6 +423,14 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         public void DrawDebugSourcePose(Transform offset, Color color)
         {
+            _sourceSkeletonDraw ??= new SkeletonDraw
+            {
+                IndexesToIgnore = new List<int>
+                {
+                    (int)SkeletonData.FullBodyTrackingBoneId.LeftHandWristTwist,
+                    (int)SkeletonData.FullBodyTrackingBoneId.RightHandWristTwist
+                }
+            };
             if (_sourceSkeletonDraw.LineThickness <= float.Epsilon)
             {
                 _sourceSkeletonDraw.InitDraw(color, 0.005f);
@@ -433,6 +449,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="useWorldPose">If rendering world transforms.</param>
         public void DrawDebugTargetPose(Transform localOffset, Color color, bool useWorldPose = false)
         {
+            _targetSkeletonDraw ??= new SkeletonDraw();
             if (_targetSkeletonDraw.LineThickness <= float.Epsilon)
             {
                 _targetSkeletonDraw.InitDraw(color, 0.005f);

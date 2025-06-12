@@ -129,10 +129,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 582f45aec0d698e438d82230e6c6e01e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animators: []
+  _animators:
+  - {fileID: 0}
+  - {fileID: 0}
+  _retargeters:
+  - {fileID: 0}
+  - {fileID: 0}
   _customAnimEnabled: 0
   _worldText: {fileID: 4504391235026854836}
-  _animParamName: Wave
+  _toggleButton: 0
 --- !u!1001 &7531259564021732987
 PrefabInstance:
   m_ObjectHideFlags: 0

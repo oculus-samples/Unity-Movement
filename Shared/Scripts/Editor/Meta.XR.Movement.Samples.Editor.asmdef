@@ -2,6 +2,7 @@
     "name": "Meta.XR.Movement.Samples.Editor",
     "rootNamespace": "",
     "references": [
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
         "GUID:d2761a0af0f567748a72629d4bb18a26",
         "GUID:05f3ea442cba2994293b0b3cd60188e4"
     ],
