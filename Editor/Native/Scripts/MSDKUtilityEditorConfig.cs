@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Meta.XR.Movement.Retargeting;
 using Unity.Collections;
 using UnityEditor;
@@ -213,33 +214,6 @@ namespace Meta.XR.Movement.Editor
             ParentIndices = parentIndices.ToArray();
         }
 
-        public void Initialize(ulong handle, SkeletonType skeletonType, SkeletonTPoseType tPoseType)
-        {
-            ConfigHandle = handle;
-            GetConfigName(ConfigHandle, out ConfigName);
-            GetBlendShapeNames(ConfigHandle, skeletonType, out BlendshapeNames);
-            GetSkeletonInfo(ConfigHandle, skeletonType, out SkeletonInfo);
-            GetJointNames(ConfigHandle, skeletonType, out JointNames);
-            GetParentJointNames(ConfigHandle, skeletonType, out ParentJointNames);
-            GetKnownJointNames(ConfigHandle, skeletonType, out KnownJointNames);
-            SkeletonTPoseType = tPoseType;
-
-            // Fill out runtime data.
-            var count = SkeletonInfo.JointCount;
-            var tPose = new NativeArray<NativeTransform>(count, Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            var parentIndices = new NativeArray<int>(count, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            GetSkeletonTPoseByRef(ConfigHandle, skeletonType, tPoseType,
-                JointRelativeSpaceType.RootOriginRelativeSpace, ref tPose);
-            GetParentJointIndexesByRef(ConfigHandle, skeletonType, ref parentIndices);
-            GetSkeletonMappings(ConfigHandle, tPoseType, out var jointMappings);
-            GetSkeletonMappingEntries(ConfigHandle, tPoseType, out var jointMappingEntries);
-            JointMappings = jointMappings.ToArray();
-            JointMappingEntries = jointMappingEntries.ToArray();
-            ReferencePose = tPose.ToArray();
-            ParentIndices = parentIndices.ToArray();
-        }
-
         /**********************************************************
          *
          *               Configuration File
@@ -417,24 +391,23 @@ namespace Meta.XR.Movement.Editor
             {
                 if (target.KnownSkeletonJoints[i] == null)
                 {
+                    target.KnownJointNames[i] = string.Empty;
                     continue;
                 }
 
-                target.KnownJointNames[i] = i == 0 ? "root" : target.KnownSkeletonJoints[i]?.name;
-            }
-
-            for (var i = 0; i < targetMinTPose.Length; i++)
-            {
-                var pose = targetMinTPose[i];
-                pose.Scale = Vector3.one * Mathf.Clamp(pose.Scale.x, 0.001f, float.MaxValue);
-                targetMinTPose[i] = pose;
-            }
-
-            for (var i = 0; i < targetMaxTPose.Length; i++)
-            {
-                var pose = targetMaxTPose[i];
-                pose.Scale = Vector3.one * Mathf.Clamp(pose.Scale.x, 0.001f, float.MaxValue);
-                targetMaxTPose[i] = pose;
+                var oldRootName = "root";
+                if (i == 0 && target.KnownJointNames[0] == oldRootName)
+                {
+                    // Upgrade to use non-root name.
+                    var newRootName = target.KnownSkeletonJoints[0].name;
+                    target.JointNames = target.JointNames.Select(s => s == oldRootName ? newRootName : s).ToArray();
+                    target.ParentJointNames = target.ParentJointNames.Select(s => s == oldRootName ? newRootName : s).ToArray();
+                    target.KnownJointNames = target.KnownJointNames.Select(s => s == oldRootName ? newRootName : s).ToArray();
+                }
+                else
+                {
+                    target.KnownJointNames[i] = target.KnownSkeletonJoints[i]?.name;
+                }
             }
 
             var initParams = new ConfigInitParams();
@@ -521,7 +494,8 @@ namespace Meta.XR.Movement.Editor
         /// <param name="win">The editor window.</param>
         /// <param name="targetTPoseType">The target T-pose type.</param>
         /// <param name="customConfig">Optional custom configuration JSON string.</param>
-        public static void LoadConfig(MSDKUtilityEditorWindow win,
+        public static void LoadConfig(
+            MSDKUtilityEditorWindow win,
             SkeletonTPoseType targetTPoseType,
             string customConfig = null)
         {
@@ -570,7 +544,8 @@ namespace Meta.XR.Movement.Editor
         /// <param name="win">The editor window.</param>
         /// <param name="customConfig">Optional custom configuration JSON string.</param>
         /// <param name="displayDialogue">Whether to display a confirmation dialogue.</param>
-        public static void ResetConfig(MSDKUtilityEditorWindow win,
+        public static void ResetConfig(
+            MSDKUtilityEditorWindow win,
             bool displayDialogue,
             string customConfig = null)
         {
@@ -592,7 +567,8 @@ namespace Meta.XR.Movement.Editor
         /// <param name="win">The editor window.</param>
         /// <param name="displayDialogue">Whether to display a confirmation dialogue.</param>
         /// <param name="customData">Optional custom skeleton data.</param>
-        public static void CreateConfig(MSDKUtilityEditorWindow win,
+        public static void CreateConfig(
+            MSDKUtilityEditorWindow win,
             bool displayDialogue,
             SkeletonData customData = null)
         {
@@ -633,7 +609,8 @@ namespace Meta.XR.Movement.Editor
         /// <param name="previewer">The editor previewer.</param>
         /// <param name="skeletonDrawTPose">The skeleton draw for T-pose.</param>
         /// <param name="config">The utility configuration.</param>
-        public static void ValidateMSDKUtilityEditorInfo(MSDKUtilityEditorPreviewer previewer,
+        public static void Validate(
+            MSDKUtilityEditorPreviewer previewer,
             SkeletonDraw skeletonDrawTPose,
             MSDKUtilityEditorConfig config)
         {

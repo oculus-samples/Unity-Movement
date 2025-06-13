@@ -1,3 +1,10 @@
+## [77.0.1]
+
+### What's Fixed
+
+- Fixed animation quaternion blending edge cases.
+- Fixed various retargeting editor issues related to posing, playback, and scaling.
+
 ## [77.0.0]
 
 ### What's New

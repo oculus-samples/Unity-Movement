@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using Meta.XR.Movement.Editor;
+using Meta.XR.Movement.Retargeting;
 using Meta.XR.Movement.Retargeting.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -175,8 +176,8 @@ namespace Meta.XR.Movement.Networking.Editor
             var networkCharacterRetargeter = MSDKUtilityEditor.GetOrAddComponent<NetworkCharacterRetargeter>(prefab);
             networkCharacterRetargeter.ConfigAsset = metadataObj.ConfigJson;
             CharacterRetargeterConfigEditor.LoadConfig(new SerializedObject(networkCharacterRetargeter), networkCharacterRetargeter);
-            var ovrBody = MSDKUtilityEditor.GetOrAddComponent<OVRBody>(prefab);
-            ovrBody.ProvidedSkeletonType = OVRPlugin.BodyJointSet.FullBody;
+            var dataProvider = MSDKUtilityEditor.GetOrAddComponent<MetaSourceDataProvider>(prefab);
+            dataProvider.ProvidedSkeletonType = OVRPlugin.BodyJointSet.FullBody;
             using var serializedObject = new SerializedObject(networkCharacterRetargeter);
             serializedObject.ApplyModifiedProperties();
             serializedObject.Update();

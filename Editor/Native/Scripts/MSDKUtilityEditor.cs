@@ -236,7 +236,7 @@ namespace Meta.XR.Movement.Editor
             var target = customData;
             if (target == null)
             {
-                target = CreateRetargetingData(targetObject);
+                target = CreateRetargetingData(targetObject.transform);
                 if (target == null)
                 {
                     Debug.LogError("Error in creating retargeting data!");
@@ -246,9 +246,14 @@ namespace Meta.XR.Movement.Editor
 
             var skinnedMeshRenderers = GetValidSkinnedMeshRenderers(targetObject);
             var blendshapeNames = GetBlendshapeNames(skinnedMeshRenderers);
-
             var output = MSDKUtilityHelper.CreateRetargetingConfig(
                 blendshapeNames, sourceData, target, targetObject.name);
+            if (output == string.Empty)
+            {
+                Debug.LogError("Error in creating retargeting config!");
+                return null;
+            }
+
             var prefabAssetPath = AssetDatabase.GetAssetPath(targetObject);
             if (string.IsNullOrEmpty(prefabAssetPath))
             {
@@ -299,21 +304,18 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Creates retargeting data for a target GameObject.
         /// </summary>
-        /// <param name="target">The target GameObject.</param>
-        /// <param name="utilityConfig">Optional utility configuration.</param>
+        /// <param name="target">The target transform.</param>
+        /// <param name="config"></param>
         /// <returns>The created skeleton data.</returns>
-        public static SkeletonData CreateRetargetingData(GameObject target,
-            MSDKUtilityEditorConfig utilityConfig = null)
+        public static SkeletonData CreateRetargetingData(Transform target, MSDKUtilityEditorConfig config = null)
         {
             var isOvrSkeleton = target.name == "OVRSkeleton";
-            var jointMapping =
-                MSDKUtilityHelper.GetChildParentJointMapping(target, isOvrSkeleton, out var previousRootName);
+            var jointMapping = MSDKUtilityHelper.GetChildParentJointMapping(target, isOvrSkeleton);
             if (jointMapping == null)
             {
                 return null;
             }
 
-            Transform rootJoint = null;
             var index = 0;
             var jointCount = jointMapping.Keys.Count;
             var data = ScriptableObject.CreateInstance<SkeletonData>();
@@ -327,7 +329,6 @@ namespace Meta.XR.Movement.Editor
                 if (parentJoint == null)
                 {
                     data.ParentJoints[index] = string.Empty;
-                    rootJoint = joint;
                 }
                 else
                 {
@@ -338,13 +339,23 @@ namespace Meta.XR.Movement.Editor
                 index++;
             }
 
-            if (utilityConfig != null)
+            // Filter out any extra joints not found in config.
+            if (config != null)
             {
                 foreach (var joint in data.Joints)
                 {
-                    if (!utilityConfig.JointNames.Contains(joint))
+                    if (!config.JointNames.Contains(joint))
                     {
                         data.RemoveJoint(joint);
+                    }
+                }
+
+                for (var i = 0; i < data.ParentJoints.Length; i++)
+                {
+                    var parentJoint = data.ParentJoints[i];
+                    if (!config.JointNames.Contains(parentJoint))
+                    {
+                        data.ParentJoints[i] = string.Empty;
                     }
                 }
             }
@@ -356,14 +367,6 @@ namespace Meta.XR.Movement.Editor
             if (isOvrSkeleton)
             {
                 data.SortData();
-            }
-            else
-            {
-                // Restore the name of the root joint to its previous name.
-                if (rootJoint != null)
-                {
-                    rootJoint.name = previousRootName;
-                }
             }
 
             return data;
@@ -506,7 +509,7 @@ namespace Meta.XR.Movement.Editor
 
         private static string[] GetBlendshapeNames(SkinnedMeshRenderer[] skinnedMeshes)
         {
-            List<string> blendshapeNames = new List<string>();
+            HashSet<string> blendshapeNames = new HashSet<string>();
             foreach (var skinnedMesh in skinnedMeshes)
             {
                 int numCurrentBlendshapes = skinnedMesh.sharedMesh.blendShapeCount;

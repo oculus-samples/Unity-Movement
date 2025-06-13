@@ -6,8 +6,9 @@ using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Profiling;
+using Allocator = Unity.Collections.Allocator;
+using Assert = UnityEngine.Assertions.Assert;
 
 namespace Meta.XR.Movement
 {
@@ -736,6 +737,11 @@ namespace Meta.XR.Movement
         {
             public NativeArray<JointMapping> Mappings;
             public NativeArray<JointMappingEntry> MappingEntries;
+
+            public override string ToString()
+            {
+                return $"JointMappingDefinition: Mappings={Mappings.Length}, MappingEntries={MappingEntries.Length}";
+            }
         }
 
         [StructLayout(LayoutKind.Sequential), Serializable]
@@ -983,6 +989,42 @@ namespace Meta.XR.Movement
 
             // Buffer of all Manifestation joint names in order of manifestations
             public string[] OptionalManifestationJointNames;
+
+            public override string ToString()
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+                sb.AppendLine($"SkeletonInitParams:");
+                sb.AppendLine($"  BlendShapes: {BlendShapeNames?.Length ?? 0}");
+                sb.AppendLine($"  Joints: {JointNames?.Length ?? 0}");
+                sb.AppendLine($"  ParentJoints: {ParentJointNames?.Length ?? 0}");
+                sb.AppendLine($"  MinTPose: {MinTPose.Length}");
+                sb.AppendLine($"  MaxTPose: {MaxTPose.Length}");
+                sb.AppendLine($"  UnscaledTPose: {UnscaledTPose.Length}");
+                sb.AppendLine($"  Manifestations: {OptionalManifestationNames?.Length ?? 0}");
+
+                // Add joint names
+                if (JointNames != null && JointNames.Length > 0)
+                {
+                    sb.AppendLine("\nJoint Names:");
+                    for (int i = 0; i < JointNames.Length; i++)
+                    {
+                        sb.AppendLine($"  [{i}] {JointNames[i]}");
+                    }
+                }
+
+                // Add parent joint names
+                if (ParentJointNames != null && ParentJointNames.Length > 0)
+                {
+                    sb.AppendLine("\nParent Joint Names:");
+                    for (int i = 0; i < ParentJointNames.Length; i++)
+                    {
+                        sb.AppendLine($"  [{i}] {ParentJointNames[i]}");
+                    }
+                }
+
+                return sb.ToString();
+            }
         }
 
         /// <summary>
@@ -1083,6 +1125,14 @@ namespace Meta.XR.Movement
             // Mapping Data
             public JointMappingDefinition MinMappings;
             public JointMappingDefinition MaxMappings;
+
+            public override string ToString()
+            {
+                return "Source: " + SourceSkeleton +
+                       "\nTarget: " + TargetSkeleton +
+                       "\nMin Mappings: " + MinMappings +
+                       "\nMax Mappings:" + MaxMappings;
+            }
         }
 
         /// <summary>
@@ -1923,6 +1973,23 @@ namespace Meta.XR.Movement
                 CoordinateSpace* optionalCoordinateSpace,
                 byte* outBuffer,
                 out int inOutBufferSize);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe Result metaMovementSDK_applyWorldSpaceCoordinateSpaceConversion(
+                CoordinateSpace inCoordinateSpace,
+                CoordinateSpace outCoordinateSpace,
+                NativeTransform* transformData,
+                int jointCount);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe Result metaMovementSDK_applyCoordinateSpaceConversion(
+                ulong handle,
+                SkeletonType skeletonType,
+                JointRelativeSpaceType jointSpaceType,
+                CoordinateSpace inCoordinateSpace,
+                CoordinateSpace outCoordinateSpace,
+                NativeTransform* skeletonPose,
+                int jointCount);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_convertJointPose(
@@ -3532,6 +3599,74 @@ namespace Meta.XR.Movement
             return success == Result.Success;
         }
 
+        /// <summary>
+        /// Converts an array of transforms from one Coordinate Space System to another.
+        /// This allows converting from data in one coordinate space system to another (such as OpenXR to Unity, etc)
+        /// Requires the transforms be in WorldSpace representation (or the same space)
+        /// Does not require a handle or a valid skeleton to convert.
+        /// </summary>
+        /// <param name="inCoordinateSpace">The current Coordinate Space System of the Tranform Array.</param>
+        /// <param name="outCoordinateSpace">The target Coordinate Space System to convert the Transform Data to.</param>
+        /// <param name="transformData">Reference to an array containing the pose to be converted, which will be updated with the converted pose.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool ApplyWorldSpaceCoordinateSpaceConversionByRef(
+            CoordinateSpace inCoordinateSpace,
+            CoordinateSpace outCoordinateSpace,
+            ref NativeArray<NativeTransform> transformData)
+        {
+            Result success;
+            using (new ProfilerScope(nameof(ApplyWorldSpaceCoordinateSpaceConversionByRef)))
+            {
+                unsafe
+                {
+                    success = Api.metaMovementSDK_applyWorldSpaceCoordinateSpaceConversion(
+                        inCoordinateSpace,
+                        outCoordinateSpace,
+                        transformData.GetPtr(),
+                        transformData.Length);
+                }
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Converts a skeleton pose from one Coordinate Space System to another.
+        /// This allows converting from data in one coordinate space system to another (such as OpenXR to Unity, etc)
+        /// </summary>
+        /// <param name="handle">The handle containing the skeleton hierarchy information.</param>
+        /// <param name="skeletonType">The type of skeleton the pose belongs to.</param>
+        /// <param name="jointSpaceType">The current joint space format of the skeleton pose.</param>
+        /// <param name="inCoordinateSpace">The current Coordinate Space System of the skeleton pose.</param>
+        /// <param name="outCoordinateSpace">The target Coordinate Space System to convert the skeleton pose to.</param>
+        /// <param name="skeletonPose">Reference to an array containing the pose to be converted, which will be updated with the converted pose.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool ApplyCoordinateSpaceConversionByRef(
+            ulong handle,
+            SkeletonType skeletonType,
+            JointRelativeSpaceType jointSpaceType,
+            CoordinateSpace inCoordinateSpace,
+            CoordinateSpace outCoordinateSpace,
+            ref NativeArray<NativeTransform> skeletonPose)
+        {
+            Result success;
+            using (new ProfilerScope(nameof(ApplyCoordinateSpaceConversionByRef)))
+            {
+                unsafe
+                {
+                    success = Api.metaMovementSDK_applyCoordinateSpaceConversion(
+                        handle,
+                        skeletonType,
+                        jointSpaceType,
+                        inCoordinateSpace,
+                        outCoordinateSpace,
+                        skeletonPose.GetPtr(),
+                        skeletonPose.Length);
+                }
+            }
+
+            return success == Result.Success;
+        }
 
         /// <summary>
         /// Converts a skeleton pose from one joint space format to another.
