@@ -1,12 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Meta.XR.Movement.Retargeting;
 using Meta.XR.Movement.Retargeting.Editor;
-using Unity.Collections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -310,12 +308,13 @@ namespace Meta.XR.Movement.Editor
         public static SkeletonData CreateRetargetingData(Transform target, MSDKUtilityEditorConfig config = null)
         {
             var isOvrSkeleton = target.name == "OVRSkeleton";
-            var jointMapping = MSDKUtilityHelper.GetChildParentJointMapping(target, isOvrSkeleton);
+            var jointMapping = MSDKUtilityHelper.GetChildParentJointMapping(target, out var root);
             if (jointMapping == null)
             {
                 return null;
             }
 
+            var positionScale = 1.0f / root.localScale.x;
             var index = 0;
             var jointCount = jointMapping.Keys.Count;
             var data = ScriptableObject.CreateInstance<SkeletonData>();
@@ -335,7 +334,7 @@ namespace Meta.XR.Movement.Editor
                     data.ParentJoints[index] = parentJoint.name;
                 }
 
-                data.TPose[index] = new Pose(joint.position, joint.rotation);
+                data.TPose[index] = new Pose(joint.position * positionScale, joint.rotation);
                 index++;
             }
 

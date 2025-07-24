@@ -61,7 +61,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
                 if (_config.objectReferenceValue != null)
                 {
                     if (GUILayout.Button("Map") ||
-                        (!string.IsNullOrEmpty(config.Config) && config.JointPairs.Length == 0))
+                        (!string.IsNullOrEmpty(config.Config) && config.JointPairs is { Length: 0 }))
                     {
                         LoadConfig(serializedObject, config);
                     }
@@ -271,6 +271,12 @@ namespace Meta.XR.Movement.Retargeting.Editor
             while (queue.Count > 0)
             {
                 Transform current = queue.Dequeue();
+
+                if (current == null)
+                {
+                    continue;
+                }
+
                 // Check for exact match or contains based on the exactMatch parameter
                 if ((exactMatch && current.name == nameToFind) || (!exactMatch && current.name.Contains(nameToFind)))
                 {

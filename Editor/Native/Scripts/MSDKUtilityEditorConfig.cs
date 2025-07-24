@@ -189,7 +189,10 @@ namespace Meta.XR.Movement.Editor
         public void Initialize(string configJson, SkeletonType skeletonType, SkeletonTPoseType tPoseType)
         {
             // Read config data first.
-            CreateOrUpdateHandle(configJson, out ConfigHandle);
+            if (!CreateOrUpdateHandle(configJson, out ConfigHandle))
+            {
+                Debug.LogError("Failed to create or update handle.");
+            }
             GetConfigName(ConfigHandle, out ConfigName);
             GetBlendShapeNames(ConfigHandle, skeletonType, out BlendshapeNames);
             GetSkeletonInfo(ConfigHandle, skeletonType, out SkeletonInfo);
@@ -438,21 +441,27 @@ namespace Meta.XR.Movement.Editor
             initParams.MaxMappings.Mappings = maxJointMapping;
             initParams.MaxMappings.MappingEntries = maxJointMappingEntries;
 
-            if (!CreateOrUpdateUtilityConfig(source.ConfigName, initParams, out var newConfigHandle))
+            bool configCreated = false;
+            if (!(configCreated = CreateOrUpdateUtilityConfig(source.ConfigName, initParams, out var newConfigHandle)))
             {
-                Debug.LogError("Was unable to create or update the config with data. Re-using old handle.");
+                var errorMessage = "Was unable to create or update the config with data. Re-using old handle.";
+                Debug.LogError(errorMessage);
                 newConfigHandle = target.ConfigHandle;
             }
             win.UtilityConfig.Handles.Add(newConfigHandle);
 
             if (performAlignment)
             {
-                AlignTargetToSource(source.ConfigName,
+                bool alignWorked = AlignTargetToSource(source.ConfigName,
                     AlignmentFlags.All,
                     newConfigHandle,
                     SkeletonType.SourceSkeleton,
                     newConfigHandle,
                     out newConfigHandle);
+                if (!alignWorked)
+                {
+                    Debug.LogError("Failed to align target to source.");
+                }
             }
 
             if (updateMappings)

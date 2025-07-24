@@ -124,16 +124,39 @@ namespace Meta.XR.Movement.Editor
             }
             catch (Exception e)
             {
-                Debug.LogError(string.Format("Could not move instantiated GameObject into" +
-                                             " preview scene. Error: {0}.", e.Message));
+                Debug.LogError("Could not move instantiated GameObject into" + $" preview scene. Error: {e.Message}.");
                 return (alignmentScene, false);
             }
 
             var rootJoint = _instantiatedCharacter.transform.GetAllChildren().FirstOrDefault(child =>
                 child.childCount > 0 && child.GetComponent<SkinnedMeshRenderer>() == null);
-            if (rootJoint != null && rootJoint.localScale != Vector3.one)
+            var importer = AssetImporter.GetAtPath(_originalAssetPath) as ModelImporter;
+            var globalScale = importer != null ? importer.globalScale : 1.0f;
+            if (importer != null && rootJoint != null && rootJoint.localScale != Vector3.one)
             {
-                Debug.LogWarning("Character joints must be uniform scale for retargeting! Setting root joint scale to uniform scale.");
+                Debug.LogWarning(
+                    "Character joints must be uniform scale for retargeting! Setting root joint scale to uniform scale.");
+
+                if (!Mathf.Approximately(globalScale, rootJoint.localScale.x))
+                {
+                    var choice = EditorUtility.DisplayDialogComplex("Scaling",
+                        "Character has scaling. Retargeting requires all the character joints to have uniform scaling. Update and reimport?",
+                        "Yes", "No", "Cancel");
+                    if (choice == 0)
+                    {
+                        var scale = Mathf.Min(rootJoint.localScale.x,
+                            Mathf.Min(rootJoint.localScale.y, rootJoint.localScale.z));
+                        importer.globalScale = scale;
+                        globalScale = scale;
+                        importer.SaveAndReimport();
+                    }
+                    else
+                    {
+                        rootJoint.localScale = Vector3.one;
+                        return (new Scene(), false);
+                    }
+                }
+                _instantiatedCharacter.transform.localScale = Vector3.one * globalScale;
                 rootJoint.localScale = Vector3.one;
             }
 

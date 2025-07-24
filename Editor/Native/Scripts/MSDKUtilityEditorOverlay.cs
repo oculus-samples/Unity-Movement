@@ -5,6 +5,8 @@ using UnityEditor;
 using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Meta.XR.Movement.Editor.MSDKUtilityEditorUIConstants;
+using static Meta.XR.Movement.Editor.MSDKUtilityEditorUIFactory;
 
 namespace Meta.XR.Movement.Editor
 {
@@ -63,13 +65,6 @@ namespace Meta.XR.Movement.Editor
         private static bool _drawPreviewValue = false;
         private static bool _autoUpdateMappingValue = true;
 
-        // UI styling constants
-        private static readonly Color _primaryColor = new Color(0.0f, 0.47f, 0.95f, 1.0f);
-        private static readonly Color _cardBackgroundColor = new Color(1f, 1f, 1f, 0.03f);
-        private static readonly Color _borderColor = new Color(0f, 0f, 0f, 0.2f);
-        private static readonly Color _headerBackgroundColor = new Color(0.0f, 0.47f, 0.95f, 0.1f);
-        private static readonly Color _toggleActiveColor = new Color(0.0f, 0.47f, 0.95f, 1.0f);
-
         /// <summary>
         /// Creates the panel content for the overlay.
         /// </summary>
@@ -80,12 +75,12 @@ namespace Meta.XR.Movement.Editor
             {
                 style =
                 {
-                    paddingTop = 2,
-                    paddingBottom = 2,
-                    paddingLeft = 4,
-                    paddingRight = 4,
-                    minWidth = 240,
-                    maxWidth = 240
+                    paddingTop = TinyPadding,
+                    paddingBottom = TinyPadding,
+                    paddingLeft = SmallPadding,
+                    paddingRight = SmallPadding,
+                    minWidth = OverlayMinWidth,
+                    maxWidth = OverlayMaxWidth
                 }
             };
 
@@ -100,14 +95,14 @@ namespace Meta.XR.Movement.Editor
             {
                 style =
                 {
-                    backgroundColor = _headerBackgroundColor,
-                    borderTopLeftRadius = 3,
-                    borderTopRightRadius = 3,
-                    paddingTop = 3,
-                    paddingBottom = 3,
-                    paddingLeft = 6,
-                    paddingRight = 6,
-                    marginBottom = 2,
+                    backgroundColor = HeaderBackgroundColor,
+                    borderTopLeftRadius = SmallBorderRadius,
+                    borderTopRightRadius = SmallBorderRadius,
+                    paddingTop = SmallBorderRadius,
+                    paddingBottom = SmallBorderRadius,
+                    paddingLeft = Margins.HeaderBottom,
+                    paddingRight = Margins.HeaderBottom,
+                    marginBottom = TinyPadding,
                     flexDirection = FlexDirection.Row,
                     justifyContent = Justify.SpaceBetween
                 }
@@ -118,66 +113,58 @@ namespace Meta.XR.Movement.Editor
                 text = "Retargeting Overlay",
                 style = {
                     unityFontStyleAndWeight = FontStyle.Bold,
-                    fontSize = 13
+                    fontSize = SubHeaderFontSize
                 }
             });
 
             root.Add(headerContainer);
 
-            // Create more compact main content card with more height
-            var mainCard = new VisualElement
-            {
-                style =
-                {
-                    backgroundColor = _cardBackgroundColor,
-                    borderBottomWidth = 1,
-                    borderTopWidth = 1,
-                    borderLeftWidth = 1,
-                    borderRightWidth = 1,
-                    borderBottomColor = _borderColor,
-                    borderTopColor = _borderColor,
-                    borderLeftColor = _borderColor,
-                    borderRightColor = _borderColor,
-                    borderTopLeftRadius = 3,
-                    borderTopRightRadius = 3,
-                    borderBottomLeftRadius = 3,
-                    borderBottomRightRadius = 3,
-                    paddingTop = 4,
-                    paddingBottom = 4,
-                    paddingLeft = 6,
-                    paddingRight = 6,
-                    marginBottom = 2
-                }
-            };
+            // Create main content card
+            var mainCard = CreateCardContainer();
+            mainCard.style.borderTopLeftRadius = SmallBorderRadius;
+            mainCard.style.borderTopRightRadius = SmallBorderRadius;
+            mainCard.style.paddingTop = SmallPadding;
+            mainCard.style.paddingLeft = Margins.HeaderBottom;
+            mainCard.style.paddingRight = Margins.HeaderBottom;
+            mainCard.style.marginBottom = TinyPadding;
 
-            // Create more compact visualization options section
+            // Create visualization options section
+            var visualizationSection = CreateVisualizationSection();
+            mainCard.Add(visualizationSection);
+
+            // Create joint information section
+            var jointInfoSection = CreateJointInfoSection();
+            mainCard.Add(jointInfoSection);
+
+            // Add the main card to the root
+            root.Add(mainCard);
+
+            // Only show certain sections based on the current step
+            if (_window.Step is < MSDKUtilityEditorConfig.EditorStep.MinTPose
+                or >= MSDKUtilityEditorConfig.EditorStep.Review)
+            {
+                jointInfoSection.style.display = DisplayStyle.None;
+            }
+
+            return root;
+        }
+
+        private VisualElement CreateVisualizationSection()
+        {
             var visualizationSection = new VisualElement
             {
-                style =
-                {
-                    marginBottom = 3
-                }
+                style = { marginBottom = SmallBorderRadius }
             };
 
-            var visualizationHeader = new Label("Visualization Options")
-            {
-                style =
-                {
-                    fontSize = 13,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    marginBottom = 4,
-                    color = _primaryColor
-                }
-            };
+            var visualizationHeader = CreateSectionHeaderLabel("Visualization Options");
+            visualizationHeader.style.fontSize = SubHeaderFontSize;
+            visualizationHeader.style.marginBottom = SmallPadding;
             visualizationSection.Add(visualizationHeader);
 
             // Create a container for toggles
             var toggleContainer = new VisualElement
             {
-                style =
-                {
-                    width = Length.Percent(100)
-                }
+                style = { width = Length.Percent(100) }
             };
 
             // Create hidden toggles for property getters
@@ -186,7 +173,7 @@ namespace Meta.XR.Movement.Editor
             _drawPreviewCheckbox = new Toggle { value = _drawPreviewValue };
             _autoUpdateMappingCheckbox = new Toggle { value = _autoUpdateMappingValue };
 
-            // Create toggle rows directly with labels and update both static values and hidden toggles
+            // Create toggle rows using the factory method
             var sourceToggleRow = CreateCustomToggleRow("Draw Source Skeleton", _drawSourceValue, value =>
             {
                 _drawSourceValue = value;
@@ -214,41 +201,34 @@ namespace Meta.XR.Movement.Editor
             toggleContainer.Add(previewToggleRow);
             toggleContainer.Add(updateToggleRow);
 
-            // Add container to visualization section
             visualizationSection.Add(toggleContainer);
+            return visualizationSection;
+        }
 
-            mainCard.Add(visualizationSection);
-
-            // Create more compact joint information section
+        private VisualElement CreateJointInfoSection()
+        {
             var jointInfoSection = new VisualElement();
 
-            var jointInfoHeader = new Label("Joint Info")
-            {
-                style =
-                {
-                    fontSize = 13,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    marginBottom = 2,
-                    color = _primaryColor
-                }
-            };
+            var jointInfoHeader = CreateSectionHeaderLabel("Joint Info");
+            jointInfoHeader.style.fontSize = SubHeaderFontSize;
+            jointInfoHeader.style.marginBottom = TinyPadding;
             jointInfoSection.Add(jointInfoHeader);
 
-            // Create more compact joint info container with more height
+            // Create joint info container
             var jointInfoContainer = new VisualElement
             {
                 style =
                 {
-                    backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.2f),
-                    borderTopLeftRadius = 2,
-                    borderTopRightRadius = 2,
-                    borderBottomLeftRadius = 2,
-                    borderBottomRightRadius = 2,
-                    paddingTop = 4,
+                    backgroundColor = DarkCardBackgroundColor,
+                    borderTopLeftRadius = TinyBorderRadius,
+                    borderTopRightRadius = TinyBorderRadius,
+                    borderBottomLeftRadius = TinyBorderRadius,
+                    borderBottomRightRadius = TinyBorderRadius,
+                    paddingTop = SmallPadding,
                     paddingBottom = 0,
-                    paddingLeft = 6,
-                    paddingRight = 6,
-                    minHeight = 60 // Ensure minimum height
+                    paddingLeft = Margins.HeaderBottom,
+                    paddingRight = Margins.HeaderBottom,
+                    minHeight = JointInfoMinHeight
                 }
             };
 
@@ -256,7 +236,7 @@ namespace Meta.XR.Movement.Editor
             {
                 style =
                 {
-                    fontSize = 13,
+                    fontSize = SubHeaderFontSize,
                     unityFontStyleAndWeight = FontStyle.Bold,
                     marginBottom = 1
                 }
@@ -268,7 +248,7 @@ namespace Meta.XR.Movement.Editor
                 style =
                 {
                     whiteSpace = WhiteSpace.Normal,
-                    fontSize = 12
+                    fontSize = StandardFontSize
                 }
             };
 
@@ -276,147 +256,9 @@ namespace Meta.XR.Movement.Editor
             jointInfoContainer.Add(_mappingJointWeightsLabel);
             jointInfoSection.Add(jointInfoContainer);
 
-            mainCard.Add(jointInfoSection);
-
-            // Add the main card to the root
-            root.Add(mainCard);
-
-            // Only show certain sections based on the current step
-            if (_window.Step is < MSDKUtilityEditorConfig.EditorStep.MinTPose
-                or >= MSDKUtilityEditorConfig.EditorStep.Review)
-            {
-                jointInfoSection.style.display = DisplayStyle.None;
-            }
-
-            return root;
+            return jointInfoSection;
         }
 
-
-        private VisualElement CreateCustomToggleRow(string labelText, bool isChecked, Action<bool> onValueChanged)
-        {
-            // Create a row container that will be clickable
-            var row = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    marginBottom = 6,
-                    width = Length.Percent(100)
-                }
-            };
-
-            // Create a container for the checkbox with fixed width
-            var checkboxContainer = new VisualElement
-            {
-                style =
-                {
-                    width = 24,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.Center
-                }
-            };
-
-            // Create custom checkbox visual
-            var checkbox = new VisualElement
-            {
-                style =
-                {
-                    width = 16,
-                    height = 16,
-                    backgroundColor = isChecked ? _toggleActiveColor : new Color(0.2f, 0.2f, 0.2f, 0.5f),
-                    borderTopLeftRadius = 2,
-                    borderTopRightRadius = 2,
-                    borderBottomLeftRadius = 2,
-                    borderBottomRightRadius = 2
-                }
-            };
-
-            // Add checkmark if checked
-            if (isChecked)
-            {
-                var checkmark = new VisualElement
-                {
-                    style =
-                    {
-                        width = 10,
-                        height = 10,
-                        backgroundColor = new Color(1f, 1f, 1f, 0.8f),
-                        alignSelf = Align.Center,
-                        position = Position.Absolute,
-                        left = 3,
-                        top = 3
-                    }
-                };
-                checkbox.Add(checkmark);
-            }
-
-            checkboxContainer.Add(checkbox);
-
-            // Create text label with explicit color and styling
-            var textLabel = new Label
-            {
-                text = labelText,
-                style =
-                {
-                    fontSize = 12,
-                    color = Color.white, // Use pure white for maximum visibility
-                    unityTextAlign = TextAnchor.MiddleLeft,
-                    flexGrow = 1,
-                    marginLeft = 4,
-                    paddingTop = 2
-                }
-            };
-
-            // Add elements to row
-            row.Add(checkboxContainer);
-            row.Add(textLabel);
-
-            // Make the entire row clickable
-            row.AddManipulator(new Clickable(() =>
-            {
-                // Toggle the state
-                isChecked = !isChecked;
-
-                // Update checkbox visual
-                checkbox.style.backgroundColor = isChecked ? _toggleActiveColor : new Color(0.2f, 0.2f, 0.2f, 0.5f);
-
-                // Update checkmark
-                checkbox.Clear();
-                if (isChecked)
-                {
-                    var checkmark = new VisualElement
-                    {
-                        style =
-                        {
-                            width = 10,
-                            height = 10,
-                            backgroundColor = new Color(1f, 1f, 1f, 0.8f),
-                            alignSelf = Align.Center,
-                            position = Position.Absolute,
-                            left = 3,
-                            top = 3
-                        }
-                    };
-                    checkbox.Add(checkmark);
-                }
-
-                // Call the callback to update the persistent value
-                onValueChanged?.Invoke(isChecked);
-            }));
-
-            // Add hover effect
-            row.RegisterCallback<MouseEnterEvent>(evt =>
-            {
-                row.style.backgroundColor = new Color(1f, 1f, 1f, 0.05f);
-            });
-
-            row.RegisterCallback<MouseLeaveEvent>(evt =>
-            {
-                row.style.backgroundColor = new Color(0f, 0f, 0f, 0f);
-            });
-
-            return row;
-        }
 
         /// <summary>
         /// Reloads the overlay.

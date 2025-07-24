@@ -18,7 +18,11 @@ namespace Meta.XR.Movement.Retargeting
         /// <summary>
         /// If the data is valid.
         /// </summary>
-        public bool IsValid => _isValid;
+        public bool IsValid
+        {
+            get => _isValid;
+            set => _isValid = value;
+        }
 
         /// <summary>
         /// Retargeting handle.
