@@ -218,6 +218,9 @@ namespace Meta.XR.Movement.Editor
                 playButtonImage.image = _config.FileReader.IsPlaying ? _pauseImage : _playImage;
             }
 
+            // Clear the playback UI reference in the window
+            _config.ClearPlaybackUI();
+
             // Remove this UI element from its parent
             if (parent != null)
             {

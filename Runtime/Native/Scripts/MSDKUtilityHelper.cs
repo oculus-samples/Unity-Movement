@@ -114,48 +114,6 @@ namespace Meta.XR.Movement
             "LeftFootAnkle",
         };
 
-        private static readonly string[][] _knownJointNames =
-        {
-            new[] { "reference", "root", "armature" },
-            new[] { "hips", "pelvis", "spine0", "root" },
-            new[]
-            {
-                "rightupperarm", "upperarmright", "upperarmr", "rupperarm", "rightarm", "rightarmupper", "armright",
-                "rightshoulder", "shoulderright", "shoulderr", "rshoulder", "armr"
-            },
-            new[]
-            {
-                "leftupperarm", "upperarmleft", "upperarml", "lupperarm", "leftarm", "leftarmupper", "armleft",
-                "leftshoulder", "shoulderleft", "shoulderl", "lshoulder", "arml"
-            },
-            new[]
-            {
-                "righthandwrist", "righthand", "rightwrist", "handright", "wristright", "handr", "rhand", "rwrist"
-            },
-            new[] { "lefthandwrist", "lefthand", "leftwrist", "handleft", "wristleft", "handl", "lhand", "lwrist" },
-            new[] { "chest", "spine3", "spine2", "spine1", "spineupper", "spinelower", "spine" },
-            new[] { "neck" },
-            new[]
-            {
-                "rightupperleg", "rightupleg", "rightleg", "rightlegupper", "rightlegup", "rthigh", "thighr", "legr",
-                "rleg", "rhip"
-            },
-            new[]
-            {
-                "leftupperleg", "leftupleg", "leftleg", "leftlegupper", "leftlegup", "lthigh", "thighl", "legl", "lleg",
-                "lhip"
-            },
-            new[]
-            {
-                "rightfootankle", "rightfoot", "rightankle", "footright", "ankleright", "footr", "rfoot", "rankle",
-                "ankler"
-            },
-            new[]
-            {
-                "leftfootankle", "leftfoot", "leftankle", "footleft", "ankleleft", "footl", "lfoot", "lankle", "anklel"
-            },
-        };
-
         /// <summary>
         /// Create the retargeting config string based on some data.
         /// </summary>
@@ -204,7 +162,7 @@ namespace Meta.XR.Movement
                 new NativeArray<JointMapping>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var maxMappingEntries =
                 new NativeArray<JointMappingEntry>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            var targetKnownJoints = FindKnownJoints(targetData);
+            var targetKnownJoints = KnownJointFinder.FindKnownJoints(targetData.Joints, targetData.ParentJoints);
 
             // 3. Function calls here, then return the retargetingConfigJson variable
             var initParams = new ConfigInitParams();
@@ -235,6 +193,7 @@ namespace Meta.XR.Movement
 
             if (!CreateOrUpdateUtilityConfig(configName, initParams, out var configHandle))
             {
+                Debug.LogError("Invalid config initialization params!\n\n" + initParams);
                 return "";
             }
 
@@ -253,51 +212,114 @@ namespace Meta.XR.Movement
         /// Get the child to parent joint transform mappings for a target.
         /// </summary>
         /// <param name="target">The target game object to get mappings for.</param>
-        /// <param name="isOvrSkeleton">True if we should also include the root in the mapping.</param>
+        /// <param name="root">The root transform of the game object.</param>
         /// <returns>The dictionary of child parent joint transform mappings.</returns>
-        public static Dictionary<Transform, Transform> GetChildParentJointMapping(Transform target, bool isOvrSkeleton)
+        public static Dictionary<Transform, Transform> GetChildParentJointMapping(Transform target, out Transform root)
         {
             // First, check if an animator exists so that we can get the hips.
-            Transform hips;
+            Transform hips = null;
+            root = null;
             var animator = target.GetComponent<Animator>();
             if (animator != null && animator.avatar != null && animator.avatar.isHuman)
             {
                 hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+                if (hips != null)
+                {
+                    root = hips.parent;
+                }
             }
-            else
-            {
-                // 1. Try to find hips manually by string matching.
-                var hipsNames = _knownJointNames[(int)KnownJointType.Hips];
-                hips = SearchForJointWithNameInChildren(target, hipsNames, 3);
 
-                // 2. If we can't find the hips by string matching, look for the legs and infer that the hips
-                // is the parent of the legs.
-                if (hips == null)
-                {
-                    var legNames = _knownJointNames[(int)KnownJointType.LeftUpperLeg];
-                    var leg = SearchForJointWithNameInChildren(target, legNames, 1);
-                    if (leg != null)
-                    {
-                        hips = leg.parent;
-                    }
-                }
-                else
-                {
-                    // Keep traversing upward - should be a zero-ed out root.
-                    while (hips.parent.transform.position.sqrMagnitude > float.Epsilon)
-                    {
-                        hips = hips.parent;
-                    }
-                }
-            }
+            // If we couldn't find hips through the animator, use KnownJointFinder
             if (hips == null)
             {
-                Debug.LogError("Could not find hips to start with!");
-                return null;
+                // Get all transforms in the hierarchy
+                var allTransforms = new List<Transform> { target };
+                allTransforms.AddRange(target.GetAllChildren());
+
+                // Filter out transforms with skinned mesh renderers as they're not joints
+                var jointTransforms = allTransforms
+                    .Where(t => t.GetComponent<SkinnedMeshRenderer>() == null)
+                    .ToArray();
+
+                // Create joint names and parent joint names arrays
+                var jointNames = jointTransforms.Select(t => t.name).ToArray();
+                var jointNameSet = new HashSet<string>(jointNames);
+                var parentJointNames = jointTransforms.Select(t =>
+                {
+                    if (t.parent == null)
+                    {
+                        return "";
+                    }
+                    var parentName = t.parent.name;
+                    // Only return parent name if it exists in our joint list, otherwise return empty string
+                    return jointNameSet.Contains(parentName) ? parentName : "";
+                }).ToArray();
+
+                if (hips == null)
+                {
+                    foreach (var jointTransform in jointTransforms)
+                    {
+                        // Check if position is greater than 0, 0, 0
+                        if (!(jointTransform.position.x > 0) && !(jointTransform.position.y > 0) &&
+                            !(jointTransform.position.z > 0))
+                        {
+                            continue;
+                        }
+                        // Count children that are different in position or rotation
+                        var validChildrenCount = 0;
+                        for (var i = 0; i < jointTransform.childCount; i++)
+                        {
+                            var child = jointTransform.GetChild(i);
+                            // Check if child is different in position or rotation from parent
+                            if (child.localPosition != Vector3.zero || child.localRotation != Quaternion.identity)
+                            {
+                                validChildrenCount++;
+                            }
+                        }
+
+                        // If this transform has 3 or more valid children, consider it as hips
+                        if (validChildrenCount < 3)
+                        {
+                            continue;
+                        }
+                        hips = jointTransform;
+                        break;
+                    }
+                }
+
+                // Fallback - search by name.
+                if (hips == null)
+                {
+                    // Use KnownJointFinder to find known joints
+                    var knownJoints = KnownJointFinder.FindKnownJoints(jointNames, parentJointNames);
+
+                    // Find the hips joint from the known joints
+                    var hipsJointName = knownJoints.Length > (int)KnownJointType.Hips ? knownJoints[(int)KnownJointType.Hips] : "";
+                    if (!string.IsNullOrEmpty(hipsJointName))
+                    {
+                        hips = jointTransforms.FirstOrDefault(t => t.name == hipsJointName);
+                    }
+
+                    // Find the root joint from the known joints
+                    var rootJointName = knownJoints.Length > (int)KnownJointType.Root ? knownJoints[(int)KnownJointType.Root] : "";
+                    if (!string.IsNullOrEmpty(rootJointName))
+                    {
+                        root = jointTransforms.FirstOrDefault(t => t.name == rootJointName);
+                    }
+                }
+
+                // If we found hips but not root, assume root is parent of hips
+                if (hips != null && root == null)
+                {
+                    root = hips.parent;
+                }
             }
 
-            // Assign root after finding hips
-            var root = hips.parent;
+            if (root == null)
+            {
+                Debug.LogError("Could not find root joint! Using the target transform as root");
+                root = target;
+            }
 
             // Once we have the root, let's find all child transforms and create a dictionary mapping.
             var jointMapping = new Dictionary<Transform, Transform>();
@@ -417,106 +439,13 @@ namespace Meta.XR.Movement
             return t.Orientation * v;
         }
 
-        public static List<(Transform, float)> FindClosestMatches(
-            Transform[] transforms, string[] namesToMatch, float threshold = 90f)
-        {
-            // Remove shared prefix and suffix from joints array
-            var trimmedJoints = TrimSharedPrefixAndSuffix(transforms.Select(n => n.name).ToArray());
-            var matches = new List<(Transform, float, int)>(); // Added index to track position in namesToMatch
-            for (int i = 0; i < namesToMatch.Length; i++)
-            {
-                var targetJoint = namesToMatch[i];
-                var matched = false;
-                var bestMatch = (default(Transform), 0.0f, i);
-                foreach (var joint in trimmedJoints)
-                {
-                    // Get the corresponding transform for the current joint
-                    var jointTransform = transforms.FirstOrDefault(n => n.name == joint.Key);
-                    if (jointTransform == null)
-                    {
-                        continue;
-                    }
-
-                    // Calculate the similarity between the target joint and the current joint
-                    var jointName = Regex.Replace(joint.Value, @"[^a-zA-Z0-9]", "").ToLower();
-                    var similarity = CalculateLevenshteinDistance(targetJoint, jointName);
-
-                    // If the similarity is above the threshold, add it to the matches list and mark it as matched
-                    if (similarity >= threshold)
-                    {
-                        matches.Add((jointTransform, similarity, i));
-                        matched = true;
-                        break;
-                    }
-
-                    // Pick the most similar match.
-                    if (similarity > bestMatch.Item2)
-                    {
-                        bestMatch = (jointTransform, similarity, i);
-                    }
-                }
-
-                if (matched)
-                {
-                    continue;
-                }
-
-                // Add the best match if an exact match couldn't be found.
-                if (bestMatch.Item1 != default(Transform))
-                {
-                    matches.Add(bestMatch);
-                }
-            }
-
-            // Group matches by similarity within 5% of each other
-            var groupedMatches = new List<(Transform, float)>();
-            var processedMatches = new List<(Transform, float, int)>(matches);
-
-            while (processedMatches.Count > 0)
-            {
-                // Find the match with the highest similarity
-                var bestMatch = processedMatches.OrderByDescending(x => x.Item2).First();
-                var similarMatches = processedMatches
-                    .Where(m => Math.Abs(m.Item2 - bestMatch.Item2) <= 5.0f)
-                    .ToList();
-
-                // If multiple matches are within 5%, prioritize by order in namesToMatch (lower index = higher priority)
-                if (similarMatches.Count > 1)
-                {
-                    var prioritizedMatch = similarMatches.OrderBy(m => m.Item3).First();
-                    groupedMatches.Add((prioritizedMatch.Item1, prioritizedMatch.Item2));
-                }
-                else
-                {
-                    groupedMatches.Add((bestMatch.Item1, bestMatch.Item2));
-                }
-
-                // Remove processed matches
-                foreach (var match in similarMatches)
-                {
-                    processedMatches.Remove(match);
-                }
-            }
-
-            return groupedMatches;
-        }
-
         public static void ScaleSkeletonPose(UInt64 handle, SkeletonType skeletonType,
             ref NativeArray<NativeTransform> scaledTransforms, float scale)
         {
-            GetJointIndexByKnownJointType(handle, skeletonType, KnownJointType.Root, out var rootIndex);
-            if (rootIndex == INVALID_JOINT_INDEX)
-            {
-                // Sanity check in case the root isn't specified
-                rootIndex = 0;
-            }
-
-            var rootTransform = scaledTransforms[rootIndex];
-            var rootPosition = rootTransform.Position;
             for (var i = 0; i < scaledTransforms.Length; i++)
             {
                 var jointTransform = scaledTransforms[i];
-                jointTransform.Position = (jointTransform.Position - rootPosition) * scale;
+                jointTransform.Position *= scale;
                 scaledTransforms[i] = jointTransform;
             }
         }
@@ -541,297 +470,25 @@ namespace Meta.XR.Movement
             return -1;
         }
 
-        private static Transform SearchForJointWithNameInChildren(Transform parent, string[] searchNames,
-            int expectedChildCount)
-        {
-            // Get all children transforms
-            var allTransforms = new List<Transform> { parent };
-            allTransforms.AddRange(parent.GetAllChildren());
-
-            // Filter out transforms with skinned mesh renderers or insufficient child count
-            var validTransforms = allTransforms
-                .Where(t => t.GetComponent<SkinnedMeshRenderer>() == null && t.childCount >= expectedChildCount)
-                .ToArray();
-
-            if (validTransforms.Length == 0)
-            {
-                return null;
-            }
-
-            // Use FindClosestMatches to find the best match based on Levenshtein distance
-            var matches = FindClosestMatches(validTransforms, searchNames);
-
-            // Return the best match if any was found
-            return matches.Count > 0 ? matches[0].Item1 : null;
-        }
-
         private static void FillJointMapping(
             bool isRoot,
             Transform target,
             ref Dictionary<Transform, Transform> jointMapping)
         {
             var targetChildCount = target.childCount;
+
+            // We don't want to record skinned meshes
+            if (target.GetComponent<SkinnedMeshRenderer>())
+            {
+                return;
+            }
+
             jointMapping.Add(target, isRoot ? null : target.parent);
             for (var i = 0; i < targetChildCount; i++)
             {
                 var child = target.GetChild(i);
                 FillJointMapping(false, child, ref jointMapping);
             }
-        }
-
-        private static string[] FindKnownJoints(SkeletonData data)
-        {
-            var knownJoints = new string[(int)KnownJointType.KnownJointCount];
-            var matchPercentages = new float[knownJoints.Length];
-            knownJoints[0] = data.Joints[0];
-
-            for (var i = KnownJointType.Hips; i < KnownJointType.KnownJointCount; i++)
-            {
-                var typeIndex = (int)i;
-                var isSpecialJoint = i is KnownJointType.Hips or KnownJointType.Chest or
-                    KnownJointType.LeftUpperArm or KnownJointType.RightUpperArm or
-                    KnownJointType.LeftUpperLeg or KnownJointType.RightUpperLeg;
-
-                var results = FindClosestMatches(data.Joints, _knownJointNames[typeIndex],
-                    isSpecialJoint ? 30f : 75f);
-                if (results.Count == 0)
-                {
-                    Debug.LogError($"Could not find any known joint for {i}.");
-                    continue;
-                }
-
-                var bestResult = results[0];
-
-                // Filter results based on joint type
-                if (results.Count > 1)
-                {
-                    var filtered = i switch
-                    {
-                        KnownJointType.Hips or KnownJointType.Chest => results
-                            .Where(j => data.ParentJoints.Count(p => p == j.Item1) >= 3)
-                            .ToList(),
-                        KnownJointType.RightUpperLeg or KnownJointType.LeftUpperLeg when
-                            knownJoints[(int)KnownJointType.Hips] != null => results.Where(j =>
-                            {
-                                var jointIndex = Array.IndexOf(data.Joints, j.Item1);
-                                var oppositeJointIndex = Array.IndexOf(data.Joints,
-                                    knownJoints[
-                                        (int)(i == KnownJointType.LeftUpperLeg
-                                            ? KnownJointType.RightUpperLeg
-                                            : KnownJointType.LeftUpperLeg)]);
-
-                                return jointIndex >= 0 &&
-                                       jointIndex != oppositeJointIndex &&
-                                       data.ParentJoints[jointIndex] == knownJoints[(int)KnownJointType.Hips];
-                            }).ToList(),
-                        KnownJointType.RightUpperArm or KnownJointType.LeftUpperArm when
-                            knownJoints[(int)KnownJointType.Chest] != null => results.Where(j =>
-                            {
-                                var jointIndex = Array.IndexOf(data.Joints, j.Item1);
-                                var oppositeJointIndex = Array.IndexOf(data.Joints,
-                                    knownJoints[
-                                        (int)(i == KnownJointType.LeftUpperArm
-                                            ? KnownJointType.RightUpperArm
-                                            : KnownJointType.LeftUpperArm)]);
-
-                                return jointIndex >= 0 &&
-                                       jointIndex != oppositeJointIndex &&
-                                       data.ParentJoints[jointIndex] != knownJoints[(int)KnownJointType.Chest];
-                            }).ToList(),
-                        _ => null
-                    };
-
-                    if (filtered?.Count > 0)
-                    {
-                        bestResult = filtered[0];
-                    }
-                }
-
-                knownJoints[typeIndex] = bestResult.Item1;
-                matchPercentages[typeIndex] = bestResult.Item2;
-            }
-
-            return knownJoints;
-        }
-
-        /// <summary>
-        /// Find the closest matches for each name in namesToMatch and sorts them by similarity.
-        /// </summary>
-        /// <param name="names">The names to search.</param>
-        /// <param name="namesToMatch">The names to match.</param>
-        /// <param name="threshold">The name similarity threshold.</param>
-        /// <returns>List of closest matches.</returns>
-        public static List<(string, float)> FindClosestMatches(
-            string[] names, string[] namesToMatch, float threshold = 90f)
-        {
-            // Remove shared prefix and suffix from joints array
-            var trimmedJoints = TrimSharedPrefixAndSuffix(names);
-            var matches = new List<(string, float, int)>(); // Added index to track position in namesToMatch
-            for (int i = 0; i < namesToMatch.Length; i++)
-            {
-                var targetJoint = namesToMatch[i];
-                var bestMatch = (string.Empty, 0.0f, i);
-                foreach (var joint in trimmedJoints)
-                {
-                    // Calculate the similarity between the target joint and the current joint
-                    var jointName = Regex.Replace(joint.Value, @"[^a-zA-Z0-9]", "").ToLower();
-                    var similarity = CalculateLevenshteinDistance(targetJoint, jointName);
-
-                    // If the similarity is above the threshold, add it to the matches list and mark it as matched
-                    if (similarity >= threshold)
-                    {
-                        matches.Add((joint.Key, similarity, i));
-                    }
-
-                    // Pick the most similar match.
-                    if (similarity > bestMatch.Item2)
-                    {
-                        bestMatch = (joint.Key, similarity, i);
-                    }
-                }
-
-                // Add the best match if an exact match couldn't be found.
-                if (!string.IsNullOrEmpty(bestMatch.Item1))
-                {
-                    matches.Add(bestMatch);
-                }
-            }
-
-            // Group matches by similarity within 5% of each other
-            var groupedMatches = new List<(string, float)>();
-            var processedMatches = new List<(string, float, int)>(matches);
-
-            while (processedMatches.Count > 0)
-            {
-                // Find the match with the highest similarity
-                var bestMatch = processedMatches.OrderByDescending(x => x.Item2).First();
-                var similarMatches = processedMatches
-                    .Where(m => Math.Abs(m.Item2 - bestMatch.Item2) <= 5.0f)
-                    .ToList();
-
-                // If multiple matches are within 5%, prioritize by order in namesToMatch (lower index = higher priority)
-                if (similarMatches.Count > 1)
-                {
-                    var prioritizedMatch = similarMatches.OrderBy(m => m.Item3).First();
-                    groupedMatches.Add((prioritizedMatch.Item1, prioritizedMatch.Item2));
-                }
-                else
-                {
-                    groupedMatches.Add((bestMatch.Item1, bestMatch.Item2));
-                }
-
-                // Remove processed matches
-                foreach (var match in similarMatches)
-                {
-                    processedMatches.Remove(match);
-                }
-            }
-
-            return groupedMatches;
-        }
-
-        private static Dictionary<string, string> TrimSharedPrefixAndSuffix(string[] joints)
-        {
-            if (joints.Length == 0)
-            {
-                return new Dictionary<string, string>();
-            }
-
-            // Take up to first three joints to derive prefix and suffix
-            var sampleJoints = new[]
-            {
-                joints[1], joints[2], joints[3]
-            };
-
-            // Find common prefix from sample joints
-            var prefix = sampleJoints[0];
-            foreach (var joint in sampleJoints)
-            {
-                var i = 0;
-                var len = Math.Min(prefix.Length, joint.Length);
-                while (i < len && prefix[i] == joint[i])
-                {
-                    i++;
-                }
-
-                prefix = prefix[..i];
-                if (string.IsNullOrEmpty(prefix))
-                {
-                    break;
-                }
-            }
-
-            // Find common suffix from sample joints
-            var suffix = sampleJoints[0];
-            foreach (var joint in sampleJoints)
-            {
-                var i = 0;
-                var len = Math.Min(suffix.Length, joint.Length);
-                while (i < len && suffix[suffix.Length - 1 - i] == joint[joint.Length - 1 - i])
-                {
-                    i++;
-                }
-
-                suffix = suffix[^i..];
-                if (string.IsNullOrEmpty(suffix)) break;
-            }
-
-            // Check if prefix/suffix is shared by at least 90% of items
-            var prefixCount = joints.Count(j => prefix != null && j.StartsWith(prefix));
-            var suffixCount = joints.Count(j => suffix != null && j.EndsWith(suffix));
-            var prefixThreshold = joints.Length * 0.9f;
-            var suffixThreshold = joints.Length * 0.9f;
-
-            var usePrefix = !string.IsNullOrEmpty(prefix) && prefixCount >= prefixThreshold;
-            var useSuffix = !string.IsNullOrEmpty(suffix) && suffixCount >= suffixThreshold;
-
-            return joints.ToDictionary(
-                j => j,
-                j =>
-                {
-                    var result = j;
-                    if (prefix != null && usePrefix && j.StartsWith(prefix))
-                    {
-                        result = result[prefix.Length..];
-                    }
-
-                    if (suffix != null && useSuffix && result.EndsWith(suffix))
-                    {
-                        result = result[..^suffix.Length];
-                    }
-
-                    return result;
-                }
-            );
-        }
-
-        private static float CalculateLevenshteinDistance(string s1, string s2)
-        {
-            var d = new int[s1.Length + 1, s2.Length + 1];
-            for (var i = 0; i <= s1.Length; i++)
-            {
-                d[i, 0] = i;
-            }
-
-            for (var j = 0; j <= s2.Length; j++)
-            {
-                d[0, j] = j;
-            }
-
-            for (var i = 1; i <= s1.Length; i++)
-            {
-                for (var j = 1; j <= s2.Length; j++)
-                {
-                    var cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
-                    d[i, j] = Math.Min(
-                        Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
-                        d[i - 1, j - 1] + cost);
-                }
-            }
-
-            var maxLength = Math.Max(s1.Length, s2.Length);
-            var similarity = 1 - (float)d[s1.Length, s2.Length] / maxLength;
-            return similarity * 100;
         }
     }
 }

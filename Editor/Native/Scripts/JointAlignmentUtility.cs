@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using UnityEngine;
 using static Meta.XR.Movement.MSDKUtility;
@@ -175,13 +176,24 @@ namespace Meta.XR.Movement.Editor
                 out var scaledTPose);
             GetJointIndexByKnownJointType(target.ConfigHandle, SkeletonType.TargetSkeleton, KnownJointType.Root,
                 out var rootJointIndex);
-            utilityConfig.RootScale = utilityConfig.Step != MSDKUtilityEditorConfig.EditorStep.Configuration
-                ? scaledTPose[rootJointIndex].Scale
-                : Vector3.one;
-            // Specific case handling for when the root scale is less than range of values due to invalid setup
-            if (utilityConfig.RootScale.x < 0.20f)
+
+            if (utilityConfig.Step != MSDKUtilityEditorConfig.EditorStep.Configuration)
             {
-                utilityConfig.RootScale *= 10f;
+                var calculatedScale = scaledTPose[rootJointIndex].Scale;
+
+                // Clamp scale components to the character retargeter range
+                utilityConfig.RootScale = new Vector3(
+                    Mathf.Clamp(calculatedScale.x, MSDKUtilityEditorPreviewer.MinScale,
+                        MSDKUtilityEditorPreviewer.MaxScale),
+                    Mathf.Clamp(calculatedScale.y, MSDKUtilityEditorPreviewer.MinScale,
+                        MSDKUtilityEditorPreviewer.MaxScale),
+                    Mathf.Clamp(calculatedScale.z, MSDKUtilityEditorPreviewer.MinScale,
+                        MSDKUtilityEditorPreviewer.MaxScale)
+                );
+            }
+            else
+            {
+                utilityConfig.RootScale = Vector3.one;
             }
         }
 
@@ -324,9 +336,13 @@ namespace Meta.XR.Movement.Editor
             var sourceRightHand = sourceTPose[(int)FullBodyTrackingBoneId.RightHandWrist];
             var targetRightHand =
                 useCurrentPose ? target.ReferencePose[rightHandJointIndex] : targetTPose[rightHandJointIndex];
+
+            // Calculate scale ratio using Y position (height-based scaling)
             var yScaleRatio = sourceRightHand.Position.y /
                               (targetRightHand.Position.y > 0.0f ? targetRightHand.Position.y : 1.0f);
-            return yScaleRatio;
+
+            // Clamp the scale ratio to prevent extreme scaling
+            return Mathf.Clamp(yScaleRatio, MSDKUtilityEditorPreviewer.MinScale, MSDKUtilityEditorPreviewer.MaxScale);
         }
 
         /// <summary>
@@ -562,7 +578,8 @@ namespace Meta.XR.Movement.Editor
             // If the new distance is greater than the initial distance, revert the rotation
             if (newDistance > initialDistance)
             {
-                Debug.LogWarning($"Finger rotation increased distance to target from {initialDistance} to {newDistance}. Reverting rotation.");
+                Debug.LogWarning(
+                    $"Finger rotation increased distance to target from {initialDistance} to {newDistance}. Reverting rotation.");
                 baseJoint.rotation = originalRotation;
             }
         }

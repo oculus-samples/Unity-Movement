@@ -11,7 +11,11 @@ using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+
 using static Meta.XR.Movement.Editor.MSDKUtilityEditorConfig;
+using static Meta.XR.Movement.Editor.MSDKUtilityEditorUIConstants;
+using static Meta.XR.Movement.Editor.MSDKUtilityEditorUIFactory;
+using static Meta.XR.Movement.Editor.MSDKUtilityEditorUISections;
 using static Meta.XR.Movement.MSDKUtility;
 using static Meta.XR.Movement.Retargeting.SkeletonData;
 
@@ -224,21 +228,45 @@ namespace Meta.XR.Movement.Editor
         private MSDKUtilityEditorStage _previewStage;
 
         // Private fields.
-        private string _currentProgressText => $"{(int)Step + 1} / {(int)EditorStep.End}";
-
-        private ulong _configHandle
-        {
-            get => _target?.ConfigHandle ?? INVALID_HANDLE;
-            set => _target.ConfigHandle = value;
-        }
-
         private GameObject _sceneViewCharacter
         {
             get => _previewer?.SceneViewCharacter;
             set => _previewer.SceneViewCharacter = value;
         }
 
-        private string _currentTitle
+        // Editor components.
+        private MSDKUtilityEditorOverlay _overlay;
+        private MSDKUtilityEditorPlaybackUI _playbackUI;
+        private SequenceFileReader _fileReader;
+        private string _currentPreviewPose;
+
+        // Editor settings.
+        private bool _debugging;
+        private bool _currentTransformEditorFoldout = true;
+        private bool _validatedConfigFinish;
+        private bool _displayedConfig;
+        private bool _initialized;
+        private Vector2 _scrollPosition;
+
+        /// <summary>
+        /// Gets or sets the config bone transforms foldout state.
+        /// </summary>
+        public bool ConfigBoneTransformsFoldout
+        {
+            get => _configBoneTransformsFoldout;
+            set => _configBoneTransformsFoldout = value;
+        }
+        private bool _configBoneTransformsFoldout;
+
+        /// <summary>
+        /// Gets the current progress text for the header.
+        /// </summary>
+        public string CurrentProgressText => $"{(int)Step + 1} / {(int)EditorStep.End}";
+
+        /// <summary>
+        /// Gets the current title based on the editor step.
+        /// </summary>
+        public string CurrentTitle
         {
             get
             {
@@ -253,35 +281,16 @@ namespace Meta.XR.Movement.Editor
             }
         }
 
-        // Editor components.
-        private MSDKUtilityEditorOverlay _overlay;
-        private MSDKUtilityEditorPlaybackUI _playbackUI;
-        private SequenceFileReader _fileReader;
-        private string _currentPreviewPose;
+        /// <summary>
+        /// Gets whether the configuration has been validated and finished.
+        /// </summary>
+        public bool ValidatedConfigFinish => _validatedConfigFinish;
 
-        // Editor settings.
-        private bool _debugging;
-        private bool _currentTransformEditorFoldout = true;
-        private bool _configBoneTransformsFoldout;
-        private bool _validatedConfigFinish;
-        private bool _displayedConfig;
-        private bool _initialized;
-        private Vector2 _scrollPosition;
+        /// <summary>
+        /// Gets the config handle for internal operations.
+        /// </summary>
+        public ulong ConfigHandle => _target?.ConfigHandle ?? INVALID_HANDLE;
 
-        // Styling settings.
-        private const int _buttonSizeHeight = 28;
-        private const int _singleLineSpace = 8;
-        private const int _doubleLineSpace = 16;
-        private const int _headerSize = 18;
-        private const int _buttonPadding = 6;
-
-        // UI Colors
-        private static readonly Color _primaryColor = new(0.0f, 0.47f, 0.95f, 1.0f);
-        private static readonly Color _backgroundColor = new(0.15f, 0.15f, 0.15f, 0.05f);
-        private static readonly Color _cardBackgroundColor = new Color(1f, 1f, 1f, 0.03f);
-        private static readonly Color _borderColor = new(0f, 0f, 0f, 0.2f);
-        private static readonly Color _headerBackgroundColor = new(0.0f, 0.47f, 0.95f, 0.1f);
-        private static readonly Color _buttonHoverColor = new(0.0f, 0.47f, 0.95f, 0.2f);
 
         private readonly FullBodyTrackingBoneId[] _leftStartBoneIds =
         {
@@ -369,7 +378,7 @@ namespace Meta.XR.Movement.Editor
             // Obtain the path to the pose file. It lives in the package folder,
             // and that folder might live outside of the project.
             var fullPath = Path.GetFullPath(
-                Path.Combine("Packages/com.meta.xr.sdk.movement/Editor/Native/Poses", poseName)
+                Path.Combine("Packages/com.meta.xr.sdk.movement/Editor/Native/Poses/Sequences", poseName)
             );
             fullPath = Path.ChangeExtension(fullPath, ".sbn");
             _fileReader.PlayBackRecording(fullPath);
@@ -402,6 +411,23 @@ namespace Meta.XR.Movement.Editor
             }
 
             _playbackUI?.Update();
+        }
+
+        /// <summary>
+        /// Sets the playback UI reference for updates.
+        /// </summary>
+        /// <param name="playbackUI">The playback UI instance.</param>
+        public void SetPlaybackUI(MSDKUtilityEditorPlaybackUI playbackUI)
+        {
+            _playbackUI = playbackUI;
+        }
+
+        /// <summary>
+        /// Clears the playback UI reference.
+        /// </summary>
+        public void ClearPlaybackUI()
+        {
+            _playbackUI = null;
         }
 
         private void OnDestroy()
@@ -437,9 +463,22 @@ namespace Meta.XR.Movement.Editor
             }
 
             _fileReader ??= new SequenceFileReader();
+
             SceneView.duringSceneGui += OnSceneGUI;
             Undo.postprocessModifications += OnPostProcessModifications;
             Undo.undoRedoPerformed += OnUndoRedoPerformed;
+
+            // Delay overlay and GUI initialization to avoid Unity's internal initialization issues
+            if (_initialized)
+            {
+                EditorApplication.delayCall += () =>
+                {
+                    if (this != null) // Check if window still exists
+                    {
+                        ReinitializeAfterDomainReload();
+                    }
+                };
+            }
         }
 
         private void OnDisable()
@@ -508,6 +547,46 @@ namespace Meta.XR.Movement.Editor
             _previewer.UpdateTargetDraw(this);
         }
 
+        private void ReinitializeAfterDomainReload()
+        {
+            try
+            {
+                // Find existing overlay instead of creating a new one
+                FindAndReinitializeOverlay();
+
+                // Refresh GUI after domain reload
+                CreateGUI();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Failed to reinitialize MSDKUtilityEditorWindow after domain reload: {e.Message}");
+            }
+        }
+
+        private void FindAndReinitializeOverlay()
+        {
+            // After domain reload, Unity's overlay system may have recreated overlays automatically
+            // We need to find and reconnect to any existing overlay or create a new one
+
+            // First, try to find if there's already an overlay instance that Unity created
+            // We'll use a different approach - check if we can create a new overlay safely
+            try
+            {
+                // Remove any existing overlays first to avoid duplicates
+                RemoveExistingOverlays();
+
+                // Create a new overlay - Unity's overlay system will handle the lifecycle
+                _overlay = new MSDKUtilityEditorOverlay(this);
+                SceneView.AddOverlayToActiveView(_overlay);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Failed to reinitialize overlay: {e.Message}");
+                // Set overlay to null so we don't try to use a broken reference
+                _overlay = null;
+            }
+        }
+
         /**********************************************************
          *
          *               UI Element Sections
@@ -530,7 +609,7 @@ namespace Meta.XR.Movement.Editor
             root.Clear();
 
             // Apply global styles to the root element
-            root.style.backgroundColor = _backgroundColor;
+            root.style.backgroundColor = BackgroundColor;
 
             // Create main scroll view with improved styling
             var scrollView = new ScrollView
@@ -538,10 +617,10 @@ namespace Meta.XR.Movement.Editor
                 horizontalScrollerVisibility = ScrollerVisibility.Hidden,
                 style =
                 {
-                    paddingTop = 8,
-                    paddingBottom = 12,
-                    paddingLeft = 10,
-                    paddingRight = 10
+                    paddingTop = CardPadding,
+                    paddingBottom = Margins.SectionBottom,
+                    paddingLeft = CardPadding + TinyPadding,
+                    paddingRight = CardPadding + TinyPadding
                 }
             };
 
@@ -560,13 +639,13 @@ namespace Meta.XR.Movement.Editor
             {
                 style =
                 {
-                    marginTop = 8,
-                    paddingTop = 8,
-                    paddingBottom = 8,
-                    paddingLeft = 8,
-                    paddingRight = 8,
+                    marginTop = CardPadding,
+                    paddingTop = CardPadding,
+                    paddingBottom = CardPadding,
+                    paddingLeft = CardPadding,
+                    paddingRight = CardPadding,
                     borderTopWidth = 1,
-                    borderTopColor = new Color(0, 0, 0, 0.2f)
+                    borderTopColor = BorderColor
                 }
             };
 
@@ -579,32 +658,12 @@ namespace Meta.XR.Movement.Editor
                     return;
                 }
 
-                debugSection.style.marginBottom = 16;
+                debugSection.style.marginBottom = DoubleLineSpace;
                 scrollView.Add(debugSection);
             }
 
             // Create main content container with card-like styling
-            var mainContentCard = new VisualElement
-            {
-                style =
-                {
-                    backgroundColor = _cardBackgroundColor,
-                    borderBottomWidth = 1,
-                    borderTopWidth = 1,
-                    borderLeftWidth = 1,
-                    borderRightWidth = 1,
-                    borderBottomColor = _borderColor,
-                    borderTopColor = _borderColor,
-                    borderLeftColor = _borderColor,
-                    borderRightColor = _borderColor,
-                    borderTopLeftRadius = 4,
-                    borderTopRightRadius = 4,
-                    borderBottomLeftRadius = 4,
-                    borderBottomRightRadius = 4,
-                    marginBottom = 8,
-                    paddingBottom = 8
-                }
-            };
+            var mainContentCard = CreateCardContainer();
 
             // Add retargeting setup section to the main content card
             var retargetingSection = RetargetingSetupSection();
@@ -630,12 +689,12 @@ namespace Meta.XR.Movement.Editor
                 editorStepsSection.style.borderTopLeftRadius =
                     editorStepsSection.style.borderTopRightRadius =
                         editorStepsSection.style.borderBottomLeftRadius =
-                            editorStepsSection.style.borderBottomRightRadius = 4;
-                editorStepsSection.style.paddingLeft = 12;
-                editorStepsSection.style.paddingRight = 12;
-                editorStepsSection.style.paddingTop = 8;
-                editorStepsSection.style.paddingBottom = 8;
-                editorStepsSection.style.marginBottom = 8;
+                            editorStepsSection.style.borderBottomRightRadius = BorderRadius;
+                editorStepsSection.style.paddingLeft = Margins.SectionBottom;
+                editorStepsSection.style.paddingRight = Margins.SectionBottom;
+                editorStepsSection.style.paddingTop = CardPadding;
+                editorStepsSection.style.paddingBottom = CardPadding;
+                editorStepsSection.style.marginBottom = CardPadding;
                 scrollView.Add(editorStepsSection);
             }
 
@@ -653,656 +712,35 @@ namespace Meta.XR.Movement.Editor
                 element.RegisterCallback<MouseUpEvent>(evt => { _utilityConfig.CurrentlyEditing = false; });
             }
 
-            // Add hover effects to buttons
+            // Add hover effects to buttons using the factory method
             var allButtons = rootVisualElement.Query<Button>().ToList();
-
-            // Store all button original colors
-            var buttonOriginalColors = new Dictionary<Button, Color>();
-
-            foreach (var button in allButtons)
-            {
-                // Get the current background color
-                var originalColor = button.text switch
-                {
-                    // Special handling for different button types
-                    "Next" or "Done" => new Color(0.1f, 0.6f, 0.3f, 0.7f),
-                    "Previous" => new Color(0.2f, 0.2f, 0.2f, 0.8f),
-                    "Pose character to T-Pose" => new Color(_primaryColor.r, _primaryColor.g, _primaryColor.b, 0.1f),
-                    "Load original T-Pose" => new Color(_primaryColor.r, _primaryColor.g, _primaryColor.b, 0.1f),
-                    "Validate and save config" => new Color(0.1f, 0.6f, 0.3f, 0.7f),
-                    _ => new Color(0, 0, 0, 0)
-                };
-
-                // Store the original color
-                buttonOriginalColors[button] = originalColor;
-
-                // Set initial background color
-                button.style.backgroundColor = originalColor;
-
-                // Add hover effect - only apply if button is enabled
-                button.RegisterCallback<MouseEnterEvent>(_ =>
-                {
-                    if (button.enabledSelf)
-                    {
-                        button.style.backgroundColor = _buttonHoverColor;
-                    }
-                });
-
-                // Restore original color on mouse exit
-                button.RegisterCallback<MouseLeaveEvent>(_ =>
-                {
-                    if (buttonOriginalColors.TryGetValue(button, out var color))
-                    {
-                        button.style.backgroundColor = color;
-                    }
-                });
-            }
+            ApplyButtonHoverEffects(allButtons);
         }
 
         private VisualElement RetargetingSetupSection()
         {
-            if (_previewer == null)
-            {
-                return null;
-            }
-
-            // Create serialized objects for binding
-            var serializedPreviewerObject = new SerializedObject(_previewer);
-
-            // Create root container
-            var root = CreateStandardContainer();
-
-            // Create a styled header with background
-            var headerContainer = new VisualElement
-            {
-                style =
-                {
-                    backgroundColor = _headerBackgroundColor,
-                    borderTopLeftRadius = 4,
-                    borderTopRightRadius = 4,
-                    paddingTop = 8,
-                    paddingBottom = 8,
-                    paddingLeft = 10,
-                    paddingRight = 10,
-                    marginBottom = 6,
-                    flexDirection = FlexDirection.Row,
-                    justifyContent = Justify.SpaceBetween
-                }
-            };
-
-            headerContainer.Add(new Label
-            { text = "Retargeting Setup", style = { unityFontStyleAndWeight = FontStyle.Bold } });
-            headerContainer.Add(new Label { text = _currentProgressText });
-            root.Add(headerContainer);
-
-            // Add title in a styled container
-            var titleContainer = new VisualElement
-            {
-                style =
-                {
-                    marginBottom = 6,
-                    paddingLeft = 4
-                }
-            };
-            titleContainer.Add(CreateHeaderLabel(_currentTitle, _headerSize));
-            root.Add(titleContainer);
-
-            // Add scene view character field in a styled container
-            var characterFieldContainer = new VisualElement
-            {
-                style =
-                {
-                    marginBottom = 8,
-                    paddingLeft = 4,
-                    paddingRight = 4
-                }
-            };
-
-            characterFieldContainer.Add(CreatePropertyField(
-                serializedPreviewerObject,
-                "_sceneViewCharacter",
-                "Scene View Character:",
-                _buttonSizeHeight));
-
-            root.Add(characterFieldContainer);
-
-            // Add config container for buttons in a styled box
-            var configOuterContainer = new VisualElement
-            {
-                style =
-                {
-                    paddingLeft = 4,
-                    paddingRight = 4,
-                }
-            };
-
-            var configContainer = new VisualElement
-            {
-                style =
-                {
-                    height = 4,
-                    flexDirection = FlexDirection.Row,
-                    justifyContent = Justify.SpaceBetween,
-                    alignItems = Align.Center,
-                    minWidth = 200
-                }
-            };
-
-            // Add config asset field
-            var configAssetField = new ObjectField("Config Asset:")
-            {
-                style =
-                {
-                    marginTop = 2,
-                    flexGrow = 1,
-                    flexShrink = 1,
-                    minWidth = 100,
-                    height = 18,
-                    alignContent = Align.Center
-                },
-                value = EditorMetadataObject.ConfigJson
-            };
-            configAssetField.RegisterValueChangedCallback(e =>
-            {
-                int choice = EditorUtility.DisplayDialogComplex("Change Config",
-                    "Change configuration file?",
-                    "Yes", "No", "Cancel");
-                if (choice == 0)
-                {
-                    EditorMetadataObject.ConfigJson = configAssetField.value as TextAsset;
-                    EditorUtility.SetDirty(EditorMetadataObject);
-                    AssetDatabase.SaveAssets();
-                }
-                else
-                {
-                    configAssetField.SetValueWithoutNotify(EditorMetadataObject.ConfigJson);
-                }
-
-            });
-
-            // Create action buttons
-            var saveButton = CreateIconActionButton("Save", () => SaveUpdateConfig(true));
-            var refreshButton = CreateIconActionButton("Refresh", RefreshConfig);
-            var createButton = CreateIconActionButton("CreateAddNew", CreateNewConfig);
-
-            // Create button container with fixed width to prevent clipping
-            var buttonContainer = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    flexShrink = 0,
-                    flexGrow = 0,
-                    marginLeft = 8,
-                    width = 90,
-                    justifyContent = Justify.FlexEnd
-                }
-            };
-
-            buttonContainer.Add(saveButton);
-            buttonContainer.Add(refreshButton);
-            buttonContainer.Add(createButton);
-
-            // Add elements to container
-            configContainer.Add(configAssetField);
-            configContainer.Add(buttonContainer);
-
-            configOuterContainer.Add(configContainer);
-            root.Add(configOuterContainer);
-
-            return root;
+            return CreateRetargetingSetupSection(this);
         }
 
         private VisualElement PreviewSection()
         {
-            var root = CreateStandardContainer();
-
-            // Create a styled header with background
-            var headerContainer = new VisualElement
-            {
-                style =
-                {
-                    backgroundColor = _headerBackgroundColor,
-                    borderTopLeftRadius = 4,
-                    borderTopRightRadius = 4,
-                    paddingTop = 8,
-                    paddingBottom = 8,
-                    paddingLeft = 10,
-                    paddingRight = 10,
-                    marginBottom = 2
-                }
-            };
-
-            headerContainer.Add(CreateHeaderLabel("Preview Sequences", _headerSize));
-            root.Add(headerContainer);
-
-            // Main container with card-like styling
-            var previewContainer = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Column,
-                    justifyContent = Justify.Center,
-                    backgroundColor = _cardBackgroundColor,
-                    borderBottomColor = _borderColor,
-                    borderBottomWidth = 1,
-                    borderLeftColor = _borderColor,
-                    borderLeftWidth = 1,
-                    borderRightColor = _borderColor,
-                    borderRightWidth = 1,
-                    borderTopColor = _borderColor,
-                    borderTopWidth = 1,
-                    borderBottomLeftRadius = 4,
-                    borderBottomRightRadius = 4,
-                    paddingTop = 8,
-                    paddingBottom = 8,
-                    paddingLeft = 10,
-                    paddingRight = 10,
-                    marginBottom = 8
-                }
-            };
-
-            // Add scale slider for review step
-            if (Step == EditorStep.Review)
-            {
-                var scaleLabel = new Label("Size Adjustment")
-                {
-                    style =
-                    {
-                        fontSize = 14,
-                        unityFontStyleAndWeight = FontStyle.Bold,
-                        marginBottom = 6
-                    }
-                };
-                previewContainer.Add(scaleLabel);
-
-                // Create outer container with fixed width to prevent overflow
-                var scaleOuterContainer = new VisualElement
-                {
-                    style =
-                    {
-                        width = Length.Percent(100),
-                        marginBottom = 12,
-                        marginLeft = 8,
-                        marginRight = 8,
-                        paddingLeft = 8,
-                        paddingRight = 8,
-                        overflow = Overflow.Hidden // Prevent content from overflowing
-                    }
-                };
-
-                var scaleContainer = new VisualElement
-                {
-                    style =
-                    {
-                        flexDirection = FlexDirection.Row,
-                        alignItems = Align.Center,
-                        width = Length.Percent(100),
-                        maxWidth = Length.Percent(100)
-                    }
-                };
-
-                // Fixed-width label
-                var sizeLabel = new Label("Size: ")
-                {
-                    style =
-                    {
-                        width = 40,
-                        minWidth = 40,
-                        flexShrink = 0,
-                        unityTextAlign = TextAnchor.MiddleLeft
-                    }
-                };
-                scaleContainer.Add(sizeLabel);
-
-                // Slider with constraints to prevent overflow
-                var scaleSlider = new Slider(0f, 100f)
-                {
-                    style =
-                    {
-                        flexGrow = 1,
-                        flexShrink = 1,
-                        minWidth = 80,
-                        maxWidth = Length.Percent(80) // Limit slider width to leave room for the value field
-                    },
-                    value = _utilityConfig.ScaleSize
-                };
-
-                // Right-aligned value field with fixed width
-                var scaleValue = new IntegerField
-                {
-                    value = Mathf.RoundToInt(_utilityConfig.ScaleSize),
-                    style =
-                    {
-                        width = 60,
-                        minWidth = 60,
-                        maxWidth = 60,
-                        marginLeft = 8,
-                        flexShrink = 0,
-                        unityTextAlign = TextAnchor.MiddleRight // Right-align text
-                    }
-                };
-
-                // Connect slider and field
-                scaleSlider.RegisterValueChangedCallback(e =>
-                {
-                    _utilityConfig.ScaleSize = e.newValue;
-                    scaleValue.value = Mathf.RoundToInt(e.newValue);
-                });
-
-                scaleValue.RegisterValueChangedCallback(e =>
-                {
-                    scaleSlider.value = Mathf.Clamp(e.newValue, 0f, 100f);
-                });
-
-                scaleContainer.Add(scaleSlider);
-                scaleContainer.Add(scaleValue);
-                scaleOuterContainer.Add(scaleContainer);
-                previewContainer.Add(scaleOuterContainer);
-            }
-
-            // Create section for sequences
-            var sequencesLabel = new Label("Available Sequences")
-            {
-                style =
-                {
-                    fontSize = 14,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    marginTop = Step == EditorStep.Review ? 0 : 6,
-                    marginBottom = 6
-                }
-            };
-            previewContainer.Add(sequencesLabel);
-
-            // Create responsive grid for sequence buttons
-            var sequenceGrid = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    flexWrap = Wrap.Wrap,
-                    justifyContent = Justify.Center,
-                    marginBottom = 8
-                }
-            };
-
-            // Add sequence buttons
-            sequenceGrid.Add(CreateSequenceButton("Walking", Resources.Load<Texture2D>("Editor/Walking")));
-            sequenceGrid.Add(CreateSequenceButton("Squatting", Resources.Load<Texture2D>("Editor/Squatting")));
-
-            previewContainer.Add(sequenceGrid);
-
-            // Add help text
-            var helpBox = new HelpBox("Select a sequence to preview character retargeting.",
-                HelpBoxMessageType.Info)
-            {
-                style =
-                {
-                    marginTop = 0
-                }
-            };
-            previewContainer.Add(helpBox);
-
-            // Add the preview container to the root
-            root.Add(previewContainer);
-
-            // Initialize playback UI if needed
-            if (_fileReader is { HasOpenedFileForPlayback: true })
-            {
-                _playbackUI = new MSDKUtilityEditorPlaybackUI(this);
-                _playbackUI.Init();
-                _playbackUI.StartPlayback();
-                root.Add(_playbackUI);
-            }
-
-            return root;
+            return CreatePreviewSection(this);
         }
 
-        private Button CreateSequenceButton(string sequenceName, Texture2D image)
+        /// <summary>
+        /// Opens a sequence for playback and refreshes the GUI.
+        /// </summary>
+        /// <param name="sequenceName">Name of the sequence to open.</param>
+        public void OpenSequence(string sequenceName)
         {
-            var button = new Button(() =>
-            {
-                CreateGUI();
-                OpenPlaybackFile(sequenceName);
-                CreateGUI();
-            })
-            {
-                style =
-                {
-                    width = 120,
-                    height = 90,
-                    marginRight = 8,
-                    marginBottom = 8,
-                    paddingTop = 6,
-                    paddingBottom = 6,
-                    flexDirection = FlexDirection.Column,
-                    alignItems = Align.Center,
-                    justifyContent = Justify.Center,
-                    borderTopLeftRadius = 3,
-                    borderTopRightRadius = 3,
-                    borderBottomLeftRadius = 3,
-                    borderBottomRightRadius = 3
-                }
-            };
-
-            // Add image
-            var imageElement = new Image
-            {
-                image = image,
-                style =
-                {
-                    width = 60,
-                    height = 60,
-                    marginBottom = 4
-                }
-            };
-            button.Add(imageElement);
-
-            // Add label
-            var label = new Label(sequenceName)
-            {
-                style =
-                {
-                    fontSize = 12,
-                    unityFontStyleAndWeight = FontStyle.Bold
-                }
-            };
-            button.Add(label);
-
-            return button;
+            CreateGUI();
+            OpenPlaybackFile(sequenceName);
+            CreateGUI();
         }
 
         private VisualElement AlignmentSection()
         {
-            var root = CreateStandardContainer();
-
-            // Create a styled header with background
-            var headerContainer = new VisualElement
-            {
-                style =
-                {
-                    backgroundColor = _headerBackgroundColor,
-                    borderTopLeftRadius = 4,
-                    borderTopRightRadius = 4,
-                    paddingTop = 8,
-                    paddingBottom = 8,
-                    paddingLeft = 10,
-                    paddingRight = 10,
-                    marginBottom = 4
-                }
-            };
-
-            headerContainer.Add(CreateHeaderLabel("Alignment", _headerSize));
-            root.Add(headerContainer);
-
-            // Main container with card-like styling
-            var alignmentContainer = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Column,
-                    justifyContent = Justify.Center,
-                    backgroundColor = _cardBackgroundColor,
-                    borderBottomColor = _borderColor,
-                    borderBottomWidth = 1,
-                    borderLeftColor = _borderColor,
-                    borderLeftWidth = 1,
-                    borderRightColor = _borderColor,
-                    borderRightWidth = 1,
-                    borderTopColor = _borderColor,
-                    borderTopWidth = 1,
-                    borderBottomLeftRadius = 4,
-                    borderBottomRightRadius = 4,
-                    paddingTop = 8,
-                    paddingBottom = 8,
-                    paddingLeft = 10,
-                    paddingRight = 10,
-                    marginBottom = 8,
-                }
-            };
-
-            // Create section for primary alignment actions
-            var primaryActionsLabel = new Label("Primary Alignment Actions")
-            {
-                style =
-                {
-                    fontSize = 14,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    marginBottom = 6
-                }
-            };
-            alignmentContainer.Add(primaryActionsLabel);
-
-            // Create responsive button grid for primary actions
-            var buttonGrid = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    flexWrap = Wrap.Wrap,
-                    marginBottom = 12
-                }
-            };
-
-            // Determine T-pose options based on current step
-            var otherTPose = Step == EditorStep.MaxTPose ? "min" : "max";
-            var tPoseOption = Step == EditorStep.MaxTPose ? SkeletonTPoseType.MinTPose : SkeletonTPoseType.MaxTPose;
-
-            // Common button style setup
-            void SetupButtonStyle(Button button)
-            {
-                button.style.flexGrow = 1;
-                button.style.minWidth = 120;
-                button.style.marginRight = 4;
-                button.style.marginBottom = 4;
-                button.style.height = 28;
-            }
-
-            // Create styled buttons with icons for primary actions
-            var alignButton =
-                CreateStyledMappingButton(PerformAutoAlignment, "Align with Skeleton", "Grid.MoveTool@2x");
-            alignButton.tooltip = "Automatically align the target skeleton with the source skeleton";
-            SetupButtonStyle(alignButton);
-
-            var scaleButton = CreateStyledMappingButton(() =>
-                {
-                    var minHeight = 1.028f;
-                    var maxHeight = 2.078f;
-                    GetSkeletonTPose(_configHandle, SkeletonType.TargetSkeleton, tPoseOption,
-                        JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
-                    ScalePoseToHeight(_configHandle, SkeletonType.TargetSkeleton,
-                        JointRelativeSpaceType.RootOriginRelativeSpace,
-                        tPoseOption == SkeletonTPoseType.MaxTPose ? minHeight : maxHeight, ref tPose);
-                    _target.ReferencePose = tPose.ToArray();
-                    _previewer.ReloadCharacter(_target);
-                    SaveUpdateConfig(false);
-                }, $"Scale from {otherTPose} T-Pose", "ScaleTool");
-            scaleButton.tooltip = $"Scale the character using the {otherTPose} T-Pose as reference";
-            SetupButtonStyle(scaleButton);
-
-            var resetButton = CreateStyledMappingButton(() =>
-            {
-                GetSkeletonTPose(_configHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.UnscaledTPose,
-                    JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
-                _target.ReferencePose = tPose.ToArray();
-                _utilityConfig.SetTPose = true;
-                _utilityConfig.RootScale = Vector3.one;
-                _previewer.ReloadCharacter(_target);
-            }, "Reset T-Pose", "Refresh");
-            resetButton.tooltip = "Reset the character to its default T-Pose";
-            SetupButtonStyle(resetButton);
-
-            var updateButton = CreateStyledMappingButton(() =>
-            {
-                SaveUpdateConfig(false);
-                _previewer.ReloadCharacter(_target);
-            }, "Update Mapping", "Update-Available");
-            updateButton.tooltip = "Update the joint mapping based on current pose";
-            SetupButtonStyle(updateButton);
-            updateButton.style.marginRight = 0; // Last button doesn't need right margin
-
-            // Add buttons to grid
-            buttonGrid.Add(alignButton);
-            buttonGrid.Add(scaleButton);
-            buttonGrid.Add(resetButton);
-            buttonGrid.Add(updateButton);
-            alignmentContainer.Add(buttonGrid);
-
-            // Create section for fine-tuning
-            var fineTuningLabel = new Label("Fine-Tuning")
-            {
-                style =
-                {
-                    fontSize = 14,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    marginTop = 4,
-                    marginBottom = 4
-                }
-            };
-            alignmentContainer.Add(fineTuningLabel);
-
-            // Create responsive grid for fine-tuning buttons
-            var fineTuningGrid = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    flexWrap = Wrap.Wrap,
-                    marginBottom = 8
-                }
-            };
-
-            // Create styled buttons for fine-tuning
-            var wristsButton = CreateStyledMappingButton(PerformMatchWrists, "Align Wrists", "AvatarPivot@2x");
-            wristsButton.tooltip = "Align the wrist joints between source and target skeletons";
-            SetupButtonStyle(wristsButton);
-
-            var fingersButton = CreateStyledMappingButton(PerformMatchFingers, "Align Fingers", "AvatarPivot@2x");
-            fingersButton.tooltip = "Align the finger joints between source and target skeletons";
-            SetupButtonStyle(fingersButton);
-            fingersButton.style.marginRight = 0; // Last button doesn't need right margin
-
-            // Add buttons to fine-tuning grid
-            fineTuningGrid.Add(wristsButton);
-            fineTuningGrid.Add(fingersButton);
-            alignmentContainer.Add(fineTuningGrid);
-
-            // Add help text
-            var helpBox =
-                new HelpBox("Use 'Align with Skeleton' first, then fine-tune with the matching tools if needed.",
-                    HelpBoxMessageType.Info)
-                {
-                    style =
-                    {
-                        marginTop = 0
-                    }
-                };
-            alignmentContainer.Add(helpBox);
-
-            // Add the alignment container to the root
-            root.Add(alignmentContainer);
-
-            return root;
+            return CreateAlignmentSection(this);
         }
 
         private Button CreateStyledMappingButton(Action callback, string text, string iconName)
@@ -1313,10 +751,10 @@ namespace Meta.XR.Movement.Editor
                 {
                     flexDirection = FlexDirection.Row,
                     alignItems = Align.Center,
-                    paddingTop = 4,
-                    paddingBottom = 4,
-                    paddingLeft = 8,
-                    paddingRight = 8,
+                    paddingTop = SmallPadding,
+                    paddingBottom = SmallPadding,
+                    paddingLeft = CardPadding,
+                    paddingRight = CardPadding,
                     flexShrink = 1
                 }
             };
@@ -1342,9 +780,9 @@ namespace Meta.XR.Movement.Editor
                     image = icon,
                     style =
                     {
-                        width = 16,
-                        height = 16,
-                        marginRight = 4,
+                        width = IconSize,
+                        height = IconSize,
+                        marginRight = SmallPadding,
                         flexShrink = 0 // Prevent icon from shrinking
                     }
                 };
@@ -1356,10 +794,10 @@ namespace Meta.XR.Movement.Editor
                 style =
                 {
                     unityTextAlign = TextAnchor.MiddleLeft,
-                    fontSize = 11, // Slightly smaller font
-                    flexShrink = 1, // Allow text to shrink if needed
-                    flexWrap = Wrap.Wrap, // Allow text to wrap
-                    whiteSpace = WhiteSpace.Normal // Allow text to wrap
+                    fontSize = SmallFontSize,
+                    flexShrink = 1,
+                    flexWrap = Wrap.Wrap,
+                    whiteSpace = WhiteSpace.Normal
                 }
             };
             contentContainer.Add(label);
@@ -1376,261 +814,60 @@ namespace Meta.XR.Movement.Editor
 
         private VisualElement RenderEditorSteps()
         {
-            switch (Step)
-            {
-                case EditorStep.Configuration:
-                    return FirstEditorStep();
-                case EditorStep.MinTPose:
-                    return SecondEditorStep();
-                case EditorStep.MaxTPose:
-                    return ThirdEditorStep();
-                case EditorStep.Review:
-                    return FourthEditorStep();
-                case EditorStep.End:
-                default:
-                    return null;
-            }
+            return CreateEditorStepSection(this);
         }
 
-        private VisualElement FirstEditorStep()
+        /// <summary>
+        /// Removes a joint from the configuration.
+        /// </summary>
+        /// <param name="jointName">Name of the joint to remove.</param>
+        public void RemoveJoint(string jointName)
         {
-            var root = EditorStepContainer();
-            var serializedTargetObject = new SerializedObject(_target);
-
-            // Create and configure bone transforms foldout
-            var foldout = new Foldout
+            // Store current scroll position before removing the joint
+            var scrollView = rootVisualElement.Q<ScrollView>();
+            if (scrollView != null)
             {
-                text = "Config Bone Transforms",
-                value = _configBoneTransformsFoldout,
-                style =
-                {
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    paddingTop = _singleLineSpace,
-                    paddingBottom = _singleLineSpace
-                }
-            };
-            foldout.RegisterValueChangedCallback(val => _configBoneTransformsFoldout = val.newValue);
-
-            // Add joint entries to foldout
-            for (var i = 0; i < _target.SkeletonInfo.JointCount; i++)
-            {
-                var entryContainer = CreateRightJointEntryContainer();
-                var leftSideContainer = CreateLeftJointEntryContainer();
-                var jointName = _target.JointNames[i];
-
-                GetChildJointIndexes(_configHandle, SkeletonType.TargetSkeleton, i, out var childJointIndexes);
-                var hasChildIndex = childJointIndexes.Length > 0;
-
-                // Add remove button or spacer
-                if (i > 0 && !hasChildIndex)
-                {
-                    var removeJointButton = new Button(() =>
-                    {
-                        // Store current scroll position before removing the joint
-                        var scrollView = rootVisualElement.Q<ScrollView>();
-                        if (scrollView != null)
-                        {
-                            _scrollPosition = scrollView.scrollOffset;
-                        }
-
-                        var knownRoot = _target.KnownSkeletonJoints[(int)KnownJointType.Root];
-                        var data = MSDKUtilityEditor.CreateRetargetingData(knownRoot == null
-                                ? _sceneViewCharacter.transform
-                                : knownRoot,
-                            _target);
-                        data.RemoveJoint(jointName);
-                        CreateConfig(this, false, data);
-                        CreateGUI();
-                    })
-                    {
-                        text = "-",
-                        style =
-                        {
-                            width = _buttonSizeHeight,
-                            height = _buttonSizeHeight
-                        }
-                    };
-                    leftSideContainer.Add(removeJointButton);
-                }
-                else
-                {
-                    leftSideContainer.Add(CreateSpacerLabel());
-                }
-
-                // Add joint name label
-                leftSideContainer.Add(CreateJointNameLabel(jointName));
-
-                // Add property field
-                var boneTransformField = CreateBoneTransformField(serializedTargetObject, i);
-
-                // Assemble container
-                entryContainer.Add(leftSideContainer);
-                entryContainer.Add(boneTransformField);
-                foldout.Add(entryContainer);
+                _scrollPosition = scrollView.scrollOffset;
             }
 
-            // Create known joints container
-            var knownJointsContainer = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Column,
-                    paddingTop = _singleLineSpace,
-                    paddingBottom = _doubleLineSpace
-                }
-            };
-            for (var i = KnownJointType.Root; i < KnownJointType.KnownJointCount; i++)
-            {
-                var knownJoints = serializedTargetObject.FindProperty("KnownSkeletonJoints");
-                var knownJointIndex = (int)i;
-                var knownJointField = new ObjectField(i.ToString())
-                {
-                    style = { justifyContent = Justify.SpaceBetween },
-                    value = knownJoints.GetArrayElementAtIndex(knownJointIndex).objectReferenceValue
-                };
-
-                knownJointField.RegisterValueChangedCallback(e =>
-                {
-                    if (e.previousValue != e.newValue)
-                    {
-                        knownJoints.GetArrayElementAtIndex(knownJointIndex).objectReferenceValue = e.newValue;
-                        serializedTargetObject.ApplyModifiedProperties();
-                        SaveUpdateConfig(false);
-                    }
-                });
-
-                knownJointField.Bind(serializedTargetObject);
-                knownJointsContainer.Add(knownJointField);
-            }
-
-            // Add elements to root
-            root.Add(foldout);
-            root.Add(CreateHeaderLabel("Known Joints", 12));
-            root.Add(knownJointsContainer);
-
-            // Add Original Source Pose button
-            var originalPoseButton = new Button(LoadOriginalSourcePose)
-            {
-                text = "Load original T-Pose",
-                style =
-                {
-                    paddingTop = _buttonPadding,
-                    paddingBottom = _buttonPadding,
-                    backgroundColor = new Color(_primaryColor.r, _primaryColor.g, _primaryColor.b, 0.1f),
-                    borderTopLeftRadius = 3,
-                    borderTopRightRadius = 3,
-                    borderBottomLeftRadius = 3,
-                    borderBottomRightRadius = 3,
-                    marginTop = 8,
-                    marginBottom = 4
-                }
-            };
-            root.Add(originalPoseButton);
-
-            // Add T-Pose button
-            var tPoseButton = new Button(SetToTPose)
-            {
-                text = "Pose character to T-Pose",
-                style =
-                {
-                    paddingTop = _buttonPadding,
-                    paddingBottom = _buttonPadding,
-                    backgroundColor = new Color(_primaryColor.r, _primaryColor.g, _primaryColor.b, 0.1f),
-                    borderTopLeftRadius = 3,
-                    borderTopRightRadius = 3,
-                    borderBottomLeftRadius = 3,
-                    borderBottomRightRadius = 3,
-                    marginTop = 8,
-                    marginBottom = 4
-                }
-            };
-            root.Add(tPoseButton);
-
-            // Add navigation buttons
-            root.Add(PreviousNextSteps(true, false, false, EditorMetadataObject.ConfigJson != null));
-            return root;
+            var knownRoot = _target.KnownSkeletonJoints[(int)KnownJointType.Root];
+            var data = MSDKUtilityEditor.CreateRetargetingData(knownRoot == null
+                    ? _sceneViewCharacter.transform
+                    : knownRoot,
+                _target);
+            data.RemoveJoint(jointName);
+            CreateConfig(this, false, data);
+            CreateGUI();
         }
 
-        private VisualElement SecondEditorStep()
+        /// <summary>
+        /// Validates and saves the configuration.
+        /// </summary>
+        public void ValidateAndSaveConfig()
         {
-            var root = EditorStepContainer();
-            root.Add(PreviewSection());
-            root.Add(AlignmentSection());
-            root.Add(PreviousNextSteps(false, false, true, true));
-            return root;
+            _validatedConfigFinish = true;
+            SaveConfig(this, false);
+            CreateGUI();
         }
 
-        private VisualElement ThirdEditorStep()
+        /// <summary>
+        /// Navigates to the previous step.
+        /// </summary>
+        /// <param name="lastStep">Whether this is the last step.</param>
+        public void NavigatePrevious(bool lastStep)
         {
-            var root = EditorStepContainer();
-            root.Add(PreviewSection());
-            root.Add(AlignmentSection());
-            root.Add(PreviousNextSteps(false, false, true, true));
-            return root;
+            SavePrompt(lastStep, false);
+            CreateGUI();
         }
 
-        private VisualElement FourthEditorStep()
+        /// <summary>
+        /// Navigates to the next step.
+        /// </summary>
+        /// <param name="lastStep">Whether this is the last step.</param>
+        public void NavigateNext(bool lastStep)
         {
-            var root = EditorStepContainer();
-            root.Add(PreviewSection());
-            var validateButton = new Button(() =>
-            {
-                _validatedConfigFinish = true;
-                SaveConfig(this, false);
-                CreateGUI();
-            })
-            {
-                text = "Validate and save config",
-                style =
-                {
-                    paddingTop = _buttonPadding,
-                    paddingBottom = _buttonPadding,
-                    backgroundColor = new Color(0.1f, 0.6f, 0.3f, 0.7f), // Match Next/Done button color
-                    color = Color.white,
-                    unityFontStyleAndWeight = FontStyle.Bold,
-                    borderTopLeftRadius = 3,
-                    borderTopRightRadius = 3,
-                    borderBottomLeftRadius = 3,
-                    borderBottomRightRadius = 3,
-                    marginBottom = 8
-                }
-            };
-            root.Add(validateButton);
-            if (_validatedConfigFinish)
-            {
-                root.Add(new HelpBox("No issues detected in mapping!", HelpBoxMessageType.Info));
-            }
-
-            root.Add(PreviousNextSteps(false, true, true, _validatedConfigFinish));
-            return root;
-        }
-
-        private VisualElement PreviousNextSteps(bool firstStep, bool lastStep, bool enablePrevious, bool enableNext)
-        {
-            var root = CreateStandardContainer();
-            root.style.flexDirection = FlexDirection.Row;
-            root.style.justifyContent = Justify.SpaceBetween;
-
-            if (!_target.IsValid())
-            {
-                root.Add(new HelpBox("Configuration is invalid! Please fix any missing fields! " +
-                                     "The configuration can also be refreshed into a valid configuration by " +
-                                     "using the buttons past the config asset field.", HelpBoxMessageType.Error));
-            }
-
-            root.Add(CreateNavigationButton("Previous", enablePrevious, enablePrevious, () =>
-            {
-                SavePrompt(lastStep, false);
-                CreateGUI();
-            }));
-
-            root.Add(CreateNavigationButton(lastStep ? "Done" : "Next", enableNext, true, () =>
-            {
-                SavePrompt(lastStep, true);
-                CreateGUI();
-            }));
-
-            return root;
+            SavePrompt(lastStep, true);
+            CreateGUI();
         }
 
         private void SavePrompt(bool lastStep, bool next)
@@ -1663,10 +900,11 @@ namespace Meta.XR.Movement.Editor
 
                 ResetConfig(this, false);
                 LoadConfig(this);
-                _overlay.Reload();
+                _overlay?.Reload();
             }
 
-            if (lastStep)
+            // Only exit the editor if we're on the last step AND moving forward (next)
+            if (lastStep && next)
             {
                 ExitEditor();
             }
@@ -1716,230 +954,51 @@ namespace Meta.XR.Movement.Editor
          *
          **********************************************************/
 
-        private Button CreateNavigationButton(string text, bool enabled, bool visible, Action onClick)
+        /// <summary>
+        /// Performs T-pose scaling from the specified T-pose type.
+        /// </summary>
+        /// <param name="tPoseOption">The T-pose type to scale from.</param>
+        /// <param name="otherTPose">The name of the other T-pose for UI display.</param>
+        public void PerformScaleFromTPose(SkeletonTPoseType tPoseOption, string otherTPose)
         {
-            var button = new Button(onClick)
-            {
-                text = text,
-                style =
-                {
-                    alignSelf = Align.Stretch,
-                    flexGrow = 1,
-                    minWidth = 100,
-                    height = _buttonSizeHeight,
-                    borderTopLeftRadius = 3,
-                    borderTopRightRadius = 3,
-                    borderBottomLeftRadius = 3,
-                    borderBottomRightRadius = 3,
-                    marginLeft = 4,
-                    marginRight = 4
-                }
-            };
-
-            // Apply special styling for "Next" or "Done" buttons
-            if (text == "Next" || text == "Done")
-            {
-                button.style.backgroundColor = new Color(0.1f, 0.6f, 0.3f, 0.7f); // Distinct green color
-                button.style.color = Color.white;
-                button.style.unityFontStyleAndWeight = FontStyle.Bold;
-            }
-
-            button.SetEnabled(enabled);
-            button.visible = visible;
-            return button;
+            var minHeight = 1.028f;
+            var maxHeight = 2.078f;
+            GetSkeletonTPose(ConfigHandle, SkeletonType.TargetSkeleton, tPoseOption,
+                JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
+            ScalePoseToHeight(ConfigHandle, SkeletonType.TargetSkeleton,
+                JointRelativeSpaceType.RootOriginRelativeSpace,
+                tPoseOption == SkeletonTPoseType.MaxTPose ? minHeight : maxHeight, ref tPose);
+            _target.ReferencePose = tPose.ToArray();
+            _previewer.ReloadCharacter(_target);
+            SaveUpdateConfig(false);
         }
 
-        private Button CreateIconActionButton(string iconName, Action clickAction)
+        /// <summary>
+        /// Resets the character to T-pose.
+        /// </summary>
+        public void ResetToTPose()
         {
-            var button = new Button(clickAction)
-            {
-                style =
-                {
-                    width = 26,
-                    height = 24,
-                    marginLeft = 4,
-                    paddingLeft = 4,
-                    paddingRight = 4,
-                    paddingTop = 2,
-                    paddingBottom = 2,
-                    flexShrink = 0,
-                    flexGrow = 0,
-                    backgroundColor = new Color(0, 0, 0, 0)
-                }
-            };
-
-            button.Add(new Image
-            {
-                image = EditorGUIUtility.IconContent(iconName).image,
-                style =
-                {
-                    width = 16,
-                    height = 16,
-                    flexShrink = 0,
-                    flexGrow = 0
-                }
-            });
-
-            return button;
+            GetSkeletonTPose(ConfigHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.UnscaledTPose,
+                JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
+            _target.ReferencePose = tPose.ToArray();
+            _utilityConfig.SetTPose = true;
+            _utilityConfig.RootScale = Vector3.one;
+            _previewer.ReloadCharacter(_target);
         }
 
-        private VisualElement CreateRightJointEntryContainer()
+        /// <summary>
+        /// Updates the mapping and reloads the character.
+        /// </summary>
+        public void UpdateMapping()
         {
-            return new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    justifyContent = Justify.SpaceBetween,
-                    alignItems = Align.FlexEnd
-                }
-            };
+            SaveUpdateConfig(false);
+            _previewer.ReloadCharacter(_target);
         }
 
-        private VisualElement CreateLeftJointEntryContainer()
-        {
-            return new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    marginRight = 1,
-                    marginBottom = -2,
-                    alignItems = Align.Center
-                }
-            };
-        }
-
-        private VisualElement EditorStepContainer()
-        {
-            return new VisualElement
-            {
-                style =
-                {
-                    paddingTop = _singleLineSpace,
-                    paddingBottom = _singleLineSpace
-                }
-            };
-        }
-
-        private VisualElement CreateStandardContainer()
-        {
-            return new VisualElement
-            {
-                style =
-                {
-                    paddingTop = _singleLineSpace,
-                    paddingBottom = _singleLineSpace
-                }
-            };
-        }
-
-        private Label CreateHeaderLabel(string text, int fontSize)
-        {
-            return new Label
-            {
-                text = text,
-                style =
-                {
-                    fontSize = fontSize,
-                    unityFontStyleAndWeight = FontStyle.Bold
-                }
-            };
-        }
-
-        private Label CreateJointNameLabel(string jointName)
-        {
-            return new Label
-            {
-                text = jointName,
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleLeft,
-                    height = _buttonSizeHeight,
-                }
-            };
-        }
-
-        private Label CreateSpacerLabel()
-        {
-            return new Label
-            {
-                text = " ",
-                style =
-                {
-                    width = _buttonSizeHeight,
-                    height = _buttonSizeHeight
-                }
-            };
-        }
-
-        private PropertyField CreateBoneTransformField(SerializedObject serializedObject, int index)
-        {
-            var field = new PropertyField(
-                serializedObject.FindProperty("SkeletonJoints").GetArrayElementAtIndex(index),
-                string.Empty)
-            {
-                style = { flexGrow = 1 }
-            };
-            field.Bind(serializedObject);
-            return field;
-        }
-
-        private PropertyField CreatePropertyField(SerializedObject serializedObject, string propertyPath, string label,
-            float height = 0)
-        {
-            var field = new PropertyField(
-                serializedObject.FindProperty(propertyPath),
-                label);
-
-            if (height > 0)
-            {
-                field.style.height = height;
-            }
-
-            field.Bind(serializedObject);
-            return field;
-        }
-
-        private Foldout CreateConfigFoldout(string configTitle, UnityEditor.Editor editor,
-            SerializedObject serializedObject)
-        {
-            var foldout = new Foldout
-            {
-                text = configTitle,
-                value = false
-            };
-
-            foldout.Add(new IMGUIContainer(editor.OnInspectorGUI));
-            foldout.Bind(serializedObject);
-
-            return foldout;
-        }
-
-
-        /**********************************************************
-         *
-         *               Utility functions
-         *
-         **********************************************************/
-
-        public void ModifyConfig(bool updateMappings, bool performAlignment)
-        {
-            UpdateConfig(this, false, updateMappings, performAlignment);
-            EditorUtility.SetDirty(EditorMetadataObject);
-            AssetDatabase.SaveAssets();
-            CreateGUI();
-        }
-
-        public void SaveUpdateConfig(bool saveConfig)
-        {
-            UpdateConfig(this, saveConfig, false, false);
-            EditorUtility.SetDirty(EditorMetadataObject);
-            AssetDatabase.SaveAssets();
-            CreateGUI();
-        }
-
-        private void RefreshConfig()
+        /// <summary>
+        /// Refreshes the configuration from the current config JSON.
+        /// </summary>
+        public void RefreshConfig()
         {
             ResetConfig(this, true, EditorMetadataObject.ConfigJson.text);
             EditorUtility.SetDirty(EditorMetadataObject);
@@ -1947,7 +1006,10 @@ namespace Meta.XR.Movement.Editor
             CreateGUI();
         }
 
-        private void CreateNewConfig()
+        /// <summary>
+        /// Creates a new configuration.
+        /// </summary>
+        public void CreateNewConfig()
         {
             CreateConfig(this, true);
             EditorUtility.SetDirty(EditorMetadataObject);
@@ -1955,14 +1017,29 @@ namespace Meta.XR.Movement.Editor
             CreateGUI();
         }
 
-        private void PerformMatchWrists()
+        /// <summary>
+        /// Performs automatic alignment between source and target skeletons.
+        /// </summary>
+        public void PerformAutoAlignment()
+        {
+            JointAlignmentUtility.AutoAlignment(this);
+            _previewer.ReloadCharacter(_target);
+        }
+
+        /// <summary>
+        /// Performs wrist matching alignment.
+        /// </summary>
+        public void PerformMatchWrists()
         {
             JointAlignmentUtility.PerformWristMatching(_source, _target);
             JointAlignmentUtility.PerformArmScaling(_source, _target);
             _previewer.ReloadCharacter(_target);
         }
 
-        private void PerformMatchFingers()
+        /// <summary>
+        /// Performs finger matching alignment.
+        /// </summary>
+        public void PerformMatchFingers()
         {
             JointAlignmentUtility.PerformFingerMatching(this, _leftStartBoneIds, _leftEndBoneIds,
                 KnownJointType.LeftWrist);
@@ -1971,13 +1048,10 @@ namespace Meta.XR.Movement.Editor
             _previewer.ReloadCharacter(_target);
         }
 
-        private void PerformAutoAlignment()
-        {
-            JointAlignmentUtility.AutoAlignment(this);
-            _previewer.ReloadCharacter(_target);
-        }
-
-        private void LoadOriginalSourcePose()
+        /// <summary>
+        /// Loads the original source pose from the prefab asset.
+        /// </summary>
+        public void LoadOriginalSourcePose()
         {
             // Get the prefab asset that the scene character originates from
             var sourceAsset = EditorMetadataObject.Model;
@@ -2022,14 +1096,75 @@ namespace Meta.XR.Movement.Editor
             _previewer.ReloadCharacter(_target);
         }
 
-        private void SetToTPose()
+        /// <summary>
+        /// Loads the original hands from the prefab asset.
+        /// </summary>
+        public void LoadOriginalHands()
+        {
+            // Get the prefab asset that the scene character originates from
+            var sourceAsset = EditorMetadataObject.Model;
+            if (sourceAsset == null)
+            {
+                EditorUtility.DisplayDialog("Error", "This character doesn't have a source prefab asset.", "OK");
+                return;
+            }
+
+            // Get all transforms from both the source asset and the scene character
+            var sourceTransforms = sourceAsset.GetComponentsInChildren<Transform>();
+            var sceneTransforms = _sceneViewCharacter.GetComponentsInChildren<Transform>();
+
+            // Create a dictionary to quickly look up scene transforms by name
+            var sceneTransformMap = new Dictionary<string, Transform>();
+            foreach (var transform in sceneTransforms)
+            {
+                sceneTransformMap[transform.name] = transform;
+            }
+
+            // Copy transform data from source to scene character
+            foreach (var t in sceneTransforms)
+            {
+                Undo.RecordObject(t, "Load Original Hands");
+            }
+
+            var handTransforms = new HashSet<Transform>
+            {
+                _target.KnownSkeletonJoints[(int)KnownJointType.LeftWrist],
+                _target.KnownSkeletonJoints[(int)KnownJointType.RightWrist]
+            };
+            foreach (var sourceTransform in sourceTransforms)
+            {
+                if (!sceneTransformMap.TryGetValue(sourceTransform.name, out var sceneTransform))
+                {
+                    continue;
+                }
+
+                // Copy local position, rotation and scale
+                var parent = sceneTransform.parent;
+                if (handTransforms.Contains(parent))
+                {
+                    sceneTransform.localPosition = sourceTransform.localPosition;
+                    sceneTransform.localRotation = sourceTransform.localRotation;
+                    sceneTransform.localScale = sourceTransform.localScale;
+                    handTransforms.Add(parent);
+                }
+            }
+
+            // Update the target draw and reload the character
+            _previewer.UpdateTargetDraw(this);
+            _previewer.ReloadCharacter(_target);
+        }
+
+        /// <summary>
+        /// Sets the character to T-pose.
+        /// </summary>
+        public void SetToTPose()
         {
             // Align target to source, which will update the T-Pose.
             AlignTargetToSource(_source.ConfigName,
                 AlignmentFlags.All,
-                _configHandle,
+                ConfigHandle,
                 SkeletonType.SourceSkeleton,
-                _configHandle,
+                ConfigHandle,
                 out var newConfigHandle);
             GetSkeletonTPose(newConfigHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.UnscaledTPose,
                 JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
@@ -2037,6 +1172,45 @@ namespace Meta.XR.Movement.Editor
             _utilityConfig.Handles.Add(newConfigHandle);
             _previewer.ReloadCharacter(_target);
         }
+
+        private Foldout CreateConfigFoldout(string configTitle, UnityEditor.Editor editor,
+            SerializedObject serializedObject)
+        {
+            var foldout = new Foldout
+            {
+                text = configTitle,
+                value = false
+            };
+
+            foldout.Add(new IMGUIContainer(editor.OnInspectorGUI));
+            foldout.Bind(serializedObject);
+
+            return foldout;
+        }
+
+
+        /**********************************************************
+         *
+         *               Utility functions
+         *
+         **********************************************************/
+
+        public void ModifyConfig(bool updateMappings, bool performAlignment)
+        {
+            UpdateConfig(this, false, updateMappings, performAlignment);
+            EditorUtility.SetDirty(EditorMetadataObject);
+            AssetDatabase.SaveAssets();
+            CreateGUI();
+        }
+
+        public void SaveUpdateConfig(bool saveConfig)
+        {
+            UpdateConfig(this, saveConfig, false, false);
+            EditorUtility.SetDirty(EditorMetadataObject);
+            AssetDatabase.SaveAssets();
+            CreateGUI();
+        }
+
 
         private void RemoveExistingOverlays()
         {
@@ -2141,36 +1315,7 @@ namespace Meta.XR.Movement.Editor
         // Debugging.
         private VisualElement DebugConfigSection()
         {
-            if (this == null)
-            {
-                return null;
-            }
-
-            // Create serialized object and root container
-            var serializedObject = new SerializedObject(this);
-            var root = CreateStandardContainer();
-
-            // Create main debug foldout
-            var foldout = new Foldout { text = "DEBUG", value = false };
-
-            // Setup editors for source and target properties
-            var sourceProperty = serializedObject.FindProperty("_source");
-            var targetProperty = serializedObject.FindProperty("_target");
-            UnityEditor.Editor.CreateCachedEditor(sourceProperty.objectReferenceValue, null, ref _sourceEditor);
-            UnityEditor.Editor.CreateCachedEditor(targetProperty.objectReferenceValue, null, ref _targetEditor);
-
-            // Create nested container with source and target foldouts
-            var nestedContainer = new VisualElement { style = { marginLeft = 15 } };
-
-            // Add config foldouts
-            nestedContainer.Add(CreateConfigFoldout("Source Config Info", _sourceEditor, serializedObject));
-            nestedContainer.Add(CreateConfigFoldout("Target Config Info", _targetEditor, serializedObject));
-
-            // Assemble UI hierarchy
-            foldout.Add(nestedContainer);
-            root.Add(foldout);
-
-            return root;
+            return CreateDebugSection(this, _sourceEditor, _targetEditor);
         }
     }
 }

@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Meta.XR.Movement.Retargeting.Editor;
 using Meta.XR.Movement.Retargeting;
@@ -65,6 +66,9 @@ namespace Meta.XR.Movement.Editor
             set => _retargeter = value;
         }
 
+        public const float MinScale = 0.5f;
+        public const float MaxScale = 2.0f;
+
         [SerializeField]
         private MSDKUtilityEditorWindow _window;
 
@@ -74,10 +78,11 @@ namespace Meta.XR.Movement.Editor
         [SerializeField]
         private CharacterRetargeter _retargeter;
 
-        private Vector3 _previewPosition = Vector3.forward;
-
         [SerializeField]
         private SkeletonDraw[] _skeletonDraws = new SkeletonDraw[4];
+
+        private Vector3 _previewPosition = Vector3.forward;
+        private bool _appliedModelScale;
 
         /// <summary>
         /// Initializes the skeleton draws.
@@ -118,7 +123,7 @@ namespace Meta.XR.Movement.Editor
             _retargeter.ConfigAsset = _window.UtilityConfig.EditorMetadataObject.ConfigJson;
             CharacterRetargeterConfigEditor.LoadConfig(new SerializedObject(_retargeter), _retargeter);
             _retargeter.SkeletonRetargeter.ApplyScale = true;
-            _retargeter.SkeletonRetargeter.ScaleRange = new Vector2(0.5f, 2.0f);
+            _retargeter.SkeletonRetargeter.ScaleRange = new Vector2(MinScale, MaxScale);
             _retargeter.Start();
 
             var serializedConfig = new SerializedObject(_retargeter);
@@ -207,6 +212,7 @@ namespace Meta.XR.Movement.Editor
             _retargeter.DebugDrawSourceSkeleton = _window.Overlay.ShouldDrawPreview;
             _retargeter.DebugDrawTargetSkeleton = _window.Overlay.ShouldDrawPreview;
             _retargeter.DebugDrawTransform = _retargeter.transform;
+            _retargeter.IsValid = true;
             _retargeter.UpdateTPose(sourceTPose);
             _retargeter.CalculatePose(sourcePose);
             _retargeter.UpdatePose();
@@ -276,7 +282,7 @@ namespace Meta.XR.Movement.Editor
             target.SkeletonJoints[index] = rootJoint;
 
             // In the case we don't have a root, create one for previewing
-            if (_sceneViewCharacter.transform == rootJoint && _window.PreviewStage.scene.IsValid())
+            if (_sceneViewCharacter.transform.name != "PreviewCharacter" && _window.PreviewStage.scene.IsValid())
             {
                 var previewCharacterParent = new GameObject("PreviewCharacter");
                 SceneManager.MoveGameObjectToScene(previewCharacterParent, _window.PreviewStage.scene);
@@ -323,7 +329,21 @@ namespace Meta.XR.Movement.Editor
             // Set the positions/rotations for the root first.
             var rootJoint = target.SkeletonJoints[rootJointIndex];
             var rootTPose = target.ReferencePose[rootJointIndex];
-            _sceneViewCharacter.transform.localScale = Vector3.Scale(rootTPose.Scale, _window.UtilityConfig.RootScale);
+
+            // Apply root scale more carefully to prevent compounding issues
+            // Use the utility config root scale directly instead of combining with T-pose scale
+            var finalRootScale = _window.UtilityConfig.RootScale;
+
+            // Validate the final root scale before applying
+            if (finalRootScale.x < MinScale || finalRootScale.y < MinScale || finalRootScale.z < MinScale ||
+                finalRootScale.x > MaxScale || finalRootScale.y > MaxScale || finalRootScale.z > MaxScale ||
+                float.IsNaN(finalRootScale.x) || float.IsNaN(finalRootScale.y) || float.IsNaN(finalRootScale.z))
+            {
+                Debug.LogWarning($"Invalid final root scale detected: {finalRootScale}. Using Vector3.one instead.");
+                finalRootScale = Vector3.one;
+            }
+
+            _sceneViewCharacter.transform.localScale = finalRootScale;
             rootJoint.SetPositionAndRotation(rootTPose.Position, rootTPose.Orientation);
             Undo.RecordObject(rootJoint, "Reload Character");
 
@@ -336,7 +356,16 @@ namespace Meta.XR.Movement.Editor
                     continue;
                 }
 
-                joint.localScale = tPose.Scale;
+                // Validate joint scale before applying
+                var jointScale = tPose.Scale;
+                if (jointScale.x < MinScale || jointScale.y < MinScale || jointScale.z < MinScale ||
+                    jointScale.x > MaxScale || jointScale.y > MaxScale || jointScale.z > MaxScale ||
+                    float.IsNaN(jointScale.x) || float.IsNaN(jointScale.y) || float.IsNaN(jointScale.z))
+                {
+                    jointScale = Vector3.one;
+                }
+
+                joint.localScale = jointScale;
             }
 
             // Second, set positions/rotations.
@@ -357,6 +386,36 @@ namespace Meta.XR.Movement.Editor
                 Undo.RecordObject(joint, "Reload Character");
                 joint.SetPositionAndRotation(tPose.Position, tPose.Orientation);
             }
+        }
+
+        private bool UsePositionScale(MSDKUtilityEditorConfig config)
+        {
+            if (config.EditorMetadataObject == null || config.EditorMetadataObject.Model == null)
+            {
+                return true;
+            }
+
+            // Fallback in case we've already applied model scale.
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.TargetSkeleton,
+                KnownJointType.Hips, out var hipsJointIndex);
+            var hipsJoint = config.SkeletonJoints[hipsJointIndex];
+            var sourceJoints = config.EditorMetadataObject.Model.GetComponentsInChildren<Transform>();
+            Transform sourceHipsJoint = null;
+            foreach (var sourceJoint in sourceJoints)
+            {
+                if (sourceJoint.name == hipsJoint.name)
+                {
+                    sourceHipsJoint = sourceJoint;
+                    break;
+                }
+            }
+
+            if (sourceHipsJoint != null && Mathf.Abs(hipsJoint.position.sqrMagnitude - sourceHipsJoint.position.sqrMagnitude) <= 0.01f)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

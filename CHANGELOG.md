@@ -1,3 +1,9 @@
+## [77.0.2]
+
+### What's Fixed
+
+- Fixed retargeting editor issues related with configuration creation, previewing, and editing.
+
 ## [77.0.1]
 
 ### What's Fixed
