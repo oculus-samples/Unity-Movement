@@ -84,6 +84,23 @@ namespace Meta.XR.Movement
                 },
                 fixMessage: "Set OVRRuntimeSettings.RequestsAudioFaceTracking = true"
             );
+#if META_XR_CORE_V78_MIN
+            OVRProjectSetup.AddTask(
+                level: OVRProjectSetup.TaskLevel.Required,
+                group: _group,
+                platform: BuildTargetGroup.Unknown,
+                isDone: group => FindComponentInScene<VisemeDriver>() == null ||
+                                 OVRRuntimeSettings.GetRuntimeSettings().EnableFaceTrackingVisemesOutput,
+                message: "The visemes feature should be enabled.",
+                fix: group =>
+                {
+                    OVRRuntimeSettings.Instance.RequestsAudioFaceTracking = true;
+                    OVRRuntimeSettings.Instance.EnableFaceTrackingVisemesOutput = true;
+                    OVRRuntimeSettings.CommitRuntimeSettings(OVRRuntimeSettings.Instance);
+                },
+                fixMessage: "Set OVRRuntimeSettings.EnableFaceTrackingVisemesOutput = true"
+            );
+#endif
 
             // Test layers.
             OVRProjectSetup.AddTask(

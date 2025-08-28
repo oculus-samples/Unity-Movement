@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.Jobs;
 using static Meta.XR.Movement.MSDKUtility;
 using static Unity.Collections.Allocator;
 using static Unity.Collections.NativeArrayOptions;
@@ -81,6 +82,11 @@ namespace Meta.XR.Movement.Retargeting
         /// The source pose that's being retargeted.
         /// </summary>
         public NativeArray<NativeTransform> SourcePose => _sourcePose;
+
+        /// <summary>
+        /// The source reference pose.
+        /// </summary>
+        public NativeArray<NativeTransform> SourceReferencePose => _sourceReferencePose;
 
         /// <summary>
         /// The min T-Pose.
@@ -218,7 +224,9 @@ namespace Meta.XR.Movement.Retargeting
         private NativeArray<NativeTransform> _maxTPose;
         private NativeArray<int> _nativeSourceParentIndices;
         private NativeArray<int> _nativeTargetParentIndices;
+        private NativeArray<int> _nativeFingerIndices;
         private NativeArray<NativeTransform> _targetReferencePose;
+        private JobHandle _applyPoseJobHandle;
 
         /// <summary>
         /// Destructor.
@@ -254,6 +262,11 @@ namespace Meta.XR.Movement.Retargeting
                 out var leftLowerLegIndices);
             GetChildJointIndexes(_nativeHandle, SkeletonType.TargetSkeleton, _rightUpperLegJointIndex,
                 out var rightLowerLegIndices);
+            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.LeftWrist,
+                out var leftWristIndex);
+            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.RightWrist,
+                out var rightWristIndex);
+
             _leftLowerLegJointIndex = leftLowerLegIndices[0];
             _rightLowerLegJointIndex = rightLowerLegIndices[0];
 
@@ -264,6 +277,26 @@ namespace Meta.XR.Movement.Retargeting
             GetParentJointIndexesByRef(_nativeHandle, SkeletonType.TargetSkeleton, ref _nativeTargetParentIndices);
             _sourceParentIndices = _nativeSourceParentIndices.ToArray();
             _targetParentIndices = _nativeTargetParentIndices.ToArray();
+
+            // Fill finger indices array with joints that have wrist parents
+            var fingerIndicesList = new List<int>();
+            for (var i = 0; i < _targetJointCount; i++)
+            {
+                // Check if this joint or any of its parents are wrist joints
+                var currentJoint = i;
+                while (currentJoint != -1)
+                {
+                    if (currentJoint == leftWristIndex || currentJoint == rightWristIndex)
+                    {
+                        fingerIndicesList.Add(i);
+                        break;
+                    }
+
+                    currentJoint = _targetParentIndices[currentJoint];
+                }
+            }
+
+            _nativeFingerIndices = new NativeArray<int>(fingerIndicesList.ToArray(), Persistent);
 
             // Setup empty retargeting pose arrays.
             _sourcePose = new NativeArray<NativeTransform>(_sourceJointCount, Persistent, UninitializedMemory);
@@ -306,6 +339,7 @@ namespace Meta.XR.Movement.Retargeting
             _maxTPose.Dispose();
             _nativeSourceParentIndices.Dispose();
             _nativeTargetParentIndices.Dispose();
+            _nativeFingerIndices.Dispose();
             _targetReferencePose.Dispose();
             RetargetedPose.Dispose();
             RetargetedPoseLocal.Dispose();
@@ -336,7 +370,7 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         /// <param name="sourcePose">The source pose.</param>
         /// <param name="manifestation">The manifestation.</param>
-        public void Update(NativeArray<NativeTransform> sourcePose, string manifestation)
+        public bool Update(NativeArray<NativeTransform> sourcePose, string manifestation)
         {
             // Get retargeting settings.
             var retargetingBehaviorInfo = RetargetingBehaviorInfo.DefaultRetargetingSettings();
@@ -361,7 +395,7 @@ namespace Meta.XR.Movement.Retargeting
                     manifestation))
             {
                 Debug.LogError("Failed to retarget source frame data!");
-                return;
+                return false;
             }
 
             AppliedPose = true;
@@ -375,6 +409,21 @@ namespace Meta.XR.Movement.Retargeting
             headPose.Scale = Vector3.one * (1 + (1 - scaleVal) * (1 - _headScaleFactor));
             RetargetedPose[RootJointIndex] = rootPose;
             RetargetedPose[HeadJointIndex] = headPose;
+            return true;
+        }
+
+        public void ApplyPose(ref TransformAccessArray joints)
+        {
+            // Create job to apply the pose.
+            var job = new SkeletonJobs.ApplyPoseJob
+            {
+                BodyPose = RetargetedPoseLocal,
+                RotationOnlyIndices = _nativeFingerIndices,
+                CurrentRotationIndex =
+                    _retargetingBehavior == RetargetingBehavior.RotationsAndPositionsHandsRotationOnly ? 0 : -1
+            };
+            _applyPoseJobHandle = job.Schedule(joints);
+            _applyPoseJobHandle.Complete();
         }
 
         /// <summary>
@@ -410,12 +459,6 @@ namespace Meta.XR.Movement.Retargeting
 
             // Scale is uniform.
             _currentScale = jointPoseWithScale[0].Scale.x;
-
-            // Specific case handling for when the root scale is less than range of values due to invalid setup
-            if (_currentScale < 0.20f)
-            {
-                _currentScale *= 10f;
-            }
         }
 
         /// <summary>
@@ -431,13 +474,28 @@ namespace Meta.XR.Movement.Retargeting
                     (int)SkeletonData.FullBodyTrackingBoneId.RightHandWristTwist
                 }
             };
-            if (_sourceSkeletonDraw.LineThickness <= float.Epsilon)
+            if (_sourceSkeletonDraw.LineThickness <= float.Epsilon || _sourceSkeletonDraw.TintColor != color)
             {
                 _sourceSkeletonDraw.InitDraw(color, 0.005f);
             }
 
             ApplyOffset(ref _sourcePose, offset, true);
             _sourceSkeletonDraw.LoadDraw(_sourcePose.Length, _sourceParentIndices, _sourcePose);
+            _sourceSkeletonDraw.Draw();
+        }
+
+        /// <summary>
+        /// Draws last valid debug source pose.
+        /// </summary>
+        /// <param name="color"></param>
+        public void DrawInvalidSourcePose(Color color)
+        {
+            _sourceSkeletonDraw ??= new SkeletonDraw();
+            if (_sourceSkeletonDraw.LineThickness <= float.Epsilon || _sourceSkeletonDraw.TintColor != color)
+            {
+                _sourceSkeletonDraw.InitDraw(color, 0.005f);
+            }
+
             _sourceSkeletonDraw.Draw();
         }
 
@@ -450,7 +508,7 @@ namespace Meta.XR.Movement.Retargeting
         public void DrawDebugTargetPose(Transform localOffset, Color color, bool useWorldPose = false)
         {
             _targetSkeletonDraw ??= new SkeletonDraw();
-            if (_targetSkeletonDraw.LineThickness <= float.Epsilon)
+            if (_targetSkeletonDraw.LineThickness <= float.Epsilon || _targetSkeletonDraw.TintColor != color)
             {
                 _targetSkeletonDraw.InitDraw(color, 0.005f);
             }
@@ -470,6 +528,21 @@ namespace Meta.XR.Movement.Retargeting
             _targetSkeletonDraw.LoadDraw(targetWorldPose.Length, _targetParentIndices, targetWorldPose);
             _targetSkeletonDraw.Draw();
             targetWorldPose.Dispose();
+        }
+
+        /// <summary>
+        /// Draws last valid debug target pose.
+        /// </summary>
+        /// <param name="color"></param>
+        public void DrawInvalidTargetPose(Color color)
+        {
+            _targetSkeletonDraw ??= new SkeletonDraw();
+            if (_targetSkeletonDraw.LineThickness <= float.Epsilon || _targetSkeletonDraw.TintColor != color)
+            {
+                _targetSkeletonDraw.InitDraw(color, 0.005f);
+            }
+
+            _targetSkeletonDraw.Draw();
         }
 
         /// <summary>

@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 6b4a8085-3c71-410b-baec-ff2c5a44ad31
   version: 1
-  blockName: Networked Retargeted Character
-  description: Showing Retargeted Characters for all connected players.
+  blockName: Networked Character Retargeter
+  description: Creates a networked version of the Character Retargeter based on a
+    networking framework, enabling users to see each other's tracked custom characters
+    in real-time.
   tags:
     array:
     - name: Multiplayer
@@ -31,7 +33,21 @@ MonoBehaviour:
   guidedSetupName: 
   packageDependencies: []
   isSingleton: 0
-  usageInstructions: A valid character that contains a pose retargeter config must
-    be set.
-  featureDocumentationName: 
-  featureDocumentationUrl: 
+  usageInstructions: '1. Add this building block to the scene
+
+    2. Select the
+    character to be networked
+
+    3. Select the save location of the networked prefab
+
+    4.
+    Go through the initial retargeting editor tooling steps
+
+    5. Validate that
+    there are no errors in the configuration and test retargeting in the retargeting
+    editor tool
+
+
+    The full instructions can be found in https://developers.meta.com/horizon/documentation/unity/move-networking'
+  featureDocumentationName: Networking with Movement SDK
+  featureDocumentationUrl: https://developers.meta.com/horizon/documentation/unity/move-networking

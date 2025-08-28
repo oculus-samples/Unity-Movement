@@ -7,29 +7,31 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HighFidelityTongueThroatMaterial
+  m_Name: RealisticEyelashMaterial
   m_Shader: {fileID: 4800000, guid: 2fbcc86ab1452f94a919d19a83abf926, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _AREA_LIGHT_SPECULAR
+  - _ALPHAPREMULTIPLY_ON
   - _NORMALMAP
-  - _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
   - _SPECGLOSSMAP
   - _SPECULAR_AFFECT_BY_NDOTL
+  - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Transparent
+  disabledShaderPasses:
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 0b1780e89ab965546a65f53dfa42bb80, type: 3}
+        m_Texture: {fileID: 2800000, guid: 5402e93a33896d14a9ac36ea3eaa85d3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -49,15 +51,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 17cf8d4b17087f24283b2ea8d59fc531, type: 3}
+        m_Texture: {fileID: 2800000, guid: ddd4180e52915f848b8bd0fe5750845d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: 1a4ce998f1df1c04ea32e553e9136f0c, type: 3}
+        m_Texture: {fileID: 2800000, guid: b2f3e814e6953db49b744222b53d3629, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 2800000, guid: e3a49d9360230b140a92752a23d8741f, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -65,31 +67,30 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
-        m_Texture: {fileID: 2800000, guid: 27c387e7619aada4fa2bcccd27f302ac, type: 3}
+        m_Texture: {fileID: 2800000, guid: 8bd59a69b243af84cb5649e2699e1c2c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _AreaLightSampleDistance: 0.5
-    - _AreaLightSampleToggle: 1
+    - _AreaLightSampleToggle: 0
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DiffuseWrapColorMult: 2
     - _DiffuseWrapDist: 0.3
     - _DiffuseWrapEnabled: 0
-    - _DstBlend: 0
-    - _EmissionStrength: 0
-    - _GlossMapScale: 0.3
-    - _Glossiness: 0.55
+    - _DstBlend: 10
+    - _EmissionStrength: 1
+    - _GlossMapScale: 0
+    - _Glossiness: 1
     - _GlossyReflections: 1
     - _Metallic: 0
-    - _Mirrored: 0
-    - _Mode: 0
-    - _OcclusionStrength: 0.7
+    - _Mode: 3
+    - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _RecalculateNormalsToggle: 0
-    - _SmoothnessTextureChannel: 1
+    - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SpecularityNDotL: 1
     - _SrcBlend: 1
@@ -97,10 +98,10 @@ Material:
     - _StencilValue: 0
     - _UVSec: 0
     - _VertexDisplShadows: 0
-    - _ZWrite: 1
+    - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DiffuseWrapColor: {r: 1, g: 0.29999998, b: 0.19999996, a: 1}
-    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _SpecColor: {r: 0.09803922, g: 0.09803922, b: 0.09803922, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

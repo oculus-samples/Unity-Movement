@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 #if ISDK_DEFINED
+using Oculus.Interaction;
 using Oculus.Interaction.Body.Input;
 using Oculus.Interaction.Input;
 #endif
@@ -30,7 +31,7 @@ namespace Meta.XR.Movement.Retargeting
             /// </summary>
             public static readonly HandBodyJointPair[] LeftHandBodyJointPairs =
             {
-#if ISDK_OPENXR_HAND
+#if ISDK_78_OR_NEWER || ISDK_OPENXR_HAND
                 (HandJointId.HandWristRoot, BodyJointId.Body_LeftHandWrist),
                 (HandJointId.HandPalm, BodyJointId.Body_LeftHandPalm),
                 (HandJointId.HandThumb1, BodyJointId.Body_LeftHandThumbMetacarpal),
@@ -94,7 +95,7 @@ namespace Meta.XR.Movement.Retargeting
             /// </summary>
             public static readonly HandBodyJointPair[] RightHandBodyJointPairs =
             {
-#if ISDK_OPENXR_HAND
+#if ISDK_78_OR_NEWER || ISDK_OPENXR_HAND
                 (HandJointId.HandWristRoot, BodyJointId.Body_RightHandWrist),
                 (HandJointId.HandPalm, BodyJointId.Body_RightHandPalm),
                 (HandJointId.HandThumb1, BodyJointId.Body_RightHandThumbMetacarpal),
@@ -169,15 +170,15 @@ namespace Meta.XR.Movement.Retargeting
             /// <param name="bodyJointId">Body joint ID.</param>
             public HandBodyJointPair(HandJointId handJointId, BodyJointId bodyJointId)
             {
-                this.HandJointID = handJointId;
-                this.BodyJointID = bodyJointId;
+                HandJointID = handJointId;
+                BodyJointID = bodyJointId;
             }
 
             /// <summary>
             /// Used for anonymous tuple conversion
             /// </summary>
             public static implicit operator HandBodyJointPair((HandJointId handJointId, BodyJointId bodyJointId) tuple)
-                => new HandBodyJointPair(tuple.handJointId, tuple.bodyJointId);
+                => new (tuple.handJointId, tuple.bodyJointId);
         }
 #endif
 
@@ -234,7 +235,7 @@ namespace Meta.XR.Movement.Retargeting
         protected bool _moveHandBackToOriginalPosition = false;
 
         /// <summary>
-        /// The maximum amount the wrist and fingers can be displaced by ISDK.
+        /// The maximum distance the wrist and fingers can be displaced by ISDK.
         /// </summary>
         [SerializeField]
         [Range(0.0f, 1.0f)]
@@ -274,7 +275,16 @@ namespace Meta.XR.Movement.Retargeting
             jointPairs = null;
 
             Assert.IsNotNull(handObject);
-            handInterface = handObject.GetComponent<IHand>();
+            var handVisual = handObject.GetComponentInChildren<HandVisual>(true);
+            if (handVisual !=  null)
+            {
+                handInterface = handVisual.Hand;
+            }
+            else
+            {
+                var handInterfaces = handObject.GetComponentsInChildren<IHand>();
+                handInterface = handInterfaces[^1];
+            }
             switch (handInterface.Handedness)
             {
                 case Handedness.Left:
@@ -322,24 +332,42 @@ namespace Meta.XR.Movement.Retargeting
 
                 var bone = trackerPoses[joint];
                 handInterface.GetJointPose(pair.HandJointID, out Pose isdkPose);
-#if ISDK_OPENXR_HAND
-                ConvertOpenXRHandToOvrHand(pair.BodyJointID, ref isdkPose);
+#if ISDK_78_OR_NEWER || ISDK_OPENXR_HAND
+                if (OVRPlugin.HandSkeletonVersion == OVRHandSkeletonVersion.OpenXR)
+                {
+                    ConvertOpenXRHandToOvrHand(pair.BodyJointID, ref isdkPose);
+                }
 #endif
 
-                var targetPosition = !_moveHandBackToOriginalPosition
-                    ? _cameraRig.transform.InverseTransformPoint(isdkPose.position)
-                    : isdkPose.position + vectorToStartingHandPosition;
                 var originalHandPos = bone.Position;
-                var restrictedPosition = Vector3.MoveTowards(originalHandPos, targetPosition, _maxDisplacementDistance);
-                // Since the position is restricted, calculate its lerp value so that rotation is restricted too.
-                var lerpValue = (restrictedPosition - originalHandPos).sqrMagnitude /
-                    (targetPosition - originalHandPos).sqrMagnitude;
-                bone.Position = restrictedPosition;
+                var originalHandRot = bone.Orientation;
+                var isdkPosCameraRig = _cameraRig.transform.InverseTransformPoint(isdkPose.position);
+                var isdkRotCameraRig = Quaternion.Inverse(_cameraRig.transform.rotation) * isdkPose.rotation;
+                if (_moveHandBackToOriginalPosition)
+                {
+                    var targetPosition = isdkPosCameraRig + vectorToStartingHandPosition;
+                    bone.Position = Vector3.Lerp(originalHandPos, targetPosition, Weight);
+                    var slerpedRotation = Quaternion.Slerp(originalHandRot, isdkRotCameraRig, Weight);
+                    bone.Orientation = slerpedRotation;
+                }
+                else
+                {
+                    var targetPosition = isdkPosCameraRig;
+                    var restrictedPosition = Vector3.MoveTowards(originalHandPos, targetPosition, _maxDisplacementDistance);
+                    bone.Position = Vector3.Lerp(originalHandPos, restrictedPosition, Weight);
+                    // restrict rotation the same way we do position, based on how much position is restricted.
+                    var slerpValueBasedOnRestriction = (restrictedPosition - originalHandPos).magnitude /
+                        (targetPosition - originalHandPos).magnitude;
+                    var sourceRotation = bone.Orientation;
+                    var restrictedRotation = Quaternion.Slerp(
+                        sourceRotation,
+                        isdkRotCameraRig,
+                        slerpValueBasedOnRestriction);
 
-                var isdkRotation = isdkPose.rotation;
-                var sourceRotation = bone.Orientation;
-                var slerpedRotation = Quaternion.Slerp(sourceRotation, isdkRotation, lerpValue);
-                bone.Orientation = slerpedRotation;
+                    var slerpedRotation = Quaternion.Slerp(sourceRotation, restrictedRotation, Weight);
+                    bone.Orientation = slerpedRotation;
+                }
+
                 trackerPoses[joint] = bone;
             }
         }
@@ -364,10 +392,13 @@ namespace Meta.XR.Movement.Retargeting
             // the entire hand (including fingers) to that spot. But find out the adjusted hand position
             // first.
             handInterface.GetJointPose(jointPairs[0].HandJointID, out Pose handInterfacePose);
-#if ISDK_OPENXR_HAND
-            ConvertOpenXRHandToOvrHand(jointPairs[0].BodyJointID, ref handInterfacePose);
+#if ISDK_78_OR_NEWER || ISDK_OPENXR_HAND
+            if (OVRPlugin.HandSkeletonVersion == OVRHandSkeletonVersion.OpenXR)
+            {
+                ConvertOpenXRHandToOvrHand(jointPairs[0].BodyJointID, ref handInterfacePose);
+            }
 #endif
-            var targetHandPos = handInterfacePose.position;
+            var targetHandPos = _cameraRig.transform.InverseTransformPoint(handInterfacePose.position);
             return startingHandPose.position - targetHandPos;
         }
 

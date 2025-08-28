@@ -881,7 +881,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7904580889813928459, guid: 8f60065df164ffa40b77cad3c7dc805e, type: 3}
       propertyPath: m_Name
-      value: HighFidelityCharacter
+      value: RealisticCharacter
       objectReference: {fileID: 0}
     - target: {fileID: 7936667094983723285, guid: 8f60065df164ffa40b77cad3c7dc805e, type: 3}
       propertyPath: m_IsActive
@@ -13991,7 +13991,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6081573691430919725, guid: e286cc5182a3ab44bb98141d30170f2e, type: 3}
       propertyPath: m_Name
-      value: HighFidelityCharacterMirrored
+      value: RealisticCharacterMirrored
       objectReference: {fileID: 0}
     - target: {fileID: 6205906283752749335, guid: e286cc5182a3ab44bb98141d30170f2e, type: 3}
       propertyPath: m_ReceiveShadows

@@ -1,3 +1,27 @@
+## [78.0.0]
+
+## What's New
+
+- **Visemes:** Added support for Visemes.
+- **Telemetry:** Added telemetry for Movement SDK features and tooling.
+- **Build Script:** Added build samples menu option (Meta -> Samples -> Build Movement SDK Samples) to easily build imported samples.
+- **Asset Naming:** Updated the realistic body tracking character name from High Fidelity to Realistic.
+- **Retargeting Motions:** Added eight new common motion sequences to the retargeting editor for previewing runtime retargeting with body tracking
+
+## What's Fixed
+
+- Fixed retargeting editor issues related with configuration creation, previewing, and editing.
+- Fixed ISDK hand weights not being applied correctly.
+- Fixed ISDK processor hand component search for latest hands.
+
+## Improvements
+
+- **Debug Draw:** Invalid retargeting due to invalid body tracking is now drawn in red when debug draw is enabled.
+- **Networking Packet Size:** Reduced average networking packet size by ~25%.
+- **Networking Compression:** Improved networking compression accuracy.
+- **Retargeting Known Joint Detection:** Improved known joint detection and naming for retargeting.
+- **Retargeting Hand Alignment:** Improved hand alignment mapping algorithm.
+
 ## [77.0.2]
 
 ### What's Fixed

@@ -15,7 +15,8 @@ MonoBehaviour:
   id: 1735b3a5-6b02-42a3-bbee-e48234afe14b
   version: 1
   blockName: Character Retargeter
-  description: 
+  description: Creates a character retargeter which maps Movement SDK tracking data
+    to any animation rig, enabling full body tracking for custom character models.
   tags:
     array:
     - name: New
@@ -30,6 +31,21 @@ MonoBehaviour:
   guidedSetupName: 
   packageDependencies: []
   isSingleton: 0
-  usageInstructions: 
-  featureDocumentationName: 
-  featureDocumentationUrl: 
+  usageInstructions: '1. Create a prefab for character model
+
+    2. Add the character
+    prefab to the scene
+
+    3. Add this building block to the character prefab
+
+    4.
+    Go through the initial retargeting editor tooling steps
+
+    5. Validate that
+    there are no errors in the configuration and test retargeting in the retargeting
+    editor tool
+
+
+    The full instructions can be found in https://developers.meta.com/horizon/documentation/unity/move-body-tracking/'
+  featureDocumentationName: Body Tracking for Movement SDK
+  featureDocumentationUrl: https://developers.meta.com/horizon/documentation/unity/move-body-tracking/

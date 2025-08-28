@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HighFidelityEyeMaterial
+  m_Name: RealisticEyeMaterial
   m_Shader: {fileID: 4800000, guid: 525663d260145d9458ce774a4fa0f04b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

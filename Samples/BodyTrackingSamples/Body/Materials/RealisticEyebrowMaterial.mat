@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HighFidelityEyebrowMaterial
+  m_Name: RealisticEyebrowMaterial
   m_Shader: {fileID: 4800000, guid: 2fbcc86ab1452f94a919d19a83abf926, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

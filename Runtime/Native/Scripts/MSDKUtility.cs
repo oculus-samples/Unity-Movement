@@ -126,6 +126,23 @@ namespace Meta.XR.Movement
         private const string DLL = "MetaMovementSDK_Utility";
 
         /// <summary>
+        /// LogLevel enum used for metaMovementSDK_LogCallback function
+        /// </summary>
+        public enum LogLevel
+        {
+            Debug = 0,
+            Info = 1,
+            Warn = 2,
+            Error = 3,
+        }
+
+        // Callback delegate type
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void LogCallback(LogLevel logLevel, IntPtr message);
+
+        private static LogCallback _logCallback = null;
+
+        /// <summary>
         /// Enum for native plugin results. Represents the possible outcomes of operations
         /// performed by the native plugin, including success and various failure modes.
         /// </summary>
@@ -976,9 +993,7 @@ namespace Meta.XR.Movement
             public NativeArray<NativeTransform> MinTPose;
             public NativeArray<NativeTransform> MaxTPose;
             public NativeArray<NativeTransform> UnscaledTPose;
-
             public string[] OptionalKnownSourceJointNamesById;
-
             public string[] OptionalAutoMapExcludedJointNames;
 
             // Number of manifestations in the name and joint counts arrays
@@ -992,7 +1007,7 @@ namespace Meta.XR.Movement
 
             public override string ToString()
             {
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                var sb = new System.Text.StringBuilder();
 
                 sb.AppendLine($"SkeletonInitParams:");
                 sb.AppendLine($"  BlendShapes: {BlendShapeNames?.Length ?? 0}");
@@ -1001,25 +1016,37 @@ namespace Meta.XR.Movement
                 sb.AppendLine($"  MinTPose: {MinTPose.Length}");
                 sb.AppendLine($"  MaxTPose: {MaxTPose.Length}");
                 sb.AppendLine($"  UnscaledTPose: {UnscaledTPose.Length}");
+                sb.AppendLine($"  OptionalKnownSourceJointNamesById: {OptionalKnownSourceJointNamesById?.Length ?? 0}");
+                sb.AppendLine($"  OptionalAutoMapExcludedJointNames: {OptionalAutoMapExcludedJointNames?.Length ?? 0}");
                 sb.AppendLine($"  Manifestations: {OptionalManifestationNames?.Length ?? 0}");
 
                 // Add joint names
-                if (JointNames != null && JointNames.Length > 0)
+                if (JointNames is { Length: > 0 })
                 {
                     sb.AppendLine("\nJoint Names:");
-                    for (int i = 0; i < JointNames.Length; i++)
+                    for (var i = 0; i < JointNames.Length; i++)
                     {
                         sb.AppendLine($"  [{i}] {JointNames[i]}");
                     }
                 }
 
                 // Add parent joint names
-                if (ParentJointNames != null && ParentJointNames.Length > 0)
+                if (ParentJointNames is { Length: > 0 })
                 {
                     sb.AppendLine("\nParent Joint Names:");
-                    for (int i = 0; i < ParentJointNames.Length; i++)
+                    for (var i = 0; i < ParentJointNames.Length; i++)
                     {
                         sb.AppendLine($"  [{i}] {ParentJointNames[i]}");
+                    }
+                }
+
+                // Add known joint names
+                if (OptionalKnownSourceJointNamesById is { Length: > 0 })
+                {
+                    sb.AppendLine("\nKnown Joint Names:");
+                    for (var i = 0; i < OptionalKnownSourceJointNamesById.Length; i++)
+                    {
+                        sb.AppendLine($"  [{(KnownJointType)i}] {OptionalKnownSourceJointNamesById[i]}");
                     }
                 }
 
@@ -1575,6 +1602,9 @@ namespace Meta.XR.Movement
             public static extern Result metaMovementSDK_initialize(in CoordinateSpace coordinateSpace);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern Result metaMovementSDK_initializeLogging(LogCallback logCallback);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_createOrUpdateHandle(string config, out ulong handle);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -1870,6 +1900,7 @@ namespace Meta.XR.Movement
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_snapshotSkeleton(
                 ulong handle,
+                SkeletonType skeletonType,
                 NativeTransform* skeletonPose,
                 int* skeletonIndices,
                 int numberOfSkeletonIndices);
@@ -1882,13 +1913,13 @@ namespace Meta.XR.Movement
                 int numberOfFaceIndices);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern Result metaMovementSDK_snapshotFrameData(ulong handle, FrameData frameData);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_serializeSnapshot(
                 ulong handle,
                 void* outBuffer,
                 out int inOutBufferSizeBytes);
-
-            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_provideFrameData(ulong handle, FrameData frameData);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_serializeStartHeader(
@@ -1896,27 +1927,19 @@ namespace Meta.XR.Movement
                 ref StartHeaderSerializedBytes headerBytes);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_deserializeStartHeader(
-                out StartHeader startHeader,
-                in StartHeaderSerializedBytes headerBytes);
-
-            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_serializeEndHeader(
                 in EndHeader endHeader,
                 ref EndHeaderSerializedBytes headerBytes);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern Result metaMovementSDK_deserializeStartHeader(
+                out StartHeader startHeader,
+                in StartHeaderSerializedBytes headerBytes);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_deserializeEndHeader(
                 out EndHeader endHeader,
                 in EndHeaderSerializedBytes headerBytes);
-
-            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern unsafe Result metaMovementSDK_provideSkeletonPose(
-                ulong handle,
-                NativeTransform* skeletonPose,
-                int* skeletonIndices,
-                int numSkeletonIndices,
-                double timestamp);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_deserializeSnapshotTimestamp(
@@ -1934,9 +1957,6 @@ namespace Meta.XR.Movement
                 float* facePose,
                 NativeTransform* btPose,
                 ref FrameData frameData);
-
-            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_resetInterpolators(ulong handle);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_getInterpolatedSkeletonPose(
@@ -1960,6 +1980,9 @@ namespace Meta.XR.Movement
                 TrackerJointType trackerJointType,
                 double timestamp,
                 ref NativeTransform nativeTransform);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern Result metaMovementSDK_resetInterpolators(ulong handle);
 
             /**********************************************************
              *
@@ -2032,6 +2055,43 @@ namespace Meta.XR.Movement
             using (new ProfilerScope(nameof(Initialize)))
             {
                 success = Api.metaMovementSDK_initialize(coordinateSpace);
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Initialize the plugin logging.
+        /// </summary>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool InitializeLogging()
+        {
+            Result success;
+            _logCallback ??= (logLevel, logMessage) =>
+            {
+                // Convert the message pointer to a string
+                var message = Marshal.PtrToStringAnsi(logMessage);
+
+                // Forward the message to Unity's logging system based on the log level
+                switch (logLevel)
+                {
+                    case LogLevel.Error:
+                        Debug.LogError($"[MSDKPlugin]{message}");
+                        break;
+                    case LogLevel.Warn:
+                        Debug.LogWarning($"[MSDKPlugin]{message}");
+                        break;
+                    case LogLevel.Info:
+                    case LogLevel.Debug:
+                    default:
+                        Debug.Log($"[MSDKPlugin]{message}");
+                        break;
+                }
+            };
+
+            using (new ProfilerScope(nameof(InitializeLogging)))
+            {
+                success = Api.metaMovementSDK_initializeLogging(_logCallback);
             }
 
             return success == Result.Success;
@@ -2198,7 +2258,7 @@ namespace Meta.XR.Movement
                         success = Api.metaMovementSDK_getConfigName(handle, nameBuffer, out stringLength);
                         if (success == Result.Success)
                         {
-                            configName = Marshal.PtrToStringAnsi((IntPtr)nameBuffer, stringLength);
+                            configName = Marshal.PtrToStringAnsi((IntPtr)nameBuffer, stringLength).TrimEnd('\0');
                         }
                     }
                 }
@@ -2317,7 +2377,7 @@ namespace Meta.XR.Movement
                             nameBuffer, out stringLength);
                         if (success == Result.Success)
                         {
-                            blendShapeName = Marshal.PtrToStringAnsi((IntPtr)nameBuffer, stringLength);
+                            blendShapeName = Marshal.PtrToStringAnsi((IntPtr)nameBuffer, stringLength).TrimEnd('\0');
                         }
                     }
                 }
@@ -2689,7 +2749,7 @@ namespace Meta.XR.Movement
         {
             Result success;
             manifestationNames = Array.Empty<string>();
-            using (new ProfilerScope(nameof(GetJointNames)))
+            using (new ProfilerScope(nameof(GetManifestationNames)))
             {
                 unsafe
                 {
@@ -3253,6 +3313,7 @@ namespace Meta.XR.Movement
                 {
                     success = Api.metaMovementSDK_snapshotSkeleton(
                         handle,
+                        SkeletonType.TargetSkeleton,
                         bodyPose.GetPtr(),
                         bodyIndices.GetPtr(),
                         bodyIndices.Length);
@@ -3332,8 +3393,12 @@ namespace Meta.XR.Movement
 
                 unsafe
                 {
-                    success = Api.metaMovementSDK_provideSkeletonPose(handle, bodyTrackingPose.GetPtr(),
-                        bodyTrackingIndices.GetPtr(), bodyTrackingIndices.Length, timestamp);
+                    success = Api.metaMovementSDK_snapshotSkeleton(
+                        handle,
+                        SkeletonType.SourceSkeleton,
+                        bodyTrackingPose.GetPtr(),
+                        bodyTrackingIndices.GetPtr(),
+                        bodyTrackingIndices.Length);
                 }
 
                 if (success != Result.Success)
@@ -3441,26 +3506,6 @@ namespace Meta.XR.Movement
         }
 
         /// <summary>
-        /// Resets all interpolators used for deserialization. This should be done
-        /// if interpolating back to an earlier snapshot.
-        /// </summary>
-        /// <param name="handle">The handle to use for deserialization.</param>
-        /// <returns>True if the function was successfully executed.</returns>
-        public static bool ResetInterpolators(ulong handle)
-        {
-            Result success;
-            using (new ProfilerScope(nameof(DeserializeSkeletonAndFace)))
-            {
-                unsafe
-                {
-                    success = Api.metaMovementSDK_resetInterpolators(handle);
-                }
-            }
-
-            return success == Result.Success;
-        }
-
-        /// <summary>
         /// Get the interpolated body pose at a specific time.
         /// This is used for smooth playback of serialized animation data by interpolating between snapshots.
         /// </summary>
@@ -3557,6 +3602,23 @@ namespace Meta.XR.Movement
             return success == Result.Success;
         }
 
+        /// <summary>
+        /// Resets all interpolators used for deserialization. This should be done
+        /// if interpolating back to an earlier snapshot.
+        /// </summary>
+        /// <param name="handle">The handle to use for deserialization.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool ResetInterpolators(ulong handle)
+        {
+            Result success;
+            using (new ProfilerScope(nameof(DeserializeSkeletonAndFace)))
+            {
+                success = Api.metaMovementSDK_resetInterpolators(handle);
+            }
+
+            return success == Result.Success;
+        }
+
         /**********************************************************
          *
          *               Tool and Data Functions
@@ -3590,7 +3652,7 @@ namespace Meta.XR.Movement
                         success = Api.metaMovementSDK_writeConfigDataToJSON(handle, null, jsonBuffer, out bufferSize);
                         if (success == Result.Success)
                         {
-                            jsonConfigData = Marshal.PtrToStringAnsi((IntPtr)jsonBuffer, bufferSize);
+                            jsonConfigData = Marshal.PtrToStringAnsi((IntPtr)jsonBuffer, bufferSize).TrimEnd('\0');
                         }
                     }
                 }
@@ -3942,7 +4004,7 @@ namespace Meta.XR.Movement
                     if (stringLength > 0)
                     {
                         stringArray[stringsFound] =
-                            Marshal.PtrToStringAnsi((IntPtr)(stringBuffer + currentNameStartIndex), stringLength);
+                            Marshal.PtrToStringAnsi((IntPtr)(stringBuffer + currentNameStartIndex), stringLength).TrimEnd('\0');
                     }
                     else
                     {

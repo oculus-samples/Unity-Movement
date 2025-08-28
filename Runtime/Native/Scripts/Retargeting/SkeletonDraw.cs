@@ -120,6 +120,18 @@ namespace Meta.XR.Movement.Retargeting
         private Vector3[] _childPositions;
 
         /// <summary>
+        /// Array of last valid parent joint positions.
+        /// </summary>
+        [SerializeField]
+        private Vector3[] _lastValidParentPositions;
+
+        /// <summary>
+        /// Array of last valid child joint positions.
+        /// </summary>
+        [SerializeField]
+        private Vector3[] _lastValidChildPositions;
+
+        /// <summary>
         /// Array of joint indices to ignore when drawing the skeleton.
         /// </summary>
         [SerializeField]
@@ -149,9 +161,12 @@ namespace Meta.XR.Movement.Retargeting
         [SerializeField]
         private GameObject[] _parentObjects;
 
+        private bool _isValid;
         private Mesh _lineDrawMesh;
+        private Mesh _lastValidLineDrawMesh;
         private Mesh _pivotDrawMesh;
         private Material _drawMaterial;
+        private Material _lastValidDrawMaterial;
         private RenderParams _renderParams;
 
         // In case coloring is used for a bone, use a custom mesh for that.
@@ -171,6 +186,11 @@ namespace Meta.XR.Movement.Retargeting
 
         ~SkeletonDraw()
         {
+            if (!_isValid)
+            {
+                return;
+            }
+
             // Remove any unmanaged objects owned and managed by this class.
             CleanUpMesh(_lineDrawMesh);
             CleanUpMesh(_pivotDrawMesh);
@@ -227,6 +247,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="thickness">Thickness.</param>
         public void InitDraw(Color color, float thickness)
         {
+            _isValid = true;
             var tempLineObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             var tempPivotObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             var tempLineMesh = tempLineObject.GetComponent<MeshFilter>().sharedMesh;
@@ -336,9 +357,18 @@ namespace Meta.XR.Movement.Retargeting
                 _parentPositions.Length == 0 || _childPositions.Length == 0 ||
                 _parentPositions.Length != _childPositions.Length)
             {
+                _parentPositions ??= _lastValidParentPositions ?? _parentPositions;
+                _childPositions ??= _lastValidChildPositions ?? _childPositions;
+            }
+            else
+            {
+                _lastValidParentPositions = _parentPositions ?? _lastValidParentPositions;
+                _lastValidChildPositions = _childPositions ?? _lastValidChildPositions;
+            }
+            if (_parentPositions == null || _childPositions == null)
+            {
                 return;
             }
-
             _drawMaterial.color = TintColor;
             _drawMaterial.SetPass(0);
 
