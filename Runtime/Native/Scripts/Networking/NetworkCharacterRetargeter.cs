@@ -149,7 +149,7 @@ namespace Meta.XR.Movement.Networking
         /// The difference in rotation in degrees for data to get sent.
         /// </summary>
         [SerializeField]
-        private float _rotationAngleThreshold = 1.00f;
+        private float _rotationAngleThreshold = 0.5f;
 
         /// <summary>
         /// The difference in the blendshape weight for data to get sent.

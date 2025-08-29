@@ -74,12 +74,34 @@ namespace Meta.XR.Movement.Retargeting
             [ReadOnly]
             public NativeArray<NativeTransform> BodyPose;
 
+            /// <summary>
+            /// Rotation only indices.
+            /// </summary>
+            [ReadOnly]
+            public NativeArray<int> RotationOnlyIndices;
+
+            /// <summary>
+            /// The current rotation index.
+            /// </summary>
+            public int CurrentRotationIndex;
+
             /// <inheritdoc cref="IJobParallelForTransform.Execute(int, TransformAccess)"/>
             [BurstCompile]
             public void Execute(int index, TransformAccess transform)
             {
                 var bodyPose = BodyPose[index];
-                transform.SetLocalPositionAndRotation(bodyPose.Position, bodyPose.Orientation);
+                bool isRotationOnly = CurrentRotationIndex >= 0 && CurrentRotationIndex < RotationOnlyIndices.Length &&
+                                      RotationOnlyIndices[CurrentRotationIndex] == index;
+
+                if (isRotationOnly)
+                {
+                    CurrentRotationIndex++; // Advance to next rotation-only index
+                    transform.localRotation = bodyPose.Orientation;
+                }
+                else
+                {
+                    transform.SetLocalPositionAndRotation(bodyPose.Position, bodyPose.Orientation);
+                }
             }
         }
 

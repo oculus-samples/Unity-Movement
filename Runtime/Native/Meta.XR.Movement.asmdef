@@ -28,6 +28,11 @@
             "name": "com.meta.xr.sdk.interaction",
             "expression": "74.0.0",
             "define": "ISDK_74_OR_NEWER"
+        },
+        {
+            "name": "com.meta.xr.sdk.interaction",
+            "expression": "77.0.1",
+            "define": "ISDK_78_OR_NEWER"
         }
     ],
     "noEngineReferences": false

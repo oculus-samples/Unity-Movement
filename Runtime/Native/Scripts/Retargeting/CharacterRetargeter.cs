@@ -105,6 +105,15 @@ namespace Meta.XR.Movement.Retargeting
         protected Color _debugDrawTargetSkeletonColor = Color.green;
 
         /// <summary>
+        /// The color to use when drawing an invalid target skeleton debug visualization.
+        /// </summary>
+        [SerializeField]
+        protected Color _debugDrawInvalidTargetSkeletonColor = Color.red;
+
+        [SerializeField]
+        protected Color _debugDrawInvalidSourceSkeletonColor = Color.magenta;
+
+        /// <summary>
         /// The skeleton retargeter instance used for retargeting operations.
         /// </summary>
         [SerializeField]
@@ -131,7 +140,6 @@ namespace Meta.XR.Movement.Retargeting
         // Jobs.
         protected Transform _debugDrawTransform;
         private JobHandle _convertPoseJobHandle;
-        private JobHandle _applyPoseJobHandle;
 
         /// <summary>
         /// Initializes the character retargeter by finding required components and validating configuration.
@@ -161,8 +169,18 @@ namespace Meta.XR.Movement.Retargeting
             var sourcePose = _dataProvider.GetSkeletonPose();
             _currentManifestation = _dataProvider.GetManifestation();
             _isValid = _dataProvider.IsPoseValid();
-            if (!RetargeterValid)
+            if (!_skeletonRetargeter.IsInitialized)
             {
+                return;
+            }
+
+            if (!_isValid)
+            {
+                if (_debugDrawSourceSkeleton)
+                {
+                    _skeletonRetargeter.DrawInvalidSourcePose(_debugDrawInvalidSourceSkeletonColor);
+                }
+
                 return;
             }
 
@@ -176,8 +194,18 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         public virtual void LateUpdate()
         {
-            if (!_skeletonRetargeter.IsInitialized || !_skeletonRetargeter.AppliedPose)
+            if (!_skeletonRetargeter.IsInitialized)
             {
+                return;
+            }
+
+            if (!_skeletonRetargeter.AppliedPose)
+            {
+                if (_debugDrawTargetSkeleton)
+                {
+                    _skeletonRetargeter.DrawInvalidTargetPose(_debugDrawInvalidTargetSkeletonColor);
+                }
+
                 return;
             }
 
@@ -261,7 +289,10 @@ namespace Meta.XR.Movement.Retargeting
                 processor.GetCurrentProcessor()?.ProcessSkeleton(sourcePose);
             }
 
-            _skeletonRetargeter.Update(sourcePose, _currentManifestation);
+            if (!_skeletonRetargeter.Update(sourcePose, _currentManifestation))
+            {
+                return;
+            }
             foreach (var targetProcessorContainer in _targetProcessorContainers)
             {
                 targetProcessorContainer?.GetCurrentProcessor()?.UpdatePose(ref _skeletonRetargeter.RetargetedPose);
@@ -305,15 +336,17 @@ namespace Meta.XR.Movement.Retargeting
 
             currentPose.Dispose();
 
-            if (!_skeletonRetargeter.IsInitialized)
-            {
-                return;
-            }
-
             ApplyPose();
             if (_debugDrawTargetSkeleton)
             {
-                _skeletonRetargeter.DrawDebugTargetPose(_debugDrawTransform, _debugDrawTargetSkeletonColor);
+                if (_isValid)
+                {
+                    _skeletonRetargeter.DrawDebugTargetPose(_debugDrawTransform, _debugDrawTargetSkeletonColor);
+                }
+                else
+                {
+                    _skeletonRetargeter.DrawInvalidTargetPose(_debugDrawInvalidTargetSkeletonColor);
+                }
             }
         }
 
@@ -413,13 +446,7 @@ namespace Meta.XR.Movement.Retargeting
                 }
             }
 
-            // Create job to apply the pose.
-            var job = new SkeletonJobs.ApplyPoseJob
-            {
-                BodyPose = _skeletonRetargeter.RetargetedPoseLocal
-            };
-            _applyPoseJobHandle = job.Schedule(_joints);
-            _applyPoseJobHandle.Complete();
+            _skeletonRetargeter.ApplyPose(ref _joints);
         }
     }
 }

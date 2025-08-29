@@ -28,7 +28,7 @@ namespace Meta.XR.Movement.Retargeting
         protected float _currentValidBodyTrackingTime;
         protected bool _isValid;
 
-        private void Start()
+        protected virtual void Start()
         {
             _currentSkeletonType = ProvidedSkeletonType;
         }

@@ -7,16 +7,17 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HighFidelityWetsuitMaterial
+  m_Name: RealisticHandMaterial
   m_Shader: {fileID: 4800000, guid: 2fbcc86ab1452f94a919d19a83abf926, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _AREA_LIGHT_SPECULAR
+  - _DIFFUSE_WRAP
   - _NORMALMAP
   - _SPECGLOSSMAP
   - _SPECULAR_AFFECT_BY_NDOTL
-  m_InvalidKeywords:
-  - _METALLICGLOSSMAP
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -28,7 +29,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 20e52378874b1c44f85074d417f2049f, type: 3}
+        m_Texture: {fileID: 2800000, guid: bce2dcc90c1aeaa4a8dc223240ce6fa0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -48,15 +49,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c4d2116dd9685ac449e0cdb7ad50ca4a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 2fc3c87bd0172fe49825179d0ec8e29a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: a3fd448f82c8d2d4280fe02a2d1bc157, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 2800000, guid: 796f5bc61df07e64c9be916bf6121e7c, type: 3}
+        m_Texture: {fileID: 2800000, guid: f45aaa56dd587454d82b1541d78e7525, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -64,27 +65,26 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
-        m_Texture: {fileID: 2800000, guid: a3fd448f82c8d2d4280fe02a2d1bc157, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0fbdb194036f4704088f69d69198f4a4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AmplFactor: 1
     - _AreaLightSampleDistance: 0.5
-    - _AreaLightSampleToggle: 0
-    - _BottomExponent: 0.5
-    - _BumpScale: 1.2
+    - _AreaLightSampleToggle: 1
+    - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DiffuseWrapColorMult: 2
     - _DiffuseWrapDist: 0.3
-    - _DiffuseWrapEnabled: 0
+    - _DiffuseWrapEnabled: 1
     - _DstBlend: 0
     - _EmissionStrength: 0
-    - _GlossMapScale: 0.847
-    - _Glossiness: 0.506
+    - _GlossMapScale: 0.23
+    - _Glossiness: 0.219
     - _GlossyReflections: 1
     - _Metallic: 0
+    - _Mirrored: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
@@ -95,16 +95,14 @@ Material:
     - _SrcBlend: 1
     - _StencilComp: 8
     - _StencilValue: 0
-    - _TopExponent: 0.5
+    - _SubsurfaceColorMult: 2
     - _UVSec: 0
     - _VertexDisplShadows: 0
     - _ZWrite: 1
     m_Colors:
-    - _BottomColor: {r: 1, g: 1, b: 1, a: 0}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
     - _DiffuseWrapColor: {r: 1, g: 0.29999998, b: 0.19999996, a: 1}
-    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HorizonColor: {r: 1, g: 1, b: 1, a: 0}
-    - _SpecColor: {r: 0.5283019, g: 0.51534355, b: 0.51534355, a: 1}
-    - _TopColor: {r: 1, g: 1, b: 1, a: 0}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    - _SubsurfaceColor: {r: 1, g: 0.29999998, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

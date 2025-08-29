@@ -403,8 +403,8 @@ namespace Meta.XR.Movement.Playback
             out EndHeader newEndHeader,
             out byte[] trimmedBytes)
         {
-            newStartHeader = new StartHeader();
             newEndHeader = new EndHeader();
+            newStartHeader = new StartHeader();
             trimmedBytes = null;
             // Do error checks first.
             if (!HasActivePlaybackFile)
@@ -446,10 +446,17 @@ namespace Meta.XR.Movement.Playback
                 maxTrimmedSnapshot,
                 _snapshotToByteoffsetAfterHeader);
             // the header of the clone need to be updated too to indicate restricted range.
-            newStartHeader.NumSnapshots = (maxTrimmedSnapshot - minTrimmedSnapshot) + 1;
-            newStartHeader.NumTotalSnapshotBytes = trimmedBytes.Length;
-            newStartHeader.StartNetworkTime =
-                _playbackFile.GetNetworkTimeForSnapshot(_snapshotToByteoffsetAfterHeader[minTrimmedSnapshot]);
+            newStartHeader = new StartHeader(
+                dataVersion: _startHeader.DataVersion,
+                osVersion: SystemInfo.operatingSystem,
+                gameEngineVersion: Application.unityVersion,
+                bundleID: Application.identifier,
+                metaXRSDKVersion: OVRPlugin.version.ToString(),
+                utcTimeStamp: DateTime.UtcNow.Ticks,
+                numSnapshots: (maxTrimmedSnapshot - minTrimmedSnapshot) + 1,
+                numTotalSnapshotBytes: trimmedBytes.Length,
+                startNetworkTime: _playbackFile.GetNetworkTimeForSnapshot(_snapshotToByteoffsetAfterHeader[minTrimmedSnapshot]),
+                numberOfBufferedSnapshots: _startHeader.NumBufferedSnapshots);
             // re-use the old UTC timestamp to maintain some association with the original recording.
             newEndHeader = new EndHeader(_endHeader.UTCTimestamp);
             return true;

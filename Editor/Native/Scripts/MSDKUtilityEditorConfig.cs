@@ -191,7 +191,7 @@ namespace Meta.XR.Movement.Editor
             // Read config data first.
             if (!CreateOrUpdateHandle(configJson, out ConfigHandle))
             {
-                Debug.LogError("Failed to create or update handle.");
+                TelemetryManager.SendErrorEvent(TelemetryManager._HANDLE_EVENT_NAME, "Failed to create or update handle.");
             }
             GetConfigName(ConfigHandle, out ConfigName);
             GetBlendShapeNames(ConfigHandle, skeletonType, out BlendshapeNames);
@@ -447,6 +447,7 @@ namespace Meta.XR.Movement.Editor
                 var errorMessage = "Was unable to create or update the config with data. Re-using old handle.";
                 Debug.LogError(errorMessage);
                 newConfigHandle = target.ConfigHandle;
+                TelemetryManager.SendErrorEvent(TelemetryManager._CONFIG_EVENT_NAME, errorMessage);
             }
             win.UtilityConfig.Handles.Add(newConfigHandle);
 
@@ -460,7 +461,8 @@ namespace Meta.XR.Movement.Editor
                     out newConfigHandle);
                 if (!alignWorked)
                 {
-                    Debug.LogError("Failed to align target to source.");
+                    TelemetryManager.SendErrorEvent(TelemetryManager._ALIGN_TARGET_TO_SOURCE_EVENT_NAME,
+                        "Failed to align target to source.");
                 }
             }
 

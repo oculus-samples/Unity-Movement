@@ -33,7 +33,7 @@ namespace Meta.XR.Movement.Networking.Block.Editor
             }
         }
 
-        [MenuItem("GameObject/Movement SDK/Networking/Add Networked Retargeted Character")]
+        [MenuItem("GameObject/Movement SDK/Networking/Add Networked Character Retargeter")]
         private static void InstallNetworkedRetargetedCharacterBuildingBlock()
         {
             InstallBuildingBlock("INetworkCharacterRetargeter");
