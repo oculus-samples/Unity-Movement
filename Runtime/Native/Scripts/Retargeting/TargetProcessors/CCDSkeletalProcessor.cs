@@ -16,6 +16,17 @@ namespace Meta.XR.Movement.Retargeting
     public class CCDSkeletalProcessor : TargetProcessor
     {
         /// <summary>
+        /// The types of targets available for CCD IK.
+        /// </summary>
+        public enum TargetType
+        {
+            Transform,
+            TrackedLeftHand,
+            TrackedRightHand,
+            TrackedHead
+        }
+
+        /// <summary>
         /// Container for CCD data related to an IK chain.
         /// </summary>
         [Serializable]
@@ -28,7 +39,13 @@ namespace Meta.XR.Movement.Retargeting
             public TargetJointIndex[] IKChain;
 
             /// <summary>
-            /// Target that the end effector must reach.
+            /// Type of target to use for CCD IK.
+            /// </summary>
+            [SerializeField]
+            public TargetType TargetType;
+
+            /// <summary>
+            /// Target that the end effector must reach (used when TargetType is Transform).
             /// </summary>
             [SerializeField]
             public Transform Target;
@@ -50,7 +67,14 @@ namespace Meta.XR.Movement.Retargeting
             /// <summary>
             /// Validates fields on struct and reports any errors.
             /// </summary>
-            public void Validate() => Assert.IsTrue(IKChain is { Length: > 0 } && Target != null);
+            public void Validate()
+            {
+                Assert.IsTrue(IKChain is { Length: > 0 });
+                if (TargetType == TargetType.Transform)
+                {
+                    Assert.IsTrue(Target != null, "Target Transform is required when TargetType is Transform");
+                }
+            }
 
             /// <summary>
             /// Finds bones related to the target joints indices specified. Initializes other
@@ -74,7 +98,6 @@ namespace Meta.XR.Movement.Retargeting
         [SerializeField]
         protected CCDSkeletalData[] _ccdData;
 
-        private int[] _parentJointIndicesTarget;
         private CharacterRetargeter _characterRetargeter;
 
         /// <inheritdoc />
@@ -86,14 +109,6 @@ namespace Meta.XR.Movement.Retargeting
                 ccdData.Initialize(retargeter);
             }
 
-            if (!GetParentJointIndexes(retargeter.RetargetingHandle, SkeletonType.TargetSkeleton,
-                    out var parentJointIndicesTarget) ||
-                !GetJointNames(retargeter.RetargetingHandle, SkeletonType.TargetSkeleton, out var jointNames))
-            {
-                throw new Exception("Failed to obtain joint data from configuration");
-            }
-
-            _parentJointIndicesTarget = parentJointIndicesTarget.ToArray();
             _characterRetargeter = retargeter;
         }
 
@@ -128,9 +143,10 @@ namespace Meta.XR.Movement.Retargeting
             ref NativeArray<NativeTransform> targetPoseLocal)
         {
             var ikChain = ccdData.IKChain;
-            var chainRootIndex = _parentJointIndicesTarget[ikChain[0]];
+            var chainRootIndex = _characterRetargeter.SkeletonRetargeter.TargetParentIndices[ikChain[0]];
             var lastChainIndex = ikChain.Length - 1;
-            var endEffectorParentIndex = _parentJointIndicesTarget[ikChain[lastChainIndex]];
+            var endEffectorParentIndex =
+                _characterRetargeter.SkeletonRetargeter.TargetParentIndices[ikChain[lastChainIndex]];
 
             if (chainRootIndex == -1 || endEffectorParentIndex == -1)
             {
@@ -138,16 +154,19 @@ namespace Meta.XR.Movement.Retargeting
                 return;
             }
 
+            // Get target position based on target type
+            if (!GetTargetPosition(ccdData, out var targetPosition))
+            {
+                return;
+            }
+
             // Get the current world pose as provided by other processors.
-            var rootScale = _characterRetargeter.SkeletonRetargeter.RootScale;
-            var targetPose = IKUtilities.ComputeWorldPoses(
-                _parentJointIndicesTarget,
+            var targetPose = SkeletonUtilities.ComputeWorldPoses(
+                _characterRetargeter.SkeletonRetargeter,
                 ref targetPoseLocal,
-                rootScale,
                 _characterRetargeter.transform.position,
                 _characterRetargeter.transform.rotation);
             var rootPose = new Pose(targetPose[chainRootIndex].Position, targetPose[chainRootIndex].Orientation);
-            var targetPosition = ccdData.Target.position;
             var endEffectorTargetIndex = ikChain[lastChainIndex];
             var targetPositionLerped =
                 Vector3.Lerp(targetPose[endEffectorTargetIndex].Position, targetPosition, _weight);
@@ -174,10 +193,9 @@ namespace Meta.XR.Movement.Retargeting
             }
 
             targetPose.Dispose();
-            targetPose = IKUtilities.ComputeWorldPoses(
-                _parentJointIndicesTarget,
+            targetPose = SkeletonUtilities.ComputeWorldPoses(
+                _characterRetargeter.SkeletonRetargeter,
                 ref targetPoseLocal,
-                rootScale,
                 _characterRetargeter.transform.position,
                 _characterRetargeter.transform.rotation);
 
@@ -197,8 +215,8 @@ namespace Meta.XR.Movement.Retargeting
         {
             var ikChainArrayEndFirst = new NativeArray<NativeTransform>(ikChain.Length, Allocator.Temp,
                 NativeArrayOptions.UninitializedMemory);
-            int lastChainIndex = ikChain.Length - 1;
-            for (int i = lastChainIndex; i >= 0; i--)
+            var lastChainIndex = ikChain.Length - 1;
+            for (var i = lastChainIndex; i >= 0; i--)
             {
                 ikChainArrayEndFirst[lastChainIndex - i] = targetPoseLocal[ikChain[i]];
             }
@@ -214,6 +232,51 @@ namespace Meta.XR.Movement.Retargeting
                                          (targetPositionWorldLerp - parentEndEffectorWorld.Position);
             return Vector3.Scale(targetRelativeToParent,
                 new Vector3(1f / rootScale.x, 1f / rootScale.y, 1f / rootScale.z));
+        }
+
+        private bool GetTargetPosition(CCDSkeletalData ccdData, out Vector3 targetPosition)
+        {
+            targetPosition = Vector3.zero;
+
+            switch (ccdData.TargetType)
+            {
+                case TargetType.Transform:
+                    if (ccdData.Target == null)
+                    {
+                        Debug.LogError("Target Transform is null for CCD IK");
+                        return false;
+                    }
+
+                    targetPosition = ccdData.Target.position;
+                    return true;
+
+                case TargetType.TrackedLeftHand:
+                    return GetTrackedPosition(SkeletonData.BodyTrackingBoneId.LeftHandWrist, out targetPosition);
+
+                case TargetType.TrackedRightHand:
+                    return GetTrackedPosition(SkeletonData.BodyTrackingBoneId.RightHandWrist, out targetPosition);
+
+                case TargetType.TrackedHead:
+                    return GetTrackedPosition(SkeletonData.BodyTrackingBoneId.Head, out targetPosition);
+
+                default:
+                    Debug.LogError($"Unknown target type: {ccdData.TargetType}");
+                    return false;
+            }
+        }
+
+        private bool GetTrackedPosition(SkeletonData.BodyTrackingBoneId boneId, out Vector3 targetPosition)
+        {
+            targetPosition = Vector3.zero;
+            var currentPose = _characterRetargeter.SkeletonRetargeter.SourcePose;
+            var boneIndex = (int)boneId;
+            if (boneIndex >= currentPose.Length)
+            {
+                return false;
+            }
+
+            targetPosition = currentPose[boneIndex].Position;
+            return true;
         }
     }
 }

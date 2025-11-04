@@ -23,14 +23,7 @@ namespace Meta.XR.Movement.Networking.Block.Editor
                 return;
             }
 
-            if (AssetDatabase.Contains(Selection.activeGameObject))
-            {
-                // Follow some other path to setup skeleton retargeter.
-            }
-            else
-            {
-                InstallBuildingBlock("ICharacterRetargeter");
-            }
+            InstallBuildingBlock("ICharacterRetargeter");
         }
 
         [MenuItem("GameObject/Movement SDK/Networking/Add Networked Character Retargeter")]

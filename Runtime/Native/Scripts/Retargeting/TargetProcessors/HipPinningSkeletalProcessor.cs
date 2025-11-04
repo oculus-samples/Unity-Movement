@@ -33,15 +33,21 @@ namespace Meta.XR.Movement.Retargeting
             [HideInInspector]
             public Transform[] LegBones;
 
+            [HideInInspector]
+            public float[] LegLengths;
+
             private int _localMidLegIndex;
 
-            public void Initialize(CharacterRetargeter characterRetargeter)
+            public void Initialize(CharacterRetargeter characterRetargeter,
+                NativeArray<MSDKUtility.NativeTransform> localTPose)
             {
                 LegBones = new Transform[LegIndexes.Length];
+                LegLengths = new float[LegIndexes.Length];
                 for (var i = 0; i < LegIndexes.Length; i++)
                 {
                     var index = LegIndexes[i];
                     LegBones[i] = characterRetargeter.JointPairs[index].Joint;
+                    LegLengths[i] = localTPose[index].Position.magnitude;
                 }
 
                 for (var i = 0; i < LegIndexes.Length; i++)
@@ -50,6 +56,7 @@ namespace Meta.XR.Movement.Retargeting
                     {
                         continue;
                     }
+
                     _localMidLegIndex = i;
                     break;
                 }
@@ -57,12 +64,26 @@ namespace Meta.XR.Movement.Retargeting
 
             public void Solve()
             {
+                for (var i = 0; i < LegBones.Length; i++)
+                {
+                    LegBones[i].localPosition = LegBones[i].localPosition.normalized * LegLengths[i];
+                }
+
                 if (TargetHint != null)
                 {
-                    var rootBone = LegBones[^1];
-                    rootBone.localRotation =
-                        Quaternion.Inverse(rootBone.parent.localRotation) * TargetHint.localRotation;
-                    LegBones[_localMidLegIndex].localPosition = TargetHint.localPosition;
+                    // Rotate the parent bone so the knee reaches the hint naturally
+                    var kneeBone = LegBones[_localMidLegIndex];
+                    var parentBone = LegBones[_localMidLegIndex + 1];
+
+                    // Calculate the rotation needed to align current knee position with hint
+                    var fromVector = (kneeBone.position - parentBone.position).normalized;
+                    var toVector = (TargetHint.position - parentBone.position).normalized;
+
+                    if (Vector3.Dot(fromVector, toVector) < 0.999f) // Only rotate if vectors are not already aligned
+                    {
+                        var rotation = Quaternion.FromToRotation(fromVector, toVector);
+                        parentBone.rotation = rotation * parentBone.rotation;
+                    }
                 }
 
                 LegBones[0].localRotation = TargetFoot.localRotation;
@@ -116,6 +137,7 @@ namespace Meta.XR.Movement.Retargeting
         private int _hipsJointIndex;
         private int _rootJointIndex;
         private bool _previouslyActive;
+        private CharacterRetargeter _retargeter;
         private Vector3 _initialHipPosition;
         private Quaternion _initialHipRotation;
         private Transform _hipsTransform;
@@ -170,12 +192,17 @@ namespace Meta.XR.Movement.Retargeting
                 MSDKUtility.SkeletonType.TargetSkeleton,
                 MSDKUtility.SkeletonTPoseType.UnscaledTPose,
                 MSDKUtility.JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
+            MSDKUtility.GetSkeletonTPose(handle,
+                MSDKUtility.SkeletonType.TargetSkeleton,
+                MSDKUtility.SkeletonTPoseType.UnscaledTPose,
+                MSDKUtility.JointRelativeSpaceType.LocalSpace, out var localTPose);
 
+            _retargeter = retargeter;
             _initialHipRotation = tPose[_hipsJointIndex].Orientation;
             _rootTransform = retargeter.JointPairs[rootJointIndex].Joint;
             _hipsTransform = retargeter.JointPairs[_hipsJointIndex].Joint;
-            _leftData.Initialize(retargeter);
-            _rightData.Initialize(retargeter);
+            _leftData.Initialize(retargeter, localTPose);
+            _rightData.Initialize(retargeter, localTPose);
         }
 
         /// <inheritdoc />
@@ -238,12 +265,12 @@ namespace Meta.XR.Movement.Retargeting
             {
                 var index = _leftData.LegIndexes[i];
                 var joint = targetPose[index];
-                if (i == _leftData.MidLegIndex)
+                joint.Orientation = _leftData.LegBones[i].localRotation;
+                joint.Position = _leftData.LegBones[i].localPosition;
+                if (i == 0)
                 {
-                    joint.Position = _leftData.TargetHint.localPosition;
                 }
 
-                joint.Orientation = _leftData.LegBones[i].localRotation;
                 targetPose[index] = joint;
             }
 
@@ -251,12 +278,12 @@ namespace Meta.XR.Movement.Retargeting
             {
                 var index = _rightData.LegIndexes[i];
                 var joint = targetPose[index];
-                if (i == _rightData.MidLegIndex)
+                joint.Orientation = _rightData.LegBones[i].localRotation;
+                joint.Position = _rightData.LegBones[i].localPosition;
+                if (i == 0)
                 {
-                    joint.Position = _rightData.TargetHint.localPosition;
                 }
 
-                joint.Orientation = _rightData.LegBones[i].localRotation;
                 targetPose[index] = joint;
             }
         }

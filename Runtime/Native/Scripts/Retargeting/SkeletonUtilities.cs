@@ -9,6 +9,10 @@ using static Meta.XR.Movement.MSDKUtility;
 using static Meta.XR.Movement.Retargeting.SkeletonData;
 using static Unity.Collections.Allocator;
 using static Unity.Collections.NativeArrayOptions;
+#if ISDK_DEFINED
+using Oculus.Interaction.Body.Input;
+using Oculus.Interaction.Input;
+#endif
 
 namespace Meta.XR.Movement.Retargeting
 {
@@ -17,6 +21,36 @@ namespace Meta.XR.Movement.Retargeting
     /// </summary>
     public static class SkeletonUtilities
     {
+        /// <summary>
+        /// Convert from OpenXR to Unity space.
+        /// </summary>
+        [BurstCompile]
+        public struct ConvertFromOpenXRToUnitySpace : IJob
+        {
+            /// <summary>
+            /// Transforms to modify
+            /// </summary>
+            public NativeArray<NativeTransform> Transforms;
+
+            /// <summary>
+            /// Execute the job.
+            /// </summary>
+            [BurstCompile]
+            public void Execute()
+            {
+                var numTransforms = Transforms.Length;
+                for (var i = 0; i < numTransforms; i++)
+                {
+                    var poseToModify = Transforms[i];
+                    var oldPosition = poseToModify.Position;
+                    var oldRotation = poseToModify.Orientation;
+                    poseToModify.Position = new Vector3() { x = oldPosition.x, y = oldPosition.y, z = -oldPosition.z };
+                    poseToModify.Orientation = new Quaternion() { x = -oldRotation.x, y = -oldRotation.y, z = oldRotation.z, w = oldRotation.w };
+                    Transforms[i] = poseToModify;
+                }
+            }
+        }
+
         /// <summary>
         /// Updates an array of source poses from arrays of
         /// positions and rotations. An offset can be provided to
@@ -44,6 +78,12 @@ namespace Meta.XR.Movement.Retargeting
             public NativeArray<OVRPlugin.Vector3f> InputPoseTranslations;
 
             /// <summary>
+            /// Whether to convert to Unity space or not.
+            /// </summary>
+            [ReadOnly]
+            public bool ConvertToUnitySpace;
+
+            /// <summary>
             /// Output poses to write to.
             /// </summary>
             public NativeArray<NativeTransform> OutputPose;
@@ -58,8 +98,12 @@ namespace Meta.XR.Movement.Retargeting
                 var numberOfPoses = OutputPose.Length;
                 for (var i = 0; i < numberOfPoses; i++)
                 {
-                    var rotation = Offset.rotation * InputPoseRotations[i].FromFlippedZQuatf();
-                    var position = Offset.rotation * InputPoseTranslations[i].FromFlippedZVector3f() + Offset.position;
+                    var sourceQuat = ConvertToUnitySpace ?
+                        InputPoseRotations[i].FromFlippedZQuatf() : InputPoseRotations[i].FromQuatf();
+                    var sourcePose = ConvertToUnitySpace ?
+                        InputPoseTranslations[i].FromFlippedZVector3f() : InputPoseTranslations[i].FromVector3f();
+                    var rotation = Offset.rotation * sourceQuat;
+                    var position = Offset.rotation * sourcePose + Offset.position;
                     var pose = OutputPose[i];
                     pose.Position = position;
                     pose.Orientation = rotation;
@@ -147,6 +191,8 @@ namespace Meta.XR.Movement.Retargeting
             }
         }
 
+        private static readonly Quaternion _openXRLeftHandRotOffset = Quaternion.Euler(180, 90, 0);
+        private static readonly Quaternion _openXRRightHandRotOffset = Quaternion.Euler(0, 270, 0);
         private static OVRCameraRig _ovrCameraRig;
         private static OVRPlugin.Skeleton2 _skeleton;
         private static OVRSkeleton.SkeletonPoseData _data;
@@ -154,14 +200,69 @@ namespace Meta.XR.Movement.Retargeting
         private static float _timestamp;
 
         /// <summary>
+        /// Converts a pose from Unity space to OpenXR space.
+        /// </summary>
+        /// <param name="oldTransform">Old transform to convert.</param>
+        /// <returns>Converted transform in Unity space.</returns>
+        public static NativeTransform FromOpenXRToUnitySpace(NativeTransform oldTransform)
+        {
+            // These are from-flipped calculations going to Unity space.
+            var unitySpacePos =
+                new Vector3(oldTransform.Position.x, oldTransform.Position.y, -oldTransform.Position.z);
+            var unitySpaceQuat =
+                new Quaternion(-oldTransform.Orientation.x, -oldTransform.Orientation.y,
+                    oldTransform.Orientation.z, oldTransform.Orientation.w);
+            return new NativeTransform(
+                new Quaternion(unitySpaceQuat.x, unitySpaceQuat.y, unitySpaceQuat.z, unitySpaceQuat.w),
+                new Vector3(unitySpacePos.x, unitySpacePos.y, unitySpacePos.z));
+        }
+
+        /// <summary>
+        /// Computes world poses using SkeletonRetargeter for automatic parameter filling.
+        /// </summary>
+        /// <param name="skeletonRetargeter">The skeleton retargeter containing all necessary parameters.</param>
+        /// <param name="targetPoses">Target poses.</param>
+        /// <param name="rootPosition">Root position, optional.</param>
+        /// <param name="rootRotation">Root rotation, optional.</param>
+        /// <returns></returns>
+        public static NativeArray<NativeTransform> ComputeWorldPoses(
+            SkeletonRetargeter skeletonRetargeter,
+            ref NativeArray<NativeTransform> targetPoses,
+            Vector3? rootPosition = null,
+            Quaternion? rootRotation = null)
+        {
+            var targetPoseWorld = new NativeArray<NativeTransform>(targetPoses.Length, Allocator.TempJob);
+            using var parentIndices = new NativeArray<int>(skeletonRetargeter.TargetParentIndices, Allocator.TempJob);
+
+            var job = new SkeletonJobs.ConvertLocalToWorldPoseJob
+            {
+                LocalPose = targetPoses,
+                WorldPose = targetPoseWorld,
+                ParentIndices = parentIndices,
+                RootIndex = skeletonRetargeter.RootJointIndex,
+                HipsIndex = skeletonRetargeter.HipsJointIndex,
+                RootScale = skeletonRetargeter.RootScale,
+                HipsScale = skeletonRetargeter.HipsScale,
+                RootPosition = rootPosition ?? Vector3.zero,
+                RootRotation = rootRotation ?? Quaternion.identity
+            };
+            job.Schedule().Complete();
+            return targetPoseWorld;
+        }
+
+        /// <summary>
         /// Get current body tracking frame data.
         /// </summary>
         /// <param name="dataProvider">Data provider.</param>
-        /// <param name="trackerPositionsWorldSpace">Gets tracker positions in world space.</param>
+        /// <param name="trackerPositionsWorldSpace">Gets tracker positions in world space.</param
+        /// <param name="lastSkeletalChangeCount">If last skeletal change count has been updated, provide a new bind pose.</param>
         /// <returns>Latest available <see cref="MSDKUtility.FrameData"/>.</returns>
         public static FrameData GetCurrentFrameData(
             OVRSkeleton.IOVRSkeletonDataProvider dataProvider,
-            bool trackerPositionsWorldSpace)
+            bool trackerPositionsWorldSpace,
+            ref int lastSkeletalChangeCount,
+            out NativeArray<NativeTransform> bindPoses,
+            out int numBindPoseJoints)
         {
             var skeletonPoseData = dataProvider.GetSkeletonPoseData();
             // provider doesn't give us fidelity, so we have to fetch it ourselves
@@ -211,7 +312,6 @@ namespace Meta.XR.Movement.Retargeting
                         trackerSpaceTransform, centerEyeTrackingPos, centerEyeTrackingRot);
                 }
             }
-
             var frameData = new FrameData(
                 (byte)fidelity2,
                 bodyState.Time,
@@ -227,6 +327,28 @@ namespace Meta.XR.Movement.Retargeting
                 new NativeTransform(centerEyeTrackingRot, centerEyeTrackingPos)
             );
 
+            bool provideBindPose = false;
+            if (skeletonPoseData.SkeletonChangedCount != lastSkeletalChangeCount)
+            {
+                lastSkeletalChangeCount = skeletonPoseData.SkeletonChangedCount;
+                provideBindPose = true;
+            }
+            if (provideBindPose)
+            {
+                var newBindPoses = GetBindPoses(dataProvider, false);
+                numBindPoseJoints = newBindPoses.Length;
+                bindPoses = new NativeArray<NativeTransform>(numBindPoseJoints, Allocator.TempJob);
+                for (int i = 0; i < numBindPoseJoints; i++)
+                {
+                    bindPoses[i] = newBindPoses[i];
+                }
+            }
+            else
+            {
+                numBindPoseJoints = 0;
+                bindPoses = new NativeArray<NativeTransform>(1, Allocator.TempJob);
+            }
+
             return frameData;
         }
 
@@ -235,23 +357,25 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         /// <param name="dataProvider">Data provider.</param>
         /// <param name="offset"></param>
+        /// <param name="convertToUnitySpace">Convert to Unity space.</param>
         /// <param name="skeletonChangeCount"></param>
         /// <param name="validPoses"></param>
-        /// <returns></returns>
+        /// <returns>Array of transforms.</returns>
         public static NativeArray<NativeTransform> GetPosesFromTheTracker(
             OVRSkeleton.IOVRSkeletonDataProvider dataProvider,
             Pose offset,
+            bool convertToUnitySpace,
             out int skeletonChangeCount,
             out bool validPoses)
         {
-            if (Mathf.Abs(Time.time - _timestamp) <= float.Epsilon)
+            if (Mathf.Approximately(Time.time - _timestamp, 0.0f))
             {
                 skeletonChangeCount = _data.SkeletonChangedCount;
                 validPoses = _data.IsDataValid;
                 return _outputPoses;
             }
 
-            var allPoses = GetPosesFromTheTracker(dataProvider, offset);
+            var allPoses = GetPosesFromTheTracker(dataProvider, offset, convertToUnitySpace);
             _timestamp = Time.time;
             _outputPoses = new NativeArray<NativeTransform>(allPoses.Length, Temp);
             _outputPoses.CopyFrom(allPoses);
@@ -266,10 +390,12 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         /// <param name="dataProvider">Data provider to provide transforms.</param>
         /// <param name="offset">Offset to apply.</param>
+        /// <param name="convertToUnitySpace">Convert to Unity space.</param>
         /// <returns>Tracker poses.</returns>
         public static NativeArray<NativeTransform> GetPosesFromTheTracker(
             OVRSkeleton.IOVRSkeletonDataProvider dataProvider,
-            Pose offset)
+            Pose offset,
+            bool convertToUnitySpace)
         {
             // Get body tracking data
             _data = dataProvider.GetSkeletonPoseData();
@@ -297,7 +423,8 @@ namespace Meta.XR.Movement.Retargeting
                 Offset = offset,
                 InputPoseRotations = boneRotations,
                 InputPoseTranslations = boneTranslations,
-                OutputPose = sourcePoses
+                OutputPose = sourcePoses,
+                ConvertToUnitySpace = convertToUnitySpace
             };
             job.Schedule().Complete();
             boneTranslations.Dispose();
@@ -309,9 +436,11 @@ namespace Meta.XR.Movement.Retargeting
         /// Returns the bind pose.
         /// </summary>
         /// <param name="dataProvider">Data provider.</param>
+        /// <param name="convertToUnitySpace">Convert to Unity space.</param>
         /// <returns></returns>
         public static NativeArray<NativeTransform> GetBindPoses(
-            OVRSkeleton.IOVRSkeletonDataProvider dataProvider)
+            OVRSkeleton.IOVRSkeletonDataProvider dataProvider,
+            bool convertToUnitySpace = true)
         {
             var sourcePoses = new NativeArray<NativeTransform>(0, Temp, UninitializedMemory);
             var skeletonType = dataProvider.GetSkeletonType() == OVRSkeleton.SkeletonType.FullBody
@@ -328,8 +457,8 @@ namespace Meta.XR.Movement.Retargeting
             {
                 var skeletonPose = _skeleton.Bones[i].Pose;
                 sourcePoses[i] = new NativeTransform(
-                    skeletonPose.Orientation.FromFlippedZQuatf(),
-                    skeletonPose.Position.FromFlippedZVector3f(),
+                    convertToUnitySpace ? skeletonPose.Orientation.FromFlippedZQuatf() : skeletonPose.Orientation.FromQuatf(),
+                    convertToUnitySpace ? skeletonPose.Position.FromFlippedZVector3f() : skeletonPose.Position.FromVector3f(),
                     Vector3.one);
             }
 
@@ -412,6 +541,9 @@ namespace Meta.XR.Movement.Retargeting
             // all joints are relative to parent, except for root.
             // This cannot be done as a job, because it computes the world poses for the parents
             // at the lower indices first, and then proceeds with the children.
+            // Note that some indices can have parents at later indices; skip these
+            // first. Process them after the rest of the "normal" nodes have been processed.
+            bool foundIndexWithLaterParent = false;
             for (int i = 0; i < posesToModify.Length; i++)
             {
                 // first joint is root, just skip.
@@ -427,6 +559,45 @@ namespace Meta.XR.Movement.Retargeting
 
                 // parent index
                 var parentIndex = parentIndices[i];
+                // Skip -- this node is unusual.
+                if (parentIndex > i)
+                {
+                    foundIndexWithLaterParent = true;
+                    continue;
+                }
+                if (parentIndex < posesToModify.Length - 1)
+                {
+                    var parentTransform = posesToModify[parentIndex];
+                    var currentTransform = posesToModify[i];
+                    posesToModify[i] = GetChildTransformAffectedByParent(
+                        new Pose(parentTransform.Position, parentTransform.Orientation),
+                        new Pose(currentTransform.Position, currentTransform.Orientation));
+                }
+            }
+            if (!foundIndexWithLaterParent)
+            {
+                return;
+            }
+            // Now process the nodes with parent indices that are greater.
+            for (int i = 0; i < posesToModify.Length; i++)
+            {
+                if (i == 0)
+                {
+                    continue;
+                }
+
+                if (i >= parentIndices.Length)
+                {
+                    continue;
+                }
+
+                // parent index
+                var parentIndex = parentIndices[i];
+                // Skip normal nodes. Focus on the unusual ones.
+                if (parentIndex < i)
+                {
+                    continue;
+                }
                 if (parentIndex < posesToModify.Length - 1)
                 {
                     var parentTransform = posesToModify[parentIndex];
@@ -457,8 +628,8 @@ namespace Meta.XR.Movement.Retargeting
                     isLeftSide ? OVRPlugin.Hand.HandLeft : OVRPlugin.Hand.HandRight, ref handState))
             {
                 isHandTracked = true;
-                inputTrackingPosition = handState.PointerPose.Position.FromFlippedZVector3f();
-                inputTrackingRotation = handState.PointerPose.Orientation.FromFlippedZQuatf();
+                inputTrackingPosition = handState.PointerPose.Position.FromVector3f();
+                inputTrackingRotation = handState.PointerPose.Orientation.FromQuatf();
             }
             else
             {
@@ -471,6 +642,10 @@ namespace Meta.XR.Movement.Retargeting
                     OVRInput.GetLocalControllerRotation(isLeftSide
                         ? OVRInput.Controller.LTouch
                         : OVRInput.Controller.RTouch);
+                var toOpenXRPos = inputTrackingPosition.ToFlippedZVector3f();
+                var toOpenXRQuat = inputTrackingRotation.ToFlippedZQuatf();
+                inputTrackingPosition = new Vector3(toOpenXRPos.x, toOpenXRPos.y, toOpenXRPos.z);
+                inputTrackingRotation = new Quaternion(toOpenXRQuat.x, toOpenXRQuat.y, toOpenXRQuat.z, toOpenXRQuat.w);
             }
         }
 
@@ -524,12 +699,6 @@ namespace Meta.XR.Movement.Retargeting
             return (position, rotation);
         }
 
-        /// <summary>
-        /// Multiplies two poses.
-        /// </summary>
-        /// <param name="a">First pose.</param>
-        /// <param name="b">Second pose.</param>
-        /// <param name="result">Resulting pose.</param>
         private static void MultiplyPoses(in Pose a, in Pose b, ref Pose result)
         {
             result.position = a.position + a.rotation * b.position;
@@ -568,5 +737,70 @@ namespace Meta.XR.Movement.Retargeting
                 return translations;
             }
         }
+
+#if ISDK_DEFINED
+        /// <summary>
+        /// Gets the world pose of an ISDK hand joint.
+        /// </summary>
+        /// <param name="hand">The IHand interface to get joint data from.</param>
+        /// <param name="jointId">The hand joint ID to get the position for.</param>
+        /// <param name="bodyJointId">The body joint ID corresponding to the hand joint ID.</param>
+        /// <param name="cameraRig">Optional camera rig for coordinate transformation.</param>
+        /// <param name="worldPosition">Output world position of the joint.</param>
+        /// <returns>True if the joint position was successfully retrieved, false otherwise.</returns>
+        public static bool GetInteractionHandJointWorldPosition(
+            IHand hand,
+            HandJointId jointId,
+            BodyJointId bodyJointId,
+            OVRCameraRig cameraRig,
+            out Vector3 worldPosition)
+        {
+            worldPosition = Vector3.zero;
+
+            if (hand is not { IsTrackedDataValid: true })
+            {
+                return false;
+            }
+
+            // Get the joint pose from the hand
+            hand.GetJointPose(jointId, out var iSDKPose);
+
+#if ISDK_78_OR_NEWER || ISDK_OPENXR_HAND
+            // Apply OpenXR to OVR conversion if needed
+            if (OVRPlugin.HandSkeletonVersion == OVRHandSkeletonVersion.OpenXR)
+            {
+                ConvertOpenXRHandToOvrHand(bodyJointId, ref iSDKPose);
+            }
+#endif
+
+            // Transform the position using camera rig if available
+            worldPosition = cameraRig?.transform.InverseTransformPoint(iSDKPose.position) ?? iSDKPose.position;
+            return true;
+        }
+
+        /// <summary>
+        /// Converts OpenXR hand pose to OVR hand pose by applying appropriate rotation offsets.
+        /// </summary>
+        /// <param name="bodyJointId">The body joint ID to determine which hand and rotation offset to apply.</param>
+        /// <param name="pose">The pose to convert (modified in place).</param>
+        public static void ConvertOpenXRHandToOvrHand(BodyJointId bodyJointId, ref Pose pose)
+        {
+            switch (bodyJointId)
+            {
+                case BodyJointId.Body_LeftHandWrist:
+                    pose.rotation *= _openXRLeftHandRotOffset;
+                    break;
+                case BodyJointId.Body_RightHandWrist:
+                    pose.rotation *= _openXRRightHandRotOffset;
+                    break;
+                case > BodyJointId.Body_LeftHandWrist and < BodyJointId.Body_LeftHandLittleTip:
+                    pose.rotation *= _openXRLeftHandRotOffset;
+                    break;
+                case > BodyJointId.Body_RightHandWrist and < BodyJointId.Body_RightHandLittleTip:
+                    pose.rotation *= _openXRRightHandRotOffset;
+                    break;
+            }
+        }
+#endif
     }
 }

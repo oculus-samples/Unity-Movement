@@ -54,9 +54,20 @@ namespace Meta.XR.Movement.Retargeting.Editor
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Configuration", EditorStyles.boldLabel);
+
+            // Display validation errors if any
+            if (config.HasValidationErrors)
+            {
+                foreach (var error in config.ValidationErrors)
+                {
+                    EditorGUILayout.HelpBox(error, MessageType.Error);
+                }
+
+                EditorGUILayout.Space();
+            }
+
             EditorGUILayout.BeginHorizontal();
             {
-
                 EditorGUILayout.PropertyField(_config);
                 if (_config.objectReferenceValue != null)
                 {
@@ -64,6 +75,8 @@ namespace Meta.XR.Movement.Retargeting.Editor
                         (!string.IsNullOrEmpty(config.Config) && config.JointPairs is { Length: 0 }))
                     {
                         LoadConfig(serializedObject, config);
+                        // Validate again after loading config to update validation state
+                        config.ValidateConfiguration();
                     }
 
                     if (config.ConfigAsset != null && GUILayout.Button("Open Editor"))
@@ -73,6 +86,15 @@ namespace Meta.XR.Movement.Retargeting.Editor
                 }
             }
             EditorGUILayout.EndHorizontal();
+
+            // Show warning if joint count mismatch detected
+            if (config.HasValidationErrors)
+            {
+                EditorGUILayout.HelpBox(
+                    "Joint count mismatch detected. Click 'Map' to automatically remap joints to match the configuration.",
+                    MessageType.Warning);
+            }
+
             EditorGUILayout.PropertyField(_jointPairs);
             EditorGUILayout.PropertyField(_shapePoseData);
         }
@@ -108,13 +130,17 @@ namespace Meta.XR.Movement.Retargeting.Editor
 
             if (metadataAssets.Count != 0)
             {
-                bool confirmed = EditorUtility.DisplayDialog("Error", $"The config isn't linked to a config scriptable object. Opening config at {metadataAssetPath}", "Ok");
+                bool confirmed = EditorUtility.DisplayDialog("Error",
+                    $"The config isn't linked to a config scriptable object. Opening config at {metadataAssetPath}",
+                    "Ok");
                 if (confirmed)
                 {
                     MSDKUtilityEditor.CreateAlignmentScene(metadataAssets[0].Model);
                 }
+
                 return;
             }
+
             if (metadataObjects.Count == 0)
             {
                 Debug.LogError("The config isn't linked to a config scriptable object!");
@@ -213,6 +239,9 @@ namespace Meta.XR.Movement.Retargeting.Editor
             serializedObject.Update();
             parentJointIndexes.Dispose();
             MSDKUtility.DestroyHandle(handle);
+
+            // Validate the configuration after loading
+            config.ValidateConfiguration();
         }
 
         private static List<ShapePoseData> BuildShapePoseData(UInt64 handle, SkinnedMeshRenderer[] skinnedMeshes,

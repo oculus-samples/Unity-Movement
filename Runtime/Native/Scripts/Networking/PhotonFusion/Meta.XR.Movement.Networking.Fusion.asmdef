@@ -14,10 +14,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [
-        "FUSION2",
-        "FUSION_WEAVER"
-    ],
+    "defineConstraints": [],
     "versionDefines": [
         {
             "name": "com.meta.xr.sdk.platform",

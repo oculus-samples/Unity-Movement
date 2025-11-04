@@ -14103,6 +14103,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6229825607387579040, guid: 1ae7b04c503f51c48ad2f60c89da8f0b, type: 3}
+      propertyPath: _retargeters.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6229825607387579040, guid: 1ae7b04c503f51c48ad2f60c89da8f0b, type: 3}
       propertyPath: _ovrBodies.Array.data[0]
       value: 
       objectReference: {fileID: 1538582923}
@@ -14110,6 +14114,14 @@ PrefabInstance:
       propertyPath: _ovrBodies.Array.data[1]
       value: 
       objectReference: {fileID: 1070385753}
+    - target: {fileID: 6229825607387579040, guid: 1ae7b04c503f51c48ad2f60c89da8f0b, type: 3}
+      propertyPath: _retargeters.Array.data[0]
+      value: 
+      objectReference: {fileID: 1694879731}
+    - target: {fileID: 6229825607387579040, guid: 1ae7b04c503f51c48ad2f60c89da8f0b, type: 3}
+      propertyPath: _retargeters.Array.data[1]
+      value: 
+      objectReference: {fileID: 1070385751}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

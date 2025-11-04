@@ -1,8 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+#if UNITY_NGO_MODULE_DEFINED
+using Unity.Netcode;
+#endif
 using System;
 using Unity.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Meta.XR.Movement.Networking.NGO
@@ -10,6 +12,7 @@ namespace Meta.XR.Movement.Networking.NGO
     /// <summary>
     /// Implementation of <see cref="INetworkCharacterBehaviour"/> using the Unity Netcode for
     /// GameObjects networking framework.
+#if UNITY_NGO_MODULE_DEFINED
     /// </summary>
     public class NetworkCharacterBehaviourNGO : NetworkBehaviour, INetworkCharacterBehaviour
     {
@@ -241,4 +244,5 @@ namespace Meta.XR.Movement.Networking.NGO
             _characterHandler.ReceiveAck(sender, ack);
         }
     }
+#endif
 }

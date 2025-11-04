@@ -29,6 +29,9 @@ namespace Meta.XR.Movement
 
             var knownJoints = new string[(int)KnownJointType.KnownJointCount];
 
+            // Build original hierarchy first for structural analysis
+            var originalHierarchy = BuildHierarchy(jointNames, parentJointNames);
+
             // Detect and trim common prefixes/suffixes for better pattern matching
             var commonPrefixSuffix = DetectCommonPrefixSuffix(jointNames);
             var normalizedJointNames =
@@ -48,28 +51,28 @@ namespace Meta.XR.Movement
             }
 
             // Find hips (child of root with spine + left/right upper legs)
-            var hipsJoint = FindHipsJoint(rootJoint, hierarchy, normalizedJointNames);
+            var hipsJoint = FindHipsJoint(rootJoint, hierarchy, normalizedJointNames, originalHierarchy, jointNames);
             if (!string.IsNullOrEmpty(hipsJoint))
             {
                 knownJoints[(int)KnownJointType.Hips] = normalizedToOriginal[hipsJoint];
             }
 
             // Find chest (highest spine joint with neck + shoulders)
-            var chestJoint = FindChestJoint(hipsJoint, hierarchy, normalizedJointNames);
+            var chestJoint = FindChestJoint(hipsJoint, hierarchy, normalizedJointNames, originalHierarchy, jointNames);
             if (!string.IsNullOrEmpty(chestJoint))
             {
                 knownJoints[(int)KnownJointType.Chest] = normalizedToOriginal[chestJoint];
             }
 
             // Find neck (child of chest)
-            var neckJoint = FindNeckJoint(chestJoint, hierarchy, normalizedJointNames);
+            var neckJoint = FindNeckJoint(chestJoint, hierarchy, normalizedJointNames, originalHierarchy, jointNames);
             if (!string.IsNullOrEmpty(neckJoint))
             {
                 knownJoints[(int)KnownJointType.Neck] = normalizedToOriginal[neckJoint];
             }
 
             // Find upper legs (children of hips)
-            var upperLegs = FindUpperLegs(hipsJoint, hierarchy, normalizedJointNames);
+            var upperLegs = FindUpperLegs(hipsJoint, hierarchy, normalizedJointNames, originalHierarchy, jointNames);
             if (upperLegs.leftUpperLeg != null)
             {
                 knownJoints[(int)KnownJointType.LeftUpperLeg] = normalizedToOriginal[upperLegs.leftUpperLeg];
@@ -81,7 +84,7 @@ namespace Meta.XR.Movement
             }
 
             // Find ankles (feet - descendants of upper legs)
-            var ankles = FindAnkles(upperLegs.leftUpperLeg, upperLegs.rightUpperLeg, hierarchy, normalizedJointNames);
+            var ankles = FindAnkles(upperLegs.leftUpperLeg, upperLegs.rightUpperLeg, hierarchy, normalizedJointNames, originalHierarchy, jointNames);
             if (ankles.leftAnkle != null)
             {
                 knownJoints[(int)KnownJointType.LeftAnkle] = normalizedToOriginal[ankles.leftAnkle];
@@ -93,9 +96,9 @@ namespace Meta.XR.Movement
             }
 
             // Find shoulders and upper arms
-            var shoulders = FindShoulders(chestJoint, hierarchy, normalizedJointNames);
+            var shoulders = FindShoulders(chestJoint, hierarchy, normalizedJointNames, originalHierarchy, jointNames);
             var upperArms = FindUpperArms(shoulders.leftShoulder, shoulders.rightShoulder, chestJoint, hierarchy,
-                normalizedJointNames);
+                normalizedJointNames, originalHierarchy, jointNames);
             if (upperArms.leftUpperArm != null)
             {
                 knownJoints[(int)KnownJointType.LeftUpperArm] = normalizedToOriginal[upperArms.leftUpperArm];
@@ -107,7 +110,7 @@ namespace Meta.XR.Movement
             }
 
             // Find wrists (hands)
-            var wrists = FindWrists(upperArms.leftUpperArm, upperArms.rightUpperArm, hierarchy, normalizedJointNames);
+            var wrists = FindWrists(upperArms.leftUpperArm, upperArms.rightUpperArm, hierarchy, normalizedJointNames, originalHierarchy, jointNames);
             if (wrists.leftWrist != null)
             {
                 knownJoints[(int)KnownJointType.LeftWrist] = normalizedToOriginal[wrists.leftWrist];
@@ -359,38 +362,25 @@ namespace Meta.XR.Movement
             var jointNameSet = new HashSet<string>(jointNames.Where(name => !string.IsNullOrEmpty(name)));
             var parentNameSet = new HashSet<string>(parentJointNames.Where(name => !string.IsNullOrEmpty(name)));
 
-            // Method 1: Find joints that are referenced as parents but don't exist in jointNames
-            var rootCandidates = parentNameSet.Except(jointNameSet).ToList();
-            if (rootCandidates.Count == 1)
-            {
-                return rootCandidates[0];
-            }
+            var allRootCandidates = new List<string>();
 
-            // Method 2: Find joint with empty parent (true root)
+            // Method 1: Find joints that are referenced as parents but don't exist in jointNames
+            var referencedRootCandidates = parentNameSet.Except(jointNameSet).ToList();
+            allRootCandidates.AddRange(referencedRootCandidates);
+
+            // Method 2: Find joints with empty parent (true roots)
+            var emptyParentCandidates = new List<string>();
             for (int i = 0; i < jointNames.Length; i++)
             {
                 if (string.IsNullOrEmpty(parentJointNames[i]) || parentJointNames[i].Length == 0)
                 {
-                    return jointNames[i];
+                    emptyParentCandidates.Add(jointNames[i]);
                 }
             }
+            allRootCandidates.AddRange(emptyParentCandidates);
 
-            // Method 3: If multiple root candidates, try to find the best one
-            if (rootCandidates.Count > 1)
-            {
-                // Prefer names that contain "root"
-                var rootNamedCandidates = rootCandidates.Where(name =>
-                    name.ToLower().Contains("root")).ToList();
-                if (rootNamedCandidates.Count == 1)
-                {
-                    return rootNamedCandidates[0];
-                }
-
-                // Return the first candidate as fallback
-                return rootCandidates[0];
-            }
-
-            // Method 4: Fallback - look for joints that reference themselves or common root names
+            // Method 3: Find joints that reference themselves or common root names
+            var selfReferencingCandidates = new List<string>();
             for (int i = 0; i < jointNames.Length; i++)
             {
                 var parentName = parentJointNames[i];
@@ -399,30 +389,107 @@ namespace Meta.XR.Movement
                     parentName.ToLower() == "armature" ||
                     parentName.ToLower() == "skeleton")
                 {
-                    return jointNames[i];
+                    selfReferencingCandidates.Add(jointNames[i]);
                 }
             }
+            allRootCandidates.AddRange(selfReferencingCandidates);
 
-            return jointNames[0];
+            // Remove duplicates while preserving order
+            var uniqueRootCandidates = allRootCandidates.Distinct().ToList();
+
+            // If no candidates found, return first joint as fallback
+            if (uniqueRootCandidates.Count == 0)
+            {
+                return jointNames.Length > 0 ? jointNames[0] : null;
+            }
+
+            // If only one candidate, return it
+            if (uniqueRootCandidates.Count == 1)
+            {
+                return uniqueRootCandidates[0];
+            }
+
+            // Multiple candidates - select the best one using priority system
+            var sortedCandidates = uniqueRootCandidates.OrderBy(candidate =>
+            {
+                var lowerName = candidate.ToLower();
+                int priority = 0;
+
+                // Highest priority: exact "root" match
+                if (lowerName == "root")
+                {
+                    priority -= 10000;
+                }
+                // High priority: names starting with "root"
+                else if (lowerName.StartsWith("root"))
+                {
+                    priority -= 5000;
+                }
+                // Medium priority: names containing "root"
+                else if (lowerName.Contains("root"))
+                {
+                    priority -= 2000;
+                }
+                // Lower priority: common root names
+                else if (lowerName == "armature" || lowerName == "skeleton")
+                {
+                    priority -= 1000;
+                }
+
+                // Prefer candidates that have empty parents (true roots) over referenced ones
+                if (emptyParentCandidates.Contains(candidate))
+                {
+                    priority -= 500;
+                }
+
+                // Prefer shorter names
+                priority += candidate.Length;
+
+                return priority;
+            }).ToList();
+
+            return sortedCandidates[0];
         }
 
         private static string FindHipsJoint(string rootJoint, Dictionary<string, List<string>> hierarchy,
-            string[] jointNames)
+            string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
         {
             if (string.IsNullOrEmpty(rootJoint))
             {
                 return null;
             }
 
-            // First try direct name matching for hips
+            // Enhanced pattern matching for hips with more specific patterns
             var hipsCandidate = FindJointByNamePatterns(jointNames, new[]
             {
-                "hips", "pelvis", "hip", "root"
+                "hips", "pelvis", "hip", "spinelower", "root"
             });
 
             if (!string.IsNullOrEmpty(hipsCandidate) && IsValidHipsWithDepth(hipsCandidate, rootJoint, hierarchy))
             {
                 return hipsCandidate;
+            }
+
+            // Also try original joint names for better pattern matching
+            var originalHipsCandidate = FindJointByNamePatterns(originalJointNames, new[]
+            {
+                "hips", "pelvis", "hip", "spinelower", "root"
+            });
+
+            if (!string.IsNullOrEmpty(originalHipsCandidate))
+            {
+                // Find corresponding normalized name
+                for (int i = 0; i < originalJointNames.Length; i++)
+                {
+                    if (originalJointNames[i] == originalHipsCandidate && i < jointNames.Length)
+                    {
+                        var normalizedCandidate = jointNames[i];
+                        if (IsValidHipsWithDepth(normalizedCandidate, rootJoint, hierarchy))
+                        {
+                            return normalizedCandidate;
+                        }
+                    }
+                }
             }
 
             // If root has children, look for structural hips
@@ -431,6 +498,11 @@ namespace Meta.XR.Movement
                 return null;
             }
 
+            return FindHipsJointTraversal(rootJoint, hierarchy, rootChildren);
+        }
+
+        private static string FindHipsJointTraversal(string rootJoint, Dictionary<string, List<string>> hierarchy, List<string> rootChildren)
+        {
             // Look for a child that has spine + left/right legs with sufficient depth
             foreach (var child in rootChildren)
             {
@@ -554,14 +626,14 @@ namespace Meta.XR.Movement
         }
 
         private static string FindChestJoint(string hipsJoint, Dictionary<string, List<string>> hierarchy,
-            string[] jointNames)
+            string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
         {
             if (string.IsNullOrEmpty(hipsJoint))
             {
                 return null;
             }
 
-            // First try direct name matching for chest/upper spine
+            // Enhanced pattern matching for chest with more specific patterns
             var chestCandidate = FindJointByNamePatterns(jointNames, new[]
             {
                 "chest", "upperchest", "spine2", "spine_03", "spine3"
@@ -572,6 +644,34 @@ namespace Meta.XR.Movement
                 return chestCandidate;
             }
 
+            // Also try original joint names for better pattern matching
+            var originalChestCandidate = FindJointByNamePatterns(originalJointNames, new[]
+            {
+                "chest", "upperchest", "spine2", "spine_03", "spine3"
+            });
+
+            if (!string.IsNullOrEmpty(originalChestCandidate))
+            {
+                // Find corresponding normalized name
+                for (int i = 0; i < originalJointNames.Length; i++)
+                {
+                    if (originalJointNames[i] == originalChestCandidate && i < jointNames.Length)
+                    {
+                        var normalizedCandidate = jointNames[i];
+                        if (IsValidChest(normalizedCandidate, hierarchy) && ValidateSpineDepth(normalizedCandidate, hierarchy))
+                        {
+                            return normalizedCandidate;
+                        }
+                    }
+                }
+            }
+
+            return FindChestJointTraversal(hipsJoint, hierarchy, jointNames, originalHierarchy, originalJointNames);
+        }
+
+        private static string FindChestJointTraversal(string hipsJoint, Dictionary<string, List<string>> hierarchy,
+            string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
+        {
             // Traverse up the spine to find chest
             var current = hipsJoint;
             var visited = new HashSet<string>();
@@ -596,7 +696,7 @@ namespace Meta.XR.Movement
 
                             lastSpineJoint = child;
                             // Continue searching deeper
-                            var deeperChest = FindChestJoint(child, hierarchy, jointNames);
+                            var deeperChest = FindChestJoint(child, hierarchy, jointNames, originalHierarchy, originalJointNames);
                             if (!string.IsNullOrEmpty(deeperChest))
                             {
                                 return deeperChest;
@@ -702,14 +802,14 @@ namespace Meta.XR.Movement
         }
 
         private static string FindNeckJoint(string chestJoint, Dictionary<string, List<string>> hierarchy,
-            string[] jointNames)
+            string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
         {
             if (string.IsNullOrEmpty(chestJoint))
             {
                 return null;
             }
 
-            // First try direct name matching
+            // Enhanced pattern matching for neck
             var neckCandidate = FindJointByNamePatterns(jointNames, new[]
             {
                 "neck"
@@ -718,6 +818,24 @@ namespace Meta.XR.Movement
             if (!string.IsNullOrEmpty(neckCandidate))
             {
                 return neckCandidate;
+            }
+
+            // Also try original joint names for better pattern matching
+            var originalNeckCandidate = FindJointByNamePatterns(originalJointNames, new[]
+            {
+                "neck"
+            });
+
+            if (!string.IsNullOrEmpty(originalNeckCandidate))
+            {
+                // Find corresponding normalized name
+                for (int i = 0; i < originalJointNames.Length; i++)
+                {
+                    if (originalJointNames[i] == originalNeckCandidate && i < jointNames.Length)
+                    {
+                        return jointNames[i];
+                    }
+                }
             }
 
             // Look in chest children
@@ -783,13 +901,54 @@ namespace Meta.XR.Movement
             return (leftJoint, rightJoint);
         }
 
-        private static (string leftUpperLeg, string rightUpperLeg) FindUpperLegs(string hipsJoint,
-            Dictionary<string, List<string>> hierarchy, string[] jointNames)
+        /// <summary>
+        /// Convert original joint names to normalized names
+        /// </summary>
+        private static string ConvertToNormalizedName(string originalName, string[] originalJointNames, string[] normalizedJointNames)
         {
-            // Find candidates using existing logic
-            var result = FindPairedJoints(hipsJoint, hierarchy, jointNames,
-                new[] { "leftupleg", "left_upleg", "leftleg", "leftthigh" },
-                new[] { "rightupleg", "right_upleg", "rightleg", "rightthigh" },
+            if (string.IsNullOrEmpty(originalName))
+            {
+                return null;
+            }
+
+            for (int i = 0; i < originalJointNames.Length; i++)
+            {
+                if (originalJointNames[i] == originalName && i < normalizedJointNames.Length)
+                {
+                    return normalizedJointNames[i];
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Generic method to find paired joints with original name fallback
+        /// </summary>
+        private static (string left, string right) FindPairedJointsWithOriginalFallback(
+            string parentJoint, Dictionary<string, List<string>> hierarchy, Dictionary<string, List<string>> originalHierarchy,
+            string[] jointNames, string[] originalJointNames,
+            string[] leftPatterns, string[] rightPatterns, Func<string, bool> jointValidator = null)
+        {
+            // Try normalized names first
+            var result = FindPairedJoints(parentJoint, hierarchy, jointNames, leftPatterns, rightPatterns, jointValidator);
+
+            // Try original names for missing joints
+            var originalResult = FindPairedJoints(parentJoint, originalHierarchy, originalJointNames, leftPatterns, rightPatterns, jointValidator);
+
+            // Convert and merge results
+            var leftCandidate = result.left ?? ConvertToNormalizedName(originalResult.left, originalJointNames, jointNames);
+            var rightCandidate = result.right ?? ConvertToNormalizedName(originalResult.right, originalJointNames, jointNames);
+
+            return (leftCandidate, rightCandidate);
+        }
+
+        private static (string leftUpperLeg, string rightUpperLeg) FindUpperLegs(string hipsJoint,
+            Dictionary<string, List<string>> hierarchy, string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
+        {
+            var result = FindPairedJointsWithOriginalFallback(hipsJoint, hierarchy, originalHierarchy, jointNames, originalJointNames,
+                new[] { "leftupleg", "left_upleg", "leftleg", "leftthigh", "leftlegupper" },
+                new[] { "rightupleg", "right_upleg", "rightleg", "rightthigh", "rightlegupper" },
                 IsLegJoint);
 
             // Find valid upper legs with depth validation
@@ -799,12 +958,64 @@ namespace Meta.XR.Movement
             return (validatedLeftUpperLeg, validatedRightUpperLeg);
         }
 
-        private static (string leftAnkle, string rightAnkle) FindAnkles(string leftUpperLeg, string rightUpperLeg,
-            Dictionary<string, List<string>> hierarchy, string[] jointNames)
+        /// <summary>
+        /// Generic method to find joints by name with original name fallback
+        /// </summary>
+        private static string FindJointWithOriginalFallback(string[] jointNames, string[] originalJointNames, string[] patterns)
         {
-            // First try direct name matching with preference for simpler names
-            var leftCandidate = FindBestAnkleByName(jointNames, true);
-            var rightCandidate = FindBestAnkleByName(jointNames, false);
+            // Try normalized names first
+            var candidate = FindJointByNamePatterns(jointNames, patterns);
+            if (!string.IsNullOrEmpty(candidate))
+            {
+                return candidate;
+            }
+
+            // Try original names
+            var originalCandidate = FindJointByNamePatterns(originalJointNames, patterns);
+            if (!string.IsNullOrEmpty(originalCandidate))
+            {
+                return ConvertToNormalizedName(originalCandidate, originalJointNames, jointNames);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Generic method to find best joint by name with original name fallback
+        /// </summary>
+        private static string FindBestJointWithOriginalFallback(string[] jointNames, string[] originalJointNames, bool isLeft,
+            string[] includePatterns, (string pattern, int priority)[] priorityPatterns, string[] penalizedSuffixes)
+        {
+            // Try normalized names first
+            var candidate = FindBestJointByName(jointNames, isLeft, includePatterns, priorityPatterns, penalizedSuffixes);
+            if (!string.IsNullOrEmpty(candidate))
+            {
+                return candidate;
+            }
+
+            // Try original names
+            var originalCandidate = FindBestJointByName(originalJointNames, isLeft, includePatterns, priorityPatterns, penalizedSuffixes);
+            if (!string.IsNullOrEmpty(originalCandidate))
+            {
+                return ConvertToNormalizedName(originalCandidate, originalJointNames, jointNames);
+            }
+
+            return null;
+        }
+
+        private static (string leftAnkle, string rightAnkle) FindAnkles(string leftUpperLeg, string rightUpperLeg,
+            Dictionary<string, List<string>> hierarchy, string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
+        {
+            // Enhanced pattern matching with original joint names
+            var leftCandidate = FindBestJointWithOriginalFallback(jointNames, originalJointNames, true,
+                new[] { "foot", "ankle" },
+                new[] { ("ankle", -2000), ("foot", -1500) },
+                new[] { "ball", "toe", "heel", "twist", "end", "tip", "roll", "bend", "ctrl", "control" });
+
+            var rightCandidate = FindBestJointWithOriginalFallback(jointNames, originalJointNames, false,
+                new[] { "foot", "ankle" },
+                new[] { ("ankle", -2000), ("foot", -1500) },
+                new[] { "ball", "toe", "heel", "twist", "end", "tip", "roll", "bend", "ctrl", "control" });
 
             if (!string.IsNullOrEmpty(leftCandidate) && !string.IsNullOrEmpty(rightCandidate))
             {
@@ -1006,16 +1217,16 @@ namespace Meta.XR.Movement
         }
 
         private static (string leftShoulder, string rightShoulder) FindShoulders(string chestJoint,
-            Dictionary<string, List<string>> hierarchy, string[] jointNames)
+            Dictionary<string, List<string>> hierarchy, string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
         {
-            return FindPairedJoints(chestJoint, hierarchy, jointNames,
+            return FindPairedJointsWithOriginalFallback(chestJoint, hierarchy, originalHierarchy, jointNames, originalJointNames,
                 new[] { "leftshoulder", "left_shoulder", "leftclavicle" },
                 new[] { "rightshoulder", "right_shoulder", "rightclavicle" },
                 name => name.Contains("shoulder") || name.Contains("clavicle"));
         }
 
         private static (string leftUpperArm, string rightUpperArm) FindUpperArms(string leftShoulder,
-            string rightShoulder, string chestJoint, Dictionary<string, List<string>> hierarchy, string[] jointNames)
+            string rightShoulder, string chestJoint, Dictionary<string, List<string>> hierarchy, string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
         {
             // Find valid upper arms with depth validation, trying multiple approaches
             string validatedLeftUpperArm = FindValidUpperArmCandidate(leftShoulder, chestJoint, hierarchy, jointNames, true);
@@ -1165,11 +1376,18 @@ namespace Meta.XR.Movement
         }
 
         private static (string leftWrist, string rightWrist) FindWrists(string leftUpperArm, string rightUpperArm,
-            Dictionary<string, List<string>> hierarchy, string[] jointNames)
+            Dictionary<string, List<string>> hierarchy, string[] jointNames, Dictionary<string, List<string>> originalHierarchy, string[] originalJointNames)
         {
-            // First try direct name matching with preference for simpler names
-            var leftCandidate = FindBestWristByName(jointNames, true);
-            var rightCandidate = FindBestWristByName(jointNames, false);
+            // Enhanced pattern matching with original joint names
+            var leftCandidate = FindBestJointWithOriginalFallback(jointNames, originalJointNames, true,
+                new[] { "hand", "wrist" },
+                new[] { ("wrist", -1500), ("hand", -1000) },
+                new[] { "twist", "end", "tip", "roll", "bend", "ctrl", "control" });
+
+            var rightCandidate = FindBestJointWithOriginalFallback(jointNames, originalJointNames, false,
+                new[] { "hand", "wrist" },
+                new[] { ("wrist", -1500), ("hand", -1000) },
+                new[] { "twist", "end", "tip", "roll", "bend", "ctrl", "control" });
 
             if (!string.IsNullOrEmpty(leftCandidate) && !string.IsNullOrEmpty(rightCandidate))
             {
@@ -1284,54 +1502,41 @@ namespace Meta.XR.Movement
         }
 
         /// <summary>
-        /// Validate that an upper leg joint has at least 2 levels of children (e.g., upper leg > lower leg > foot)
+        /// Generic method to validate joint depth using a common validation function
         /// </summary>
-        /// <param name="upperLeg">The upper leg joint to validate</param>
-        /// <param name="hierarchy">The joint hierarchy</param>
-        /// <returns>True if the upper leg has sufficient child depth, false otherwise</returns>
-        private static bool ValidateUpperLegDepth(string upperLeg, Dictionary<string, List<string>> hierarchy)
+        private static bool ValidateJointDepth(string joint, Dictionary<string, List<string>> hierarchy, int minDepth = 2)
         {
-            if (string.IsNullOrEmpty(upperLeg))
+            if (string.IsNullOrEmpty(joint))
             {
                 return false;
             }
 
-            int depth = CalculateChildDepth(upperLeg, hierarchy);
-            return depth >= 2;
+            int depth = CalculateChildDepth(joint, hierarchy);
+            return depth >= minDepth;
+        }
+
+        /// <summary>
+        /// Validate that an upper leg joint has at least 2 levels of children (e.g., upper leg > lower leg > foot)
+        /// </summary>
+        private static bool ValidateUpperLegDepth(string upperLeg, Dictionary<string, List<string>> hierarchy)
+        {
+            return ValidateJointDepth(upperLeg, hierarchy, 2);
         }
 
         /// <summary>
         /// Validate that an upper arm joint has at least 2 levels of children (e.g., upper arm > forearm > hand)
         /// </summary>
-        /// <param name="upperArm">The upper arm joint to validate</param>
-        /// <param name="hierarchy">The joint hierarchy</param>
-        /// <returns>True if the upper arm has sufficient child depth, false otherwise</returns>
         private static bool ValidateUpperArmDepth(string upperArm, Dictionary<string, List<string>> hierarchy)
         {
-            if (string.IsNullOrEmpty(upperArm))
-            {
-                return false;
-            }
-
-            int depth = CalculateChildDepth(upperArm, hierarchy);
-            return depth >= 2;
+            return ValidateJointDepth(upperArm, hierarchy, 2);
         }
 
         /// <summary>
         /// Validate that a spine joint has at least 2 levels of children (e.g., spine > chest > neck)
         /// </summary>
-        /// <param name="spine">The spine joint to validate</param>
-        /// <param name="hierarchy">The joint hierarchy</param>
-        /// <returns>True if the spine has sufficient child depth, false otherwise</returns>
         private static bool ValidateSpineDepth(string spine, Dictionary<string, List<string>> hierarchy)
         {
-            if (string.IsNullOrEmpty(spine))
-            {
-                return false;
-            }
-
-            int depth = CalculateChildDepth(spine, hierarchy);
-            return depth >= 2;
+            return ValidateJointDepth(spine, hierarchy, 2);
         }
 
         /// <summary>

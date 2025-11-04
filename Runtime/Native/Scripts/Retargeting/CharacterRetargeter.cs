@@ -4,7 +4,6 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Jobs;
 using static Meta.XR.Movement.MSDKUtility;
 
 namespace Meta.XR.Movement.Retargeting
@@ -28,6 +27,11 @@ namespace Meta.XR.Movement.Retargeting
         /// Retargeting handle.
         /// </summary>
         public ulong RetargetingHandle => _skeletonRetargeter?.NativeHandle ?? 0;
+
+        /// <summary>
+        /// The source data provider.
+        /// </summary>
+        public ISourceDataProvider DataProvider => _dataProvider;
 
         /// <summary>
         /// Source processor containers.
@@ -110,6 +114,9 @@ namespace Meta.XR.Movement.Retargeting
         [SerializeField]
         protected Color _debugDrawInvalidTargetSkeletonColor = Color.red;
 
+        /// <summary>
+        /// The color to use when drawing an invalid target skeleton debug visualization.
+        /// </summary>
         [SerializeField]
         protected Color _debugDrawInvalidSourceSkeletonColor = Color.magenta;
 
@@ -228,6 +235,9 @@ namespace Meta.XR.Movement.Retargeting
         {
             _skeletonRetargeter.Dispose();
             _skeletonRetargeter.Setup(config);
+            _skeletonRetargeter.HipsScale =
+                Vector3.Scale(_jointPairs[_skeletonRetargeter.HipsJointIndex].Joint.lossyScale,
+                    transform.lossyScale.Reciprocal());
             foreach (var sourceProcessorContainer in _sourceProcessorContainers)
             {
                 sourceProcessorContainer?.GetCurrentProcessor()?.Initialize(this);
@@ -238,7 +248,7 @@ namespace Meta.XR.Movement.Retargeting
                 targetProcessorContainer?.GetCurrentProcessor()?.Initialize(this);
             }
 
-            if (_skeletonRetargeter.ApplyScale)
+            if (_skeletonRetargeter.ApplyRootScale)
             {
                 transform.localScale = Vector3.zero;
             }
@@ -293,18 +303,31 @@ namespace Meta.XR.Movement.Retargeting
             {
                 return;
             }
+
             foreach (var targetProcessorContainer in _targetProcessorContainers)
             {
                 targetProcessorContainer?.GetCurrentProcessor()?.UpdatePose(ref _skeletonRetargeter.RetargetedPose);
+            }
+
+            // If root scale isn't being applied, we should still retarget in world space correctly.
+            if (!_skeletonRetargeter.ApplyRootScale)
+            {
+                var pose = _skeletonRetargeter.RetargetedPose[_skeletonRetargeter.RootJointIndex];
+                pose.Scale = transform.localScale;
+                _skeletonRetargeter.RetargetedPose[_skeletonRetargeter.RootJointIndex] = pose;
             }
 
             // Create job to convert world pose to local pose.
             var job = new SkeletonJobs.ConvertWorldToLocalPoseJob
             {
                 RootJointIndex = _skeletonRetargeter.RootJointIndex,
-                ParentIndices = _skeletonRetargeter.NativeTargetParentIndices,
+                HipsJointIndex = _skeletonRetargeter.HipsJointIndex,
+                HipsScale = _skeletonRetargeter.HipsScale,
+                RetargetingBehavior = _skeletonRetargeter.RetargetingBehavior,
+                ParentIndices = _skeletonRetargeter.TargetParentIndices,
                 WorldPose = _skeletonRetargeter.RetargetedPose,
-                LocalPose = _skeletonRetargeter.RetargetedPoseLocal
+                LocalPose = _skeletonRetargeter.RetargetedPoseLocal,
+                LocalTPose = _skeletonRetargeter.TargetReferencePoseLocal,
             };
             _convertPoseJobHandle = job.Schedule();
 
@@ -325,6 +348,7 @@ namespace Meta.XR.Movement.Retargeting
         public void UpdatePose()
         {
             _convertPoseJobHandle.Complete();
+
             // Run processors with current pose and retargeted target pose data if the character is non-zero.
             var currentPose = GetCurrentBodyPose(JointType.NoWorldSpace);
             foreach (var targetProcessorContainer in _targetProcessorContainers)
@@ -356,7 +380,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="sourcePose">The source pose to use as reference for the T-pose.</param>
         public void UpdateTPose(NativeArray<NativeTransform> sourcePose)
         {
-            UpdateSourceReferenceTPose(_skeletonRetargeter.NativeHandle, sourcePose);
+            UpdateSourceReferenceTPose(_skeletonRetargeter.NativeHandle, sourcePose, _currentManifestation);
             _skeletonRetargeter.UpdateSourceReferencePose(sourcePose, _currentManifestation);
         }
 
@@ -411,11 +435,19 @@ namespace Meta.XR.Movement.Retargeting
 
         private void ApplyPose()
         {
+            var rootScale = _skeletonRetargeter.RootScale;
+            var headScale = _skeletonRetargeter.HeadScale;
+
             // Apply scale first.
-            if (_skeletonRetargeter.ApplyScale && transform.localScale != _skeletonRetargeter.RootScale)
+            if (_skeletonRetargeter.ApplyRootScale && transform.localScale != rootScale)
             {
-                transform.localScale = _skeletonRetargeter.RootScale;
-                _joints[_skeletonRetargeter.HeadJointIndex].localScale = _skeletonRetargeter.HeadScale;
+                transform.localScale = rootScale;
+            }
+
+            var headJoint = _joints[_skeletonRetargeter.HeadJointIndex];
+            if (_skeletonRetargeter.ApplyHeadScale && headJoint.localScale != headScale)
+            {
+                headJoint.localScale = headScale;
             }
 
             // Hide the lower body by setting the scale of the leg joints to zero.

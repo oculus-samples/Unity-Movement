@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+using Meta.XR.Movement.Editor;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -379,9 +380,16 @@ namespace Meta.XR.Movement
         /// </summary>
         public enum RetargetingBehavior
         {
+            [InspectorName("Source Body Proportions")]
             RotationsAndPositions = 0,
+
+            [InspectorName("Source Body Proportions + Target Hand Proportions")]
             RotationsAndPositionsHandsRotationOnly = 1,
-            RotationOnlyUniformScale = 2,
+
+            [InspectorName("Source Body Proportions + Target Scale")]
+            RotationAndPositionsUniformScale = 2, // RotationOnlyUniformScale
+
+            [InspectorName("Target Body Proportions")]
             RotationOnlyNoScaling = 3,
         }
 
@@ -754,6 +762,13 @@ namespace Meta.XR.Movement
         {
             public NativeArray<JointMapping> Mappings;
             public NativeArray<JointMappingEntry> MappingEntries;
+
+            public JointMappingDefinition(NativeArray<JointMapping> mappings,
+                NativeArray<JointMappingEntry> mappingEntries)
+            {
+                Mappings = mappings;
+                MappingEntries = mappingEntries;
+            }
 
             public override string ToString()
             {
@@ -1642,6 +1657,9 @@ namespace Meta.XR.Movement
             public static extern Result metaMovementSDK_getVersion(ulong handle, out double version);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern Result metaMovementSDK_getSerializationVersion(out double version);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_getSkeletonInfo(
                 ulong handle,
                 SkeletonType skeletonType,
@@ -1658,6 +1676,15 @@ namespace Meta.XR.Movement
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_getJointNames(
+                ulong handle,
+                SkeletonType skeletonType,
+                byte* outBuffer,
+                out int inOutBufferSize,
+                void* outUnusedJointNames,
+                out int inOutNumJointNames);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe Result metaMovementSDK_getAutoMappingExcludedJoints(
                 ulong handle,
                 SkeletonType skeletonType,
                 byte* outBuffer,
@@ -1870,9 +1897,29 @@ namespace Meta.XR.Movement
                 out ulong handle);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe Result metaMovementSDK_alignInputToSource(
+                string configName,
+                AlignmentFlags alignmentBehavior,
+                NativeTransform* inputTargetSkeleton,
+                int inputTargetSkeletonJointCount,
+                ulong sourceConfigHandle,
+                SkeletonType sourceConfigSkeletonType,
+                ulong targetConfigHandle,
+                out ulong handle);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern Result metaMovementSDK_generateMappings(
                 ulong handle,
-                AutoMappingFlags autoMappingBehaviorFlags);
+                AutoMappingFlags autoMappingBehaviorFlags,
+                int[] twistBlocklistJointIndexes,
+                int twistBlocklistCount);
+
+            [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe Result metaMovementSDK_getTwistJoints(
+                ulong handle,
+                SkeletonType skeletonType,
+                TwistJointDefinition* outTwistJointDefinitions,
+                out int inOutNumTwistJoints);
 
             /**********************************************************
              *
@@ -1913,7 +1960,8 @@ namespace Meta.XR.Movement
                 int numberOfFaceIndices);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-            public static extern Result metaMovementSDK_snapshotFrameData(ulong handle, FrameData frameData);
+            public static extern unsafe Result metaMovementSDK_snapshotFrameData(ulong handle, FrameData frameData,
+                NativeTransform* skeletonPose, int numBindPoseJoints);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_serializeSnapshot(
@@ -1956,7 +2004,9 @@ namespace Meta.XR.Movement
                 NativeTransform* skeletonPose,
                 float* facePose,
                 NativeTransform* btPose,
-                ref FrameData frameData);
+                ref FrameData frameData,
+                NativeTransform* outBindPose,
+                out int numBindPoseJoints);
 
             [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
             public static extern unsafe Result metaMovementSDK_getInterpolatedSkeletonPose(
@@ -2064,30 +2114,34 @@ namespace Meta.XR.Movement
         /// Initialize the plugin logging.
         /// </summary>
         /// <returns>True if the function was successfully executed.</returns>
+        // Static method for log callback to avoid IL2CPP marshaling issues with lambda expressions
+        [AOT.MonoPInvokeCallback(typeof(LogCallback))]
+        private static void HandleLogCallback(LogLevel logLevel, IntPtr logMessage)
+        {
+            // Convert the message pointer to a string
+            var message = Marshal.PtrToStringAnsi(logMessage);
+
+            // Forward the message to Unity's logging system based on the log level
+            switch (logLevel)
+            {
+                case LogLevel.Error:
+                    Debug.LogError($"[MSDKPlugin]{message}");
+                    break;
+                case LogLevel.Warn:
+                    Debug.LogWarning($"[MSDKPlugin]{message}");
+                    break;
+                case LogLevel.Info:
+                case LogLevel.Debug:
+                default:
+                    Debug.Log($"[MSDKPlugin]{message}");
+                    break;
+            }
+        }
+
         public static bool InitializeLogging()
         {
             Result success;
-            _logCallback ??= (logLevel, logMessage) =>
-            {
-                // Convert the message pointer to a string
-                var message = Marshal.PtrToStringAnsi(logMessage);
-
-                // Forward the message to Unity's logging system based on the log level
-                switch (logLevel)
-                {
-                    case LogLevel.Error:
-                        Debug.LogError($"[MSDKPlugin]{message}");
-                        break;
-                    case LogLevel.Warn:
-                        Debug.LogWarning($"[MSDKPlugin]{message}");
-                        break;
-                    case LogLevel.Info:
-                    case LogLevel.Debug:
-                    default:
-                        Debug.Log($"[MSDKPlugin]{message}");
-                        break;
-                }
-            };
+            _logCallback ??= HandleLogCallback;
 
             using (new ProfilerScope(nameof(InitializeLogging)))
             {
@@ -2169,7 +2223,11 @@ namespace Meta.XR.Movement
                 }
             }
 
-            return success == Result.Success;
+            bool wasSuccesful = success == Result.Success;
+            const string CREATE_OR_UPDATE_UTIL_ERROR_MESSAGE = "Failed to create or update utility config.";
+            TelemetryManager.SendConfigEvent(TelemetryManager._CREATE_OR_UPDATE_UTILITY_CONFIG_EVENT_NAME,
+                wasSuccesful ? null : CREATE_OR_UPDATE_UTIL_ERROR_MESSAGE);
+            return wasSuccesful;
         }
 
         /// <summary>
@@ -2188,8 +2246,11 @@ namespace Meta.XR.Movement
             {
                 success = Api.metaMovementSDK_createOrUpdateHandle(config, out handle);
             }
-
-            return success == Result.Success;
+            bool wasSuccesful = success == Result.Success;
+            const string CREATE_OR_UPDATE_HANDLE_ERROR_MESSAGE = "Failed to create or update handle.";
+            TelemetryManager.SendConfigEvent(TelemetryManager._CREATE_OR_UPDATE_HANDLE_EVENT_NAME,
+                wasSuccesful ? null : CREATE_OR_UPDATE_HANDLE_ERROR_MESSAGE);
+            return wasSuccesful;
         }
 
         /// <summary>
@@ -2283,6 +2344,26 @@ namespace Meta.XR.Movement
                 unsafe
                 {
                     success = Api.metaMovementSDK_getVersion(handle, out version);
+                }
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Gets the version of serialized data.
+        /// Version numbers help ensure that the bytes deserialized are compatible with the current SDK.
+        /// </summary>
+        /// <param name="version">Output parameter that receives the serialization version number.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool GetSerializationVersion(out double version)
+        {
+            Result success;
+            using (new ProfilerScope(nameof(GetConfigName)))
+            {
+                unsafe
+                {
+                    success = Api.metaMovementSDK_getSerializationVersion(out version);
                 }
             }
 
@@ -2417,6 +2498,79 @@ namespace Meta.XR.Movement
                             {
                                 ConvertByteBufferToStringArray(bytes, bufferSize, nameCount, out jointNames);
                             }
+                        }
+                    }
+                }
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Get the names of all joints that are excluded from automatic mapping for a skeleton type.
+        /// These joints will be ignored during the automapping process to prevent unwanted mappings.
+        /// This is useful for identifying which joints should be manually mapped or left unmapped.
+        /// </summary>
+        /// <param name="handle">The handle to get the excluded joints from.</param>
+        /// <param name="skeletonType">The type of skeleton to get the excluded joint names from.</param>
+        /// <param name="excludedJointNames">Output array that receives the excluded joint names.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool GetAutoMappingExcludedJoints(ulong handle, SkeletonType skeletonType, out string[] excludedJointNames)
+        {
+            Result success;
+            excludedJointNames = Array.Empty<string>();
+            using (new ProfilerScope(nameof(GetAutoMappingExcludedJoints)))
+            {
+                unsafe
+                {
+                    success = Api.metaMovementSDK_getAutoMappingExcludedJoints(handle, skeletonType, null, out var bufferSize, null,
+                        out var nameCount);
+                    if (success == Result.Success)
+                    {
+                        var buffer = new byte[bufferSize];
+                        Span<byte> nameBuffer = buffer;
+                        fixed (byte* bytes = &nameBuffer.GetPinnableReference())
+                        {
+                            success = Api.metaMovementSDK_getAutoMappingExcludedJoints(handle, skeletonType, bytes, out bufferSize,
+                                null, out nameCount);
+                            if (success == Result.Success)
+                            {
+                                ConvertByteBufferToStringArray(bytes, bufferSize, nameCount, out excludedJointNames);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Get the twist joints for a specific skeleton type.
+        /// This method retrieves a list of all identified twist joints including both child aligned twist
+        /// and detected twist joints for the skeleton.
+        /// </summary>
+        /// <param name="handle">The handle to get the twist joints from.</param>
+        /// <param name="skeletonType">The type of skeleton to get the twist joints from.</param>
+        /// <param name="twistJoints">Output array that receives the twist joint definitions.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool GetTwistJoints(ulong handle, SkeletonType skeletonType, out TwistJointDefinition[] twistJoints)
+        {
+            Result success;
+            twistJoints = Array.Empty<TwistJointDefinition>();
+            using (new ProfilerScope(nameof(GetTwistJoints)))
+            {
+                unsafe
+                {
+                    // First, get the count of twist joints
+                    success = Api.metaMovementSDK_getTwistJoints(handle, skeletonType, null, out var twistJointCount);
+                    if (success == Result.Success && twistJointCount > 0)
+                    {
+                        // Allocate array and get the twist joint definitions
+                        twistJoints = new TwistJointDefinition[twistJointCount];
+                        fixed (TwistJointDefinition* twistJointPtr = twistJoints)
+                        {
+                            success = Api.metaMovementSDK_getTwistJoints(handle, skeletonType, twistJointPtr, out twistJointCount);
                         }
                     }
                 }
@@ -3110,8 +3264,7 @@ namespace Meta.XR.Movement
         }
 
         /// <summary>
-        /// Scales a pose to a specific height.
-        /// This is useful for adapting a pose to match a target character's height.
+        /// Aligns the target skeleton to the source skeleton
         /// </summary>
         /// <param name="configName">The name of the new config to be created</param>
         /// <param name="alignmentBehavior">Flags used to instruct operations to process.</param>
@@ -3131,11 +3284,48 @@ namespace Meta.XR.Movement
             Result success;
             using (new ProfilerScope(nameof(AlignTargetToSource)))
             {
+                success = Api.metaMovementSDK_alignTargetToSource(
+                    configName,
+                    alignmentBehavior,
+                    sourceConfigHandle,
+                    sourceSkeletonType,
+                    targetConfigHandle,
+                    out handle);
+            }
+
+            return success == Result.Success;
+        }
+
+        /// <summary>
+        /// Aligns the input skeleton to a source skeleton
+        /// </summary>
+        /// <param name="configName">The name of the new config to be created</param>
+        /// <param name="alignmentBehavior">Flags used to instruct operations to process.</param>
+        /// <param name="inputSkeleton">The input skeleton to align to the source skeleton</param>
+        /// <param name="sourceConfigHandle">The config handle with the source skeleton definition</param>
+        /// <param name="sourceSkeletonType">Skeleton Type to pull the source skeleton from in the sourceConfigHandle data</param>
+        /// <param name="targetConfigHandle">The config handle with the source skeleton definition (Assumed to be the Target skeleton)</param>
+        /// <param name="handle">The out parameter used to communicate the new handle with the source skeleton aligned to the target skeleton.</param>
+        /// <returns>True if the function was successfully executed.</returns>
+        public static bool AlignInputToSource(
+            string configName,
+            AlignmentFlags alignmentBehavior,
+            NativeArray<NativeTransform> inputSkeleton,
+            ulong sourceConfigHandle,
+            SkeletonType sourceSkeletonType,
+            ulong targetConfigHandle,
+            out ulong handle)
+        {
+            Result success;
+            using (new ProfilerScope(nameof(AlignTargetToSource)))
+            {
                 unsafe
                 {
-                    success = Api.metaMovementSDK_alignTargetToSource(
+                    success = Api.metaMovementSDK_alignInputToSource(
                         configName,
                         alignmentBehavior,
+                        inputSkeleton.GetPtr(),
+                        inputSkeleton.Length,
                         sourceConfigHandle,
                         sourceSkeletonType,
                         targetConfigHandle,
@@ -3143,7 +3333,11 @@ namespace Meta.XR.Movement
                 }
             }
 
-            return success == Result.Success;
+            bool wasSuccesful = success == Result.Success;
+            const string ALIGN_ERROR_MESSAGE = "Failed to align input to source skeleton.";
+            TelemetryManager.SendConfigEvent(TelemetryManager._ALIGN_TARGET_TO_SOURCE_EVENT_NAME,
+                wasSuccesful ? null : ALIGN_ERROR_MESSAGE);
+            return wasSuccesful;
         }
 
         /// <summary>
@@ -3151,10 +3345,12 @@ namespace Meta.XR.Movement
         /// </summary>
         /// <param name="handle">A valid handle of a config containing a Target skeleton aligned to a source skeleton.</param>
         /// <param name="autoMappingBehavior">Flags used to the automapper how to process the request.</param>
+        /// <param name="twistBlocklistJointIndexes">Optional list of joint indexes that are not allowed to have twist behavior. If null or empty, all joints get the behavior by default.</param>
         /// <returns>True if the function was successfully executed.</returns>
         public static bool GenerateMappings(
             ulong handle,
-            AutoMappingFlags autoMappingBehavior)
+            AutoMappingFlags autoMappingBehavior,
+            int[] twistBlocklistJointIndexes = null)
         {
             Result success;
             using (new ProfilerScope(nameof(GenerateMappings)))
@@ -3163,7 +3359,9 @@ namespace Meta.XR.Movement
                 {
                     success = Api.metaMovementSDK_generateMappings(
                         handle,
-                        autoMappingBehavior);
+                        autoMappingBehavior,
+                        twistBlocklistJointIndexes,
+                        twistBlocklistJointIndexes?.Length ?? 0);
                 }
             }
 
@@ -3456,9 +3654,10 @@ namespace Meta.XR.Movement
                 unsafe
                 {
                     var frameData = new FrameData();
+                    int numBind = 0;
                     success = Api.metaMovementSDK_deserializeSnapshot(handle, data.GetPtr(),
                         out timestamp, out compressionType, out ack, outputBodyPose.GetPtr(),
-                        outputFacePose.GetPtr(), null, ref frameData);
+                        outputFacePose.GetPtr(), null, ref frameData, null, out numBind);
                 }
             }
 
@@ -3478,6 +3677,8 @@ namespace Meta.XR.Movement
         /// <param name="outputFacePose">Reference to an array that will be filled with the deserialized face pose blendshape weights.</param>
         /// <param name="outputBodyTrackingPose">Reference to an array that will be filled with the deserialized body tracking pose transforms.</param>
         /// <param name="frameData">Reference to a FrameData structure that will be filled with metadata about the frame.</param>
+        /// <param name="outBindPose">Output bind pose.</param>
+        /// <param name="outBindPoseCount">Output bind pose count.</param>
         /// <returns>True if deserialization was successful.</returns>
         public static bool DeserializeSkeletonAndFace(
             ulong handle,
@@ -3488,7 +3689,9 @@ namespace Meta.XR.Movement
             ref NativeArray<NativeTransform> outputBodyPose,
             ref NativeArray<float> outputFacePose,
             ref NativeArray<NativeTransform> outputBodyTrackingPose,
-            ref FrameData frameData)
+            ref FrameData frameData,
+            ref NativeArray<NativeTransform> outBindPose,
+            out int outBindPoseCount)
         {
             Result success;
             using (new ProfilerScope(nameof(DeserializeSkeletonAndFace)))
@@ -3498,7 +3701,7 @@ namespace Meta.XR.Movement
                     success = Api.metaMovementSDK_deserializeSnapshot(handle, data.GetPtr(),
                         out timestamp, out compressionType, out ack, outputBodyPose.GetPtr(),
                         outputFacePose.GetPtr(), outputBodyTrackingPose.GetPtr(),
-                        ref frameData);
+                        ref frameData, outBindPose.GetPtr(), out outBindPoseCount);
                 }
             }
 
@@ -3636,23 +3839,27 @@ namespace Meta.XR.Movement
         public static bool WriteConfigDataToJson(ulong handle, out string jsonConfigData)
         {
             Result success;
-            // Empty String
             jsonConfigData = "";
             using (new ProfilerScope(nameof(WriteConfigDataToJson)))
             {
                 unsafe
                 {
-                    // NOTE: Second Parameter is an optional coordinate space.
-                    // null is passed so that the JSON config will be written in Unity
-                    // Coordinate Space (Z Forward, Y Up, LH)
+                    // First call to get required buffer size
                     success = Api.metaMovementSDK_writeConfigDataToJSON(handle, null, null, out int bufferSize);
                     if (success == Result.Success && bufferSize > 0)
                     {
-                        var jsonBuffer = stackalloc byte[bufferSize];
-                        success = Api.metaMovementSDK_writeConfigDataToJSON(handle, null, jsonBuffer, out bufferSize);
-                        if (success == Result.Success)
+                        // Use heap allocation to handle large buffers
+                        byte[] jsonBuffer = new byte[bufferSize];
+                        fixed (byte* jsonBufferPtr = jsonBuffer)
                         {
-                            jsonConfigData = Marshal.PtrToStringAnsi((IntPtr)jsonBuffer, bufferSize).TrimEnd('\0');
+                            success = Api.metaMovementSDK_writeConfigDataToJSON(handle, null, jsonBufferPtr,
+                                out bufferSize);
+                            if (success == Result.Success)
+                            {
+                                // Convert to string, trimming any null terminators
+                                jsonConfigData = System.Text.Encoding.ASCII.GetString(jsonBuffer, 0, bufferSize)
+                                    .TrimEnd('\0');
+                            }
                         }
                     }
                 }
@@ -4004,7 +4211,8 @@ namespace Meta.XR.Movement
                     if (stringLength > 0)
                     {
                         stringArray[stringsFound] =
-                            Marshal.PtrToStringAnsi((IntPtr)(stringBuffer + currentNameStartIndex), stringLength).TrimEnd('\0');
+                            Marshal.PtrToStringAnsi((IntPtr)(stringBuffer + currentNameStartIndex), stringLength)
+                                .TrimEnd('\0');
                     }
                     else
                     {

@@ -665,6 +665,14 @@ PrefabInstance:
       value: 0.000001
       objectReference: {fileID: 0}
     - target: {fileID: 8156316538343237965, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._ccdData.Array.data[0].TargetType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8156316538343237965, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._ccdData.Array.data[0].TargetType
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8156316538343237965, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._twistProcessor._targetData.Array.data[0].Index
       value: 36
       objectReference: {fileID: 0}
@@ -991,42 +999,5 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1019368882090018644, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8832036326866209653}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
---- !u!1 &4320566067332766601 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1019368882090018644, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
-  m_PrefabInstance: {fileID: 3877666807190510813}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &8832036326866209653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4320566067332766601}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3106aa1cda43ddc42b520d48b37532db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _retargeter: {fileID: 4963305197896889744}
-  _processorAnchors:
-  - TargetProcessorIndex: 1
-    Anchor: {fileID: 0}
-  - TargetProcessorIndex: 2
-    Anchor: {fileID: 0}
---- !u!114 &4963305197896889744 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8156316538343237965, guid: 0e5c330c8ce917042b667b967e11994f, type: 3}
-  m_PrefabInstance: {fileID: 3877666807190510813}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4320566067332766601}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f33d97102f288541ac193243cdafeec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

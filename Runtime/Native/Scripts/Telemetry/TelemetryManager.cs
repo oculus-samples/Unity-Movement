@@ -9,12 +9,23 @@ namespace Meta.XR.Movement.Editor
     {
         public static string _PRODUCT_TYPE = "movement_sdk";
         public static string _ALIGN_TARGET_TO_SOURCE_EVENT_NAME = "align_target_to_source";
-        public static string _HANDLE_EVENT_NAME = "create_or_update_handle";
-        public static string _CONFIG_EVENT_NAME = "new_or_updated_config";
+        public static string _CREATE_OR_UPDATE_HANDLE_EVENT_NAME = "create_or_update_handle";
+        public static string _CREATE_OR_UPDATE_UTILITY_CONFIG_EVENT_NAME = "create_or_update_utility_config";
 
         private static bool _loggedOVRBody = false;
         private static bool _loggedOVRFace = false;
         private static bool _loggedOVREye = false;
+
+        /// <summary>
+        /// Send a config event.
+        /// </summary>
+        /// <param name="eventName">Event name.</param>
+        /// <param name="errorMessage">Error message. None means no error was encountered.</param>
+        public static void SendConfigEvent(string eventName, string errorMessage = null)
+        {
+            SendEvent(isEssentialEvent: errorMessage != null ? true : false, eventNameToLog: eventName,
+                errorMessage: errorMessage);
+        }
 
         /// <summary>
         /// Use this to log error messages.

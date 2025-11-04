@@ -25,11 +25,10 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public static VisualElement CreateRetargetingSetupSection(MSDKUtilityEditorWindow window)
         {
-            if (window.Previewer == null)
+            if (window == null)
             {
                 return null;
             }
-
             var serializedPreviewerObject = new SerializedObject(window.Previewer);
             var root = CreateStandardContainer();
 
@@ -186,12 +185,18 @@ namespace Meta.XR.Movement.Editor
 
             root.Add(previewContainer);
 
-            // Add playback UI if needed
-            if (window.FileReader is { HasOpenedFileForPlayback: true })
+            // Add playback UI if needed (either currently playing or scheduled to restart)
+            if (window.FileReader is { HasOpenedFileForPlayback: true } || window.ShouldRestartPlayback)
             {
                 var playbackUI = new MSDKUtilityEditorPlaybackUI(window);
                 playbackUI.Init();
-                playbackUI.StartPlayback();
+
+                // Only start playback if file is actually open
+                if (window.FileReader.HasOpenedFileForPlayback)
+                {
+                    playbackUI.StartPlayback();
+                }
+
                 root.Add(playbackUI);
 
                 // Store reference in the window for updates
@@ -256,13 +261,13 @@ namespace Meta.XR.Movement.Editor
                     minWidth = MinSliderWidth,
                     maxWidth = Length.Percent(MaxSliderWidthPercent)
                 },
-                value = window.UtilityConfig.ScaleSize
+                value = window.Config.ScaleSize
             };
 
             // Value field
             var scaleValue = new IntegerField
             {
-                value = Mathf.RoundToInt(window.UtilityConfig.ScaleSize),
+                value = Mathf.RoundToInt(window.Config.ScaleSize),
                 style =
                 {
                     width = ScaleFieldWidth,
@@ -277,7 +282,7 @@ namespace Meta.XR.Movement.Editor
             // Connect slider and field
             scaleSlider.RegisterValueChangedCallback(e =>
             {
-                window.UtilityConfig.ScaleSize = e.newValue;
+                window.Config.ScaleSize = e.newValue;
                 scaleValue.value = Mathf.RoundToInt(e.newValue);
             });
 
@@ -477,7 +482,7 @@ namespace Meta.XR.Movement.Editor
         private static VisualElement CreateConfigurationStep(MSDKUtilityEditorWindow window)
         {
             var root = CreateStandardContainer();
-            var serializedTargetObject = new SerializedObject(window.TargetInfo);
+            var serializedTargetObject = new SerializedObject(window.Config);
 
             // Create bone transforms foldout
             root.Add(CreateBoneTransformsFoldout(window, serializedTargetObject));
@@ -558,7 +563,7 @@ namespace Meta.XR.Movement.Editor
             foldout.RegisterValueChangedCallback(val => window.ConfigBoneTransformsFoldout = val.newValue);
 
             // Add joint entries
-            for (var i = 0; i < window.TargetInfo.SkeletonInfo.JointCount; i++)
+            for (var i = 0; i < window.Config.SkeletonInfo.JointCount; i++)
             {
                 foldout.Add(CreateJointEntry(window, serializedTargetObject, i));
             }
@@ -571,7 +576,7 @@ namespace Meta.XR.Movement.Editor
         {
             var entryContainer = CreateJointEntryContainer();
             var leftSideContainer = CreateLeftJointEntryContainer();
-            var jointName = window.TargetInfo.JointNames[index];
+            var jointName = window.Config.TargetSkeletonData.Joints[index];
 
             GetChildJointIndexes(window.ConfigHandle, SkeletonType.TargetSkeleton, index, out var childJointIndexes);
             var hasChildIndex = childJointIndexes.Length > 0;
@@ -709,7 +714,7 @@ namespace Meta.XR.Movement.Editor
             root.style.flexDirection = FlexDirection.Row;
             root.style.justifyContent = Justify.SpaceBetween;
 
-            if (!window.TargetInfo.IsValid())
+            if (!window.Config.IsValid())
             {
                 root.Add(new HelpBox("Configuration is invalid! Please fix any missing fields! " +
                                      "The configuration can also be refreshed into a valid configuration by " +
@@ -765,7 +770,7 @@ namespace Meta.XR.Movement.Editor
         /// Creates a debug section for development purposes.
         /// </summary>
         public static VisualElement CreateDebugSection(MSDKUtilityEditorWindow window,
-            UnityEditor.Editor sourceEditor, UnityEditor.Editor targetEditor)
+            UnityEditor.Editor editor)
         {
             if (window == null)
             {
@@ -780,17 +785,14 @@ namespace Meta.XR.Movement.Editor
             var foldout = new Foldout { text = "DEBUG", value = false };
 
             // Setup editors for source and target properties
-            var sourceProperty = serializedObject.FindProperty("_source");
-            var targetProperty = serializedObject.FindProperty("_target");
-            UnityEditor.Editor.CreateCachedEditor(sourceProperty.objectReferenceValue, null, ref sourceEditor);
-            UnityEditor.Editor.CreateCachedEditor(targetProperty.objectReferenceValue, null, ref targetEditor);
+            var configProperty = serializedObject.FindProperty("_config");
+            UnityEditor.Editor.CreateCachedEditor(configProperty.objectReferenceValue, null, ref editor);
 
             // Create nested container with source and target foldouts
             var nestedContainer = new VisualElement { style = { marginLeft = 15 } };
 
             // Add config foldouts
-            nestedContainer.Add(CreateConfigFoldout("Source Config Info", sourceEditor, serializedObject));
-            nestedContainer.Add(CreateConfigFoldout("Target Config Info", targetEditor, serializedObject));
+            nestedContainer.Add(CreateConfigFoldout("Config Info", editor, serializedObject));
 
             // Assemble UI hierarchy
             foldout.Add(nestedContainer);

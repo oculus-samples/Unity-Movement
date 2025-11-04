@@ -116,7 +116,7 @@ namespace Meta.XR.Movement.Playback
         public void OpenFileForPlayback(ulong handle, string playbackPath = null)
         {
             double expectedDataVersion;
-            MSDKUtility.GetVersion(handle, out expectedDataVersion);
+            MSDKUtility.GetSerializationVersion(out expectedDataVersion);
             _playbackFile = PlaybackFunctions.OpenFileForPlayback(
                 ref _startHeader,
                 ref _endHeader,

@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+#if FUSION2
 using Fusion;
+#endif
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -8,6 +10,7 @@ using UnityEngine;
 
 namespace Meta.XR.Movement.Networking.Fusion
 {
+#if FUSION2
     /// <summary>
     /// Implementation of <see cref="INetworkCharacterBehaviour"/> using the Photon Fusion 2
     /// networking framework.
@@ -245,4 +248,5 @@ namespace Meta.XR.Movement.Networking.Fusion
             _characterHandler.ReceiveAck(id, ack);
         }
     }
+#endif
 }

@@ -23754,6 +23754,7 @@ MonoBehaviour:
   requestEyeTrackingPermissionOnStartup: 0
   requestScenePermissionOnStartup: 0
   requestRecordAudioPermissionOnStartup: 0
+  requestPassthroughCameraAccessPermissionOnStartup: 0
   _localDimming: 1
   _trackingOriginType: 1
   usePositionTracking: 1
@@ -24755,7 +24756,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3014010137082524213, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 5
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 5558038247458039740, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -24810,8 +24811,16 @@ PrefabInstance:
       value: -12
       objectReference: {fileID: 0}
     - target: {fileID: 7607224134050559574, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99965733
+      objectReference: {fileID: 0}
+    - target: {fileID: 7607224134050559574, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.026176924
+      objectReference: {fileID: 0}
+    - target: {fileID: 7607224134050559574, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 5
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 8290174448249556598, guid: d58e14a8ab54f24428fbc3e051bf50f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -25381,6 +25390,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1863607546}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._cameraRig
+      value: 
+      objectReference: {fileID: 2062269062}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._cameraRig
+      value: 
+      objectReference: {fileID: 2062269062}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _sourceProcessorContainers.Array.data[0]._isdkProcessor._cameraRig
       value: 
       objectReference: {fileID: 2062269062}
@@ -25402,7 +25419,7 @@ PrefabInstance:
       objectReference: {fileID: 2119847543}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._isFoldoutExpanded
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[1]._hipPinningProcessor._targetHips
@@ -25410,7 +25427,7 @@ PrefabInstance:
       objectReference: {fileID: 2119847543}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._isFoldoutExpanded
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[2]._hipPinningProcessor._targetHips
@@ -25474,7 +25491,7 @@ PrefabInstance:
       objectReference: {fileID: 1831169839}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[0]._hipPinningProcessor._isFoldoutExpanded
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[3]._hipPinningProcessor._isFoldoutExpanded
@@ -25601,6 +25618,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1831169838}
     - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._ccdData.Array.data[0].ISDKHand
+      value: 
+      objectReference: {fileID: 1359226820}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._ccdData.Array.data[0].ISDKHand
+      value: 
+      objectReference: {fileID: 180743674}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[1]._ccdProcessor._ccdData.Array.data[0].TargetType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
+      propertyPath: _targetProcessorContainers.Array.data[2]._ccdProcessor._ccdData.Array.data[0].TargetType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4963305197896889744, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
       propertyPath: _targetProcessorContainers.Array.data[3]._ccdProcessor._ccdData.Array.data[0].IKChain.Array.data[0].Index
       value: 35
       objectReference: {fileID: 0}
@@ -25620,7 +25653,8 @@ PrefabInstance:
       propertyPath: _processorAnchors.Array.data[1].Anchor
       value: 
       objectReference: {fileID: 1419136270}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8832036326866209653, guid: f26be2a7dbd67dc42b7191b7a75047a6, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

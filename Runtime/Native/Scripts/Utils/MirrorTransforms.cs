@@ -207,6 +207,7 @@ namespace Meta.XR.Movement.Utils
 
         /// <summary>
         /// Finds matching bone pairs between this hierarchy and the target hierarchy based on name.
+        /// Uses a multi-stage matching approach: exact names first, then normalized names, then contains matching.
         /// </summary>
         private void FindBonePairs()
         {
@@ -218,30 +219,141 @@ namespace Meta.XR.Movement.Utils
             var transforms = GetComponentsInChildren<Transform>();
             var targetTransforms = _target.GetComponentsInChildren<Transform>();
             var bonePairs = new List<JointPair>();
+
+            // Always add root pair
             bonePairs.Add(new JointPair
             {
                 Joint = transform,
                 ParentJoint = _target
             });
-            foreach (var source in transforms)
-            {
-                foreach (var target in targetTransforms)
-                {
-                    if (source.name != target.name)
-                    {
-                        continue;
-                    }
 
-                    bonePairs.Add(new JointPair()
+            var unmatchedSources = new List<Transform>(transforms);
+            var unmatchedTargets = new List<Transform>(targetTransforms);
+
+            // Stage 1: Exact name matching
+            for (int i = unmatchedSources.Count - 1; i >= 0; i--)
+            {
+                var source = unmatchedSources[i];
+                for (int j = unmatchedTargets.Count - 1; j >= 0; j--)
+                {
+                    var target = unmatchedTargets[j];
+                    if (source.name == target.name)
                     {
-                        Joint = source,
-                        ParentJoint = target
-                    });
-                    break;
+                        bonePairs.Add(new JointPair()
+                        {
+                            Joint = source,
+                            ParentJoint = target
+                        });
+                        unmatchedSources.RemoveAt(i);
+                        unmatchedTargets.RemoveAt(j);
+                        break;
+                    }
+                }
+            }
+
+            // Check if we found matches for at least 50% of bones
+            float matchPercentage = (float)bonePairs.Count / transforms.Length;
+            if (matchPercentage < 0.5f && unmatchedSources.Count > 0)
+            {
+                // Stage 2: Normalized name matching (remove prefixes/suffixes and special characters)
+                for (int i = unmatchedSources.Count - 1; i >= 0; i--)
+                {
+                    var source = unmatchedSources[i];
+                    var normalizedSourceName = NormalizeBoneName(source.name);
+
+                    for (int j = unmatchedTargets.Count - 1; j >= 0; j--)
+                    {
+                        var target = unmatchedTargets[j];
+                        var normalizedTargetName = NormalizeBoneName(target.name);
+
+                        if (normalizedSourceName == normalizedTargetName)
+                        {
+                            bonePairs.Add(new JointPair()
+                            {
+                                Joint = source,
+                                ParentJoint = target
+                            });
+                            unmatchedSources.RemoveAt(i);
+                            unmatchedTargets.RemoveAt(j);
+                            break;
+                        }
+                    }
+                }
+
+                // Stage 3: Contains matching for remaining bones
+                for (int i = unmatchedSources.Count - 1; i >= 0; i--)
+                {
+                    var source = unmatchedSources[i];
+                    var normalizedSourceName = NormalizeBoneName(source.name);
+
+                    for (int j = unmatchedTargets.Count - 1; j >= 0; j--)
+                    {
+                        var target = unmatchedTargets[j];
+                        var normalizedTargetName = NormalizeBoneName(target.name);
+
+                        if (normalizedTargetName.Contains(normalizedSourceName) || normalizedSourceName.Contains(normalizedTargetName))
+                        {
+                            bonePairs.Add(new JointPair()
+                            {
+                                Joint = source,
+                                ParentJoint = target
+                            });
+                            unmatchedSources.RemoveAt(i);
+                            unmatchedTargets.RemoveAt(j);
+                            break;
+                        }
+                    }
                 }
             }
 
             _bonePairs = bonePairs.ToArray();
+        }
+
+        /// <summary>
+        /// Normalizes bone names by removing common prefixes, suffixes, and special characters.
+        /// </summary>
+        /// <param name="boneName">The original bone name</param>
+        /// <returns>Normalized bone name for matching</returns>
+        private string NormalizeBoneName(string boneName)
+        {
+            if (string.IsNullOrEmpty(boneName))
+                return string.Empty;
+
+            string normalized = boneName.ToLowerInvariant();
+
+            // Remove common prefixes (like character names followed by colon)
+            int colonIndex = normalized.IndexOf(':');
+            if (colonIndex >= 0 && colonIndex < normalized.Length - 1)
+            {
+                normalized = normalized.Substring(colonIndex + 1);
+            }
+
+            // Remove common prefixes
+            string[] commonPrefixes = { "mixamorig:", "chr_", "character_", "rig_", "bone_", "joint_" };
+            foreach (var prefix in commonPrefixes)
+            {
+                if (normalized.StartsWith(prefix))
+                {
+                    normalized = normalized.Substring(prefix.Length);
+                    break;
+                }
+            }
+
+            // Remove common suffixes
+            string[] commonSuffixes = { "_bone", "_joint", "_ctrl", "_control", ".001", ".002", ".003" };
+            foreach (var suffix in commonSuffixes)
+            {
+                if (normalized.EndsWith(suffix))
+                {
+                    normalized = normalized.Substring(0, normalized.Length - suffix.Length);
+                    break;
+                }
+            }
+
+            // Remove or replace special characters
+            normalized = normalized.Replace("_", "").Replace("-", "").Replace(".", "").Replace(" ", "");
+
+            return normalized;
         }
 
         private void UpdateJobs()

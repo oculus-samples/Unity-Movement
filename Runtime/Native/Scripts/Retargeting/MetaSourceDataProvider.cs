@@ -39,6 +39,7 @@ namespace Meta.XR.Movement.Retargeting
             var sourcePose = SkeletonUtilities.GetPosesFromTheTracker(
                 this,
                 Pose.identity,
+                true,
                 out _currentSkeletalChangeCount,
                 out _isValid);
 

@@ -16,23 +16,27 @@ namespace Meta.XR.Movement.Retargeting
             ("_retargetingBehavior", new GUIContent("Retargeting Behavior")),
             ("_hideLowerBodyWhenUpperBodyTracking", new GUIContent("Hide Lower Body when using Upper Body Tracking")),
             ("_hideLegScale", new GUIContent("Leg Scale when using Hide Lower Body")),
-            ("_applyScale", new GUIContent("Apply Scale")),
-            ("_currentScale", new GUIContent("Current Scale")),
+            ("_applyRootScale", new GUIContent("Apply Root Scale")),
+            ("_applyHeadScale", new GUIContent("Apply Head Scale")),
             ("_headScaleFactor", new GUIContent("Head Scale Multiplier")),
             ("_scaleRange", new GUIContent("Scale Range")),
+            ("_currentScale", new GUIContent("Current Scale")),
         };
 
         private const int _hideLowerBodyPropertyIndex = 1;
         private const int _hideLegScalePropertyIndex = 2;
-        private const int _applyScalePropertyIndex = 3;
-        private const int _readOnlyScalePropertyIndex = 4;
+        private const int _applyRootScalePropertyIndex = 3;
+        private const int _applyHeadScalePropertyIndex = 4;
+        private const int _readOnlyScalePropertyIndex = 7;
 
         /// <inheritdoc cref="PropertyDrawer.OnGUI"/>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
-            var applyScale =
-                property.FindPropertyRelative(_properties[_applyScalePropertyIndex].propertyName).boolValue;
+            var applyRootScale =
+                property.FindPropertyRelative(_properties[_applyRootScalePropertyIndex].propertyName).boolValue;
+            var applyHeadScale =
+                property.FindPropertyRelative(_properties[_applyHeadScalePropertyIndex].propertyName).boolValue;
             var hideLowerBody =
                 property.FindPropertyRelative(_properties[_hideLowerBodyPropertyIndex].propertyName).boolValue;
 
@@ -40,7 +44,12 @@ namespace Meta.XR.Movement.Retargeting
             for (var i = 0; i < _properties.Length; i++)
             {
                 // Skip scale-related properties if scale is not applied
-                if (i >= _applyScalePropertyIndex + 1 && !applyScale)
+                if (i >= _applyRootScalePropertyIndex + 1 && !applyRootScale)
+                {
+                    continue;
+                }
+
+                if (i is >= _applyHeadScalePropertyIndex + 1 and <= _applyHeadScalePropertyIndex + 1 && !applyHeadScale)
                 {
                     continue;
                 }
@@ -70,8 +79,10 @@ namespace Meta.XR.Movement.Retargeting
         /// <inheritdoc cref="PropertyDrawer.GetPropertyHeight(SerializedProperty, GUIContent)"/>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            var applyScale =
-                property.FindPropertyRelative(_properties[_applyScalePropertyIndex].propertyName).boolValue;
+            var applyRootScale =
+                property.FindPropertyRelative(_properties[_applyRootScalePropertyIndex].propertyName).boolValue;
+            var applyHeadScale =
+                property.FindPropertyRelative(_properties[_applyHeadScalePropertyIndex].propertyName).boolValue;
             var hideLowerBody =
                 property.FindPropertyRelative(_properties[_hideLowerBodyPropertyIndex].propertyName).boolValue;
 
@@ -79,9 +90,14 @@ namespace Meta.XR.Movement.Retargeting
             int hiddenProperties = 0;
 
             // Hide scale-related properties if scale is not applied
-            if (!applyScale)
+            if (!applyRootScale)
             {
-                hiddenProperties += 3; // _currentScale, _headScaleFactor, _scaleRange
+                hiddenProperties += 2; // _scaleRange, _currentScale
+            }
+
+            if (!applyRootScale || !applyHeadScale)
+            {
+                hiddenProperties += 1; // _headScaleFactor
             }
 
             // Hide leg scale property if hide lower body is not enabled

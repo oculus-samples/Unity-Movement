@@ -77,48 +77,8 @@ namespace Meta.XR.Movement.Retargeting.Editor
 
         private void RunSetup(SerializedProperty property)
         {
-#if ISDK_DEFINED
-            // First search for HandVisual components
-            var handVisuals = Object.FindObjectsByType<HandVisual>(FindObjectsSortMode.None);
-            GameObject leftHand = null;
-            GameObject rightHand = null;
-
-            if (handVisuals is { Length: >= 2 })
-            {
-                // Find left and right hands from HandVisual components
-                foreach (var handVisual in handVisuals)
-                {
-                    if (IsLeftHand(handVisual.gameObject))
-                    {
-                        leftHand = handVisual.gameObject;
-                    }
-                    else if (IsRightHand(handVisual.gameObject))
-                    {
-                        rightHand = handVisual.gameObject;
-                    }
-                }
-            }
-
-            // If we didn't find both hands from HandVisual, search for SyntheticHand
-            if (leftHand == null || rightHand == null)
-            {
-                var synthHands = Object.FindObjectsByType<SyntheticHand>(FindObjectsSortMode.None);
-
-                if (synthHands is { Length: >= 2 })
-                {
-                    foreach (var synthHand in synthHands)
-                    {
-                        if (leftHand == null && IsLeftHand(synthHand.gameObject))
-                        {
-                            leftHand = synthHand.gameObject;
-                        }
-                        else if (rightHand == null && IsRightHand(synthHand.gameObject))
-                        {
-                            rightHand = synthHand.gameObject;
-                        }
-                    }
-                }
-            }
+            var leftHand = MSDKUtilityEditor.FindISDKHand(true);
+            var rightHand = MSDKUtilityEditor.FindISDKHand(false);
 
             if (leftHand != null && rightHand != null &&
                 MSDKUtilityEditor.TryGetProcessorAtPropertyPathIndex<ISDKSkeletalProcessor>(
@@ -135,81 +95,6 @@ namespace Meta.XR.Movement.Retargeting.Editor
             {
                 Debug.LogError($"Error! Could not set up ISDK processor. Could not find both left and right hands.");
             }
-#endif
-        }
-
-        private bool IsLeftHand(GameObject handObject)
-        {
-            return ContainsLeftInHierarchy(handObject);
-        }
-
-        private bool IsRightHand(GameObject handObject)
-        {
-            return ContainsRightInHierarchy(handObject);
-        }
-
-        private bool ContainsLeftInHierarchy(GameObject obj)
-        {
-            // Check the object's name
-            if (obj.name.ToLower().Contains("left"))
-                return true;
-
-            // Check parent names
-            Transform parent = obj.transform.parent;
-            while (parent != null)
-            {
-                if (parent.name.ToLower().Contains("left"))
-                    return true;
-                parent = parent.parent;
-            }
-
-            // Check child names
-            return CheckChildrenForLeft(obj.transform);
-        }
-
-        private bool ContainsRightInHierarchy(GameObject obj)
-        {
-            // Check the object's name
-            if (obj.name.ToLower().Contains("right"))
-                return true;
-
-            // Check parent names
-            Transform parent = obj.transform.parent;
-            while (parent != null)
-            {
-                if (parent.name.ToLower().Contains("right"))
-                    return true;
-                parent = parent.parent;
-            }
-
-            // Check child names
-            return CheckChildrenForRight(obj.transform);
-        }
-
-        private bool CheckChildrenForLeft(Transform parent)
-        {
-            for (int i = 0; i < parent.childCount; i++)
-            {
-                Transform child = parent.GetChild(i);
-                if (child.name.ToLower().Contains("left"))
-                    return true;
-                if (CheckChildrenForLeft(child))
-                    return true;
-            }
-            return false;
-        }
-
-        private bool CheckChildrenForRight(Transform parent)
-        {
-            for (int i = 0; i < parent.childCount; i++)
-            {
-                Transform child = parent.GetChild(i);
-                if (child.name.ToLower().Contains("right"))
-                    return true;
-                if (CheckChildrenForRight(child))
-                    return true;
-            }
-            return false;
         }
 
         /// <inheritdoc cref="PropertyDrawer.GetPropertyHeight"/>
