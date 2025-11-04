@@ -3,15 +3,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Meta.XR.Movement.Recording;
+using Unity.Collections;
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEditor.Overlays;
 using UnityEditor.SceneManagement;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 using static Meta.XR.Movement.Editor.MSDKUtilityEditorConfig;
 using static Meta.XR.Movement.Editor.MSDKUtilityEditorUIConstants;
 using static Meta.XR.Movement.Editor.MSDKUtilityEditorUIFactory;
@@ -31,7 +32,7 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Current editor step.
         /// </summary>
-        public EditorStep Step => _utilityConfig.Step;
+        public EditorStep Step => _config.Step;
 
         /// <summary>
         /// Preview section.
@@ -40,8 +41,8 @@ namespace Meta.XR.Movement.Editor
 
         public MSDKUtilityEditorMetadata EditorMetadataObject
         {
-            get => _utilityConfig?.EditorMetadataObject;
-            set => _utilityConfig.EditorMetadataObject = value;
+            get => _config.EditorMetadataObject;
+            set => _config.EditorMetadataObject = value;
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Config instance.
         /// </summary>
-        public MSDKUtilityEditorConfig UtilityConfig => _utilityConfig;
+        public MSDKUtilityEditorConfig Config => _config;
 
         /// <summary>
         /// Visual overlay.
@@ -65,10 +66,17 @@ namespace Meta.XR.Movement.Editor
         public string CurrentPreviewPose => _currentPreviewPose;
 
         /// <summary>
+        /// Gets whether playback should be restarted (used for UI state management).
+        /// </summary>
+        public bool ShouldRestartPlayback => _shouldRestartPlayback;
+
+        /// <summary>
         /// Returns the selected joint.
         /// </summary>
         public string SelectedJointName =>
-            _target.JointNames != null ? _target.JointNames[SelectedIndex] : string.Empty;
+            _config.TargetSkeletonData?.Joints != null
+                ? _config.TargetSkeletonData.Joints[SelectedIndex]
+                : string.Empty;
 
         /// <summary>
         /// Returns the preview stage.
@@ -80,38 +88,20 @@ namespace Meta.XR.Movement.Editor
         }
 
         /// <summary>
-        /// Returns the target editor config.
-        /// </summary>
-        public MSDKUtilityEditorConfig TargetInfo
-        {
-            get => _target;
-            set => _target = value;
-        }
-
-        /// <summary>
-        /// Returns the source editor config.
-        /// </summary>
-        public MSDKUtilityEditorConfig SourceInfo
-        {
-            get => _source;
-            set => _source = value;
-        }
-
-        /// <summary>
         /// Selected joint index.
         /// </summary>
         public int SelectedIndex
         {
             get
             {
-                if (_target == null || _target.SkeletonJoints == null || _target.SkeletonJoints.Length == 0)
+                if (_config.SkeletonJoints == null || _config.SkeletonJoints.Length == 0)
                 {
                     return -1;
                 }
 
-                for (var i = 0; i < _target.SkeletonJoints.Length; i++)
+                for (var i = 0; i < _config.SkeletonJoints.Length; i++)
                 {
-                    if (Selection.activeTransform == _target.SkeletonJoints[i])
+                    if (Selection.activeTransform == _config.SkeletonJoints[i])
                     {
                         return i;
                     }
@@ -128,7 +118,7 @@ namespace Meta.XR.Movement.Editor
         {
             get
             {
-                if (_target == null || SelectedIndex == -1 || _target.JointMappings.Length == 0)
+                if (SelectedIndex == -1 || _config.JointMappings.Length == 0)
                 {
                     return null;
                 }
@@ -137,9 +127,9 @@ namespace Meta.XR.Movement.Editor
                 var entryIndex = 0;
                 var currentBehavior = JointMappingBehaviorType.Invalid;
 
-                for (var i = 0; i < _target.JointMappings.Length; i++)
+                for (var i = 0; i < _config.JointMappings.Length; i++)
                 {
-                    var jointMapping = _target.JointMappings[i];
+                    var jointMapping = _config.JointMappings[i];
                     if (jointMapping.JointIndex != SelectedIndex)
                     {
                         continue;
@@ -162,17 +152,17 @@ namespace Meta.XR.Movement.Editor
                     var startIndex = 0;
                     for (var j = 0; j < i; j++)
                     {
-                        startIndex += _target.JointMappings[j].EntriesCount;
+                        startIndex += _config.JointMappings[j].EntriesCount;
                     }
 
                     // Collect all entries for this mapping
                     var entries = new List<(JointMappingEntry entry, string jointName, int originalIndex)>();
-                    for (var k = 0; k < _target.JointMappings[i].EntriesCount; k++)
+                    for (var k = 0; k < _config.JointMappings[i].EntriesCount; k++)
                     {
-                        var entry = _target.JointMappingEntries[startIndex + k];
-                        var jointName = _target.JointMappings[i].Type == SkeletonType.SourceSkeleton
-                            ? _source.JointNames[entry.JointIndex]
-                            : _target.JointNames[entry.JointIndex];
+                        var entry = _config.JointMappingEntries[startIndex + k];
+                        var jointName = _config.JointMappings[i].Type == SkeletonType.SourceSkeleton
+                            ? _config.SourceSkeletonData?.Joints[entry.JointIndex]
+                            : _config.TargetSkeletonData?.Joints[entry.JointIndex];
 
                         entries.Add((entry, jointName, k));
                     }
@@ -202,52 +192,6 @@ namespace Meta.XR.Movement.Editor
             }
         }
 
-        // Serialized fields.
-        [SerializeField]
-        private UnityEditor.Editor _sourceEditor;
-
-        [SerializeField]
-        private UnityEditor.Editor _targetEditor;
-
-        [SerializeField]
-        private UnityEditor.Editor _currentTransformEditor;
-
-        [SerializeField]
-        private MSDKUtilityEditorPreviewer _previewer;
-
-        [SerializeField]
-        private MSDKUtilityEditorConfig _source;
-
-        [SerializeField]
-        private MSDKUtilityEditorConfig _target;
-
-        [SerializeField]
-        private MSDKUtilityEditorConfig _utilityConfig;
-
-        [SerializeField]
-        private MSDKUtilityEditorStage _previewStage;
-
-        // Private fields.
-        private GameObject _sceneViewCharacter
-        {
-            get => _previewer?.SceneViewCharacter;
-            set => _previewer.SceneViewCharacter = value;
-        }
-
-        // Editor components.
-        private MSDKUtilityEditorOverlay _overlay;
-        private MSDKUtilityEditorPlaybackUI _playbackUI;
-        private SequenceFileReader _fileReader;
-        private string _currentPreviewPose;
-
-        // Editor settings.
-        private bool _debugging;
-        private bool _currentTransformEditorFoldout = true;
-        private bool _validatedConfigFinish;
-        private bool _displayedConfig;
-        private bool _initialized;
-        private Vector2 _scrollPosition;
-
         /// <summary>
         /// Gets or sets the config bone transforms foldout state.
         /// </summary>
@@ -256,7 +200,6 @@ namespace Meta.XR.Movement.Editor
             get => _configBoneTransformsFoldout;
             set => _configBoneTransformsFoldout = value;
         }
-        private bool _configBoneTransformsFoldout;
 
         /// <summary>
         /// Gets the current progress text for the header.
@@ -289,50 +232,95 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Gets the config handle for internal operations.
         /// </summary>
-        public ulong ConfigHandle => _target?.ConfigHandle ?? INVALID_HANDLE;
+        public ulong ConfigHandle => _config?.ConfigHandle ?? INVALID_HANDLE;
 
+        /// <summary>
+        /// Gets or sets the custom data source path.
+        /// </summary>
+        public string CustomDataSourcePath { get; set; }
 
-        private readonly FullBodyTrackingBoneId[] _leftStartBoneIds =
+        // Serialized fields.
+        [SerializeField]
+        private UnityEditor.Editor _configEditor;
+
+        [SerializeField]
+        private UnityEditor.Editor _currentTransformEditor;
+
+        [SerializeField]
+        private MSDKUtilityEditorPreviewer _previewer;
+
+        [SerializeField]
+        private MSDKUtilityEditorConfig _config;
+
+        [SerializeField]
+        private MSDKUtilityEditorStage _previewStage;
+
+        // Private fields.
+        private GameObject _sceneViewCharacter
         {
-            FullBodyTrackingBoneId.LeftHandThumbMetacarpal,
-            FullBodyTrackingBoneId.LeftHandIndexProximal,
-            FullBodyTrackingBoneId.LeftHandMiddleProximal,
-            FullBodyTrackingBoneId.LeftHandRingProximal,
-            FullBodyTrackingBoneId.LeftHandLittleProximal,
-        };
+            get => _previewer.SceneViewCharacter;
+            set => _previewer.SceneViewCharacter = value;
+        }
 
-        private readonly FullBodyTrackingBoneId[] _leftEndBoneIds =
-        {
-            FullBodyTrackingBoneId.LeftHandThumbDistal,
-            FullBodyTrackingBoneId.LeftHandIndexDistal,
-            FullBodyTrackingBoneId.LeftHandMiddleDistal,
-            FullBodyTrackingBoneId.LeftHandRingDistal,
-            FullBodyTrackingBoneId.LeftHandLittleDistal,
-        };
+        // Editor components.
+        private MSDKUtilityEditorOverlay _overlay;
+        private MSDKUtilityEditorPlaybackUI _playbackUI;
+        private SequenceFileReader _fileReader;
+        private string _currentPreviewPose;
 
-        private readonly FullBodyTrackingBoneId[] _rightStartBoneIds =
-        {
-            FullBodyTrackingBoneId.RightHandThumbMetacarpal,
-            FullBodyTrackingBoneId.RightHandIndexProximal,
-            FullBodyTrackingBoneId.RightHandMiddleProximal,
-            FullBodyTrackingBoneId.RightHandRingProximal,
-            FullBodyTrackingBoneId.RightHandLittleProximal,
-        };
+        // Playback restart functionality
+        private bool _shouldRestartPlayback;
+        private string _restartPlaybackPose;
+        private int _restartPlaybackSnapshotIndex;
 
-        private readonly FullBodyTrackingBoneId[] _rightEndBoneIds =
-        {
-            FullBodyTrackingBoneId.RightHandThumbDistal,
-            FullBodyTrackingBoneId.RightHandIndexDistal,
-            FullBodyTrackingBoneId.RightHandMiddleDistal,
-            FullBodyTrackingBoneId.RightHandRingDistal,
-            FullBodyTrackingBoneId.RightHandLittleDistal,
-        };
+        // Editor settings.
+        private bool _debugging;
+        private bool _currentTransformEditorFoldout = true;
+        private bool _configBoneTransformsFoldout;
+        private bool _validatedConfigFinish;
+        private bool _initialized;
+        private Vector2 _scrollPosition;
+
 
         /**********************************************************
          *
          *               Unity Functions
          *
          **********************************************************/
+
+        /// <summary>
+        /// Handles script reloading by reinitializing the entire window using the config scriptable object.
+        /// </summary>
+        [DidReloadScripts]
+        private static void OnScriptsReloaded()
+        {
+            var existingWindows = Resources.FindObjectsOfTypeAll<MSDKUtilityEditorWindow>();
+
+            foreach (var window in existingWindows)
+            {
+                if (window != null)
+                {
+                    try
+                    {
+                        // Reinitialize the entire window using the config scriptable object
+                        window.EnsureBasicObjectsInitialized();
+
+                        if (window.EnsureMetadataLoaded())
+                        {
+                            LoadConfig(window);
+                            window.Init();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning(
+                            $"Failed to reinitialize MSDKUtilityEditorWindow after script reload: {e.Message}");
+                        // If reinitalization fails, close the window to prevent broken UI state
+                        window.Close();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Creates a docked inspector for the retargeting editor.
@@ -353,58 +341,55 @@ namespace Meta.XR.Movement.Editor
         public void Init()
         {
             RemoveExistingOverlays();
-            _overlay = new MSDKUtilityEditorOverlay(this);
-            SceneView.AddOverlayToActiveView(_overlay);
-            _source = CreateInstance<MSDKUtilityEditorConfig>();
-            _target = CreateInstance<MSDKUtilityEditorConfig>();
+            EnsureOverlayInitialized();
             _previewer.InitializeSkeletonDraws();
             _initialized = true;
-            CreateGUI();
+            OnUndoRedoPerformed();
         }
 
         /// <summary>
-        /// Opens file for playback.
+        /// Ensures the overlay is properly initialized and added to the scene view.
+        /// If the overlay is null, it will be created. This method avoids unnecessary recreation
+        /// to preserve UI state and settings.
         /// </summary>
-        /// <param name="poseName">Playback file name.</param>
-        public void OpenPlaybackFile(string poseName)
+        private void EnsureOverlayInitialized()
         {
-            _fileReader.Init(_source.ConfigHandle);
-            if (_fileReader.IsPlaying)
+            try
             {
-                _fileReader.ClosePlaybackFile();
+                // Only create overlay if it doesn't exist
+                if (_overlay == null)
+                {
+                    _overlay = new MSDKUtilityEditorOverlay(this)
+                    {
+                        displayed = true,
+                        collapsed = false
+                    };
+                    SceneView.AddOverlayToActiveView(_overlay);
+                }
+                // If overlay exists but is not displayed, just show it without recreating
+                else if (!_overlay.displayed)
+                {
+                    _overlay.displayed = true;
+                    _overlay.collapsed = false;
+                }
             }
-
-            _currentPreviewPose = poseName;
-            // Obtain the path to the pose file. It lives in the package folder,
-            // and that folder might live outside of the project.
-            var fullPath = Path.GetFullPath(
-                Path.Combine("Packages/com.meta.xr.sdk.movement/Editor/Native/Poses/Sequences", poseName)
-            );
-            fullPath = Path.ChangeExtension(fullPath, ".sbn");
-            _fileReader.PlayBackRecording(fullPath);
-
-            // If there is no previewCharacter, we need to create one.
-            if (_previewer.Retargeter == null)
+            catch (Exception e)
             {
-                _fileReader.PlayNextFrame();
-                _previewer.InstantiatePreviewCharacterRetargeter();
+                Debug.LogWarning($"Failed to initialize overlay: {e.Message}. Proceeding with default settings.");
+                // Set overlay to null so that UpdateSkeletonDraws will use default settings
+                _overlay = null;
             }
-        }
-
-        private void CreateGUI()
-        {
-            if (!_initialized || !EnsureMetadataLoaded())
-            {
-                return;
-            }
-
-            ValidateConfiguration();
-            _previewer.AssociateSceneCharacter(_target);
-            CreateRootGUI();
         }
 
         private void Update()
         {
+            // Handle playback restart if needed
+            if (_shouldRestartPlayback && !string.IsNullOrEmpty(_restartPlaybackPose))
+            {
+                RestartPlaybackFromStoredState();
+            }
+
+            // Handle sequence playback with improved timing
             if (_fileReader is { IsPlaying: true })
             {
                 _fileReader.PlayNextFrame();
@@ -413,26 +398,9 @@ namespace Meta.XR.Movement.Editor
             _playbackUI?.Update();
         }
 
-        /// <summary>
-        /// Sets the playback UI reference for updates.
-        /// </summary>
-        /// <param name="playbackUI">The playback UI instance.</param>
-        public void SetPlaybackUI(MSDKUtilityEditorPlaybackUI playbackUI)
-        {
-            _playbackUI = playbackUI;
-        }
-
-        /// <summary>
-        /// Clears the playback UI reference.
-        /// </summary>
-        public void ClearPlaybackUI()
-        {
-            _playbackUI = null;
-        }
-
         private void OnDestroy()
         {
-            foreach (var handle in _utilityConfig.Handles)
+            foreach (var handle in _config.Handles)
             {
                 DestroyHandle(handle);
             }
@@ -442,43 +410,21 @@ namespace Meta.XR.Movement.Editor
                 DestroyImmediate(_currentTransformEditor);
             }
 
-            SceneView.RemoveOverlayFromActiveView(_overlay);
-            DestroyImmediate(_utilityConfig);
+            if (_overlay != null)
+            {
+                SceneView.RemoveOverlayFromActiveView(_overlay);
+            }
+
+            DestroyImmediate(_config);
             DestroyImmediate(_previewer);
-            DestroyImmediate(_source);
-            DestroyImmediate(_target);
         }
 
         private void OnEnable()
         {
-            if (_utilityConfig == null)
-            {
-                _utilityConfig = CreateInstance<MSDKUtilityEditorConfig>();
-            }
-
-            if (_previewer == null)
-            {
-                _previewer = CreateInstance<MSDKUtilityEditorPreviewer>();
-                _previewer.Window = this;
-            }
-
-            _fileReader ??= new SequenceFileReader();
-
+            EnsureBasicObjectsInitialized();
             SceneView.duringSceneGui += OnSceneGUI;
             Undo.postprocessModifications += OnPostProcessModifications;
             Undo.undoRedoPerformed += OnUndoRedoPerformed;
-
-            // Delay overlay and GUI initialization to avoid Unity's internal initialization issues
-            if (_initialized)
-            {
-                EditorApplication.delayCall += () =>
-                {
-                    if (this != null) // Check if window still exists
-                    {
-                        ReinitializeAfterDomainReload();
-                    }
-                };
-            }
         }
 
         private void OnDisable()
@@ -493,25 +439,30 @@ namespace Meta.XR.Movement.Editor
 
         private void OnSelectionChange()
         {
-            if (EditorMetadataObject == null)
+            if (EditorMetadataObject != null)
             {
-                return;
+                CreateGUI();
             }
-
-            CreateGUI();
         }
 
         private void OnSceneGUI(SceneView sceneView)
         {
-            if (_sceneViewCharacter == null || !_utilityConfig.DrawLines)
+            if (_sceneViewCharacter == null || !_config.DrawLines)
             {
                 return;
             }
 
-            if (_previewer.TargetSkeletonDrawTPose == null || _previewer.SourceSkeletonDrawTPose == null ||
-                _target == null || _source == null)
+            if (_previewer.TargetSkeletonDrawTPose == null ||
+                _previewer.SourceSkeletonDrawTPose == null ||
+                _config == null)
             {
                 return;
+            }
+
+            // Ensure overlay is initialized if it's null
+            if (_initialized && _overlay is not { displayed: true })
+            {
+                EnsureOverlayInitialized();
             }
 
             UpdateSkeletonDraws();
@@ -537,54 +488,87 @@ namespace Meta.XR.Movement.Editor
                 return modifications;
             }
 
-            _previewer.UpdateTargetDraw(this);
-            _utilityConfig.SetTPose = false;
+            _previewer.UpdateTargetDraw(_config);
+            _config.SetTPose = false;
+
             return modifications;
         }
 
         private void OnUndoRedoPerformed()
         {
-            _previewer.UpdateTargetDraw(this);
-        }
+            // Store playback state before stopping to enable restart
+            StorePlaybackStateForRestart();
 
-        private void ReinitializeAfterDomainReload()
-        {
             try
             {
-                // Find existing overlay instead of creating a new one
-                FindAndReinitializeOverlay();
+                // Clear the current playback UI reference to ensure it gets recreated
+                ClearPlaybackUI();
 
-                // Refresh GUI after domain reload
+                // Force a complete reload of the character to prevent AABB errors
+                if (_previewer != null && _config.SkeletonJoints != null)
+                {
+                    _previewer.UpdateTargetDraw(_config);
+
+                    // If we have a valid target config, reload the character completely
+                    if (ConfigHandle != INVALID_HANDLE)
+                    {
+                        _previewer.ReloadCharacter(_config);
+                    }
+
+                    // Ensure skeleton draws are properly initialized after undo
+                    _previewer.EnsureSkeletonDrawsInitialized();
+                }
+
+                // Recreate the GUI to ensure playback UI is properly restored
                 CreateGUI();
+
+                // Force a repaint to update the scene view
+                SceneView.RepaintAll();
+                Repaint();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                Debug.LogWarning($"Failed to reinitialize MSDKUtilityEditorWindow after domain reload: {e.Message}");
+                Debug.LogWarning($"Error handling undo/redo operation: {e.Message}");
+
+                // If there's an error, try to reinitialize the previewer
+                try
+                {
+                    _previewer.DestroyPreviewCharacterRetargeter();
+                    _previewer.InitializeSkeletonDraws();
+
+                    // Reset to T-pose as a fallback to ensure valid state
+                    if (ConfigHandle != INVALID_HANDLE)
+                    {
+                        ResetToTPose();
+                    }
+
+                    // Still try to recreate the GUI even after an error
+                    CreateGUI();
+                }
+                catch (Exception reinitException)
+                {
+                    Debug.LogError($"Failed to reinitialize previewer after undo error: {reinitException.Message}");
+                }
             }
         }
 
-        private void FindAndReinitializeOverlay()
+        /// <summary>
+        /// Ensures that basic objects (_config, _previewer, _fileReader) are properly initialized.
+        /// </summary>
+        private void EnsureBasicObjectsInitialized()
         {
-            // After domain reload, Unity's overlay system may have recreated overlays automatically
-            // We need to find and reconnect to any existing overlay or create a new one
-
-            // First, try to find if there's already an overlay instance that Unity created
-            // We'll use a different approach - check if we can create a new overlay safely
-            try
+            if (_config == null)
             {
-                // Remove any existing overlays first to avoid duplicates
-                RemoveExistingOverlays();
+                _config = CreateInstance<MSDKUtilityEditorConfig>();
+            }
 
-                // Create a new overlay - Unity's overlay system will handle the lifecycle
-                _overlay = new MSDKUtilityEditorOverlay(this);
-                SceneView.AddOverlayToActiveView(_overlay);
-            }
-            catch (System.Exception e)
+            if (_previewer == null)
             {
-                Debug.LogWarning($"Failed to reinitialize overlay: {e.Message}");
-                // Set overlay to null so we don't try to use a broken reference
-                _overlay = null;
+                _previewer = CreateInstance<MSDKUtilityEditorPreviewer>();
+                _previewer.Window = this;
             }
+
+            _fileReader ??= new SequenceFileReader();
         }
 
         /**********************************************************
@@ -592,6 +576,80 @@ namespace Meta.XR.Movement.Editor
          *               UI Element Sections
          *
          **********************************************************/
+
+        private void CreateGUI()
+        {
+            if (!_initialized || !EnsureMetadataLoaded())
+            {
+                return;
+            }
+
+            if (ConfigHandle == INVALID_HANDLE)
+            {
+                LoadConfig(this);
+            }
+
+            _previewer.AssociateSceneCharacter(_config);
+            _previewer.UpdateSourceDraw(_config);
+            CreateRootGUI();
+        }
+
+        /// <summary>
+        /// Opens file for playback.
+        /// </summary>
+        /// <param name="poseName">Playback file name.</param>
+        public void OpenPlaybackFile(string poseName)
+        {
+            _fileReader.Init(ConfigHandle);
+            if (_fileReader.IsPlaying)
+            {
+                _fileReader.ClosePlaybackFile();
+            }
+
+            _currentPreviewPose = poseName;
+            // Obtain the path to the pose file. It lives in the package folder,
+            // and that folder might live outside of the project.
+            var fullPath = Path.GetFullPath(
+                Path.Combine("Packages/com.meta.xr.sdk.movement/Editor/Native/Poses/Sequences", poseName)
+            );
+            fullPath = Path.ChangeExtension(fullPath, ".sbn");
+            _fileReader.PlayBackRecording(fullPath);
+
+            // If there is no previewCharacter, we need to create one.
+            if (_previewer.Retargeter == null)
+            {
+                _fileReader.PlayNextFrame();
+                _previewer.InstantiatePreviewCharacterRetargeter();
+            }
+        }
+
+        /// <summary>
+        /// Sets the playback UI reference for updates.
+        /// </summary>
+        /// <param name="playbackUI">The playback UI instance.</param>
+        public void SetPlaybackUI(MSDKUtilityEditorPlaybackUI playbackUI)
+        {
+            _playbackUI = playbackUI;
+        }
+
+        /// <summary>
+        /// Clears the playback UI reference.
+        /// </summary>
+        public void ClearPlaybackUI()
+        {
+            _playbackUI = null;
+        }
+
+        /// <summary>
+        /// Opens a sequence for playback and refreshes the GUI.
+        /// </summary>
+        /// <param name="sequenceName">Name of the sequence to open.</param>
+        public void OpenSequence(string sequenceName)
+        {
+            CreateGUI();
+            OpenPlaybackFile(sequenceName);
+            CreateGUI();
+        }
 
         private void CreateRootGUI()
         {
@@ -708,8 +766,8 @@ namespace Meta.XR.Movement.Editor
             var allElements = rootVisualElement.Query<VisualElement>().ToList();
             foreach (var element in allElements)
             {
-                element.RegisterCallback<MouseDownEvent>(evt => { _utilityConfig.CurrentlyEditing = true; });
-                element.RegisterCallback<MouseUpEvent>(evt => { _utilityConfig.CurrentlyEditing = false; });
+                element.RegisterCallback<MouseDownEvent>(evt => { _config.CurrentlyEditing = true; });
+                element.RegisterCallback<MouseUpEvent>(evt => { _config.CurrentlyEditing = false; });
             }
 
             // Add hover effects to buttons using the factory method
@@ -717,93 +775,14 @@ namespace Meta.XR.Movement.Editor
             ApplyButtonHoverEffects(allButtons);
         }
 
+        private VisualElement RenderEditorSteps()
+        {
+            return CreateEditorStepSection(this);
+        }
+
         private VisualElement RetargetingSetupSection()
         {
             return CreateRetargetingSetupSection(this);
-        }
-
-        private VisualElement PreviewSection()
-        {
-            return CreatePreviewSection(this);
-        }
-
-        /// <summary>
-        /// Opens a sequence for playback and refreshes the GUI.
-        /// </summary>
-        /// <param name="sequenceName">Name of the sequence to open.</param>
-        public void OpenSequence(string sequenceName)
-        {
-            CreateGUI();
-            OpenPlaybackFile(sequenceName);
-            CreateGUI();
-        }
-
-        private VisualElement AlignmentSection()
-        {
-            return CreateAlignmentSection(this);
-        }
-
-        private Button CreateStyledMappingButton(Action callback, string text, string iconName)
-        {
-            var button = new Button(callback)
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    paddingTop = SmallPadding,
-                    paddingBottom = SmallPadding,
-                    paddingLeft = CardPadding,
-                    paddingRight = CardPadding,
-                    flexShrink = 1
-                }
-            };
-
-            // Create a container for the icon and label to manage layout
-            var contentContainer = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    alignItems = Align.Center,
-                    flexGrow = 1,
-                    flexShrink = 1
-                }
-            };
-
-            // Try to load the icon
-            var icon = EditorGUIUtility.IconContent(iconName).image;
-            if (icon != null)
-            {
-                var iconElement = new Image
-                {
-                    image = icon,
-                    style =
-                    {
-                        width = IconSize,
-                        height = IconSize,
-                        marginRight = SmallPadding,
-                        flexShrink = 0 // Prevent icon from shrinking
-                    }
-                };
-                contentContainer.Add(iconElement);
-            }
-
-            var label = new Label(text)
-            {
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleLeft,
-                    fontSize = SmallFontSize,
-                    flexShrink = 1,
-                    flexWrap = Wrap.Wrap,
-                    whiteSpace = WhiteSpace.Normal
-                }
-            };
-            contentContainer.Add(label);
-            button.Add(contentContainer);
-
-            return button;
         }
 
         /**********************************************************
@@ -811,11 +790,6 @@ namespace Meta.XR.Movement.Editor
          *               Editor Steps
          *
          **********************************************************/
-
-        private VisualElement RenderEditorSteps()
-        {
-            return CreateEditorStepSection(this);
-        }
 
         /// <summary>
         /// Removes a joint from the configuration.
@@ -830,13 +804,22 @@ namespace Meta.XR.Movement.Editor
                 _scrollPosition = scrollView.scrollOffset;
             }
 
-            var knownRoot = _target.KnownSkeletonJoints[(int)KnownJointType.Root];
-            var data = MSDKUtilityEditor.CreateRetargetingData(knownRoot == null
-                    ? _sceneViewCharacter.transform
-                    : knownRoot,
-                _target);
-            data.RemoveJoint(jointName);
-            CreateConfig(this, false, data);
+            var knownRoot = _config.KnownSkeletonJoints[(int)KnownJointType.Root];
+
+            // Always read source information from the config file using the MSDKUtility API
+            // instead of searching through a data path for an asset
+            var sourceData = CreateFromConfig(EditorMetadataObject.ConfigJson.text, SkeletonType.SourceSkeleton);
+
+            if (sourceData == null)
+            {
+                Debug.LogError("Failed to extract source skeleton data from config JSON. Cannot remove joint.");
+                return;
+            }
+
+            var targetData = CreateFromTransform(knownRoot == null ? _sceneViewCharacter.transform : knownRoot);
+            targetData.FilterJoints(_config.TargetSkeletonData.Joints);
+            targetData.RemoveJoint(jointName);
+            CreateConfig(this, false, sourceData, targetData);
             CreateGUI();
         }
 
@@ -880,26 +863,44 @@ namespace Meta.XR.Movement.Editor
                     "Yes", "No", "Cancel");
             }
 
+            // Cancel button pressed - do nothing
+            if (choice == 2)
+            {
+                return;
+            }
+
+            // Proceed with step transition only if Yes or No was selected
             if (choice is 0 or 1)
             {
-                if (next)
-                {
-                    _utilityConfig.Step++;
-                }
-                else
-                {
-                    _utilityConfig.Step--;
-                }
-
                 _validatedConfigFinish = false;
                 _previewer.DestroyPreviewCharacterRetargeter();
+
+                // Only save and update configuration if user pressed "Yes"
                 if (choice == 0)
                 {
                     SaveUpdateConfig(true);
                 }
 
-                ResetConfig(this, false);
+                // Go into the next/previous step
+                if (next)
+                {
+                    _config.Step++;
+                }
+                else
+                {
+                    _config.Step--;
+                }
+
+                // Load config without changes if user pressed "No"
+                ResetConfig(this, false, EditorMetadataObject.ConfigJson.text);
                 LoadConfig(this);
+
+                // Update character from the loaded configuration
+                _previewer.AssociateSceneCharacter(_config);
+                _previewer.UpdateSourceDraw(_config);
+                _previewer.UpdateTargetDraw(_config);
+                _previewer.ReloadCharacter(_config);
+
                 _overlay?.Reload();
             }
 
@@ -968,8 +969,8 @@ namespace Meta.XR.Movement.Editor
             ScalePoseToHeight(ConfigHandle, SkeletonType.TargetSkeleton,
                 JointRelativeSpaceType.RootOriginRelativeSpace,
                 tPoseOption == SkeletonTPoseType.MaxTPose ? minHeight : maxHeight, ref tPose);
-            _target.ReferencePose = tPose.ToArray();
-            _previewer.ReloadCharacter(_target);
+            _config.CurrentPose = tPose.ToArray();
+            _previewer.ReloadCharacter(_config);
             SaveUpdateConfig(false);
         }
 
@@ -980,10 +981,10 @@ namespace Meta.XR.Movement.Editor
         {
             GetSkeletonTPose(ConfigHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.UnscaledTPose,
                 JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
-            _target.ReferencePose = tPose.ToArray();
-            _utilityConfig.SetTPose = true;
-            _utilityConfig.RootScale = Vector3.one;
-            _previewer.ReloadCharacter(_target);
+            _config.CurrentPose = tPose.ToArray();
+            _config.SetTPose = true;
+            _config.RootScale = Vector3.one;
+            _previewer.ReloadCharacter(_config);
         }
 
         /// <summary>
@@ -991,8 +992,27 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void UpdateMapping()
         {
-            SaveUpdateConfig(false);
-            _previewer.ReloadCharacter(_target);
+            bool? twistJointOverride = null;
+
+            // Show prompt for twist joint mapping in min/max t-pose steps
+            if (Step == MSDKUtilityEditorConfig.EditorStep.MinTPose ||
+                Step == MSDKUtilityEditorConfig.EditorStep.MaxTPose)
+            {
+                int choice = EditorUtility.DisplayDialogComplex(
+                    "Update Mapping",
+                    "Do you want to map twist joints?",
+                    "Yes", "No", "Cancel");
+
+                if (choice == 2) // Cancel
+                {
+                    return;
+                }
+
+                twistJointOverride = choice == 0; // Yes = true, No = false
+            }
+
+            SaveUpdateConfig(false, twistJointOverride);
+            _previewer.ReloadCharacter(_config);
         }
 
         /// <summary>
@@ -1022,8 +1042,13 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void PerformAutoAlignment()
         {
-            JointAlignmentUtility.AutoAlignment(this);
-            _previewer.ReloadCharacter(_target);
+            PerformActionWithPlaybackRestart(() =>
+            {
+                JointAlignmentUtility.AutoAlignment(this);
+                // Apply scaling when align skeleton button is pressed
+                JointAlignmentUtility.LoadScale(_config);
+                _previewer.ReloadCharacter(_config);
+            });
         }
 
         /// <summary>
@@ -1031,21 +1056,71 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void PerformMatchWrists()
         {
-            JointAlignmentUtility.PerformWristMatching(_source, _target);
-            JointAlignmentUtility.PerformArmScaling(_source, _target);
-            _previewer.ReloadCharacter(_target);
+            PerformActionWithPlaybackRestart(() =>
+            {
+                JointAlignmentUtility.PerformWristMatching(_config);
+                JointAlignmentUtility.PerformArmScaling(_config);
+                _previewer.ReloadCharacter(_config);
+            });
         }
 
         /// <summary>
-        /// Performs finger matching alignment.
+        /// Performs finger matching alignment using native implementation.
         /// </summary>
         public void PerformMatchFingers()
         {
-            JointAlignmentUtility.PerformFingerMatching(this, _leftStartBoneIds, _leftEndBoneIds,
-                KnownJointType.LeftWrist);
-            JointAlignmentUtility.PerformFingerMatching(this, _rightStartBoneIds, _rightEndBoneIds,
-                KnownJointType.RightWrist);
-            _previewer.ReloadCharacter(_target);
+            PerformActionWithPlaybackRestart(() =>
+            {
+                // Use native finger alignment implementation
+                AlignInputToSource(_config.ConfigName,
+                    AlignmentFlags.HandAndFingerRotations |
+                    AlignmentFlags.MatchHandAndFingerPoseWithDeformation,
+                    new NativeArray<NativeTransform>(_config.CurrentPose, Allocator.Temp),
+                    ConfigHandle,
+                    SkeletonType.SourceSkeleton,
+                    ConfigHandle,
+                    out var newConfigHandle);
+
+                // Update the config with the new handle
+                _config.AddHandle(newConfigHandle);
+
+                // Get the updated pose from the aligned skeleton
+                GetSkeletonTPose(newConfigHandle, SkeletonType.TargetSkeleton, _config.SkeletonTPoseType,
+                    JointRelativeSpaceType.RootOriginRelativeSpace, out var alignedPose);
+
+                // Only update hand + finger joints (descendants of hand transforms) instead of copying entire pose
+                var handTransforms = new HashSet<Transform>
+                {
+                    _config.KnownSkeletonJoints[(int)KnownJointType.LeftWrist],
+                    _config.KnownSkeletonJoints[(int)KnownJointType.RightWrist]
+                };
+
+                // Helper function to check if a transform is a finger (descendant of hand but not the hand itself)
+                bool IsHandJoint(Transform transform)
+                {
+                    var current = transform.parent;
+                    while (current != null)
+                    {
+                        if (handTransforms.Contains(current))
+                        {
+                            return true; // This is a descendant of a hand (finger)
+                        }
+
+                        current = current.parent;
+                    }
+
+                    return false;
+                }
+                for (var i = 0; i < _config.SkeletonJoints.Length && i < alignedPose.Length; i++)
+                {
+                    if (_config.SkeletonJoints[i] != null && IsHandJoint(_config.SkeletonJoints[i]))
+                    {
+                        _config.CurrentPose[i] = alignedPose[i];
+                    }
+                }
+
+                _previewer.ReloadCharacter(_config);
+            });
         }
 
         /// <summary>
@@ -1092,8 +1167,8 @@ namespace Meta.XR.Movement.Editor
             }
 
             // Update the target draw and reload the character
-            _previewer.UpdateTargetDraw(this);
-            _previewer.ReloadCharacter(_target);
+            _previewer.UpdateTargetDraw(_config);
+            _previewer.ReloadCharacter(_config);
         }
 
         /// <summary>
@@ -1128,9 +1203,27 @@ namespace Meta.XR.Movement.Editor
 
             var handTransforms = new HashSet<Transform>
             {
-                _target.KnownSkeletonJoints[(int)KnownJointType.LeftWrist],
-                _target.KnownSkeletonJoints[(int)KnownJointType.RightWrist]
+                _config.KnownSkeletonJoints[(int)KnownJointType.LeftWrist],
+                _config.KnownSkeletonJoints[(int)KnownJointType.RightWrist]
             };
+
+            // Helper function to check if a transform is a descendant of any hand transform
+            bool IsDescendantOfHand(Transform transform)
+            {
+                var current = transform;
+                while (current != null)
+                {
+                    if (handTransforms.Contains(current))
+                    {
+                        return true;
+                    }
+
+                    current = current.parent;
+                }
+
+                return false;
+            }
+
             foreach (var sourceTransform in sourceTransforms)
             {
                 if (!sceneTransformMap.TryGetValue(sourceTransform.name, out var sceneTransform))
@@ -1138,20 +1231,18 @@ namespace Meta.XR.Movement.Editor
                     continue;
                 }
 
-                // Copy local position, rotation and scale
-                var parent = sceneTransform.parent;
-                if (handTransforms.Contains(parent))
+                // Copy local position, rotation and scale for all descendants of hand transforms (including hands themselves)
+                if (IsDescendantOfHand(sceneTransform))
                 {
                     sceneTransform.localPosition = sourceTransform.localPosition;
                     sceneTransform.localRotation = sourceTransform.localRotation;
                     sceneTransform.localScale = sourceTransform.localScale;
-                    handTransforms.Add(parent);
                 }
             }
 
             // Update the target draw and reload the character
-            _previewer.UpdateTargetDraw(this);
-            _previewer.ReloadCharacter(_target);
+            _previewer.UpdateTargetDraw(_config);
+            _previewer.ReloadCharacter(_config);
         }
 
         /// <summary>
@@ -1159,8 +1250,8 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void SetToTPose()
         {
-            // Align target to source, which will update the T-Pose.
-            AlignTargetToSource(_source.ConfigName,
+            // Align target to source, but only use the aligned unscaled T-Pose.
+            AlignTargetToSource(_config.ConfigName,
                 AlignmentFlags.All,
                 ConfigHandle,
                 SkeletonType.SourceSkeleton,
@@ -1168,26 +1259,10 @@ namespace Meta.XR.Movement.Editor
                 out var newConfigHandle);
             GetSkeletonTPose(newConfigHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.UnscaledTPose,
                 JointRelativeSpaceType.RootOriginRelativeSpace, out var tPose);
-            tPose.CopyTo(_target.ReferencePose);
-            _utilityConfig.Handles.Add(newConfigHandle);
-            _previewer.ReloadCharacter(_target);
+            tPose.CopyTo(_config.CurrentPose);
+            _config.AddHandle(newConfigHandle);
+            _previewer.ReloadCharacter(_config);
         }
-
-        private Foldout CreateConfigFoldout(string configTitle, UnityEditor.Editor editor,
-            SerializedObject serializedObject)
-        {
-            var foldout = new Foldout
-            {
-                text = configTitle,
-                value = false
-            };
-
-            foldout.Add(new IMGUIContainer(editor.OnInspectorGUI));
-            foldout.Bind(serializedObject);
-
-            return foldout;
-        }
-
 
         /**********************************************************
          *
@@ -1197,7 +1272,15 @@ namespace Meta.XR.Movement.Editor
 
         public void ModifyConfig(bool updateMappings, bool performAlignment)
         {
-            UpdateConfig(this, false, updateMappings, performAlignment);
+            // When updating mappings through auto update, we need to respect the twist joint settings
+            bool? twistJointOverride = null;
+            if (updateMappings)
+            {
+                // Use the overlay's twist joint mapping setting, but only if auto-update is enabled
+                twistJointOverride = Overlay?.ShouldMapTwistJoints;
+            }
+
+            UpdateConfig(this, false, updateMappings, performAlignment, twistJointOverride);
             EditorUtility.SetDirty(EditorMetadataObject);
             AssetDatabase.SaveAssets();
             CreateGUI();
@@ -1211,35 +1294,87 @@ namespace Meta.XR.Movement.Editor
             CreateGUI();
         }
 
+        public void SaveUpdateConfig(bool saveConfig, bool? twistJointOverride)
+        {
+            // When we have a twist joint override, we want to update mappings
+            bool updateMappings = twistJointOverride.HasValue;
+            UpdateConfig(this, saveConfig, updateMappings, false, twistJointOverride);
+            EditorUtility.SetDirty(EditorMetadataObject);
+            AssetDatabase.SaveAssets();
+            CreateGUI();
+        }
 
         private void RemoveExistingOverlays()
         {
-            foreach (var sceneView in SceneView.sceneViews)
+            // Find and remove all existing MSDKUtilityEditorOverlay instances from all scene views
+            var existingOverlays = new List<MSDKUtilityEditorOverlay>();
+
+            foreach (SceneView sceneView in SceneView.sceneViews)
             {
-                if (sceneView is MSDKUtilityEditorOverlay targetOverlay)
+                if (sceneView != null && sceneView.overlayCanvas != null)
                 {
-                    SceneView.RemoveOverlayFromActiveView(targetOverlay);
+                    try
+                    {
+                        // Use reflection to access the internal 'overlays' field
+                        var overlayCanvasType = sceneView.overlayCanvas.GetType();
+                        var overlaysField = overlayCanvasType.GetField("overlays",
+                            BindingFlags.NonPublic | BindingFlags.Instance);
+
+                        if (overlaysField != null)
+                        {
+                            var overlays =
+                                overlaysField.GetValue(sceneView.overlayCanvas) as System.Collections.IEnumerable;
+                            if (overlays != null)
+                            {
+                                foreach (var overlay in overlays)
+                                {
+                                    if (overlay is MSDKUtilityEditorOverlay msdkOverlay)
+                                    {
+                                        existingOverlays.Add(msdkOverlay);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"Failed to access overlays via reflection: {e.Message}");
+                    }
+                }
+            }
+
+            // Remove all found overlays
+            foreach (var overlay in existingOverlays)
+            {
+                try
+                {
+                    SceneView.RemoveOverlayFromActiveView(overlay);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"Failed to remove existing overlay: {e.Message}");
                 }
             }
         }
 
         private void UpdateSkeletonDraws()
         {
-            if (_overlay == null)
-            {
-                return;
-            }
+            // If overlay is null, proceed with default settings (show both source and target)
+            bool shouldDrawSource = _overlay?.ShouldDrawSource ?? true;
+            bool shouldDrawTarget = _overlay?.ShouldDrawTarget ?? true;
 
-            if (_overlay.ShouldDrawSource)
+            if (shouldDrawSource)
             {
                 if (Step is > EditorStep.Configuration and < EditorStep.Review)
                 {
+                    _previewer.EnsureSkeletonDrawsInitialized();
                     _previewer.SourceSkeletonDrawTPose.Draw();
                 }
             }
 
-            if (_overlay.ShouldDrawTarget)
+            if (shouldDrawTarget)
             {
+                _previewer.EnsureSkeletonDrawsInitialized();
                 _previewer.TargetSkeletonDrawTPose.Draw();
             }
 
@@ -1264,58 +1399,131 @@ namespace Meta.XR.Movement.Editor
 
             if (Event.current.type == EventType.MouseDown)
             {
-                _utilityConfig.CurrentlyEditing = true;
+                _config.CurrentlyEditing = true;
             }
-            else if (_utilityConfig.CurrentlyEditing && Event.current.type == EventType.MouseUp)
+            else if (_config.CurrentlyEditing && Event.current.type == EventType.MouseUp)
             {
-                _utilityConfig.CurrentlyEditing = false;
-                if (_utilityConfig.SetTPose)
+                _config.CurrentlyEditing = false;
+                if (_config.SetTPose)
                 {
-                    _utilityConfig.SetTPose = false;
+                    _config.SetTPose = false;
                 }
-                else
-                {
-                    JointAlignmentUtility.LoadScale(_target, _utilityConfig);
-                    _previewer.ReloadCharacter(_target);
-                }
+                // Removed automatic scaling - now only done manually via button or specific scenarios
             }
         }
 
         private bool EnsureMetadataLoaded()
         {
-            if (EditorMetadataObject == null)
+            if (EditorMetadataObject != null)
             {
-                MSDKUtilityEditorMetadata.LoadConfigAsset(UtilityConfig.MetadataAssetPath,
-                    ref _utilityConfig.EditorMetadataObject, ref _displayedConfig);
+                return EditorMetadataObject != null;
             }
+
+            var originalAsset =
+                AssetDatabase.LoadAssetAtPath(_config.MetadataAssetPath, typeof(GameObject)) as GameObject;
+            _config.EditorMetadataObject =
+                MSDKUtilityEditor.GetOrCreateMetadata(originalAsset, originalAsset, CustomDataSourcePath);
 
             return EditorMetadataObject != null;
-        }
-
-        private void ValidateConfiguration()
-        {
-            if (EditorMetadataObject.ConfigJson == null || _target == null || _source == null)
-            {
-                return;
-            }
-
-            if (_target.ConfigHandle == INVALID_HANDLE)
-            {
-                LoadConfig(this);
-            }
-
-            Validate(_previewer, _previewer.TargetSkeletonDrawTPose, _target);
-
-            if (Step >= EditorStep.MinTPose)
-            {
-                Validate(_previewer, _previewer.SourceSkeletonDrawTPose, _source);
-            }
         }
 
         // Debugging.
         private VisualElement DebugConfigSection()
         {
-            return CreateDebugSection(this, _sourceEditor, _targetEditor);
+            return CreateDebugSection(this, _configEditor);
+        }
+
+        /**********************************************************
+         *
+         *               Playback Restart Functionality
+         *
+         **********************************************************/
+
+        /// <summary>
+        /// Stores the current playback state before stopping playback to enable restart.
+        /// </summary>
+        private void StorePlaybackStateForRestart()
+        {
+            // Only store state if playback is currently active
+            if (_fileReader is { IsPlaying: true } && !string.IsNullOrEmpty(_currentPreviewPose))
+            {
+                _restartPlaybackPose = _currentPreviewPose;
+                _restartPlaybackSnapshotIndex = _fileReader.SnapshotIndex;
+                _shouldRestartPlayback = true;
+
+                // Stop playback after storing state
+                _fileReader.ClosePlaybackFile();
+            }
+        }
+
+        /// <summary>
+        /// Restarts playback from the stored state after undo/redo or alignment operations.
+        /// </summary>
+        private void RestartPlaybackFromStoredState()
+        {
+            try
+            {
+                // Clear the restart flag first to prevent infinite loops
+                _shouldRestartPlayback = false;
+
+                // Ensure we have valid restart data
+                if (string.IsNullOrEmpty(_restartPlaybackPose))
+                {
+                    return;
+                }
+
+                // Restart the playback
+                OpenPlaybackFile(_restartPlaybackPose);
+
+                // Seek to the stored position if we have a valid snapshot index
+                if (_restartPlaybackSnapshotIndex > 0 && _fileReader.HasOpenedFileForPlayback)
+                {
+                    _fileReader.Seek(_restartPlaybackSnapshotIndex);
+                }
+
+                // Ensure the playback UI is properly initialized after restart
+                if (_playbackUI != null)
+                {
+                    // Force the playback UI to reinitialize its slider with the correct range
+                    _playbackUI.StartPlayback();
+                }
+
+                // Clear the stored state
+                _restartPlaybackPose = null;
+                _restartPlaybackSnapshotIndex = 0;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to restart playback: {e.Message}");
+                // Clear restart state on failure
+                _shouldRestartPlayback = false;
+                _restartPlaybackPose = null;
+                _restartPlaybackSnapshotIndex = 0;
+            }
+        }
+
+        /// <summary>
+        /// Stores playback state and performs the specified action, then schedules playback restart.
+        /// This is a helper method for alignment operations that should preserve playback.
+        /// </summary>
+        /// <param name="action">The action to perform that might affect the character.</param>
+        private void PerformActionWithPlaybackRestart(Action action)
+        {
+            // Store current playback state
+            StorePlaybackStateForRestart();
+
+            try
+            {
+                // Perform the action
+                action?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error performing action with playback restart: {e.Message}");
+                // Clear restart state if action failed
+                _shouldRestartPlayback = false;
+                _restartPlaybackPose = null;
+            }
         }
     }
 }

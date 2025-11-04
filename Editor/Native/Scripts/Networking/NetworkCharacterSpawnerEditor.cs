@@ -144,7 +144,7 @@ namespace Meta.XR.Movement.Networking.Editor
                 return null;
             }
             var variantAssetPath = EditorUtility.SaveFilePanelInProject("Character Prefab Save Location",
-                "Network" + asset.name,
+                "Networked" + asset.name,
                 "prefab",
                 "Character Prefab Save Location",
                 assetPath.Replace("Assets", Application.dataPath));
@@ -181,9 +181,6 @@ namespace Meta.XR.Movement.Networking.Editor
             using var serializedObject = new SerializedObject(networkCharacterRetargeter);
             serializedObject.ApplyModifiedProperties();
             serializedObject.Update();
-
-            // Open editor.
-            MSDKUtilityEditor.VerifyAndOpenRetargetingEditor(networkCharacterRetargeter);
             return networkCharacterRetargeter;
         }
     }

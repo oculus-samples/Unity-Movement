@@ -446,6 +446,13 @@ namespace Meta.XR.Movement.BodyTrackingForFitness
             {
                 return;
             }
+
+            // Only execute when in the scene view (not project view) and actually modified
+            if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this))
+            {
+                return;
+            }
+
             RefreshHierarchy();
         }
 #endif

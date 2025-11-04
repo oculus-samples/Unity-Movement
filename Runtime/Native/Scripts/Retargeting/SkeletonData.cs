@@ -1,15 +1,20 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using UnityEngine;
+using static Meta.XR.Movement.MSDKUtility;
 
 namespace Meta.XR.Movement.Retargeting
 {
     /// <summary>
-    /// Scriptable object used to store data relevant for retargeting.
+    /// Serializable class used to store data relevant for retargeting.
+    /// Contains skeleton hierarchy, T-pose data, known joints, and manifestations.
     /// </summary>
-    public class SkeletonData : ScriptableObject
+    [Serializable]
+    public class SkeletonData
     {
         /// <summary>
         /// Full body tracking bone id.
@@ -192,110 +197,421 @@ namespace Meta.XR.Movement.Retargeting
         };
 
         /// <summary>
-        /// Gets or sets the array of joint names in the skeleton.
+        /// Gets the number of joints in the skeleton.
         /// </summary>
-        public string[] Joints
-        {
-            get => _joints;
-            set => _joints = value;
-        }
+        public int JointCount => Joints?.Length ?? 0;
 
-        /// <summary>
-        /// Gets or sets the array of parent joint names corresponding to each joint in the skeleton.
-        /// </summary>
-        public string[] ParentJoints
-        {
-            get => _parentJoints;
-            set => _parentJoints = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the array of poses representing the T-pose configuration of the skeleton.
-        /// </summary>
-        public Pose[] TPose
-        {
-            get => _tPose;
-            set => _tPose = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the array of poses representing the minimum T-pose configuration for joint limits.
-        /// </summary>
-        public Pose[] TPoseMin
-        {
-            get => _tPoseMin;
-            set => _tPoseMin = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the array of poses representing the maximum T-pose configuration for joint limits.
-        /// </summary>
-        public Pose[] TPoseMax
-        {
-            get => _tPoseMax;
-            set => _tPoseMax = value;
-        }
-
-        /// <summary>
-        /// Array of joint names in the skeleton.
-        /// </summary>
-        [ContextMenuItem("Sort", "SortData")]
-        [SerializeField]
-        private string[] _joints;
-
-        /// <summary>
-        /// Array of parent joint names corresponding to each joint in the skeleton.
-        /// </summary>
-        [SerializeField]
-        private string[] _parentJoints;
+        [SerializeField] private NativeTransform[] _tPoseArray;
+        [SerializeField] private NativeTransform[] _minTPoseArray;
+        [SerializeField] private NativeTransform[] _maxTPoseArray;
+        [SerializeField] private string[] _joints;
+        [SerializeField] private string[] _parentJoints;
+        [SerializeField] private string[] _knownJoints;
+        [SerializeField] private string[] _autoMapExcludedJointNames;
+        [SerializeField] private string[] _manifestationNames;
+        [SerializeField] private int[] _manifestationJointCounts;
+        [SerializeField] private string[] _manifestationJointNames;
+        [SerializeField] private int[] _parentIndices;
+        [SerializeField] private int _rootJointIndex = -1;
+        [SerializeField] private int _hipsJointIndex = -1;
+        [SerializeField] private int _headJointIndex = -1;
+        [SerializeField] private int _leftUpperLegJointIndex = -1;
+        [SerializeField] private int _rightUpperLegJointIndex = -1;
+        [SerializeField] private int _leftLowerLegJointIndex = -1;
+        [SerializeField] private int _rightLowerLegJointIndex = -1;
+        [SerializeField] private int[] _fingerIndices;
+        [SerializeField] private string[] _manifestations;
 
         /// <summary>
         /// Array of poses representing the T-pose configuration of the skeleton.
         /// </summary>
-        [SerializeField]
-        private Pose[] _tPose;
+        public NativeTransform[] TPoseArray => _tPoseArray;
 
         /// <summary>
-        /// Array of poses representing the minimum T-pose configuration for joint limits.
+        /// Gets the minimum T-pose transforms as regular array.
         /// </summary>
-        [SerializeField]
-        private Pose[] _tPoseMin;
+        public NativeTransform[] MinTPoseArray => _minTPoseArray;
 
         /// <summary>
-        /// Array of poses representing the maximum T-pose configuration for joint limits.
+        /// Gets the maximum T-pose transforms as regular array.
         /// </summary>
-        [SerializeField]
-        private Pose[] _tPoseMax;
+        public NativeTransform[] MaxTPoseArray => _maxTPoseArray;
 
         /// <summary>
-        /// Initializes the skeleton data with arrays of the specified joint count.
+        /// Array of joint names in the skeleton.
         /// </summary>
-        /// <param name="jointCount">The number of joints in the skeleton.</param>
-        public void Initialize(int jointCount)
+        public string[] Joints => _joints;
+
+        /// <summary>
+        /// Array of parent joint names corresponding to each joint in the skeleton.
+        /// </summary>
+        public string[] ParentJoints => _parentJoints;
+
+        /// <summary>
+        /// Array of known joint names that have been identified and mapped in the skeleton.
+        /// </summary>
+        public string[] KnownJoints => _knownJoints;
+
+        /// <summary>
+        /// Array of joint names that should be excluded from automatic mapping operations.
+        /// </summary>
+        public string[] AutoMapExcludedJointNames => _autoMapExcludedJointNames;
+
+        /// <summary>
+        /// Array of manifestation names available in the skeleton configuration.
+        /// </summary>
+        public string[] ManifestationNames => _manifestationNames;
+
+        /// <summary>
+        /// Array containing the number of joints in each manifestation.
+        /// </summary>
+        public int[] ManifestationJointCounts => _manifestationJointCounts;
+
+        /// <summary>
+        /// Array of joint names organized by manifestation.
+        /// </summary>
+        public string[] ManifestationJointNames => _manifestationJointNames;
+
+        /// <summary>
+        /// Array of parent joint indices corresponding to each joint in the skeleton hierarchy.
+        /// </summary>
+        public int[] ParentIndices => _parentIndices;
+
+        /// <summary>
+        /// Index of the root joint in the skeleton hierarchy, or -1 if not found.
+        /// </summary>
+        public int RootJointIndex => _rootJointIndex;
+
+        /// <summary>
+        /// Index of the hips joint in the skeleton, or -1 if not found.
+        /// </summary>
+        public int HipsJointIndex => _hipsJointIndex;
+
+        /// <summary>
+        /// Index of the head joint in the skeleton, or -1 if not found.
+        /// </summary>
+        public int HeadJointIndex => _headJointIndex;
+
+        /// <summary>
+        /// Index of the left upper leg joint in the skeleton, or -1 if not found.
+        /// </summary>
+        public int LeftUpperLegJointIndex => _leftUpperLegJointIndex;
+
+        /// <summary>
+        /// Index of the right upper leg joint in the skeleton, or -1 if not found.
+        /// </summary>
+        public int RightUpperLegJointIndex => _rightUpperLegJointIndex;
+
+        /// <summary>
+        /// Index of the left lower leg joint in the skeleton, or -1 if not found.
+        /// </summary>
+        public int LeftLowerLegJointIndex => _leftLowerLegJointIndex;
+
+        /// <summary>
+        /// Index of the right lower leg joint in the skeleton, or -1 if not found.
+        /// </summary>
+        public int RightLowerLegJointIndex => _rightLowerLegJointIndex;
+
+        /// <summary>
+        /// Array of joint indices that represent finger joints (descendants of wrist joints).
+        /// </summary>
+        public int[] FingerIndices => _fingerIndices;
+
+        /// <summary>
+        /// Array of manifestation names available for this skeleton.
+        /// </summary>
+        public string[] Manifestations => _manifestations;
+
+        /// <summary>
+        /// Creates a SkeletonData instance from configuration JSON using MSDKUtility API.
+        /// </summary>
+        /// <param name="configJson">The configuration JSON string.</param>
+        /// <param name="skeletonType">The type of skeleton (Source or Target).</param>
+        /// <returns>A new SkeletonData instance initialized from the config.</returns>
+        public static SkeletonData CreateFromConfig(string configJson, SkeletonType skeletonType)
         {
-            _joints = new string[jointCount];
-            _parentJoints = new string[jointCount];
-            _tPose = new Pose[jointCount];
-            _tPoseMin = new Pose[jointCount];
-            _tPoseMax = new Pose[jointCount];
+            if (!CreateOrUpdateHandle(configJson, out var configHandle))
+            {
+                throw new Exception("Failed to create configuration handle from JSON.");
+            }
+
+            try
+            {
+                return CreateFromHandle(configHandle, skeletonType);
+            }
+            finally
+            {
+                // Clean up the handle
+                DestroyHandle(configHandle);
+            }
         }
 
         /// <summary>
-        /// Sorts the skeleton data based on bone IDs.
+        /// Creates a SkeletonData instance from an existing configuration handle using MSDKUtility API.
         /// </summary>
-        public void SortData()
+        /// <param name="configHandle">The existing configuration handle.</param>
+        /// <param name="skeletonType">The type of skeleton (Source or Target).</param>
+        /// <returns>A new SkeletonData instance initialized from the handle.</returns>
+        public static SkeletonData CreateFromHandle(ulong configHandle, SkeletonType skeletonType)
         {
-            var combined =
-                _joints.Zip(_parentJoints, (joint, parentJoint) => new { joint, parentJoint })
-                .Zip(_tPose, (x, tPose) => new { x.joint, x.parentJoint, tPose })
-                .Zip(_tPoseMin, (x, tPoseMin) => new { x.joint, x.parentJoint, x.tPose, tPoseMin })
-                .Zip(_tPoseMax, (x, tPoseMax) => new { x.joint, x.parentJoint, x.tPose, x.tPoseMin, tPoseMax });
-            var sortedCombined = combined.OrderBy(x => GetBoneId(x.joint.Replace("LittlePinky", "Little")));
-            _joints = sortedCombined.Select(x => x.joint).ToArray();
-            _parentJoints = sortedCombined.Select(x => x.parentJoint).ToArray();
-            _tPose = sortedCombined.Select(x => x.tPose).ToArray();
-            _tPoseMin = sortedCombined.Select(x => x.tPoseMin).ToArray();
-            _tPoseMax = sortedCombined.Select(x => x.tPoseMax).ToArray();
+            var skeletonData = new SkeletonData();
+
+            // Get skeleton info
+            GetSkeletonInfo(configHandle, skeletonType, out var skeletonInfo);
+            var jointCount = skeletonInfo.JointCount;
+
+            // Extract joint hierarchy data using MSDKUtility API
+            GetJointNames(configHandle, skeletonType, out var joints);
+            GetParentJointNames(configHandle, skeletonType, out var parentJoints);
+            GetKnownJointNames(configHandle, skeletonType, out var knownJoints);
+            GetManifestationNames(configHandle, skeletonType, out var manifestationNames);
+            GetAutoMappingExcludedJoints(configHandle, skeletonType, out var autoMapExcludedJoints);
+
+            skeletonData._joints = joints;
+            skeletonData._parentJoints = parentJoints;
+            skeletonData._knownJoints = knownJoints;
+            skeletonData._manifestationNames = manifestationNames;
+            skeletonData._autoMapExcludedJointNames = autoMapExcludedJoints;
+
+            // Get manifestation data
+            var manifestationJointCounts = new List<int>();
+            var manifestationJointNames = new List<string>();
+            foreach (var manifestationName in skeletonData.ManifestationNames)
+            {
+                GetJointsInManifestation(configHandle, skeletonType, manifestationName, out var jointsInManifestation);
+                manifestationJointCounts.Add(jointsInManifestation.Length);
+                manifestationJointNames.AddRange(jointsInManifestation.Select(jointIndex =>
+                    skeletonData.Joints[jointIndex]));
+            }
+
+            skeletonData._manifestationJointCounts = manifestationJointCounts.ToArray();
+            skeletonData._manifestationJointNames = manifestationJointNames.ToArray();
+
+            // Extract T-pose data using MSDKUtility API
+            var tPose = new NativeArray<NativeTransform>(jointCount, Allocator.Temp,
+                NativeArrayOptions.UninitializedMemory);
+            var tPoseMin =
+                new NativeArray<NativeTransform>(jointCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var tPoseMax =
+                new NativeArray<NativeTransform>(jointCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+
+            GetSkeletonTPoseByRef(configHandle, skeletonType, SkeletonTPoseType.UnscaledTPose,
+                JointRelativeSpaceType.RootOriginRelativeSpace, ref tPose);
+            GetSkeletonTPoseByRef(configHandle, skeletonType, SkeletonTPoseType.MinTPose,
+                JointRelativeSpaceType.RootOriginRelativeSpace, ref tPoseMin);
+            GetSkeletonTPoseByRef(configHandle, skeletonType, SkeletonTPoseType.MaxTPose,
+                JointRelativeSpaceType.RootOriginRelativeSpace, ref tPoseMax);
+
+            // Get parent indices
+            var parentIndices =
+                new NativeArray<int>(jointCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            GetParentJointIndexesByRef(configHandle, skeletonType, ref parentIndices);
+            skeletonData._parentIndices = parentIndices.ToArray();
+
+            // Get known joint indices and set properties
+            GetJointIndexByKnownJointType(configHandle, skeletonType, KnownJointType.Root, out var rootJointIndex);
+            GetJointIndexByKnownJointType(configHandle, skeletonType, KnownJointType.Hips, out var hipsJointIndex);
+            GetJointIndexByKnownJointType(configHandle, skeletonType, KnownJointType.Neck, out var headJointIndex);
+            GetJointIndexByKnownJointType(configHandle, skeletonType, KnownJointType.LeftUpperLeg,
+                out var leftUpperLegJointIndex);
+            GetJointIndexByKnownJointType(configHandle, skeletonType, KnownJointType.RightUpperLeg,
+                out var rightUpperLegJointIndex);
+
+            // Set the properties
+            skeletonData._rootJointIndex = rootJointIndex;
+            skeletonData._hipsJointIndex = hipsJointIndex;
+            skeletonData._headJointIndex = headJointIndex;
+            skeletonData._leftUpperLegJointIndex = leftUpperLegJointIndex;
+            skeletonData._rightUpperLegJointIndex = rightUpperLegJointIndex;
+
+            // Get child joint indices for lower legs
+            GetChildJointIndexes(configHandle, skeletonType, leftUpperLegJointIndex, out var leftLowerLegIndices);
+            GetChildJointIndexes(configHandle, skeletonType, rightUpperLegJointIndex, out var rightLowerLegIndices);
+            skeletonData._leftLowerLegJointIndex = leftLowerLegIndices.Length > 0
+                ? leftLowerLegIndices[0]
+                : INVALID_JOINT_INDEX;
+            skeletonData._rightLowerLegJointIndex = rightLowerLegIndices.Length > 0
+                ? rightLowerLegIndices[0]
+                : INVALID_JOINT_INDEX;
+
+            // Calculate finger indices (joints that have wrist parents)
+            GetJointIndexByKnownJointType(configHandle, skeletonType, KnownJointType.LeftWrist, out var leftWristIndex);
+            GetJointIndexByKnownJointType(configHandle, skeletonType, KnownJointType.RightWrist,
+                out var rightWristIndex);
+
+            var fingerIndicesList = new List<int>();
+            for (var i = 0; i < jointCount; i++)
+            {
+                // Check if this joint or any of its parents are wrist joints
+                var currentJoint = i;
+                while (currentJoint != -1)
+                {
+                    if (currentJoint == leftWristIndex || currentJoint == rightWristIndex)
+                    {
+                        fingerIndicesList.Add(i);
+                        break;
+                    }
+
+                    currentJoint = skeletonData.ParentIndices[currentJoint];
+                }
+            }
+
+            skeletonData._fingerIndices = fingerIndicesList.ToArray();
+
+            // Convert T-pose NativeArrays to regular arrays for storage
+            skeletonData._tPoseArray = tPose.ToArray();
+            skeletonData._minTPoseArray = tPoseMin.ToArray();
+            skeletonData._maxTPoseArray = tPoseMax.ToArray();
+
+            // Set other properties
+            skeletonData._manifestations = skeletonData.ManifestationNames;
+
+            parentIndices.Dispose();
+            tPose.Dispose();
+            tPoseMin.Dispose();
+            tPoseMax.Dispose();
+
+            return skeletonData;
+        }
+
+        /// <summary>
+        /// Creates a SkeletonData instance from a Unity Transform hierarchy.
+        /// Extracts joint hierarchy and T-pose data from the transform tree.
+        /// </summary>
+        /// <param name="target">The root transform of the skeleton hierarchy.</param>
+        /// <returns>A new SkeletonData instance created from the transform hierarchy, or null if the hierarchy is invalid.</returns>
+        public static SkeletonData CreateFromTransform(Transform target)
+        {
+            var jointMapping = MSDKUtilityHelper.GetChildParentJointMapping(target, out var root);
+            if (jointMapping == null)
+            {
+                return null;
+            }
+
+            var data = new SkeletonData();
+            var positionScale = 1.0f / root.localScale.x;
+            var index = 0;
+            var jointCount = jointMapping.Keys.Count;
+
+            // Build parent indices array and joint mappings
+            var jointToIndexMap = new Dictionary<Transform, int>();
+            data._parentIndices = new int[jointCount];
+            data._joints = new string[jointCount];
+            data._parentJoints = new string[jointCount];
+            data._tPoseArray = new NativeTransform[jointCount];
+            data._minTPoseArray = new NativeTransform[jointCount];
+            data._maxTPoseArray = new NativeTransform[jointCount];
+
+            // First pass: assign indices to all joints
+            foreach (var jointPair in jointMapping)
+            {
+                jointToIndexMap[jointPair.Key] = index;
+                index++;
+            }
+
+            // Second pass: populate data arrays
+            index = 0;
+            foreach (var jointPair in jointMapping)
+            {
+                var joint = jointPair.Key;
+                var parentJoint = jointPair.Value;
+
+                data._joints[index] = joint.name;
+                if (parentJoint == null)
+                {
+                    data._parentJoints[index] = string.Empty;
+                    data._parentIndices[index] = -1;
+                }
+                else
+                {
+                    data._parentJoints[index] = parentJoint.name;
+                    data._parentIndices[index] = jointToIndexMap.GetValueOrDefault(parentJoint, -1);
+                }
+
+                data._tPoseArray[index] = new Pose(joint.position * positionScale, joint.rotation);
+                index++;
+            }
+
+            // Set T-pose min/max to the same as T-pose (no joint limits from transform)
+            data._minTPoseArray = data._tPoseArray;
+            data._maxTPoseArray = data._tPoseArray;
+            data._knownJoints = KnownJointFinder.FindKnownJoints(data.Joints, data.ParentJoints);
+            data._autoMapExcludedJointNames = Array.Empty<string>();
+            data._manifestationNames = Array.Empty<string>();
+            data._manifestationJointCounts = Array.Empty<int>();
+            data._manifestationJointNames = Array.Empty<string>();
+            data._manifestations = Array.Empty<string>();
+
+            return data;
+        }
+
+        public void SetJoints(string[] joints)
+        {
+            _joints = joints;
+        }
+
+        public void SetParentJoints(string[] parentJoints)
+        {
+            _parentJoints = parentJoints;
+        }
+
+        public void SetKnownJoints(string[] knownJoints)
+        {
+            _knownJoints = knownJoints;
+        }
+
+        /// <summary>
+        /// Filters the skeleton to only include joints specified in the filter array.
+        /// Removes joints not found in the filter and updates parent references accordingly.
+        /// </summary>
+        /// <param name="jointsToFilter">Array of joint names to keep in the skeleton.</param>
+        public void FilterJoints(string[] jointsToFilter)
+        {
+            // Filter out any extra joints not found in config.
+            foreach (var joint in Joints)
+            {
+                if (!jointsToFilter.Contains(joint))
+                {
+                    RemoveJoint(joint);
+                }
+            }
+
+            for (var i = 0; i < ParentJoints.Length; i++)
+            {
+                var parentJoint = ParentJoints[i];
+                if (!jointsToFilter.Contains(parentJoint))
+                {
+                    ParentJoints[i] = string.Empty;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fills a SkeletonInitParams structure with data from this SkeletonData instance.
+        /// </summary>
+        /// <returns>A SkeletonInitParams populated with this skeleton's data.</returns>
+        public SkeletonInitParams FillConfigInitParams()
+        {
+            var initParams = new SkeletonInitParams
+            {
+                // Basic skeleton structure
+                JointNames = Joints,
+                ParentJointNames = ParentJoints,
+                // T-pose data
+                UnscaledTPose = new NativeArray<NativeTransform>(TPoseArray, Allocator.Temp),
+                MinTPose = new NativeArray<NativeTransform>(MinTPoseArray, Allocator.Temp),
+                MaxTPose = new NativeArray<NativeTransform>(MaxTPoseArray, Allocator.Temp),
+                // Optional data
+                OptionalKnownSourceJointNamesById = KnownJoints,
+                OptionalAutoMapExcludedJointNames = AutoMapExcludedJointNames,
+                OptionalManifestationNames = ManifestationNames,
+                OptionalManifestationJointCounts = ManifestationJointCounts,
+                OptionalManifestationJointNames = ManifestationJointNames,
+                // Blend shape data (empty for skeleton data)
+                BlendShapeNames = Array.Empty<string>()
+            };
+
+            return initParams;
         }
 
         /// <summary>
@@ -304,22 +620,24 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="jointToRemove">The name of the joint to remove.</param>
         public void RemoveJoint(string jointToRemove)
         {
-            var indexToRemove = Array.IndexOf(_joints, jointToRemove);
-            if (indexToRemove != -1)
+            var indexToRemove = Array.IndexOf(Joints, jointToRemove);
+            if (indexToRemove == -1)
             {
-                _joints = _joints.Where((val, index) => index != indexToRemove).ToArray();
-                _parentJoints = _parentJoints.Where((val, index) => index != indexToRemove).ToArray();
-                _tPose = _tPose.Where((val, index) => index != indexToRemove).ToArray();
-                _tPoseMin = _tPoseMin.Where((val, index) => index != indexToRemove).ToArray();
-                _tPoseMax = _tPoseMax.Where((val, index) => index != indexToRemove).ToArray();
+                return;
+            }
 
-                // Reparent the joint.
-                for (var i = 0; i < _parentJoints.Length; i++)
+            _joints = _joints.Where((_, index) => index != indexToRemove).ToArray();
+            _parentJoints = _parentJoints.Where((_, index) => index != indexToRemove).ToArray();
+            _tPoseArray = _tPoseArray.Where((_, index) => index != indexToRemove).ToArray();
+            _minTPoseArray = _minTPoseArray.Where((_, index) => index != indexToRemove).ToArray();
+            _maxTPoseArray = _maxTPoseArray.Where((_, index) => index != indexToRemove).ToArray();
+
+            // Re-parent the joint.
+            for (var i = 0; i < ParentJoints.Length; i++)
+            {
+                if (ParentJoints[i] == jointToRemove)
                 {
-                    if (_parentJoints[i] == jointToRemove)
-                    {
-                        _parentJoints[i] = _parentJoints[indexToRemove];
-                    }
+                    _parentJoints[i] = ParentJoints[indexToRemove];
                 }
             }
         }

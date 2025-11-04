@@ -1,10 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+using Meta.XR.Movement.Retargeting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Meta.XR.Movement.Retargeting;
 using Unity.Collections;
 using UnityEngine;
 using static Meta.XR.Movement.MSDKUtility;
@@ -16,104 +15,6 @@ namespace Meta.XR.Movement
     /// </summary>
     public static class MSDKUtilityHelper
     {
-        public static readonly string[] AutoMapExcludedJointNames =
-        {
-            "LeftHandPalm",
-            "LeftHandWristTwist",
-            "RightHandPalm",
-            "RightHandWristTwist"
-        };
-
-        public static readonly string[] HalfBodyManifestationJointNames =
-        {
-            "Root",
-            "Hips",
-            "SpineLower",
-            "SpineMiddle",
-            "SpineUpper",
-            "Chest",
-            "Neck",
-            "Head",
-            "LeftShoulder",
-            "LeftScapula",
-            "LeftArmUpper",
-            "LeftArmLower",
-            "LeftHandWristTwist",
-            "RightShoulder",
-            "RightScapula",
-            "RightArmUpper",
-            "RightArmLower",
-            "RightHandWristTwist",
-            "LeftHandPalm",
-            "LeftHandWrist",
-            "LeftHandThumbMetacarpal",
-            "LeftHandThumbProximal",
-            "LeftHandThumbDistal",
-            "LeftHandThumbTip",
-            "LeftHandIndexMetacarpal",
-            "LeftHandIndexProximal",
-            "LeftHandIndexIntermediate",
-            "LeftHandIndexDistal",
-            "LeftHandIndexTip",
-            "LeftHandMiddleMetacarpal",
-            "LeftHandMiddleProximal",
-            "LeftHandMiddleIntermediate",
-            "LeftHandMiddleDistal",
-            "LeftHandMiddleTip",
-            "LeftHandRingMetacarpal",
-            "LeftHandRingProximal",
-            "LeftHandRingIntermediate",
-            "LeftHandRingDistal",
-            "LeftHandRingTip",
-            "LeftHandLittlePinkyMetacarpal",
-            "LeftHandLittlePinkyProximal",
-            "LeftHandLittlePinkyIntermediate",
-            "LeftHandLittlePinkyDistal",
-            "LeftHandLittlePinkyTip",
-            "RightHandPalm",
-            "RightHandWrist",
-            "RightHandThumbMetacarpal",
-            "RightHandThumbProximal",
-            "RightHandThumbDistal",
-            "RightHandThumbTip",
-            "RightHandIndexMetacarpal",
-            "RightHandIndexProximal",
-            "RightHandIndexIntermediate",
-            "RightHandIndexDistal",
-            "RightHandIndexTip",
-            "RightHandMiddleMetacarpal",
-            "RightHandMiddleProximal",
-            "RightHandMiddleIntermediate",
-            "RightHandMiddleDistal",
-            "RightHandMiddleTip",
-            "RightHandRingMetacarpal",
-            "RightHandRingProximal",
-            "RightHandRingIntermediate",
-            "RightHandRingDistal",
-            "RightHandRingTip",
-            "RightHandLittlePinkyMetacarpal",
-            "RightHandLittlePinkyProximal",
-            "RightHandLittlePinkyIntermediate",
-            "RightHandLittlePinkyDistal",
-            "RightHandLittlePinkyTip"
-        };
-
-        private static readonly string[] _sourceKnownJoints =
-        {
-            "Root",
-            "Hips",
-            "RightArmUpper",
-            "LeftArmUpper",
-            "RightHandWrist",
-            "LeftHandWrist",
-            "Chest",
-            "Neck",
-            "RightUpperLeg",
-            "LeftUpperLeg",
-            "RightFootAnkle",
-            "LeftFootAnkle",
-        };
-
         /// <summary>
         /// Create the retargeting config string based on some data.
         /// </summary>
@@ -128,32 +29,6 @@ namespace Meta.XR.Movement
             SkeletonData targetData,
             string configName)
         {
-            // We need the following for the json:
-            // 1. Source RetargetingBodyData
-            // 2. Target RetargetingBodyData
-            var sourceMinTPose = new NativeArray<NativeTransform>(sourceData.Joints.Length, Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            var sourceMaxTPose = new NativeArray<NativeTransform>(sourceData.Joints.Length, Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            for (var i = 0; i < sourceData.Joints.Length; i++)
-            {
-                sourceMinTPose[i] = sourceData.TPoseMin[i];
-                sourceMaxTPose[i] = sourceData.TPoseMax[i];
-            }
-
-            var targetUnscaledTPose = new NativeArray<NativeTransform>(targetData.Joints.Length, Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            var targetMinTPose = new NativeArray<NativeTransform>(targetData.Joints.Length, Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            var targetMaxTPose = new NativeArray<NativeTransform>(targetData.Joints.Length, Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            for (var i = 0; i < targetData.Joints.Length; i++)
-            {
-                targetUnscaledTPose[i] = targetData.TPose[i];
-                targetMinTPose[i] = targetData.TPoseMin[i];
-                targetMaxTPose[i] = targetData.TPoseMax[i];
-            }
-
             var minMappings =
                 new NativeArray<JointMapping>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var minMappingEntries =
@@ -162,30 +37,16 @@ namespace Meta.XR.Movement
                 new NativeArray<JointMapping>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var maxMappingEntries =
                 new NativeArray<JointMappingEntry>(0, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            var targetKnownJoints = KnownJointFinder.FindKnownJoints(targetData.Joints, targetData.ParentJoints);
 
-            // 3. Function calls here, then return the retargetingConfigJson variable
-            var initParams = new ConfigInitParams();
-            initParams.SourceSkeleton.JointNames = sourceData.Joints;
-            initParams.SourceSkeleton.ParentJointNames = sourceData.ParentJoints;
-            initParams.SourceSkeleton.OptionalKnownSourceJointNamesById = _sourceKnownJoints;
-            initParams.SourceSkeleton.OptionalAutoMapExcludedJointNames = AutoMapExcludedJointNames;
-            initParams.SourceSkeleton.OptionalManifestationNames =
-                new[] { MetaSourceDataProvider.HalfBodyManifestation };
-            initParams.SourceSkeleton.OptionalManifestationJointCounts =
-                new[] { (int)SkeletonData.BodyTrackingBoneId.End };
-            initParams.SourceSkeleton.OptionalManifestationJointNames = HalfBodyManifestationJointNames;
-            initParams.SourceSkeleton.MinTPose = sourceMinTPose;
-            initParams.SourceSkeleton.MaxTPose = sourceMaxTPose;
+            // Use the FillConfigInitParams method for source/target skeleton info
+            var initParams = new ConfigInitParams
+            {
+                SourceSkeleton = sourceData.FillConfigInitParams(),
+                TargetSkeleton = targetData.FillConfigInitParams()
+            };
 
+            // Override blend shape names for target skeleton
             initParams.TargetSkeleton.BlendShapeNames = targetBlendshapeNames;
-            initParams.TargetSkeleton.JointNames = targetData.Joints;
-            initParams.TargetSkeleton.ParentJointNames = targetData.ParentJoints;
-            initParams.TargetSkeleton.OptionalKnownSourceJointNamesById = targetKnownJoints;
-            initParams.TargetSkeleton.MinTPose = targetMinTPose;
-            initParams.TargetSkeleton.MaxTPose = targetMaxTPose;
-            initParams.TargetSkeleton.UnscaledTPose = targetUnscaledTPose;
-
             initParams.MinMappings.Mappings = minMappings;
             initParams.MinMappings.MappingEntries = minMappingEntries;
             initParams.MaxMappings.Mappings = maxMappings;
@@ -193,15 +54,16 @@ namespace Meta.XR.Movement
 
             if (!CreateOrUpdateUtilityConfig(configName, initParams, out var configHandle))
             {
-                Debug.LogError("Invalid config initialization params!\n\n" + initParams);
+                var errorMessage = "Invalid config initialization params!";
+                Debug.LogError($"{errorMessage}\n\n" + initParams);
                 return "";
             }
 
-            // 4. Try to auto align.
+            // Try to auto align.
             AlignTargetToSource(configName, AlignmentFlags.All, configHandle, SkeletonType.SourceSkeleton,
                 configHandle, out configHandle);
 
-            // 5. Try to auto map.
+            // Try to auto map.
             GenerateMappings(configHandle, AutoMappingFlags.EmptyFlag);
             WriteConfigDataToJson(configHandle, out var retargetingConfigJson);
             DestroyHandle(configHandle);
@@ -229,10 +91,10 @@ namespace Meta.XR.Movement
                 }
             }
 
-            // If we couldn't find hips through the animator, use KnownJointFinder
+            // If we couldn't find hips through the animator, use the valid humanoid rig hierarchy chain
             if (hips == null)
             {
-                // Get all transforms in the hierarchy
+                // Get all transforms in the hierarchy, filtering out non-joint transforms
                 var allTransforms = new List<Transform> { target };
                 allTransforms.AddRange(target.GetAllChildren());
 
@@ -241,7 +103,15 @@ namespace Meta.XR.Movement
                     .Where(t => t.GetComponent<SkinnedMeshRenderer>() == null)
                     .ToArray();
 
-                // Create joint names and parent joint names arrays
+                // Use the hierarchy validation approach from MSDKUtilityEditor to find valid humanoid hierarchy
+                var validHumanoidRoot = FindValidHumanoidHierarchy(target);
+                if (validHumanoidRoot != null)
+                {
+                    hips = validHumanoidRoot;
+                    root = validHumanoidRoot.parent;
+                }
+
+                // Create joint names arrays using the filtered joint transforms based on valid hierarchy
                 var jointNames = jointTransforms.Select(t => t.name).ToArray();
                 var jointNameSet = new HashSet<string>(jointNames);
                 var parentJointNames = jointTransforms.Select(t =>
@@ -250,61 +120,39 @@ namespace Meta.XR.Movement
                     {
                         return "";
                     }
+
                     var parentName = t.parent.name;
                     // Only return parent name if it exists in our joint list, otherwise return empty string
                     return jointNameSet.Contains(parentName) ? parentName : "";
                 }).ToArray();
 
-                if (hips == null)
-                {
-                    foreach (var jointTransform in jointTransforms)
-                    {
-                        // Check if position is greater than 0, 0, 0
-                        if (!(jointTransform.position.x > 0) && !(jointTransform.position.y > 0) &&
-                            !(jointTransform.position.z > 0))
-                        {
-                            continue;
-                        }
-                        // Count children that are different in position or rotation
-                        var validChildrenCount = 0;
-                        for (var i = 0; i < jointTransform.childCount; i++)
-                        {
-                            var child = jointTransform.GetChild(i);
-                            // Check if child is different in position or rotation from parent
-                            if (child.localPosition != Vector3.zero || child.localRotation != Quaternion.identity)
-                            {
-                                validChildrenCount++;
-                            }
-                        }
-
-                        // If this transform has 3 or more valid children, consider it as hips
-                        if (validChildrenCount < 3)
-                        {
-                            continue;
-                        }
-                        hips = jointTransform;
-                        break;
-                    }
-                }
-
-                // Fallback - search by name.
+                // Fallback - search by name using KnownJointFinder
                 if (hips == null)
                 {
                     // Use KnownJointFinder to find known joints
                     var knownJoints = KnownJointFinder.FindKnownJoints(jointNames, parentJointNames);
 
                     // Find the hips joint from the known joints
-                    var hipsJointName = knownJoints.Length > (int)KnownJointType.Hips ? knownJoints[(int)KnownJointType.Hips] : "";
+                    var hipsJointName = knownJoints.Length > (int)KnownJointType.Hips
+                        ? knownJoints[(int)KnownJointType.Hips]
+                        : "";
                     if (!string.IsNullOrEmpty(hipsJointName))
                     {
                         hips = jointTransforms.FirstOrDefault(t => t.name == hipsJointName);
                     }
 
-                    // Find the root joint from the known joints
-                    var rootJointName = knownJoints.Length > (int)KnownJointType.Root ? knownJoints[(int)KnownJointType.Root] : "";
+                    // Find the root joint from the known joints - prioritize this for joint mapping
+                    var rootJointName = knownJoints.Length > (int)KnownJointType.Root
+                        ? knownJoints[(int)KnownJointType.Root]
+                        : "";
                     if (!string.IsNullOrEmpty(rootJointName))
                     {
-                        root = jointTransforms.FirstOrDefault(t => t.name == rootJointName);
+                        var knownRoot = jointTransforms.FirstOrDefault(t => t.name == rootJointName);
+                        if (knownRoot != null)
+                        {
+                            // Use the actual known joint root for mapping, not just for hierarchy detection
+                            root = knownRoot;
+                        }
                     }
                 }
 
@@ -326,6 +174,57 @@ namespace Meta.XR.Movement
             FillJointMapping(true, root, ref jointMapping);
 
             return jointMapping;
+        }
+
+        /// <summary>
+        /// Get the twist joint mappings for a specific skeleton type.
+        /// This method retrieves a dictionary mapping Transform objects to their corresponding twist joint definitions.
+        /// </summary>
+        /// <param name="handle">The handle to get the twist joints from.</param>
+        /// <param name="skeletonType">The type of skeleton to get the twist joints from.</param>
+        /// <param name="root">The root transform to search for joints.</param>
+        /// <returns>Dictionary mapping Transform objects to their TwistJointDefinition.</returns>
+        public static Dictionary<Transform, TwistJointDefinition> GetTwistJointMappings(ulong handle, SkeletonType skeletonType, Transform root)
+        {
+            var twistJointMappings = new Dictionary<Transform, TwistJointDefinition>();
+            // Get joint names for the skeleton type
+            if (!GetJointNames(handle, skeletonType, out var jointNames))
+            {
+                Debug.LogWarning($"Failed to get joint names for skeleton type: {skeletonType}");
+                return twistJointMappings;
+            }
+            // Get twist joints from the native API
+            if (!GetTwistJoints(handle, skeletonType, out var twistJoints))
+            {
+                Debug.LogWarning($"Failed to get twist joints for skeleton type: {skeletonType}");
+                return twistJointMappings;
+            }
+            // Map twist joint definitions to their corresponding transforms
+            foreach (var twistJoint in twistJoints)
+            {
+                // Validate joint index bounds
+                if (twistJoint.TwistJointIndex < 0 || twistJoint.TwistJointIndex >= jointNames.Length)
+                {
+                    Debug.LogWarning($"Invalid twist joint index: {twistJoint.TwistJointIndex}");
+                    continue;
+                }
+                var jointName = jointNames[twistJoint.TwistJointIndex];
+                if (string.IsNullOrEmpty(jointName))
+                {
+                    continue;
+                }
+                // Find the transform that corresponds to this joint
+                var jointTransform = root.FindChildRecursive(jointName);
+                if (jointTransform != null)
+                {
+                    twistJointMappings[jointTransform] = twistJoint;
+                }
+                else
+                {
+                    Debug.LogWarning($"Could not find transform for twist joint: {jointName}");
+                }
+            }
+            return twistJointMappings;
         }
 
         /// <summary>
@@ -429,6 +328,20 @@ namespace Meta.XR.Movement
             return null;
         }
 
+        public static Vector3 Reciprocal(this Vector3 vector)
+        {
+            if (vector.sqrMagnitude < float.Epsilon)
+            {
+                return Vector3.zero;
+            }
+
+            return new Vector3(
+                1.0f / vector.x,
+                1.0f / vector.y,
+                1.0f / vector.z
+            );
+        }
+
         public static Vector3 InverseTransformVector(NativeTransform t, Vector3 v)
         {
             return Quaternion.Inverse(t.Orientation) * v;
@@ -468,6 +381,131 @@ namespace Meta.XR.Movement
             }
 
             return -1;
+        }
+
+        /// <summary>
+        /// Determines if childJoint is a descendant (child/grandchild/etc.) of parentJoint.
+        /// </summary>
+        /// <param name="childJoint">The joint to check as descendant.</param>
+        /// <param name="parentJoint">The joint to check as ancestor.</param>
+        /// <returns>True if childJoint is a descendant of parentJoint.</returns>
+        public static bool IsDescendantOf(Transform childJoint, Transform parentJoint)
+        {
+            return IsAncestorOf(parentJoint, childJoint);
+        }
+
+        /// <summary>
+        /// Determines if parentJoint is an ancestor (parent/grandparent/etc.) of childJoint.
+        /// </summary>
+        /// <param name="parentJoint">The joint to check as ancestor.</param>
+        /// <param name="childJoint">The joint to check as descendant.</param>
+        /// <returns>True if parentJoint is an ancestor of childJoint.</returns>
+        public static bool IsAncestorOf(Transform parentJoint, Transform childJoint)
+        {
+            var current = childJoint;
+            while ((current = current.parent) != null)
+            {
+                if (current == parentJoint) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Finds a valid humanoid hierarchy based on the same validation logic used in MSDKUtilityEditor.
+        /// Looks for transforms with at least 3 children that each have minimum hierarchy depth.
+        /// </summary>
+        /// <param name="target">The target transform to validate and search.</param>
+        /// <returns>The transform representing a valid humanoid hierarchy root, or null if not found.</returns>
+        private static Transform FindValidHumanoidHierarchy(Transform target)
+        {
+            // Recursively search through all transforms in the hierarchy
+            return ValidateHumanoidHierarchyRecursive(target);
+        }
+
+        /// <summary>
+        /// Recursively validates transforms in the hierarchy for humanoid rig structure.
+        /// Checks for structural hierarchy without relying on naming conventions.
+        /// </summary>
+        /// <param name="transform">The transform to check and recurse through.</param>
+        /// <returns>The transform with valid humanoid hierarchy, or null if not found.</returns>
+        private static Transform ValidateHumanoidHierarchyRecursive(Transform transform)
+        {
+            // Check if current transform has exactly 3 children with required depth
+            if (transform.childCount >= 3)
+            {
+                int validChildrenCount = 0;
+                foreach (Transform child in transform)
+                {
+                    // Check if child has minimum hierarchy depth
+                    if (HasMinimumHierarchyDepth(child, 2))
+                    {
+                        // Check if child has different position than the potential hips (parent transform)
+                        bool hasDifferentPosition = child.position != transform.position;
+
+                        // Check if child does not have a skinned mesh renderer
+                        bool hasNoSkinnedMeshRenderer = child.GetComponent<SkinnedMeshRenderer>() == null;
+
+                        // Only count as valid if all conditions are met
+                        if (hasDifferentPosition && hasNoSkinnedMeshRenderer)
+                        {
+                            validChildrenCount++;
+                        }
+                    }
+                }
+
+                // If at least 3 children meet all the requirements
+                if (validChildrenCount >= 3)
+                {
+                    return transform;
+                }
+            }
+
+            // Recursively check all children
+            foreach (Transform child in transform)
+            {
+                var validHierarchy = ValidateHumanoidHierarchyRecursive(child);
+                if (validHierarchy != null)
+                {
+                    return validHierarchy;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if a transform has the minimum required hierarchy depth.
+        /// </summary>
+        /// <param name="transform">The transform to check.</param>
+        /// <param name="minDepth">The minimum depth required (1 = has child, 2 = has child and grandchild, etc.).</param>
+        /// <returns>True if the transform has at least the minimum hierarchy depth.</returns>
+        private static bool HasMinimumHierarchyDepth(Transform transform, int minDepth)
+        {
+            if (minDepth <= 0)
+            {
+                return true;
+            }
+
+            if (transform.childCount == 0)
+            {
+                return false;
+            }
+
+            if (minDepth == 1)
+            {
+                return true;
+            }
+
+            // Check if any child has the remaining depth
+            foreach (Transform child in transform)
+            {
+                if (HasMinimumHierarchyDepth(child, minDepth - 1))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void FillJointMapping(

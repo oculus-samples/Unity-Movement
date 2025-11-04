@@ -769,7 +769,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f51477cda5e694449be8238a4f5516f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _networkCharacterRetargeter: {fileID: 0}
+  _networkCharacterRetargeter: {fileID: 4852450239114790530}
   _applyData: 1
   _spawnDelay: 0.5
 --- !u!114 &4852450239114790530
@@ -897,11 +897,15 @@ MonoBehaviour:
   _debugDrawSourceSkeletonColor: {r: 1, g: 1, b: 1, a: 1}
   _debugDrawTargetSkeleton: 0
   _debugDrawTargetSkeletonColor: {r: 1, g: 1, b: 1, a: 1}
+  _debugDrawInvalidTargetSkeletonColor: {r: 1, g: 0, b: 0, a: 1}
+  _debugDrawInvalidSourceSkeletonColor: {r: 1, g: 0, b: 1, a: 1}
   _skeletonRetargeter:
+    HipsScale: {x: 0, y: 0, z: 0}
     _retargetingBehavior: 0
     _hideLowerBodyWhenUpperBodyTracking: 0
     _hideLegScale: {x: 0, y: 0, z: 0}
-    _applyScale: 1
+    _applyRootScale: 1
+    _applyHeadScale: 1
     _currentScale: 1
     _headScaleFactor: 0.95
     _scaleRange: {x: 0.8, y: 1.2}

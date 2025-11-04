@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f19d1e02490929e41b903b049fc91c34, type: 3}
-  m_Name: Armature-Pose-metadata
+  m_Name: Lina-metadata
   m_EditorClassIdentifier: 
-  _model: {fileID: 5277832601808152396, guid: 01841ff2664437e41a3418592a12de6d, type: 3}
-  _configJson: {fileID: 0}
+  _model: {fileID: 919132149155446097, guid: 979c359199d8d3c4095ae3c05ad730c6, type: 3}
+  _configJson: {fileID: 4900000, guid: e8579a8ee54f7754baa4eac4e17130db, type: 3}

@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Collections;
 using UnityEngine;
 using static Meta.XR.Movement.MSDKUtility;
@@ -16,126 +15,52 @@ namespace Meta.XR.Movement.Editor
     public class JointAlignmentUtility
     {
         /// <summary>
-        /// Aligns finger bones between source and target skeletons using a position-independent approach.
-        /// </summary>
-        /// <param name="win">The editor window.</param>
-        /// <param name="startBoneIds">The array of starting bone IDs for fingers.</param>
-        /// <param name="endBoneIds">The array of ending bone IDs for fingers.</param>
-        /// <param name="wristType">The wrist joint type.</param>
-        public static void PerformFingerMatching(MSDKUtilityEditorWindow win,
-            FullBodyTrackingBoneId[] startBoneIds,
-            FullBodyTrackingBoneId[] endBoneIds,
-            KnownJointType wristType)
-        {
-            var source = win.SourceInfo;
-            var target = win.TargetInfo;
-
-            // Get the wrist joint from the target skeleton
-            var wristJointIndex = GetKnownJointIndex(target, wristType);
-            var wristTransform = target.SkeletonJoints[wristJointIndex];
-
-            if (wristTransform == null)
-            {
-                Debug.LogError($"Could not find wrist transform for {wristType}");
-                return;
-            }
-
-            // Update wrist rotation.
-            ApplyWristFingerAlignment(win, startBoneIds, wristType);
-
-            // Get finger chains using the simplified method
-            Dictionary<string, List<Transform>> fingerChains = GetFingerChains(wristTransform);
-
-            // Process each finger chain
-            foreach (var fingerPair in fingerChains)
-            {
-                string fingerName = fingerPair.Key;
-                List<Transform> fingerChain = fingerPair.Value;
-
-                if (fingerChain.Count < 2)
-                {
-                    // Need at least two joints for a proper finger
-                    continue;
-                }
-
-                // Find the corresponding source fingertip
-                FullBodyTrackingBoneId? sourceFingertipId = null;
-
-                // Map finger name to source bone ID
-                if (fingerName.Equals("Thumb", StringComparison.OrdinalIgnoreCase))
-                {
-                    sourceFingertipId = wristType == KnownJointType.LeftWrist
-                        ? FullBodyTrackingBoneId.LeftHandThumbTip
-                        : FullBodyTrackingBoneId.RightHandThumbTip;
-                }
-                else if (fingerName.Equals("Index", StringComparison.OrdinalIgnoreCase))
-                {
-                    sourceFingertipId = wristType == KnownJointType.LeftWrist
-                        ? FullBodyTrackingBoneId.LeftHandIndexTip
-                        : FullBodyTrackingBoneId.RightHandIndexTip;
-                }
-                else if (fingerName.Equals("Middle", StringComparison.OrdinalIgnoreCase))
-                {
-                    sourceFingertipId = wristType == KnownJointType.LeftWrist
-                        ? FullBodyTrackingBoneId.LeftHandMiddleTip
-                        : FullBodyTrackingBoneId.RightHandMiddleTip;
-                }
-                else if (fingerName.Equals("Ring", StringComparison.OrdinalIgnoreCase))
-                {
-                    sourceFingertipId = wristType == KnownJointType.LeftWrist
-                        ? FullBodyTrackingBoneId.LeftHandRingTip
-                        : FullBodyTrackingBoneId.RightHandRingTip;
-                }
-                else if (fingerName.Equals("Pinky", StringComparison.OrdinalIgnoreCase))
-                {
-                    sourceFingertipId = wristType == KnownJointType.LeftWrist
-                        ? FullBodyTrackingBoneId.LeftHandLittleTip
-                        : FullBodyTrackingBoneId.RightHandLittleTip;
-                }
-
-                if (!sourceFingertipId.HasValue || (int)sourceFingertipId.Value >= source.ReferencePose.Length)
-                {
-                    // Skip if we don't have a valid source fingertip
-                    continue;
-                }
-
-                // Get the source fingertip position
-                Vector3 sourceFingertipPosition = source.ReferencePose[(int)sourceFingertipId.Value].Position;
-
-                // Apply simple rotation to align the finger with the source fingertip
-                AlignFingerToTarget(fingerChain, sourceFingertipPosition);
-            }
-
-            // Update the T-pose data after adjusting the fingers
-            UpdateTPoseData(target);
-        }
-
-        /// <summary>
         /// Aligns wrist joints between source and target skeletons.
+        /// First rotates the upper arm joints to get wrists as close as possible,
+        /// then snaps the wrist positions to the exact target positions.
         /// </summary>
-        /// <param name="source">The source skeleton configuration.</param>
-        /// <param name="target">The target skeleton configuration.</param>
-        public static void PerformWristMatching(MSDKUtilityEditorConfig source, MSDKUtilityEditorConfig target)
+        /// <param name="config">The configuration.</param>
+        public static void PerformWristMatching(MSDKUtilityEditorConfig config)
         {
-            // Rotate to match left/right hand.
-            var sourceRightHand = source.ReferencePose[(int)FullBodyTrackingBoneId.RightHandWrist];
-            var sourceLeftHand = source.ReferencePose[(int)FullBodyTrackingBoneId.LeftHandWrist];
-            var leftArmIndex = GetKnownJointIndex(target, KnownJointType.LeftUpperArm);
-            var rightArmIndex = GetKnownJointIndex(target, KnownJointType.RightUpperArm);
+            // Get source wrist positions
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.SourceSkeleton,
+                KnownJointType.RightWrist, out var rightHandIndex);
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.SourceSkeleton,
+                KnownJointType.LeftWrist, out var leftHandIndex);
+            var isMinTPose = config.Step == MSDKUtilityEditorConfig.EditorStep.MinTPose;
+            var sourceRightHand = isMinTPose
+                ? config.SourceSkeletonData.MinTPoseArray[rightHandIndex]
+                : config.SourceSkeletonData.MaxTPoseArray[rightHandIndex];
+            var sourceLeftHand = isMinTPose
+                ? config.SourceSkeletonData.MinTPoseArray[leftHandIndex]
+                : config.SourceSkeletonData.MaxTPoseArray[leftHandIndex];
+            var leftArmIndex = GetKnownJointIndex(config, KnownJointType.LeftUpperArm);
+            var rightArmIndex = GetKnownJointIndex(config, KnownJointType.RightUpperArm);
 
-            var leftUpperArm = target.SkeletonJoints[leftArmIndex];
-            var leftHand =
-                target.SkeletonJoints[GetKnownJointIndex(target, KnownJointType.LeftWrist)];
-            leftUpperArm.rotation =
-                GetBestRotation(leftUpperArm, leftHand, sourceLeftHand.Position);
+            // Step 1: Rotate upper arms to get wrists as close as possible to target positions
+            var leftUpperArm = config.SkeletonJoints[leftArmIndex];
+            var leftHand = config.SkeletonJoints[GetKnownJointIndex(config, KnownJointType.LeftWrist)];
 
-            var rightUpperArm = target.SkeletonJoints[rightArmIndex];
-            var rightHand =
-                target.SkeletonJoints[GetKnownJointIndex(target, KnownJointType.RightWrist)];
-            rightUpperArm.rotation =
-                GetBestRotation(rightUpperArm, rightHand, sourceRightHand.Position);
+            // Record undo operations for all transforms that will be modified
+            UnityEditor.Undo.RecordObject(leftUpperArm, "Align Wrists");
+            UnityEditor.Undo.RecordObject(leftHand, "Align Wrists");
 
-            UpdateTPoseData(target);
+            leftUpperArm.rotation = GetBestRotation(leftUpperArm, leftHand, sourceLeftHand.Position);
+
+            var rightUpperArm = config.SkeletonJoints[rightArmIndex];
+            var rightHand = config.SkeletonJoints[GetKnownJointIndex(config, KnownJointType.RightWrist)];
+
+            // Record undo operations for right side transforms
+            UnityEditor.Undo.RecordObject(rightUpperArm, "Align Wrists");
+            UnityEditor.Undo.RecordObject(rightHand, "Align Wrists");
+
+            rightUpperArm.rotation = GetBestRotation(rightUpperArm, rightHand, sourceRightHand.Position);
+
+            // Step 2: Snap wrist positions to exact target positions
+            leftHand.position = sourceLeftHand.Position;
+            rightHand.position = sourceRightHand.Position;
+
+            UpdateTPoseData(config);
         }
 
         /// <summary>
@@ -144,11 +69,11 @@ namespace Meta.XR.Movement.Editor
         /// <param name="win">The editor window.</param>
         public static void AutoAlignment(MSDKUtilityEditorWindow win)
         {
-            win.TargetInfo.SkeletonTPoseType = win.Step switch
+            win.Config.SkeletonTPoseType = win.Step switch
             {
                 MSDKUtilityEditorConfig.EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
                 MSDKUtilityEditorConfig.EditorStep.MaxTPose => SkeletonTPoseType.MaxTPose,
-                _ => win.TargetInfo.SkeletonTPoseType
+                _ => win.Config.SkeletonTPoseType
             };
 
             win.ModifyConfig(false, true);
@@ -162,27 +87,26 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Loads the scale from the target configuration into the utility configuration.
         /// </summary>
-        /// <param name="target">The target configuration.</param>
-        /// <param name="utilityConfig">The utility configuration to update.</param>
-        public static void LoadScale(MSDKUtilityEditorConfig target, MSDKUtilityEditorConfig utilityConfig)
+        /// <param name="config">The target configuration.</param>
+        public static void LoadScale(MSDKUtilityEditorConfig config)
         {
-            var targetTPose = new NativeArray<NativeTransform>(target.ReferencePose.Length, Allocator.Temp);
-            targetTPose.CopyFrom(target.ReferencePose);
-            ConvertJointPose(target.ConfigHandle,
+            var targetTPose = new NativeArray<NativeTransform>(config.CurrentPose.Length, Allocator.Temp);
+            targetTPose.CopyFrom(config.CurrentPose);
+            ConvertJointPose(config.ConfigHandle,
                 SkeletonType.TargetSkeleton,
                 JointRelativeSpaceType.RootOriginRelativeSpace,
                 JointRelativeSpaceType.LocalSpaceScaled,
                 targetTPose,
                 out var scaledTPose);
-            GetJointIndexByKnownJointType(target.ConfigHandle, SkeletonType.TargetSkeleton, KnownJointType.Root,
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.TargetSkeleton, KnownJointType.Root,
                 out var rootJointIndex);
 
-            if (utilityConfig.Step != MSDKUtilityEditorConfig.EditorStep.Configuration)
+            if (config.Step != MSDKUtilityEditorConfig.EditorStep.Configuration)
             {
                 var calculatedScale = scaledTPose[rootJointIndex].Scale;
 
                 // Clamp scale components to the character retargeter range
-                utilityConfig.RootScale = new Vector3(
+                config.RootScale = new Vector3(
                     Mathf.Clamp(calculatedScale.x, MSDKUtilityEditorPreviewer.MinScale,
                         MSDKUtilityEditorPreviewer.MaxScale),
                     Mathf.Clamp(calculatedScale.y, MSDKUtilityEditorPreviewer.MinScale,
@@ -193,7 +117,7 @@ namespace Meta.XR.Movement.Editor
             }
             else
             {
-                utilityConfig.RootScale = Vector3.one;
+                config.RootScale = Vector3.one;
             }
         }
 
@@ -208,11 +132,11 @@ namespace Meta.XR.Movement.Editor
                 var joint = target.SkeletonJoints[i];
                 if (joint == null)
                 {
-                    target.ReferencePose[i] = NativeTransform.Identity();
+                    target.CurrentPose[i] = NativeTransform.Identity();
                 }
                 else
                 {
-                    target.ReferencePose[i] = new NativeTransform
+                    target.CurrentPose[i] = new NativeTransform
                     {
                         Position = joint.position,
                         Orientation = joint.rotation,
@@ -225,15 +149,23 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Scales the arms of the target skeleton to match the source skeleton.
         /// </summary>
-        /// <param name="source">The source configuration.</param>
-        /// <param name="target">The target configuration to modify.</param>
-        public static void PerformArmScaling(MSDKUtilityEditorConfig source, MSDKUtilityEditorConfig target)
+        /// <param name="config">The configuration.</param>
+        public static void PerformArmScaling(MSDKUtilityEditorConfig config)
         {
             // Scale arms - stretch/squash for aligning X-axis.
-            var sourceRightHand = source.ReferencePose[(int)FullBodyTrackingBoneId.RightHandWrist];
-            var sourceLeftHand = source.ReferencePose[(int)FullBodyTrackingBoneId.LeftHandWrist];
-            var targetRightHand = GetTargetTPoseFromKnownJoint(target, KnownJointType.RightWrist);
-            var targetLeftHand = GetTargetTPoseFromKnownJoint(target, KnownJointType.LeftWrist);
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.SourceSkeleton,
+                KnownJointType.RightWrist, out var rightHandIndex);
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.SourceSkeleton,
+                KnownJointType.LeftWrist, out var leftHandIndex);
+            var isMinTPose = config.Step == MSDKUtilityEditorConfig.EditorStep.MinTPose;
+            var sourceRightHand = isMinTPose
+                ? config.SourceSkeletonData.MinTPoseArray[rightHandIndex]
+                : config.SourceSkeletonData.MaxTPoseArray[rightHandIndex];
+            var sourceLeftHand = isMinTPose
+                ? config.SourceSkeletonData.MinTPoseArray[leftHandIndex]
+                : config.SourceSkeletonData.MaxTPoseArray[leftHandIndex];
+            var targetRightHand = GetTargetTPoseFromKnownJoint(config, KnownJointType.RightWrist);
+            var targetLeftHand = GetTargetTPoseFromKnownJoint(config, KnownJointType.LeftWrist);
 
             var sourceRightWristVal = Mathf.Abs(sourceRightHand.Position.x);
             var targetRightWristVal = Mathf.Abs(targetRightHand.Position.x);
@@ -246,15 +178,15 @@ namespace Meta.XR.Movement.Editor
             var xScaleRatioLeftWrist = sourceLeftWristVal / (targetLeftWristVal > 0.0f
                 ? targetLeftWristVal
                 : 1.0f);
-            GetJointIndexByKnownJointType(target.ConfigHandle, SkeletonType.TargetSkeleton,
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.TargetSkeleton,
                 KnownJointType.RightUpperArm,
                 out var rightArmIndex);
-            GetJointIndexByKnownJointType(target.ConfigHandle, SkeletonType.TargetSkeleton, KnownJointType.LeftUpperArm,
+            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.TargetSkeleton, KnownJointType.LeftUpperArm,
                 out var leftArmIndex);
-            GetParentJointIndex(target.ConfigHandle, SkeletonType.TargetSkeleton, rightArmIndex, out var rightIndex);
-            GetParentJointIndex(target.ConfigHandle, SkeletonType.TargetSkeleton, leftArmIndex, out var leftIndex);
-            ApplyScalingToJointIndexAndChildren(target, rightIndex, xScaleRatioRightWrist, true);
-            ApplyScalingToJointIndexAndChildren(target, leftIndex, xScaleRatioLeftWrist, true);
+            GetParentJointIndex(config.ConfigHandle, SkeletonType.TargetSkeleton, rightArmIndex, out var rightIndex);
+            GetParentJointIndex(config.ConfigHandle, SkeletonType.TargetSkeleton, leftArmIndex, out var leftIndex);
+            ApplyScalingToJointIndexAndChildren(config, rightIndex, xScaleRatioRightWrist, true);
+            ApplyScalingToJointIndexAndChildren(config, leftIndex, xScaleRatioLeftWrist, true);
         }
 
         /// <summary>
@@ -270,15 +202,15 @@ namespace Meta.XR.Movement.Editor
             // Apply the scaling to the current joint.
             if (!skip)
             {
-                var joint = target.ReferencePose[jointIndex];
+                var joint = target.CurrentPose[jointIndex];
                 joint.Position.x *= scaleFactor;
-                target.ReferencePose[jointIndex] = joint;
+                target.CurrentPose[jointIndex] = joint;
             }
 
             // Recursively apply the scaling to the children of the current joint.
-            for (var i = 0; i < target.ParentIndices.Length; i++)
+            for (var i = 0; i < target.TargetSkeletonData.ParentIndices.Length; i++)
             {
-                if (target.ParentIndices[i] == jointIndex)
+                if (target.TargetSkeletonData.ParentIndices[i] == jointIndex)
                 {
                     ApplyScalingToJointIndexAndChildren(target, i, scaleFactor);
                 }
@@ -307,7 +239,7 @@ namespace Meta.XR.Movement.Editor
         public static NativeTransform GetTargetTPoseFromKnownJoint(MSDKUtilityEditorConfig target,
             KnownJointType knownJointType)
         {
-            return target.ReferencePose[GetKnownJointIndex(target, knownJointType)];
+            return target.CurrentPose[GetKnownJointIndex(target, knownJointType)];
         }
 
         /// <summary>
@@ -333,9 +265,11 @@ namespace Meta.XR.Movement.Editor
                 out var targetTPose);
 
             var rightHandJointIndex = GetKnownJointIndex(target, KnownJointType.RightWrist);
-            var sourceRightHand = sourceTPose[(int)FullBodyTrackingBoneId.RightHandWrist];
+            GetJointIndexByKnownJointType(target.ConfigHandle, SkeletonType.SourceSkeleton,
+                KnownJointType.RightWrist, out var rightHandIndex);
+            var sourceRightHand = sourceTPose[rightHandIndex];
             var targetRightHand =
-                useCurrentPose ? target.ReferencePose[rightHandJointIndex] : targetTPose[rightHandJointIndex];
+                useCurrentPose ? target.CurrentPose[rightHandJointIndex] : targetTPose[rightHandJointIndex];
 
             // Calculate scale ratio using Y position (height-based scaling)
             var yScaleRatio = sourceRightHand.Position.y /
@@ -377,238 +311,6 @@ namespace Meta.XR.Movement.Editor
             }
 
             return bestRotation;
-        }
-
-        private static void ApplyWristFingerAlignment(MSDKUtilityEditorWindow win,
-            FullBodyTrackingBoneId[] startBoneIds,
-            KnownJointType wristType)
-        {
-            var source = win.SourceInfo;
-            var target = win.TargetInfo;
-
-            // Get the wrist joint from the target skeleton
-            var wristJointIndex = GetKnownJointIndex(target, wristType);
-            var wristTransform = target.SkeletonJoints[wristJointIndex];
-
-            if (wristTransform == null)
-            {
-                Debug.LogError($"Could not find wrist transform for {wristType}");
-                return;
-            }
-
-            // Calculate the average position of source metacarpal joints
-            Vector3 sourceMetacarpalAverage = Vector3.zero;
-            int validMetacarpalCount = 0;
-
-            foreach (var startBoneId in startBoneIds)
-            {
-                if ((int)startBoneId >= 0 && (int)startBoneId < source.ReferencePose.Length)
-                {
-                    sourceMetacarpalAverage += source.ReferencePose[(int)startBoneId].Position;
-                    validMetacarpalCount++;
-                }
-            }
-
-            if (validMetacarpalCount > 0)
-            {
-                sourceMetacarpalAverage /= validMetacarpalCount;
-            }
-            else
-            {
-                Debug.LogError("No valid metacarpal joints found in source skeleton");
-                return;
-            }
-
-            // Store the initial rotation of the wrist
-            Quaternion initialWristRotation = wristTransform.rotation;
-
-            // Find the best rotation for the wrist to align child fingers with source metacarpals
-            // We'll test rotations around different axes to find the best match
-            float minDistance = float.MaxValue;
-            Quaternion bestRotation = initialWristRotation;
-
-            // Get all finger joints under the wrist
-            List<Transform> fingerJoints = new List<Transform>();
-            for (int i = 0; i < target.ParentIndices.Length; i++)
-            {
-                if (IsChildOfJoint(target, i, wristJointIndex))
-                {
-                    fingerJoints.Add(target.SkeletonJoints[i]);
-                }
-            }
-
-            // Test rotations around different axes
-            foreach (var axis in new[] { wristTransform.forward, wristTransform.up, wristTransform.right })
-            {
-                for (float angle = -180f; angle <= 180f; angle += 5f) // Use a larger step for initial search
-                {
-                    wristTransform.rotation = initialWristRotation * Quaternion.AngleAxis(angle, axis);
-
-                    // Calculate the average position of all finger joints after rotation
-                    Vector3 targetFingerAverage = Vector3.zero;
-                    foreach (var joint in fingerJoints)
-                    {
-                        targetFingerAverage += joint.position;
-                    }
-
-                    targetFingerAverage /= fingerJoints.Count;
-
-                    // Calculate distance between averages
-                    float distance = Vector3.Distance(targetFingerAverage, sourceMetacarpalAverage);
-
-                    if (distance < minDistance)
-                    {
-                        minDistance = distance;
-                        bestRotation = wristTransform.rotation;
-                    }
-                }
-            }
-
-            // Apply the best rotation
-            wristTransform.rotation = bestRotation;
-
-            // Update the T-pose data after rotating the wrist
-            UpdateTPoseData(target);
-        }
-
-        private static Dictionary<string, List<Transform>> GetFingerChains(Transform wristTransform)
-        {
-            Dictionary<string, List<Transform>> fingerChains = new Dictionary<string, List<Transform>>();
-
-            // Define finger names to search for
-            string[] fingerNames = new[] { "Thumb", "Index", "Middle", "Ring", "Pinky", "Little" };
-
-            // Check each child of the wrist for potential finger roots
-            foreach (Transform child in wristTransform)
-            {
-                // Try to determine which finger this might be
-                string matchedFingerName = null;
-                foreach (string fingerName in fingerNames)
-                {
-                    if (child.name.IndexOf(fingerName, StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        matchedFingerName = fingerName;
-                        break;
-                    }
-                }
-
-                // If this child doesn't match any finger name, skip it
-                if (matchedFingerName == null)
-                {
-                    continue;
-                }
-
-                // Special case for "Little" which is an alternative name for "Pinky"
-                if (matchedFingerName == "Little")
-                {
-                    matchedFingerName = "Pinky";
-                }
-
-                // Build the finger chain by following the hierarchy
-                List<Transform> chain = new List<Transform>();
-                Transform current = child;
-
-                // Add the starting joint
-                chain.Add(current);
-
-                // Follow the hierarchy to build the chain
-                while (current.childCount > 0)
-                {
-                    // Simply take the first child to continue the chain
-                    current = current.GetChild(0);
-                    chain.Add(current);
-
-                    // Limit chain length as a safety measure
-                    if (chain.Count >= 5)
-                    {
-                        break;
-                    }
-                }
-
-                // Only add the chain if it doesn't already exist or if this one is longer
-                if (!fingerChains.ContainsKey(matchedFingerName) ||
-                    chain.Count > fingerChains[matchedFingerName].Count)
-                {
-                    fingerChains[matchedFingerName] = chain;
-                }
-            }
-
-            return fingerChains;
-        }
-
-        private static void AlignFingerToTarget(List<Transform> fingerChain, Vector3 targetPosition)
-        {
-            if (fingerChain.Count < 2)
-            {
-                return;
-            }
-
-            // Get the base and tip of the finger
-            Transform baseJoint = fingerChain[0];
-            Transform tipJoint = fingerChain[^1];
-
-            // Calculate the current direction of the finger
-            Vector3 currentDirection = (tipJoint.position - baseJoint.position).normalized;
-
-            // Calculate the desired direction to the target
-            Vector3 targetDirection = (targetPosition - baseJoint.position).normalized;
-
-            // Create a rotation to align the current direction with the target direction
-            Quaternion rotation = Quaternion.FromToRotation(currentDirection, targetDirection);
-
-            // Check if the rotation angle is too large (more than 60 degrees)
-            float rotationAngle = Quaternion.Angle(Quaternion.identity, rotation);
-            if (rotationAngle > 60f)
-            {
-                Debug.LogWarning($"Excessive finger rotation detected: {rotationAngle} degrees. Ignoring rotation.");
-                return;
-            }
-
-            // Store the initial position of the tip joint
-            Vector3 initialTipPosition = tipJoint.position;
-
-            // Apply the rotation to the base joint
-            Quaternion originalRotation = baseJoint.rotation;
-            baseJoint.rotation = rotation * baseJoint.rotation;
-
-            // Check if the rotation actually improved the distance to the target
-            float initialDistance = Vector3.Distance(initialTipPosition, targetPosition);
-            float newDistance = Vector3.Distance(tipJoint.position, targetPosition);
-
-            // If the new distance is greater than the initial distance, revert the rotation
-            if (newDistance > initialDistance)
-            {
-                Debug.LogWarning(
-                    $"Finger rotation increased distance to target from {initialDistance} to {newDistance}. Reverting rotation.");
-                baseJoint.rotation = originalRotation;
-            }
-        }
-
-        private static bool IsChildOfJoint(MSDKUtilityEditorConfig config, int childIndex, int parentIndex)
-        {
-            if (childIndex == parentIndex)
-            {
-                return false;
-            }
-
-            int currentIndex = childIndex;
-            while (currentIndex >= 0 && currentIndex < config.ParentIndices.Length)
-            {
-                int parent = config.ParentIndices[currentIndex];
-                if (parent == parentIndex)
-                {
-                    return true;
-                }
-
-                if (parent == currentIndex || parent < 0)
-                {
-                    break;
-                }
-
-                currentIndex = parent;
-            }
-
-            return false;
         }
     }
 }

@@ -1,7 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System.Collections.Generic;
-using System.Reflection;
 using Meta.XR.BuildingBlocks.Editor;
 using Meta.XR.Movement.Networking.Editor;
 using UnityEditor;
@@ -33,17 +32,11 @@ namespace Meta.XR.Movement.Networking.NGO.Editor
             var installation = base.Install(block, selectedGameObject);
 
             // Update prefab reference.
-            var field = typeof(NetworkCharacterSpawnerNGO)
-                .GetField("_characterRetargeterPrefabs", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (field == null)
-            {
-                return installation;
-            }
-
             var instance = installation[0].GetComponent<NetworkCharacterSpawnerNGO>();
-            field.SetValue(instance, new[] { characterPrefab });
-            NetworkCharacterNGOSetupRules.Fix();
             Undo.RecordObject(instance, "Update " + instance.name);
+            instance.CharacterRetargeterPrefabs = new[] { characterPrefab };
+            EditorUtility.SetDirty(instance);
+            NetworkCharacterNGOSetupRules.Fix();
 
             return installation;
         }

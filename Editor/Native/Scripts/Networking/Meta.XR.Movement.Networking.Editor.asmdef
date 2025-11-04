@@ -6,8 +6,7 @@
         "GUID:93bda9a2bc9dddc43930634fa65d6e42",
         "GUID:f4af9e3560e85174f90917cb2bbcda01",
         "GUID:e9e84ad7fc80f3b45a59b3e2ba81a234",
-        "GUID:8e76fd86d1fdc9243a341ca50624a575",
-        "GUID:502e28d01b3ebaf4689df96d8655467c"
+        "GUID:8e76fd86d1fdc9243a341ca50624a575"
     ],
     "includePlatforms": [
         "Editor"
@@ -18,12 +17,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.meta.movement",
-            "expression": "",
-            "define": "MOVEMENT_DEFINED"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

@@ -12,17 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59a8626004e3ff046a416a6600b0f34a, type: 3}
   m_Name: ICharacterRetargeter
   m_EditorClassIdentifier: 
-  id: 1735b3a5-6b02-42a3-bbee-e48234afe14b
+  id: 632b5811-dd57-4cca-af5f-fc261cc011c8
   version: 1
   blockName: Character Retargeter
   description: Creates a character retargeter which maps Movement SDK tracking data
     to any animation rig, enabling full body tracking for custom character models.
   tags:
     array:
-    - name: New
-    - name: Tracking
+    - name: Hidden
   thumbnail: {fileID: 2800000, guid: f60898585088a594683aa5aed6ba7b0f, type: 3}
-  order: 0
+  remoteThumbnailContentId: 0
   prefab: {fileID: 0}
   selectedGuidedSetupIndex: 0
   externalBlockDependencies: []

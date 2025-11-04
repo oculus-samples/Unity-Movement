@@ -16,6 +16,11 @@ namespace Meta.XR.Movement.Networking
         public int SelectedCharacterIndex { get; set; }
 
         /// <summary>
+        /// The base network character handler prefab to contain the instantiated networked character.
+        /// </summary>
+        public GameObject NetworkedCharacterHandler { get; }
+
+        /// <summary>
         /// The array of character prefabs that possibly could be spawned.
         /// </summary>
         public GameObject[] CharacterRetargeterPrefabs { get; set; }

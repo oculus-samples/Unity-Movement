@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using UnityEditor;
+using UnityEngine;
 
 namespace Meta.XR.Movement.Retargeting.Editor
 {
@@ -36,8 +37,19 @@ namespace Meta.XR.Movement.Retargeting.Editor
         /// <inheritdoc />
         public override void OnInspectorGUI()
         {
+            EditorGUI.BeginChangeCheck();
             RenderConfig();
             RenderRetargeting();
+            EditorGUI.EndChangeCheck();
+
+            // Trigger validation on GUI changes
+            var retargeter = target as CharacterRetargeter;
+            if (retargeter != null && GUI.changed)
+            {
+                retargeter.ValidateConfiguration();
+                EditorUtility.SetDirty(retargeter);
+            }
+
             serializedObject.ApplyModifiedProperties();
             serializedObject.Update();
         }

@@ -19,17 +19,31 @@ namespace Meta.XR.Movement.Retargeting
     public class SkeletonRetargeter
     {
         /// <summary>
+        /// True if this is initialized.
+        /// </summary>
+        public bool IsInitialized { get; private set; }
+
+        /// <summary>
         /// True if the pose was applied.
         /// </summary>
         public bool AppliedPose { get; private set; }
 
         /// <summary>
-        /// True if scale should be applied.
+        /// True if scale should be applied to the root.
         /// </summary>
-        public bool ApplyScale
+        public bool ApplyRootScale
         {
-            get => _applyScale;
-            set => _applyScale = value;
+            get => _applyRootScale;
+            set => _applyRootScale = value;
+        }
+
+        /// <summary>
+        /// True if scale should be applied to the head.
+        /// </summary>
+        public bool ApplyHeadScale
+        {
+            get => _applyHeadScale;
+            set => _applyHeadScale = value;
         }
 
         /// <summary>
@@ -42,16 +56,40 @@ namespace Meta.XR.Movement.Retargeting
         }
 
         /// <summary>
+        /// The current retargeting behavior.
+        /// </summary>
+        public RetargetingBehavior RetargetingBehavior
+        {
+            get => _retargetingBehavior;
+            set => _retargetingBehavior = value;
+        }
+
+        /// <summary>
+        /// The source skeleton data containing joint hierarchies, T-pose data, known joints, and manifestations.
+        /// </summary>
+        public SkeletonData SourceSkeletonData { get; private set; }
+
+        /// <summary>
+        /// The target skeleton data containing joint hierarchies, T-pose data, known joints, and manifestations.
+        /// </summary>
+        public SkeletonData TargetSkeletonData { get; private set; }
+
+        /// <summary>
         /// The root scale.
         /// </summary>
         public Vector3 RootScale =>
-            !_applyScale || !_isInitialized ? Vector3.one : RetargetedPose[_rootJointIndex].Scale;
+            !_applyRootScale || !IsInitialized ? Vector3.one : RetargetedPose[TargetSkeletonData.RootJointIndex].Scale;
+
+        /// <summary>
+        /// The hips scale.
+        /// </summary>
+        public Vector3 HipsScale;
 
         /// <summary>
         /// The head scale.
         /// </summary>
         public Vector3 HeadScale =>
-            !_applyScale || !_isInitialized ? Vector3.one : RetargetedPose[_headJointIndex].Scale;
+            !_applyHeadScale || !IsInitialized ? Vector3.one : RetargetedPose[TargetSkeletonData.HeadJointIndex].Scale;
 
         /// <summary>
         /// The leg scale when hiding the lower body.
@@ -64,9 +102,19 @@ namespace Meta.XR.Movement.Retargeting
         public bool HideLowerBodyWhenUpperBodyTracking => _hideLowerBodyWhenUpperBodyTracking;
 
         /// <summary>
-        /// True if this is initialized.
+        /// The native retargeting handle.
         /// </summary>
-        public bool IsInitialized => _isInitialized;
+        public ulong NativeHandle => _nativeHandle;
+
+        /// <summary>
+        /// The number of joints in the source skeleton.
+        /// </summary>
+        public int SourceJointCount => SourceSkeletonData?.JointCount ?? 0;
+
+        /// <summary>
+        /// The number of joints in the target skeleton.
+        /// </summary>
+        public int TargetJointCount => TargetSkeletonData?.JointCount ?? 0;
 
         /// <summary>
         /// The retargeted pose in world space.
@@ -79,79 +127,77 @@ namespace Meta.XR.Movement.Retargeting
         public NativeArray<NativeTransform> RetargetedPoseLocal;
 
         /// <summary>
+        /// The T-Pose in local space.
+        /// </summary>
+        public NativeArray<NativeTransform> TargetReferencePoseLocal;
+
+        /// <summary>
         /// The source pose that's being retargeted.
         /// </summary>
-        public NativeArray<NativeTransform> SourcePose => _sourcePose;
+        public NativeArray<NativeTransform> SourcePose;
 
         /// <summary>
         /// The source reference pose.
         /// </summary>
-        public NativeArray<NativeTransform> SourceReferencePose => _sourceReferencePose;
+        public NativeArray<NativeTransform> SourceReferencePose;
 
         /// <summary>
         /// The min T-Pose.
         /// </summary>
-        public NativeArray<NativeTransform> MinTPose => _minTPose;
+        public NativeArray<NativeTransform> SourceMinTPose;
 
         /// <summary>
         /// The max T-Pose
         /// </summary>
-        public NativeArray<NativeTransform> MaxTPose => _maxTPose;
-
-        /// <summary>
-        /// The native retargeting handle.
-        /// </summary>
-        public ulong NativeHandle => _nativeHandle;
+        public NativeArray<NativeTransform> SourceMaxTPose;
 
         /// <summary>
         /// The source parent joint indices.
         /// </summary>
-        public NativeArray<int> NativeSourceParentIndices => _nativeSourceParentIndices;
+        public NativeArray<int> SourceParentIndices;
 
         /// <summary>
         /// The target parent joint indices.
         /// </summary>
-        public NativeArray<int> NativeTargetParentIndices => _nativeTargetParentIndices;
-
-        /// <summary>
-        /// The number of joints in the source skeleton.
-        /// </summary>
-        public int SourceJointCount => _sourceJointCount;
-
-        /// <summary>
-        /// The number of joints in the target skeleton.
-        /// </summary>
-        public int TargetJointCount => _targetJointCount;
+        public NativeArray<int> TargetParentIndices;
 
         /// <summary>
         /// The root joint index.
         /// </summary>
-        public int RootJointIndex => _rootJointIndex;
+        public int RootJointIndex => TargetSkeletonData?.RootJointIndex ?? INVALID_JOINT_INDEX;
+
+        /// <summary>
+        /// The hips joint index.
+        /// </summary>
+        public int HipsJointIndex => TargetSkeletonData?.HipsJointIndex ?? INVALID_JOINT_INDEX;
 
         /// <summary>
         /// The head joint index.
         /// </summary>
-        public int HeadJointIndex => _headJointIndex;
+        public int HeadJointIndex => TargetSkeletonData?.HeadJointIndex ?? INVALID_JOINT_INDEX;
 
         /// <summary>
         /// The left leg joint index.
         /// </summary>
-        public int LeftUpperLegJointIndex => _leftUpperLegJointIndex;
+        public int LeftUpperLegJointIndex => TargetSkeletonData?.LeftUpperLegJointIndex ?? INVALID_JOINT_INDEX;
 
         /// <summary>
         /// The right leg joint index.
         /// </summary>
-        public int RightUpperLegJointIndex => _rightUpperLegJointIndex;
+        public int RightUpperLegJointIndex =>
+            TargetSkeletonData?.RightUpperLegJointIndex ?? MSDKUtility.INVALID_JOINT_INDEX;
 
         /// <summary>
         /// The left lower leg index.
         /// </summary>
-        public int LeftLowerLegJointIndex => _leftLowerLegJointIndex;
+        public int LeftLowerLegJointIndex =>
+            TargetSkeletonData?.LeftLowerLegJointIndex ?? MSDKUtility.INVALID_JOINT_INDEX;
 
         /// <summary>
         /// The right lower leg  index.
         /// </summary>
-        public int RightLowerLegJointIndex => _rightLowerLegJointIndex;
+        public int RightLowerLegJointIndex =>
+            TargetSkeletonData?.RightLowerLegJointIndex ?? MSDKUtility.INVALID_JOINT_INDEX;
 
         /// <summary>
         /// The behavior type for retargeting operations.
@@ -175,7 +221,13 @@ namespace Meta.XR.Movement.Retargeting
         /// Whether to apply scaling to the retargeted skeleton.
         /// </summary>
         [SerializeField]
-        private bool _applyScale = true;
+        private bool _applyRootScale = true;
+
+        /// <summary>
+        /// Whether to apply head scaling to the retargeted skeleton.
+        /// </summary>
+        [SerializeField]
+        private bool _applyHeadScale = true;
 
         /// <summary>
         /// The current scale factor applied to the retargeted skeleton.
@@ -200,32 +252,16 @@ namespace Meta.XR.Movement.Retargeting
             IndexesToIgnore = new List<int>
             {
                 (int)SkeletonData.FullBodyTrackingBoneId.LeftHandWristTwist,
-                (int)SkeletonData.FullBodyTrackingBoneId.RightHandWristTwist
+                (int)SkeletonData.FullBodyTrackingBoneId.RightHandWristTwist,
+                (int)SkeletonData.FullBodyTrackingBoneId.LeftHandPalm,
+                (int)SkeletonData.FullBodyTrackingBoneId.RightHandPalm
             }
         };
 
         private SkeletonDraw _targetSkeletonDraw = new();
         private ulong _nativeHandle = INVALID_HANDLE;
-        private bool _isInitialized;
-        private int _sourceJointCount;
-        private int _targetJointCount;
-        private int _rootJointIndex;
-        private int _headJointIndex;
-        private int _leftUpperLegJointIndex;
-        private int _rightUpperLegJointIndex;
-        private int _leftLowerLegJointIndex;
-        private int _rightLowerLegJointIndex;
-        private string[] _manifestations;
-        private int[] _sourceParentIndices;
-        private int[] _targetParentIndices;
-        private NativeArray<NativeTransform> _sourceReferencePose;
-        private NativeArray<NativeTransform> _sourcePose;
-        private NativeArray<NativeTransform> _minTPose;
-        private NativeArray<NativeTransform> _maxTPose;
-        private NativeArray<int> _nativeSourceParentIndices;
-        private NativeArray<int> _nativeTargetParentIndices;
-        private NativeArray<int> _nativeFingerIndices;
         private NativeArray<NativeTransform> _targetReferencePose;
+        private NativeArray<int> _targetFingerIndices;
         private JobHandle _applyPoseJobHandle;
 
         /// <summary>
@@ -237,7 +273,7 @@ namespace Meta.XR.Movement.Retargeting
         }
 
         /// <summary>
-        /// Setup the retargeting info arrays.
+        /// Setup the retargeting info arrays using config-based SkeletonData initialization.
         /// </summary>
         public void Setup(string config)
         {
@@ -247,76 +283,40 @@ namespace Meta.XR.Movement.Retargeting
                 throw new Exception("Failed to create a retargeting handle!.");
             }
 
-            // Query skeleton info.
-            GetSkeletonJointCount(_nativeHandle, SkeletonType.SourceSkeleton, out _sourceJointCount);
-            GetSkeletonJointCount(_nativeHandle, SkeletonType.TargetSkeleton, out _targetJointCount);
-            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.Root,
-                out _rootJointIndex);
-            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.Neck,
-                out _headJointIndex);
-            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.LeftUpperLeg,
-                out _leftUpperLegJointIndex);
-            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.RightUpperLeg,
-                out _rightUpperLegJointIndex);
-            GetChildJointIndexes(_nativeHandle, SkeletonType.TargetSkeleton, _leftUpperLegJointIndex,
-                out var leftLowerLegIndices);
-            GetChildJointIndexes(_nativeHandle, SkeletonType.TargetSkeleton, _rightUpperLegJointIndex,
-                out var rightLowerLegIndices);
-            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.LeftWrist,
-                out var leftWristIndex);
-            GetJointIndexByKnownJointType(_nativeHandle, SkeletonType.TargetSkeleton, KnownJointType.RightWrist,
-                out var rightWristIndex);
+            // Create SkeletonData instances from the existing handle
+            SourceSkeletonData = SkeletonData.CreateFromHandle(_nativeHandle, SkeletonType.SourceSkeleton);
+            TargetSkeletonData = SkeletonData.CreateFromHandle(_nativeHandle, SkeletonType.TargetSkeleton);
 
-            _leftLowerLegJointIndex = leftLowerLegIndices[0];
-            _rightLowerLegJointIndex = rightLowerLegIndices[0];
-
-            // Query parent indices.
-            _nativeSourceParentIndices = new NativeArray<int>(_sourceJointCount, Persistent, UninitializedMemory);
-            _nativeTargetParentIndices = new NativeArray<int>(_targetJointCount, Persistent, UninitializedMemory);
-            GetParentJointIndexesByRef(_nativeHandle, SkeletonType.SourceSkeleton, ref _nativeSourceParentIndices);
-            GetParentJointIndexesByRef(_nativeHandle, SkeletonType.TargetSkeleton, ref _nativeTargetParentIndices);
-            _sourceParentIndices = _nativeSourceParentIndices.ToArray();
-            _targetParentIndices = _nativeTargetParentIndices.ToArray();
-
-            // Fill finger indices array with joints that have wrist parents
-            var fingerIndicesList = new List<int>();
-            for (var i = 0; i < _targetJointCount; i++)
-            {
-                // Check if this joint or any of its parents are wrist joints
-                var currentJoint = i;
-                while (currentJoint != -1)
-                {
-                    if (currentJoint == leftWristIndex || currentJoint == rightWristIndex)
-                    {
-                        fingerIndicesList.Add(i);
-                        break;
-                    }
-
-                    currentJoint = _targetParentIndices[currentJoint];
-                }
-            }
-
-            _nativeFingerIndices = new NativeArray<int>(fingerIndicesList.ToArray(), Persistent);
-
-            // Setup empty retargeting pose arrays.
-            _sourcePose = new NativeArray<NativeTransform>(_sourceJointCount, Persistent, UninitializedMemory);
-            _sourceReferencePose = new NativeArray<NativeTransform>(_sourceJointCount, Persistent, UninitializedMemory);
-            _minTPose = new NativeArray<NativeTransform>(_sourceJointCount, Persistent, UninitializedMemory);
-            _maxTPose = new NativeArray<NativeTransform>(_sourceJointCount, Persistent, UninitializedMemory);
+            // Setup runtime pose arrays using SkeletonData joint counts
+            SourcePose =
+                new NativeArray<NativeTransform>(SourceSkeletonData.JointCount, Persistent, UninitializedMemory);
+            SourceReferencePose =
+                new NativeArray<NativeTransform>(SourceSkeletonData.JointCount, Persistent, UninitializedMemory);
 
             // Retargeting pose arrays.
-            _targetReferencePose = new NativeArray<NativeTransform>(_targetJointCount, Persistent, UninitializedMemory);
-            RetargetedPose = new NativeArray<NativeTransform>(_targetJointCount, Persistent, UninitializedMemory);
-            RetargetedPoseLocal = new NativeArray<NativeTransform>(_targetJointCount, Persistent, UninitializedMemory);
+            _targetReferencePose =
+                new NativeArray<NativeTransform>(TargetSkeletonData.JointCount, Persistent, UninitializedMemory);
+            RetargetedPose =
+                new NativeArray<NativeTransform>(TargetSkeletonData.JointCount, Persistent, UninitializedMemory);
+            RetargetedPoseLocal =
+                new NativeArray<NativeTransform>(TargetSkeletonData.JointCount, Persistent, UninitializedMemory);
+            TargetReferencePoseLocal =
+                new NativeArray<NativeTransform>(TargetSkeletonData.JointCount, Persistent, UninitializedMemory);
 
-            // Setup T-Pose.
-            GetSkeletonTPoseByRef(_nativeHandle, SkeletonType.SourceSkeleton, SkeletonTPoseType.MinTPose,
-                JointRelativeSpaceType.RootOriginRelativeSpace, ref _minTPose);
-            GetSkeletonTPoseByRef(_nativeHandle, SkeletonType.SourceSkeleton, SkeletonTPoseType.MaxTPose,
-                JointRelativeSpaceType.RootOriginRelativeSpace, ref _maxTPose);
-            UpdateSourceReferenceTPose(_nativeHandle, _maxTPose);
+            // Create NativeArrays from SkeletonData regular arrays
+            _targetFingerIndices = new NativeArray<int>(TargetSkeletonData.FingerIndices, Persistent);
+            SourceMinTPose = new NativeArray<NativeTransform>(SourceSkeletonData.MinTPoseArray, Persistent);
+            SourceMaxTPose = new NativeArray<NativeTransform>(SourceSkeletonData.MaxTPoseArray, Persistent);
+            SourceParentIndices = new NativeArray<int>(SourceSkeletonData.ParentIndices, Persistent);
+            TargetParentIndices = new NativeArray<int>(TargetSkeletonData.ParentIndices, Persistent);
 
-            _isInitialized = true;
+            // Setup T-Pose from native API.
+            GetSkeletonTPoseByRef(_nativeHandle, SkeletonType.TargetSkeleton, SkeletonTPoseType.UnscaledTPose,
+                JointRelativeSpaceType.LocalSpace, ref TargetReferencePoseLocal);
+            UpdateSourceReferenceTPose(_nativeHandle, SourceMaxTPose);
+
+            AppliedPose = false;
+            IsInitialized = true;
         }
 
         /// <summary>
@@ -325,24 +325,27 @@ namespace Meta.XR.Movement.Retargeting
         public void Dispose()
         {
             // Dispose of native arrays.
-            if (!_isInitialized)
+            if (!IsInitialized)
             {
                 return;
             }
 
-            _isInitialized = false;
+            AppliedPose = false;
+            IsInitialized = false;
             _sourceSkeletonDraw = null;
             _targetSkeletonDraw = null;
-            _sourcePose.Dispose();
-            _sourceReferencePose.Dispose();
-            _minTPose.Dispose();
-            _maxTPose.Dispose();
-            _nativeSourceParentIndices.Dispose();
-            _nativeTargetParentIndices.Dispose();
-            _nativeFingerIndices.Dispose();
             _targetReferencePose.Dispose();
+            SourcePose.Dispose();
+            SourceReferencePose.Dispose();
             RetargetedPose.Dispose();
             RetargetedPoseLocal.Dispose();
+
+            // Dispose NativeArrays created from SkeletonData
+            _targetFingerIndices.Dispose();
+            SourceMinTPose.Dispose();
+            SourceMaxTPose.Dispose();
+            SourceParentIndices.Dispose();
+            TargetParentIndices.Dispose();
 
             // Destroy native handle.
             if (!DestroyHandle(_nativeHandle))
@@ -362,7 +365,7 @@ namespace Meta.XR.Movement.Retargeting
         public void Align(NativeArray<NativeTransform> sourcePose)
         {
             MatchPose(_nativeHandle, SkeletonType.SourceSkeleton, MatchPoseBehavior.MatchScale,
-                JointRelativeSpaceType.RootOriginRelativeSpace, ref _sourceReferencePose, ref sourcePose);
+                JointRelativeSpaceType.RootOriginRelativeSpace, ref SourceReferencePose, ref sourcePose);
         }
 
         /// <summary>
@@ -375,22 +378,27 @@ namespace Meta.XR.Movement.Retargeting
             // Get retargeting settings.
             var retargetingBehaviorInfo = RetargetingBehaviorInfo.DefaultRetargetingSettings();
             retargetingBehaviorInfo.RetargetingBehavior = _retargetingBehavior;
-
-            // If manifestation caused a change in the pose size, resize source pose.
-            if (_sourcePose.Length != sourcePose.Length)
+            if (_retargetingBehavior is RetargetingBehavior.RotationAndPositionsUniformScale
+                or RetargetingBehavior.RotationOnlyNoScaling)
             {
-                _sourcePose.Dispose();
-                _sourcePose = new NativeArray<NativeTransform>(sourcePose, Persistent);
+                retargetingBehaviorInfo.RetargetingBehavior = RetargetingBehavior.RotationsAndPositions;
             }
 
-            _sourcePose.CopyFrom(sourcePose);
+            // If manifestation caused a change in the pose size, resize source pose.
+            if (SourcePose.Length != sourcePose.Length)
+            {
+                SourcePose.Dispose();
+                SourcePose = new NativeArray<NativeTransform>(sourcePose, Persistent);
+            }
+
+            SourcePose.CopyFrom(sourcePose);
 
             // Run retargeting.
             AppliedPose = false;
             if (!RetargetFromSourceFrameData(
                     _nativeHandle,
                     retargetingBehaviorInfo,
-                    _sourcePose,
+                    SourcePose,
                     ref RetargetedPose,
                     manifestation))
             {
@@ -405,6 +413,12 @@ namespace Meta.XR.Movement.Retargeting
             var headPose = RetargetedPose[HeadJointIndex];
             var scaleVal = Mathf.Max(float.Epsilon,
                 Mathf.Clamp(_currentScale, _scaleRange.x, _scaleRange.y));
+            if (_retargetingBehavior == RetargetingBehavior.RotationOnlyNoScaling ||
+                _retargetingBehavior == RetargetingBehavior.RotationAndPositionsUniformScale)
+            {
+                scaleVal = 1.0f;
+            }
+
             rootPose.Scale = Vector3.one * scaleVal;
             headPose.Scale = Vector3.one * (1 + (1 - scaleVal) * (1 - _headScaleFactor));
             RetargetedPose[RootJointIndex] = rootPose;
@@ -412,13 +426,19 @@ namespace Meta.XR.Movement.Retargeting
             return true;
         }
 
+        /// <summary>
+        /// Applies the pose to the skeleton.
+        /// </summary>
+        /// <param name="joints">The joint access array to apply to.</param>
         public void ApplyPose(ref TransformAccessArray joints)
         {
             // Create job to apply the pose.
             var job = new SkeletonJobs.ApplyPoseJob
             {
                 BodyPose = RetargetedPoseLocal,
-                RotationOnlyIndices = _nativeFingerIndices,
+                RotationOnlyIndices = _targetFingerIndices,
+                RootJointIndex = RootJointIndex,
+                HipsJointIndex = HipsJointIndex,
                 CurrentRotationIndex =
                     _retargetingBehavior == RetargetingBehavior.RotationsAndPositionsHandsRotationOnly ? 0 : -1
             };
@@ -434,14 +454,14 @@ namespace Meta.XR.Movement.Retargeting
         public void UpdateSourceReferencePose(NativeArray<NativeTransform> sourcePose, string manifestation)
         {
             // If manifestation caused a change in the pose size, resize source reference pose.
-            if (_sourceReferencePose.Length != sourcePose.Length)
+            if (SourceReferencePose.Length != sourcePose.Length)
             {
-                _sourceReferencePose.Dispose();
-                _sourceReferencePose = new NativeArray<NativeTransform>(sourcePose, Persistent);
+                SourceReferencePose.Dispose();
+                SourceReferencePose = new NativeArray<NativeTransform>(sourcePose, Persistent);
             }
 
             // Save the source reference pose.
-            _sourceReferencePose.CopyFrom(sourcePose);
+            SourceReferencePose.CopyFrom(sourcePose);
 
             // Retarget from source t-pose to get scaling.
             RetargetFromSourceFrameData(
@@ -471,7 +491,9 @@ namespace Meta.XR.Movement.Retargeting
                 IndexesToIgnore = new List<int>
                 {
                     (int)SkeletonData.FullBodyTrackingBoneId.LeftHandWristTwist,
-                    (int)SkeletonData.FullBodyTrackingBoneId.RightHandWristTwist
+                    (int)SkeletonData.FullBodyTrackingBoneId.RightHandWristTwist,
+                    (int)SkeletonData.FullBodyTrackingBoneId.LeftHandPalm,
+                    (int)SkeletonData.FullBodyTrackingBoneId.RightHandPalm
                 }
             };
             if (_sourceSkeletonDraw.LineThickness <= float.Epsilon || _sourceSkeletonDraw.TintColor != color)
@@ -479,8 +501,13 @@ namespace Meta.XR.Movement.Retargeting
                 _sourceSkeletonDraw.InitDraw(color, 0.005f);
             }
 
-            ApplyOffset(ref _sourcePose, offset, true);
-            _sourceSkeletonDraw.LoadDraw(_sourcePose.Length, _sourceParentIndices, _sourcePose);
+            var scale = offset.lossyScale;
+            scale.x = scale.x >= 0.0f ? 1.0f : -1.0f;
+            scale.y = scale.y >= 0.0f ? 1.0f : -1.0f;
+            scale.z = scale.z >= 0.0f ? 1.0f : -1.0f;
+            var debugSourcePose = new NativeArray<NativeTransform>(SourcePose, Temp);
+            ApplyOffset(ref debugSourcePose, offset, scale);
+            _sourceSkeletonDraw.LoadDraw(debugSourcePose.Length, SourceSkeletonData.ParentIndices, debugSourcePose);
             _sourceSkeletonDraw.Draw();
         }
 
@@ -502,10 +529,10 @@ namespace Meta.XR.Movement.Retargeting
         /// <summary>
         /// Draws debug target pose.
         /// </summary>
-        /// <param name="localOffset">Offset applied when drawing based on local transforms.</param>
+        /// <param name="offset">Offset applied when drawing based on local transforms.</param>
         /// <param name="color">Color to use.</param>
         /// <param name="useWorldPose">If rendering world transforms.</param>
-        public void DrawDebugTargetPose(Transform localOffset, Color color, bool useWorldPose = false)
+        public void DrawDebugTargetPose(Transform offset, Color color, bool useWorldPose = false)
         {
             _targetSkeletonDraw ??= new SkeletonDraw();
             if (_targetSkeletonDraw.LineThickness <= float.Epsilon || _targetSkeletonDraw.TintColor != color)
@@ -513,19 +540,12 @@ namespace Meta.XR.Movement.Retargeting
                 _targetSkeletonDraw.InitDraw(color, 0.005f);
             }
 
-            NativeArray<NativeTransform> targetWorldPose;
-            if (useWorldPose)
-            {
-                targetWorldPose = new NativeArray<NativeTransform>(RetargetedPose.Length, Temp);
-                targetWorldPose.CopyFrom(RetargetedPose);
-            }
-            else
-            {
-                targetWorldPose = GetWorldPoseFromLocalPose(RetargetedPoseLocal);
-            }
-
-            ApplyOffset(ref targetWorldPose, localOffset, false);
-            _targetSkeletonDraw.LoadDraw(targetWorldPose.Length, _targetParentIndices, targetWorldPose);
+            var scale = offset.lossyScale;
+            var targetWorldPose = useWorldPose
+                ? new NativeArray<NativeTransform>(RetargetedPose, Temp)
+                : GetWorldPoseFromLocalPose(RetargetedPoseLocal);
+            ApplyOffset(ref targetWorldPose, offset, scale);
+            _targetSkeletonDraw.LoadDraw(targetWorldPose.Length, TargetSkeletonData.ParentIndices, targetWorldPose);
             _targetSkeletonDraw.Draw();
             targetWorldPose.Dispose();
         }
@@ -560,10 +580,13 @@ namespace Meta.XR.Movement.Retargeting
             var worldPose = new NativeArray<NativeTransform>(localPose.Length, TempJob);
             var job = new SkeletonJobs.ConvertLocalToWorldPoseJob
             {
+                RootIndex = RootJointIndex,
+                HipsIndex = HipsJointIndex,
                 LocalPose = localPose,
                 WorldPose = worldPose,
-                ParentIndices = _nativeTargetParentIndices,
+                ParentIndices = TargetParentIndices,
                 RootScale = Vector3.one,
+                HipsScale = HipsScale,
                 RootPosition = rootPosition ?? Vector3.zero,
                 RootRotation = rootRotation ?? Quaternion.identity
             };
@@ -571,19 +594,13 @@ namespace Meta.XR.Movement.Retargeting
             return worldPose;
         }
 
-        private void ApplyOffset(ref NativeArray<NativeTransform> pose, Transform offset, bool uniformScale)
+        private void ApplyOffset(ref NativeArray<NativeTransform> pose,
+            Transform offset,
+            Vector3 scale)
         {
             if (offset == null)
             {
                 return;
-            }
-
-            var scale = offset.lossyScale;
-            if (uniformScale)
-            {
-                scale.x = scale.x >= 0.0f ? 1.0f : -1.0f;
-                scale.y = scale.y >= 0.0f ? 1.0f : -1.0f;
-                scale.z = scale.z >= 0.0f ? 1.0f : -1.0f;
             }
 
             for (var i = 0; i < pose.Length; i++)

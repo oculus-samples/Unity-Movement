@@ -14,9 +14,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [
-        "UNITY_NGO_MODULE_DEFINED"
-    ],
+    "defineConstraints": [],
     "versionDefines": [
         {
             "name": "com.meta.xr.sdk.platform",

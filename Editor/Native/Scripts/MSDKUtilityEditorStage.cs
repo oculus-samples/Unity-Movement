@@ -42,6 +42,12 @@ namespace Meta.XR.Movement.Editor
             set => _originalAssetPath = value;
         }
 
+        public string CustomDataSourcePath
+        {
+            get => _customDataSourcePath;
+            set => _customDataSourcePath = value;
+        }
+
         /// <summary>
         /// Gets or sets the editor window toolbar.
         /// </summary>
@@ -56,16 +62,20 @@ namespace Meta.XR.Movement.Editor
         [SerializeField]
         private AlignmentSceneView _alignmentSceneView = null;
 
+        [SerializeField]
+        private string _customDataSourcePath = null;
+
         /// <summary>
         /// Creates an instance of the editor stage.
         /// </summary>
         /// <param name="assetPath">The asset path.</param>
-        /// <param name="customDataSourceName">Optional custom data source name.</param>
+        /// <param name="customDataSourcePath">Optional custom data source path.</param>
         /// <returns>The created editor stage.</returns>
-        public static MSDKUtilityEditorStage CreateInstanceOfStage(string assetPath, string customDataSourceName = null)
+        public static MSDKUtilityEditorStage CreateInstanceOfStage(string assetPath, string customDataSourcePath = null)
         {
             var newAlignmentStage = CreateInstance<MSDKUtilityEditorStage>();
             newAlignmentStage.OriginalAssetPath = assetPath;
+            newAlignmentStage.CustomDataSourcePath = customDataSourcePath;
 
             var nativeUtilityConfigToolbar = MSDKUtilityEditorWindow.CreateDockedInspector();
             newAlignmentStage.Toolbar = nativeUtilityConfigToolbar;
@@ -115,7 +125,7 @@ namespace Meta.XR.Movement.Editor
             var assetNameSansExtension = Path.GetFileNameWithoutExtension(_originalAssetPath);
             var assetObject = AssetDatabase.LoadAssetAtPath(_originalAssetPath, typeof(GameObject)) as GameObject;
 
-            Toolbar.UtilityConfig.MetadataAssetPath = _originalAssetPath;
+            Toolbar.Config.MetadataAssetPath = _originalAssetPath;
             alignmentScene.name = assetNameSansExtension + " Config";
             try
             {
@@ -163,6 +173,13 @@ namespace Meta.XR.Movement.Editor
             SceneManager.MoveGameObjectToScene(_instantiatedCharacter, alignmentScene);
             Toolbar.Previewer.SceneViewCharacter = _instantiatedCharacter;
             Toolbar.PreviewStage = this;
+
+            // Pass the custom data source name to the toolbar for initialization
+            if (!string.IsNullOrEmpty(_customDataSourcePath))
+            {
+                Toolbar.CustomDataSourcePath = _customDataSourcePath;
+            }
+
             Toolbar.Init();
             return (alignmentScene, true);
         }

@@ -27,8 +27,8 @@ namespace Meta.XR.Movement.Editor
         public const int TinyBorderRadius = 2;
         public const int IconSize = 16;
         public const int LargeIconSize = 60;
-        public const int OverlayMinWidth = 240;
-        public const int OverlayMaxWidth = 240;
+        public const int OverlayMinWidth = 300;
+        public const int OverlayMaxWidth = 300;
         public const int SequenceButtonWidth = 120;
         public const int SequenceButtonHeight = 90;
         public const int ActionButtonWidth = 26;

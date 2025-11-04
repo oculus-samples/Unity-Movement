@@ -105,6 +105,55 @@ namespace Meta.XR.Movement.Editor
         }
 
         /// <summary>
+        /// Ensures skeleton draws are properly initialized. Call this before drawing to handle domain reloads.
+        /// </summary>
+        public void EnsureSkeletonDrawsInitialized()
+        {
+            // Check if skeleton draws need reinitialization (after domain reload)
+            if (_skeletonDraws == null || _skeletonDraws.Length != 4)
+            {
+                _skeletonDraws = new SkeletonDraw[4];
+                InitializeSkeletonDraws();
+                return;
+            }
+
+            // Check if any skeleton draw is null or invalid
+            for (var i = 0; i < _skeletonDraws.Length; i++)
+            {
+                if (_skeletonDraws[i] == null || !IsSkeletonDrawValid(_skeletonDraws[i]))
+                {
+                    InitializeSkeletonDraws();
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if a SkeletonDraw instance is valid and ready for drawing.
+        /// </summary>
+        /// <param name="skeletonDraw">The SkeletonDraw instance to check.</param>
+        /// <returns>True if valid, false otherwise.</returns>
+        private bool IsSkeletonDrawValid(SkeletonDraw skeletonDraw)
+        {
+            if (skeletonDraw == null)
+            {
+                return false;
+            }
+
+            // Try to access properties that would indicate if the internal state is valid
+            // If the skeleton draw was not properly initialized, these will be default values
+            try
+            {
+                // Check if basic properties are set (these would be default if not initialized)
+                return skeletonDraw.TintColor != default(Color) && skeletonDraw.LineThickness > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Instantiates the preview character retargeter.
         /// </summary>
         public void InstantiatePreviewCharacterRetargeter()
@@ -120,9 +169,9 @@ namespace Meta.XR.Movement.Editor
             previewCharacter.transform.position = _previewPosition;
             SceneManager.MoveGameObjectToScene(previewCharacter, _window.PreviewStage.scene);
             _retargeter = previewCharacter.AddComponent<CharacterRetargeter>();
-            _retargeter.ConfigAsset = _window.UtilityConfig.EditorMetadataObject.ConfigJson;
+            _retargeter.ConfigAsset = _window.Config.EditorMetadataObject.ConfigJson;
             CharacterRetargeterConfigEditor.LoadConfig(new SerializedObject(_retargeter), _retargeter);
-            _retargeter.SkeletonRetargeter.ApplyScale = true;
+            _retargeter.SkeletonRetargeter.ApplyRootScale = true;
             _retargeter.SkeletonRetargeter.ScaleRange = new Vector2(MinScale, MaxScale);
             _retargeter.Start();
 
@@ -133,32 +182,51 @@ namespace Meta.XR.Movement.Editor
         /// <summary>
         /// Loads the skeleton draw with the specified configuration.
         /// </summary>
+        /// <param name="skeletonType">The skeleton type.</param>
         /// <param name="drawer">The skeleton drawer to load.</param>
         /// <param name="config">The configuration to use.</param>
-        public void LoadDraw(SkeletonDraw drawer, MSDKUtilityEditorConfig config)
+        public void LoadDraw(SkeletonType skeletonType, SkeletonDraw drawer, MSDKUtilityEditorConfig config)
         {
-            drawer.LoadDraw(config.SkeletonInfo.JointCount, config.ParentIndices,
-                config.ReferencePose.ToArray(), config.JointNames, config.SkeletonJoints);
+            if (skeletonType == SkeletonType.SourceSkeleton)
+            {
+                // Get the appropriate T-pose array based on the current step
+                var tPoseArray = config.Step switch
+                {
+                    MSDKUtilityEditorConfig.EditorStep.MinTPose => config.SourceSkeletonData.MinTPoseArray,
+                    MSDKUtilityEditorConfig.EditorStep.MaxTPose => config.SourceSkeletonData.MaxTPoseArray,
+                    _ => config.SourceSkeletonData.TPoseArray // Default to unscaled T-pose
+                };
+                drawer.LoadDraw(config.SourceSkeletonData.JointCount, config.SourceSkeletonData.ParentIndices,
+                    tPoseArray, config.SourceSkeletonData.Joints, config.SkeletonJoints);
+            }
+            else if (skeletonType == SkeletonType.TargetSkeleton)
+            {
+                drawer.LoadDraw(config.TargetSkeletonData.JointCount, config.TargetSkeletonData.ParentIndices,
+                    config.CurrentPose, config.TargetSkeletonData.Joints, config.SkeletonJoints);
+            }
+        }
+
+        /// <summary>
+        /// Updates the source draw.
+        /// </summary>
+        public void UpdateSourceDraw(MSDKUtilityEditorConfig config)
+        {
+            LoadDraw(SkeletonType.SourceSkeleton, SourceSkeletonDrawTPose, config);
         }
 
         /// <summary>
         /// Updates the target draw.
         /// </summary>
-        public void UpdateTargetDraw(MSDKUtilityEditorWindow win)
+        public void UpdateTargetDraw(MSDKUtilityEditorConfig config)
         {
-            if (TargetSkeletonDrawTPose == null || win.TargetInfo == null)
-            {
-                return;
-            }
-
-            JointAlignmentUtility.UpdateTPoseData(win.TargetInfo);
-            if (win.Step != MSDKUtilityEditorConfig.EditorStep.Configuration &&
-                win.Step != MSDKUtilityEditorConfig.EditorStep.Review)
+            JointAlignmentUtility.UpdateTPoseData(config);
+            if (config.Step != MSDKUtilityEditorConfig.EditorStep.Configuration &&
+                config.Step != MSDKUtilityEditorConfig.EditorStep.Review)
             {
                 _window.ModifyConfig(_window.Overlay.ShouldAutoUpdateMappings, false);
             }
 
-            LoadDraw(TargetSkeletonDrawTPose, win.TargetInfo);
+            LoadDraw(SkeletonType.TargetSkeleton, TargetSkeletonDrawTPose, config);
         }
 
         /// <summary>
@@ -166,18 +234,18 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void DrawPreviewCharacter()
         {
-            if (_window.FileReader == null || !_window.FileReader.BodyPose.IsCreated)
+            if (!_window.FileReader.BodyPose.IsCreated)
             {
                 DestroyPreviewCharacterRetargeter();
                 return;
             }
 
             var sourcePose = new NativeArray<NativeTransform>(
-                _window.SourceInfo.SkeletonInfo.JointCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                _window.Config.SourceSkeletonData.JointCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             var sourceTPose = new NativeArray<NativeTransform>(
-                _window.SourceInfo.SkeletonInfo.JointCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+                _window.Config.SourceSkeletonData.JointCount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
 
-            sourceTPose.CopyFrom(_window.SourceInfo.ReferencePose);
+            sourceTPose.CopyFrom(_window.Config.SourceSkeletonData.TPoseArray);
             sourcePose.CopyFrom(_window.FileReader.BodyPose);
 
             // Scale the TPose and the body pose.
@@ -185,9 +253,9 @@ namespace Meta.XR.Movement.Editor
             {
                 MSDKUtilityEditorConfig.EditorStep.MinTPose => 0.0f,
                 MSDKUtilityEditorConfig.EditorStep.MaxTPose => 1.0f,
-                _ => _window.UtilityConfig.ScaleSize / 100.0f
+                _ => _window.Config.ScaleSize / 100.0f
             };
-            var scale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo,
+            var scale = JointAlignmentUtility.GetDesiredScale(_window.Config, _window.Config,
                 _window.Step switch
                 {
                     MSDKUtilityEditorConfig.EditorStep.MinTPose => SkeletonTPoseType.MinTPose,
@@ -196,16 +264,16 @@ namespace Meta.XR.Movement.Editor
                 });
             if (_window.Step == MSDKUtilityEditorConfig.EditorStep.Review)
             {
-                var minPoseScale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo,
+                var minPoseScale = JointAlignmentUtility.GetDesiredScale(_window.Config, _window.Config,
                     SkeletonTPoseType.MinTPose);
-                var maxPoseScale = JointAlignmentUtility.GetDesiredScale(_window.SourceInfo, _window.TargetInfo,
+                var maxPoseScale = JointAlignmentUtility.GetDesiredScale(_window.Config, _window.Config,
                     SkeletonTPoseType.MaxTPose);
-                scale = Mathf.Lerp(minPoseScale, maxPoseScale, _window.UtilityConfig.ScaleSize / 100.0f);
+                scale = Mathf.Lerp(minPoseScale, maxPoseScale, _window.Config.ScaleSize / 100.0f);
             }
 
-            CalculateSkeletonTPoseByRef(_window.SourceInfo.ConfigHandle, SkeletonType.SourceSkeleton,
+            CalculateSkeletonTPoseByRef(_window.ConfigHandle, SkeletonType.SourceSkeleton,
                 JointRelativeSpaceType.RootOriginRelativeSpace, scalePercentage, ref sourceTPose);
-            MSDKUtilityHelper.ScaleSkeletonPose(_window.SourceInfo.ConfigHandle, SkeletonType.SourceSkeleton,
+            MSDKUtilityHelper.ScaleSkeletonPose(_window.ConfigHandle, SkeletonType.SourceSkeleton,
                 ref sourcePose, scale);
 
             // Run preview retargeter.
@@ -248,6 +316,7 @@ namespace Meta.XR.Movement.Editor
                 target.SkeletonJoints = new Transform[targetJointCount];
             }
 
+            // Check if scene view character is null or destroyed
             if (_sceneViewCharacter == null)
             {
                 return;
@@ -271,7 +340,7 @@ namespace Meta.XR.Movement.Editor
                     continue;
                 }
 
-                var jointName = target.JointNames[i];
+                var jointName = target.TargetSkeletonData.Joints[i];
                 var joint = MSDKUtilityHelper.FindChildRecursiveExact(rootSearchTransform, jointName);
                 target.SkeletonJoints[i] = joint;
             }
@@ -328,11 +397,11 @@ namespace Meta.XR.Movement.Editor
 
             // Set the positions/rotations for the root first.
             var rootJoint = target.SkeletonJoints[rootJointIndex];
-            var rootTPose = target.ReferencePose[rootJointIndex];
+            var rootTPose = target.CurrentPose[rootJointIndex];
 
             // Apply root scale more carefully to prevent compounding issues
             // Use the utility config root scale directly instead of combining with T-pose scale
-            var finalRootScale = _window.UtilityConfig.RootScale;
+            var finalRootScale = _window.Config.RootScale;
 
             // Validate the final root scale before applying
             if (finalRootScale.x < MinScale || finalRootScale.y < MinScale || finalRootScale.z < MinScale ||
@@ -350,7 +419,7 @@ namespace Meta.XR.Movement.Editor
             for (var i = 0; i < target.SkeletonJoints.Length; i++)
             {
                 var joint = target.SkeletonJoints[i];
-                var tPose = target.ReferencePose[i];
+                var tPose = target.CurrentPose[i];
                 if (joint == null)
                 {
                     continue;
@@ -377,7 +446,7 @@ namespace Meta.XR.Movement.Editor
                 }
 
                 var joint = target.SkeletonJoints[i];
-                var tPose = target.ReferencePose[i];
+                var tPose = target.CurrentPose[i];
                 if (joint == null)
                 {
                     continue;
@@ -386,36 +455,6 @@ namespace Meta.XR.Movement.Editor
                 Undo.RecordObject(joint, "Reload Character");
                 joint.SetPositionAndRotation(tPose.Position, tPose.Orientation);
             }
-        }
-
-        private bool UsePositionScale(MSDKUtilityEditorConfig config)
-        {
-            if (config.EditorMetadataObject == null || config.EditorMetadataObject.Model == null)
-            {
-                return true;
-            }
-
-            // Fallback in case we've already applied model scale.
-            GetJointIndexByKnownJointType(config.ConfigHandle, SkeletonType.TargetSkeleton,
-                KnownJointType.Hips, out var hipsJointIndex);
-            var hipsJoint = config.SkeletonJoints[hipsJointIndex];
-            var sourceJoints = config.EditorMetadataObject.Model.GetComponentsInChildren<Transform>();
-            Transform sourceHipsJoint = null;
-            foreach (var sourceJoint in sourceJoints)
-            {
-                if (sourceJoint.name == hipsJoint.name)
-                {
-                    sourceHipsJoint = sourceJoint;
-                    break;
-                }
-            }
-
-            if (sourceHipsJoint != null && Mathf.Abs(hipsJoint.position.sqrMagnitude - sourceHipsJoint.position.sqrMagnitude) <= 0.01f)
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }

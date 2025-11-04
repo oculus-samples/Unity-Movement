@@ -690,18 +690,21 @@ namespace Meta.XR.Movement.Retargeting
                 if (GetInterpolatedJointPose(handle, TrackerJointType.CenterEye, ref centerEye,
                         renderTime))
                 {
+                    centerEye = SkeletonUtilities.FromOpenXRToUnitySpace(centerEye);
                     finalCenterEyePose = new Pose(centerEye.Position, centerEye.Orientation);
                 }
 
                 if (GetInterpolatedJointPose(handle, TrackerJointType.RightInput, ref rightInput,
                         renderTime))
                 {
+                    rightInput = SkeletonUtilities.FromOpenXRToUnitySpace(rightInput);
                     finalRightPose = new Pose(rightInput.Position, rightInput.Orientation);
                 }
 
                 if (GetInterpolatedJointPose(handle, TrackerJointType.LeftInput, ref leftInput,
                         renderTime))
                 {
+                    leftInput = SkeletonUtilities.FromOpenXRToUnitySpace(leftInput);
                     finalLeftPose = new Pose(leftInput.Position, leftInput.Orientation);
                 }
             }

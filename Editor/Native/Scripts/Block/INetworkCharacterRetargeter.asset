@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81d5758cfb47823489080981979f33be, type: 3}
   m_Name: INetworkCharacterRetargeter
   m_EditorClassIdentifier: 
-  id: 6b4a8085-3c71-410b-baec-ff2c5a44ad31
+  id: 5b9a1ea5-1bf0-4c72-af51-147b74928bc0
   version: 1
   blockName: Networked Character Retargeter
   description: Creates a networked version of the Character Retargeter based on a
@@ -20,10 +20,9 @@ MonoBehaviour:
     in real-time.
   tags:
     array:
-    - name: Multiplayer
-    - name: Tracking
+    - name: Hidden
   thumbnail: {fileID: 2800000, guid: 0bff7535bc7b21f4382b01f5178a1dcb, type: 3}
-  order: 0
+  remoteThumbnailContentId: 0
   prefab: {fileID: 0}
   selectedGuidedSetupIndex: 0
   externalBlockDependencies: []

@@ -5,6 +5,7 @@ using Meta.XR.Movement.Retargeting;
 using System;
 using System.IO;
 using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 using static Meta.XR.Movement.MSDKUtility;
 
@@ -188,6 +189,11 @@ namespace Meta.XR.Movement.Recording
 
         private void ProcessReceivedData()
         {
+            var job = new SkeletonUtilities.ConvertFromOpenXRToUnitySpace
+            {
+                Transforms = _deserSourcePose
+            };
+            job.Schedule().Complete();
             if (CompressionUsesJointLengths(_receivedCompressionType))
             {
                 SkeletonUtilities.ConvertLocalPosesToAbsolute(_sourceParentIndices, _deserSourcePose);
@@ -207,6 +213,8 @@ namespace Meta.XR.Movement.Recording
             var emptyBody = new NativeArray<NativeTransform>(1, Allocator.Temp);
             var emptyFace = new NativeArray<float>(1, Allocator.Temp);
             var frameData = new FrameData();
+            var bindPose = new NativeArray<NativeTransform>(_numSourceJoints, Allocator.Temp);
+            int numBindPose = 0;
             if (!DeserializeSkeletonAndFace(
                     _playbackHandle,
                     nativeBytes,
@@ -216,7 +224,9 @@ namespace Meta.XR.Movement.Recording
                     ref emptyBody,
                     ref emptyFace,
                     ref _deserSourcePose,
-                    ref frameData))
+                    ref frameData,
+                    ref bindPose,
+                    out numBindPose))
             {
                 Debug.LogError("Data deserialized is invalid!");
                 return false;

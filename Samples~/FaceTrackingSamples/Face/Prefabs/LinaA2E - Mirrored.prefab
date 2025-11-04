@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 45230777459800938, guid: e1d43a0992403a546b83d4ce09940b5e, type: 3}
+      propertyPath: _customSkeleton
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 78602733017180382, guid: e1d43a0992403a546b83d4ce09940b5e, type: 3}
       propertyPath: m_Layer
       value: 11
@@ -500,7 +504,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 11
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7954537199492726419, guid: e1d43a0992403a546b83d4ce09940b5e, type: 3}
+    - {fileID: 8339732544964368404, guid: e1d43a0992403a546b83d4ce09940b5e, type: 3}
+    - {fileID: 6305819818428065044, guid: e1d43a0992403a546b83d4ce09940b5e, type: 3}
+    - {fileID: 384769480237314525, guid: e1d43a0992403a546b83d4ce09940b5e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -547,8 +555,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _target: {fileID: 0}
   _isLocal: 1
+  _useJobs: 1
   _mirrorPositions: 1
   _mirrorRotations: 1
+  _mirrorScales: 1
   _bonePairs:
   - Joint: {fileID: 930510313814282159}
     ParentJoint: {fileID: 0}

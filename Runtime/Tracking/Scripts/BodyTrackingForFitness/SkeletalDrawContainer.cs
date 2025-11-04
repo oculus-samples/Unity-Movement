@@ -32,10 +32,10 @@ namespace Meta.XR.Movement.Fitness
         protected BodyPoseBoneTransforms _bodyPoseTransforms;
 
         /// <summary>
-        /// Retargeting body data.
+        /// Retargeting body data asset.
         /// </summary>
         [SerializeField]
-        protected SkeletonData _data;
+        protected TextAsset _data;
 
         /// <summary>
         /// The indexes to ignore when doing skeleton draw.
@@ -67,13 +67,9 @@ namespace Meta.XR.Movement.Fitness
 
         private void InitializeParentIndices()
         {
-#if ISDK_DEFINED
-            _parentIndices = new int[_bodyPoseTransforms.BoneTransforms.Count];
-            for (int i = 0; i < _parentIndices.Length; i++)
-            {
-                _parentIndices[i] = FitnessCommon.GetParentIndex(_data, i);
-            }
-#endif
+            MSDKUtility.CreateOrUpdateHandle(_data.text, out var handle);
+            MSDKUtility.GetParentJointIndexes(handle, MSDKUtility.SkeletonType.SourceSkeleton, out var indices);
+            _parentIndices = indices.ToArray();
         }
 
         private void OnDestroy()

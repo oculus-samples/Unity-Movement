@@ -9,7 +9,7 @@ using static Meta.XR.Movement.MSDKUtility;
 
 namespace Meta.XR.Movement.Retargeting
 {
-    public class SkeletonJobs
+    public abstract class SkeletonJobs
     {
         /// <summary>
         /// Job that gets a pose.
@@ -81,6 +81,18 @@ namespace Meta.XR.Movement.Retargeting
             public NativeArray<int> RotationOnlyIndices;
 
             /// <summary>
+            /// The root joint index.
+            /// </summary>
+            [ReadOnly]
+            public int RootJointIndex;
+
+            /// <summary>
+            /// The hips joint index.
+            /// </summary>
+            [ReadOnly]
+            public int HipsJointIndex;
+
+            /// <summary>
             /// The current rotation index.
             /// </summary>
             public int CurrentRotationIndex;
@@ -90,10 +102,10 @@ namespace Meta.XR.Movement.Retargeting
             public void Execute(int index, TransformAccess transform)
             {
                 var bodyPose = BodyPose[index];
-                bool isRotationOnly = CurrentRotationIndex >= 0 && CurrentRotationIndex < RotationOnlyIndices.Length &&
-                                      RotationOnlyIndices[CurrentRotationIndex] == index;
-
-                if (isRotationOnly)
+                var isRotationOnly = CurrentRotationIndex >= 0 &&
+                                     CurrentRotationIndex < RotationOnlyIndices.Length &&
+                                     RotationOnlyIndices[CurrentRotationIndex] == index;
+                if (isRotationOnly && index != RootJointIndex && index != HipsJointIndex)
                 {
                     CurrentRotationIndex++; // Advance to next rotation-only index
                     transform.localRotation = bodyPose.Orientation;
@@ -118,6 +130,24 @@ namespace Meta.XR.Movement.Retargeting
             public int RootJointIndex;
 
             /// <summary>
+            /// The index of the hips joint in the skeleton.
+            /// </summary>
+            [ReadOnly]
+            public int HipsJointIndex;
+
+            /// <summary>
+            /// The optional scale on the hips.
+            /// </summary>
+            [ReadOnly]
+            public Vector3 HipsScale;
+
+            /// <summary>
+            /// The retargeting behaviour.
+            /// </summary>
+            [ReadOnly]
+            public RetargetingBehavior RetargetingBehavior;
+
+            /// <summary>
             /// Array of parent indices for each joint in the skeleton.
             /// </summary>
             [ReadOnly]
@@ -128,6 +158,12 @@ namespace Meta.XR.Movement.Retargeting
             /// </summary>
             [ReadOnly]
             public NativeArray<NativeTransform> WorldPose;
+
+            /// <summary>
+            /// Array of local space poses in T-Pose.
+            /// </summary>
+            [ReadOnly]
+            public NativeArray<NativeTransform> LocalTPose;
 
             /// <summary>
             /// Output array for the converted local space poses.
@@ -141,24 +177,43 @@ namespace Meta.XR.Movement.Retargeting
             public void Execute()
             {
                 var rootScale = WorldPose[RootJointIndex].Scale;
-                var inverseScale = new Vector3(1f / rootScale.x, 1f / rootScale.y, 1f / rootScale.z);
+                var inverseRootScale = rootScale.Reciprocal();
+                var inverseHipsScale = HipsScale.Reciprocal();
+
                 for (var i = 0; i < WorldPose.Length; i++)
                 {
                     var pose = WorldPose[i];
                     var parentIndex = ParentIndices[i];
-                    if (parentIndex != -1)
+                    if (i <= RootJointIndex)
+                    {
+                        pose.Position = Vector3.Scale(pose.Position, inverseRootScale);
+                    }
+                    else if (i > RootJointIndex)
                     {
                         var parentPose = WorldPose[parentIndex];
                         var localPosition = Quaternion.Inverse(parentPose.Orientation) *
                                             (pose.Position - parentPose.Position);
-                        localPosition = Vector3.Scale(localPosition, inverseScale);
                         var localRotation = Quaternion.Inverse(parentPose.Orientation) * pose.Orientation;
+                        if (RetargetingBehavior == RetargetingBehavior.RotationOnlyNoScaling)
+                        {
+                            localPosition = LocalTPose[i].Position;
+                            if (i == HipsJointIndex)
+                            {
+                                localPosition.y -= WorldPose[RootJointIndex].Position.y;
+                            }
+                        }
+                        else
+                        {
+                            localPosition = Vector3.Scale(localPosition, inverseRootScale);
+                        }
+
+                        if (i != HipsJointIndex && parentIndex != RootJointIndex)
+                        {
+                            localPosition = Vector3.Scale(localPosition, inverseHipsScale);
+                        }
+
                         pose.Position = localPosition;
                         pose.Orientation = localRotation;
-                    }
-                    else
-                    {
-                        pose.Position = Vector3.Scale(pose.Position, inverseScale);
                     }
 
                     LocalPose[i] = pose;
@@ -185,10 +240,28 @@ namespace Meta.XR.Movement.Retargeting
             public NativeArray<int> ParentIndices;
 
             /// <summary>
+            /// The index of the root joint.
+            /// </summary>
+            [ReadOnly]
+            public int RootIndex;
+
+            /// <summary>
+            /// The index of the hips joint.
+            /// </summary>
+            [ReadOnly]
+            public int HipsIndex;
+
+            /// <summary>
             /// The scale of the root joint to apply to the skeleton.
             /// </summary>
             [ReadOnly]
             public Vector3 RootScale;
+
+            /// <summary>
+            /// The scale of the hips joint to apply to the skeleton.
+            /// </summary>
+            [ReadOnly]
+            public Vector3 HipsScale;
 
             /// <summary>
             /// Root position.
@@ -197,7 +270,7 @@ namespace Meta.XR.Movement.Retargeting
             public Vector3 RootPosition;
 
             /// <summary>
-            /// Rooot rotation.
+            /// Root rotation.
             /// </summary>
             [ReadOnly]
             public Quaternion RootRotation;
@@ -214,7 +287,7 @@ namespace Meta.XR.Movement.Retargeting
                 {
                     var parentIndex = ParentIndices[i];
 
-                    if (parentIndex < 0)
+                    if (i == RootIndex)
                     {
                         // Root joint - local is already world
                         WorldPose[i] = new NativeTransform(
@@ -222,14 +295,20 @@ namespace Meta.XR.Movement.Retargeting
                             RootPosition + RootRotation * Vector3.Scale(LocalPose[i].Position, RootScale),
                             LocalPose[i].Scale);
                     }
-                    else
+                    else if (i > RootIndex)
                     {
                         var parentWorldTransform = WorldPose[parentIndex];
+                        var scale = RootScale;
+                        if (i > HipsIndex)
+                        {
+                            scale = Vector3.Scale(scale, HipsScale);
+                        }
+
                         var localTransform = LocalPose[i];
                         var worldRotation = parentWorldTransform.Orientation * localTransform.Orientation;
                         var worldPosition = parentWorldTransform.Position +
                                             parentWorldTransform.Orientation *
-                                            Vector3.Scale(localTransform.Position, RootScale);
+                                            Vector3.Scale(localTransform.Position, scale);
                         WorldPose[i] = new NativeTransform(worldRotation, worldPosition);
                     }
                 }

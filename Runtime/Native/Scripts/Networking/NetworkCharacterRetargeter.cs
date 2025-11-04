@@ -242,8 +242,12 @@ namespace Meta.XR.Movement.Networking
             worldPose.Dispose();
         }
 
-        protected void OnValidate()
+        /// <summary>
+        /// Validation.
+        /// </summary>
+        public override void OnValidate()
         {
+            base.OnValidate();
             UpdateSerializationSettings();
         }
 

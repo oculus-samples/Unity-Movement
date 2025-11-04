@@ -200,10 +200,7 @@ namespace Meta.XR.Movement.Editor
 
             // Update button icon
             var playButtonImage = _playButton.Q<Image>();
-            if (playButtonImage != null)
-            {
-                playButtonImage.image = _config.FileReader.IsPlaying ? _pauseImage : _playImage;
-            }
+            playButtonImage.image = _config.FileReader.IsPlaying ? _pauseImage : _playImage;
         }
 
         private void Stop()
@@ -311,30 +308,27 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void Update()
         {
-            if (_config != null)
+            if (!_config.FileReader.UserActivelyScrubbing)
             {
-                if (!_config.FileReader.UserActivelyScrubbing)
+                _slider.value = _config.FileReader.SnapshotIndex;
+            }
+            else
+            {
+                if (_slider.value != _config.FileReader.SnapshotIndex)
                 {
-                    _slider.value = _config.FileReader.SnapshotIndex;
+                    Seek((int)_slider.value);
                 }
-                else
-                {
-                    if (_slider.value != _config.FileReader.SnapshotIndex)
-                    {
-                        Seek((int)_slider.value);
-                    }
-                }
+            }
 
-                // Update percentage label
-                if (_config.FileReader.NumSnapshots > 0)
-                {
-                    float percentage = (float)_config.FileReader.SnapshotIndex / _config.FileReader.NumSnapshots * 100f;
-                    _currentTimeLabel.text = $"{Mathf.RoundToInt(percentage)}%";
-                }
-                else
-                {
-                    _currentTimeLabel.text = "0%";
-                }
+            // Update percentage label
+            if (_config.FileReader.NumSnapshots > 0)
+            {
+                float percentage = (float)_config.FileReader.SnapshotIndex / _config.FileReader.NumSnapshots * 100f;
+                _currentTimeLabel.text = $"{Mathf.RoundToInt(percentage)}%";
+            }
+            else
+            {
+                _currentTimeLabel.text = "0%";
             }
         }
 

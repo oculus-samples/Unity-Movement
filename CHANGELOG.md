@@ -1,3 +1,22 @@
+## [81.0.0]
+
+## What's New
+- **Face tracking retargeting update:** Face tracking scenes use new retargeting pipeline.
+- **Twist joints**: Twist joints have been integrated into the tooling UI.
+
+## What's Fixed
+- Fixed incorrect use of height estimate with half body tracking.
+- Fixed error in retargeter related to taking reciprocal of values near zero.
+- Fixed hands getting locked above head in hip pinning scene.
+- Fixed fitness sample debug draw skeleton.
+- Fixed numerous retargeting tooling errors and support for Unity 6.
+- Prevent constant refreshing and saving of fitness body pose transforms when no changes have been made.
+- Fixed bug where the debug draw skeleton was using the source skeleton used for retargeting.
+- Fixed hip pinning processor from going into the ground due to varying leg lengths.
+
+## Improvements
+- Improved general tooling flow and character bone alignment.
+
 ## [78.0.0]
 
 ## What's New

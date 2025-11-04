@@ -1,10 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+#if FUSION2
 using Fusion;
+using Meta.XR.MultiplayerBlocks.Fusion;
+#endif
 #if META_PLATFORM_SDK_DEFINED
 using Meta.XR.MultiplayerBlocks.Shared;
 #endif // META_PLATFORM_SDK_DEFINED
-using Meta.XR.MultiplayerBlocks.Fusion;
 using System.Collections;
 using UnityEngine;
 
@@ -14,6 +16,7 @@ namespace Meta.XR.Movement.Networking.Fusion
     /// Implementation of <see cref="INetworkCharacterSpawner"/> using the Photon Fusion 2
     /// networking framework.
     /// </summary>
+#if FUSION2
     public class NetworkCharacterSpawnerFusion : MonoBehaviour, INetworkCharacterSpawner
     {
         /// <summary>
@@ -27,6 +30,9 @@ namespace Meta.XR.Movement.Networking.Fusion
             get => _selectedCharacterIndex;
             set => _selectedCharacterIndex = value;
         }
+
+        /// <inheritdoc cref="INetworkCharacterSpawner.NetworkedCharacterHandler"/>
+        public GameObject NetworkedCharacterHandler => _networkedCharacterHandler;
 
         /// <inheritdoc cref="INetworkCharacterSpawner.CharacterRetargeterPrefabs"/>
         public GameObject[] CharacterRetargeterPrefabs
@@ -148,4 +154,11 @@ namespace Meta.XR.Movement.Networking.Fusion
             );
         }
     }
+#else
+    public class NetworkCharacterSpawnerFusion : MonoBehaviour
+    {
+        /// <inheritdoc cref="INetworkCharacterSpawner.CharacterRetargeterPrefabs"/>
+        public GameObject[] CharacterRetargeterPrefabs;
+    }
+#endif
 }

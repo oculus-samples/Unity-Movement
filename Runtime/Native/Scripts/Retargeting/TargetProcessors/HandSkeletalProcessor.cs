@@ -492,21 +492,29 @@ namespace Meta.XR.Movement.Retargeting
             ref NativeArray<NativeTransform> currentPose,
             ref NativeArray<NativeTransform> targetPoseLocal)
         {
-            var rootScale = _retargeter.SkeletonRetargeter.RootScale;
-            var targetWorldPose = IKUtilities.ComputeWorldPoses(
-                _parentJointIndicesTarget, ref targetPoseLocal, rootScale,
+            var targetWorldPose = SkeletonUtilities.ComputeWorldPoses(
+                _retargeter.SkeletonRetargeter,
+                ref targetPoseLocal,
                 _retargeter.transform.position,
                 _retargeter.transform.rotation);
 
+            var oldRotation = Quaternion.identity;
             if (_useRetargetedHandRotation)
             {
                 // If using the retargeted hand rotation, source the retargeted data first.
+                // And then affected the custom hand joint root.
                 _leftHandJoints[0].rotation =
                     targetWorldPose[_leftArmIKData.ArmJointIndicesReversed[0]].Orientation;
                 _rightHandJoints[0].rotation =
                     targetWorldPose[_rightArmIKData.ArmJointIndicesReversed[0]].Orientation;
             }
-
+            else
+            {
+                SetJointRotationToTarget(targetPoseLocal, targetWorldPose,
+                    _leftHandJoints[0].rotation, _leftArmIKData.ArmJointIndicesReversed[0]);
+                SetJointRotationToTarget(targetPoseLocal, targetWorldPose,
+                    _rightHandJoints[0].rotation, _rightArmIKData.ArmJointIndicesReversed[0]);
+            }
             targetWorldPose.Dispose();
 
             if (_runSerial)
@@ -523,6 +531,18 @@ namespace Meta.XR.Movement.Retargeting
                 RunCCDOnSkeletalData(_leftArmIKData, _leftHandJoints, ref targetPoseLocal, _weight);
                 RunCCDOnSkeletalData(_rightArmIKData, _rightHandJoints, ref targetPoseLocal, _weight);
             }
+        }
+
+        private void SetJointRotationToTarget(
+            NativeArray<NativeTransform> targetPoseLocal,
+            NativeArray<NativeTransform> targetPoseWorld,
+            Quaternion targetRotationWorld, int armJointIndex)
+        {
+            var parentIndexIkJoint = _parentJointIndicesTarget[armJointIndex];
+            var inLocalSpace = Quaternion.Inverse(targetPoseWorld[parentIndexIkJoint].Orientation) * targetRotationWorld;
+            targetPoseLocal[armJointIndex] =
+                new NativeTransform(inLocalSpace, targetPoseLocal[armJointIndex].Position,
+                targetPoseLocal[armJointIndex].Scale);
         }
 
         private List<Transform> FindTransformsDownChain(Transform startingTransform, Transform endTransform)
@@ -639,7 +659,7 @@ namespace Meta.XR.Movement.Retargeting
         private void RunCCDOnSkeletalData(
             ArmIKData armIKData,
             Transform[] customHandJoints,
-            ref NativeArray<NativeTransform> targetPoseLocal,
+            ref NativeArray<NativeTransform> targetSkeletonPoseLocal,
             float weight)
         {
             var ikChainIndicesRev = armIKData.ArmJointIndicesReversed;
@@ -655,67 +675,75 @@ namespace Meta.XR.Movement.Retargeting
             }
 
             // Get the current world pose as provided by other processors.
-            var rootScale = _retargeter.SkeletonRetargeter.RootScale;
-            var targetPoseWorld = IKUtilities.ComputeWorldPoses(
-                _parentJointIndicesTarget,
-                ref targetPoseLocal,
-                rootScale,
+            var targetSkeletonPoseWorld = SkeletonUtilities.ComputeWorldPoses(
+                _retargeter.SkeletonRetargeter,
+                ref targetSkeletonPoseLocal,
                 _retargeter.transform.position,
                 _retargeter.transform.rotation);
-            var rootPoseWorld = new Pose(targetPoseWorld[chainRootIndex].Position,
-                targetPoseWorld[chainRootIndex].Orientation);
+            var rootPoseWorld = new Pose(targetSkeletonPoseWorld[chainRootIndex].Position,
+                targetSkeletonPoseWorld[chainRootIndex].Orientation);
             var customHandTargetPosition = customHandJoints[0].position;
-            var targetPositionLerped =
-                Vector3.Lerp(targetPoseWorld[chainEndEffectorIndex].Position, customHandTargetPosition, weight);
+            var targetPositionLerpedWorld =
+                Vector3.Lerp(targetSkeletonPoseWorld[chainEndEffectorIndex].Position, customHandTargetPosition, weight);
 
             // Build IK transforms from the indices given.
-            var ikChainTransformsRev = GetIKChainEndFirst(ikChainIndicesRev, ref targetPoseLocal);
+            var ikChainTransformsRev = GetIKChainEndFirst(ikChainIndicesRev, ref targetSkeletonPoseLocal);
 
             // Run CCD IK solver.
             IKUtilities.SolveCCDIKLocalNativeArray(
                 rootPoseWorld,
                 ikChainTransformsRev,
-                targetPositionLerped,
+                targetPositionLerpedWorld,
                 _ikTolerance,
                 _ikIterations);
 
             // Set the final poses, but store the end effector rotation before doing that.
-            var endEffectorRotation = targetPoseWorld[chainEndEffectorIndex].Orientation;
+            // Note that this updates only rotation.
+            var originalEndEffectorRotationWorld = targetSkeletonPoseWorld[chainEndEffectorIndex].Orientation;
             for (var i = 0; i < ikChainIndicesRev.Length; i++)
             {
                 // Each element in the transform array is 1-to-1 with the index array used to build it.
                 var currentIndexInTarget = ikChainIndicesRev[i];
                 var poseToLerpTo = ikChainTransformsRev[i];
-                var poseToSet = targetPoseLocal[currentIndexInTarget];
+                var poseToSet = targetSkeletonPoseLocal[currentIndexInTarget];
                 poseToSet.Orientation =
                     Quaternion.Slerp(poseToSet.Orientation, poseToLerpTo.Orientation, weight);
-                targetPoseLocal[currentIndexInTarget] = poseToSet;
+                targetSkeletonPoseLocal[currentIndexInTarget] = poseToSet;
             }
 
             // Covert the CCD-modified local positions back to global we need to use these values to compute
             // the local transform of the end effector to push it toward the target.
-            targetPoseWorld.Dispose();
-            targetPoseWorld = IKUtilities.ComputeWorldPoses(
-                _parentJointIndicesTarget,
-                ref targetPoseLocal,
-                rootScale,
+            targetSkeletonPoseWorld.Dispose();
+            targetSkeletonPoseWorld = SkeletonUtilities.ComputeWorldPoses(
+                _retargeter.SkeletonRetargeter,
+                ref targetSkeletonPoseLocal,
                 _retargeter.transform.position,
                 _retargeter.transform.rotation);
+            // Calculate local space end effector position.
+            var limitedEndEffectWorldSpace = targetSkeletonPoseWorld[chainEndEffectorIndex].Position;
+            var limitedEndEffectLocalSpace = GetTargetRelativeToEffectorParent(endEffectorParentIndex, targetSkeletonPoseWorld,
+                limitedEndEffectWorldSpace,
+                _retargeter.SkeletonRetargeter.RootScale);
 
             // Push end effector to target. We need to know what the local position of the target
             // is based on the last recomputed world positions of the IK chain after CCD has
             // modified them.
             var targetLocalPosition =
                 _limitStretch
-                    ? targetPoseLocal[chainEndEffectorIndex].Position
-                    : GetTargetRelativeToEffectorParent(endEffectorParentIndex, targetPoseWorld,
-                        targetPositionLerped,
-                        rootScale);
+                    ? limitedEndEffectLocalSpace
+                    : GetTargetRelativeToEffectorParent(endEffectorParentIndex, targetSkeletonPoseWorld,
+                        // Use offset here in case the limited end effector needs to be moved back.
+                        targetPositionLerpedWorld,
+                        _retargeter.SkeletonRetargeter.RootScale);
+
             var endEffectorRotationInLocalSpace =
-                Quaternion.Inverse(targetPoseWorld[endEffectorParentIndex].Orientation) * endEffectorRotation;
-            targetPoseLocal[chainEndEffectorIndex] =
-                new NativeTransform(endEffectorRotationInLocalSpace, targetLocalPosition);
-            targetPoseWorld.Dispose();
+                Quaternion.Inverse(targetSkeletonPoseWorld[endEffectorParentIndex].Orientation) *
+                (originalEndEffectorRotationWorld);
+            targetSkeletonPoseLocal[chainEndEffectorIndex] =
+                new NativeTransform(
+                    endEffectorRotationInLocalSpace,
+                    targetLocalPosition);
+            targetSkeletonPoseWorld.Dispose();
         }
 
         private NativeArray<NativeTransform> GetIKChainEndFirst(

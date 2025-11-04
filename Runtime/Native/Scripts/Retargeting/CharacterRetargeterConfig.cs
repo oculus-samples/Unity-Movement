@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
 using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -180,6 +181,16 @@ namespace Meta.XR.Movement.Retargeting
         public TransformAccessArray Joints => _joints;
 
         /// <summary>
+        /// Gets validation errors for the current configuration.
+        /// </summary>
+        public List<string> ValidationErrors { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// Gets whether the configuration has any validation errors.
+        /// </summary>
+        public bool HasValidationErrors => ValidationErrors.Count > 0;
+
+        /// <summary>
         /// The configuration text asset containing retargeting data.
         /// </summary>
         [SerializeField]
@@ -306,6 +317,93 @@ namespace Meta.XR.Movement.Retargeting
             }
 
             return useWorldSpace;
+        }
+
+        /// <summary>
+        /// Validates the current configuration and populates validation errors.
+        /// Called automatically in the Unity editor when inspector values change.
+        /// </summary>
+        public virtual void OnValidate()
+        {
+            ValidateConfiguration();
+        }
+
+        /// <summary>
+        /// Validates the current configuration and logs errors if any issues are found.
+        /// </summary>
+        public void ValidateConfiguration()
+        {
+            ValidationErrors.Clear();
+
+            if (_config == null)
+            {
+                ValidationErrors.Add("Configuration asset is not assigned.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(Config))
+            {
+                ValidationErrors.Add("Configuration asset contains no data.");
+                return;
+            }
+
+            ValidateJointMapping();
+            if (!HasValidationErrors)
+            {
+                return;
+            }
+            foreach (var error in ValidationErrors)
+            {
+                Debug.LogError($"Character Retargeter Configuration Error: {error}", this);
+            }
+        }
+
+        /// <summary>
+        /// Validates the joint mapping configuration.
+        /// </summary>
+        private void ValidateJointMapping()
+        {
+            if (_jointPairs == null || _jointPairs.Length == 0)
+            {
+                ValidationErrors.Add("No joint pairs are configured. Use the 'Map' button to generate joint mappings from the config asset.");
+                return;
+            }
+
+            // Check for missing joint assignments
+            var missingJoints = new List<int>();
+            for (int i = 0; i < _jointPairs.Length; i++)
+            {
+                if (_jointPairs[i].Joint == null)
+                {
+                    missingJoints.Add(i);
+                }
+            }
+
+            if (missingJoints.Count > 0)
+            {
+                ValidationErrors.Add($"Missing joint assignments for indices: {string.Join(", ", missingJoints)}. These joints are required for proper retargeting.");
+            }
+
+            // Check if config joint count matches mapped fields
+            if (!string.IsNullOrEmpty(Config))
+            {
+                try
+                {
+                    MSDKUtility.CreateOrUpdateHandle(Config, out var handle);
+                    MSDKUtility.GetSkeletonInfo(handle, MSDKUtility.SkeletonType.TargetSkeleton, out var skeletonInfo);
+
+                    if (skeletonInfo.JointCount != _jointPairs.Length)
+                    {
+                        ValidationErrors.Add($"Configuration specifies {skeletonInfo.JointCount} joints but {_jointPairs.Length} joint pairs are mapped. Use the 'Map' button to remap the joints.");
+                    }
+
+                    MSDKUtility.DestroyHandle(handle);
+                }
+                catch (Exception e)
+                {
+                    ValidationErrors.Add($"Failed to validate configuration: {e.Message}");
+                }
+            }
         }
     }
 }

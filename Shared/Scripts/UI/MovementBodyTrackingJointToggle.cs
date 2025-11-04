@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+using Meta.XR.Movement.Retargeting;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -23,6 +24,12 @@ namespace Meta.XR.Movement.Samples
         /// </summary>
         [SerializeField]
         protected OVRBody _ovrBody;
+
+        /// <summary>
+        /// The character retargeters.
+        /// </summary>
+        [SerializeField]
+        protected CharacterRetargeter[] _retargeters;
 
         [SerializeField, InspectorButton("SwapJointSet")]
         private bool _toggleButton;
@@ -52,6 +59,28 @@ namespace Meta.XR.Movement.Samples
             foreach (var ovrBody in ovrBodies)
             {
                 ovrBody.ProvidedSkeletonType = desiredSkeletonType;
+                if (_retargeters == null)
+                {
+                    continue;
+                }
+
+                // Set retargeting behavior to avoid scaling when using half body
+                if (desiredSkeletonType == BodyJointSet.FullBody)
+                {
+                    foreach (var retargeter in _retargeters)
+                    {
+                        retargeter.SkeletonRetargeter.RetargetingBehavior =
+                            MSDKUtility.RetargetingBehavior.RotationsAndPositions;
+                    }
+                }
+                else
+                {
+                    foreach (var retargeter in _retargeters)
+                    {
+                        retargeter.SkeletonRetargeter.RetargetingBehavior =
+                            MSDKUtility.RetargetingBehavior.RotationAndPositionsUniformScale;
+                    }
+                }
             }
             UpdateText();
         }

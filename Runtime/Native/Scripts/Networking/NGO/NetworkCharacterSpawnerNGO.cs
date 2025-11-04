@@ -1,10 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+#if UNITY_NGO_MODULE_DEFINED
+using Unity.Netcode;
+#endif
 #if META_PLATFORM_SDK_DEFINED
 using Meta.XR.MultiplayerBlocks.Shared;
 #endif // META_PLATFORM_SDK_DEFINED
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Meta.XR.Movement.Networking.NGO
@@ -13,6 +15,7 @@ namespace Meta.XR.Movement.Networking.NGO
     /// Implementation of <see cref="INetworkCharacterSpawner"/> using the Unity Netcode for
     /// GameObjects networking framework.
     /// </summary>
+#if UNITY_NGO_MODULE_DEFINED
     public class NetworkCharacterSpawnerNGO : NetworkBehaviour, INetworkCharacterSpawner
     {
         /// <summary>
@@ -26,6 +29,9 @@ namespace Meta.XR.Movement.Networking.NGO
             get => _selectedCharacterIndex;
             set => _selectedCharacterIndex = value;
         }
+
+        /// <inheritdoc cref="INetworkCharacterSpawner.NetworkedCharacterHandler"/>
+        public GameObject NetworkedCharacterHandler => _networkedCharacterHandler;
 
         /// <inheritdoc cref="INetworkCharacterSpawner.CharacterRetargeterPrefabs"/>
         public GameObject[] CharacterRetargeterPrefabs
@@ -137,4 +143,11 @@ namespace Meta.XR.Movement.Networking.NGO
             _idCharacterMapping.Add(owningId, character);
         }
     }
+#else
+    public class NetworkCharacterSpawnerNGO : MonoBehaviour
+    {
+        /// <inheritdoc cref="INetworkCharacterSpawner.CharacterRetargeterPrefabs"/>
+        public GameObject[] CharacterRetargeterPrefabs;
+    }
+#endif
 }
