@@ -376,7 +376,7 @@ namespace Meta.XR.Movement.Retargeting
         public bool Update(NativeArray<NativeTransform> sourcePose, string manifestation)
         {
             // Get retargeting settings.
-            var retargetingBehaviorInfo = RetargetingBehaviorInfo.DefaultRetargetingSettings();
+            var retargetingBehaviorInfo = RetargetingBehaviorInfo.DefaultRetargetingSettingsForMSDK();
             retargetingBehaviorInfo.RetargetingBehavior = _retargetingBehavior;
             if (_retargetingBehavior is RetargetingBehavior.RotationAndPositionsUniformScale
                 or RetargetingBehavior.RotationOnlyNoScaling)
@@ -466,7 +466,7 @@ namespace Meta.XR.Movement.Retargeting
             // Retarget from source t-pose to get scaling.
             RetargetFromSourceFrameData(
                 NativeHandle,
-                RetargetingBehaviorInfo.DefaultRetargetingSettings(),
+                RetargetingBehaviorInfo.DefaultRetargetingSettingsForMSDK(),
                 sourcePose,
                 ref _targetReferencePose,
                 manifestation);
@@ -498,7 +498,7 @@ namespace Meta.XR.Movement.Retargeting
             };
             if (_sourceSkeletonDraw.LineThickness <= float.Epsilon || _sourceSkeletonDraw.TintColor != color)
             {
-                _sourceSkeletonDraw.InitDraw(color, 0.005f);
+                _sourceSkeletonDraw.InitDraw(color);
             }
 
             var scale = offset.lossyScale;
@@ -520,7 +520,7 @@ namespace Meta.XR.Movement.Retargeting
             _sourceSkeletonDraw ??= new SkeletonDraw();
             if (_sourceSkeletonDraw.LineThickness <= float.Epsilon || _sourceSkeletonDraw.TintColor != color)
             {
-                _sourceSkeletonDraw.InitDraw(color, 0.005f);
+                _sourceSkeletonDraw.InitDraw(color);
             }
 
             _sourceSkeletonDraw.Draw();
@@ -537,7 +537,7 @@ namespace Meta.XR.Movement.Retargeting
             _targetSkeletonDraw ??= new SkeletonDraw();
             if (_targetSkeletonDraw.LineThickness <= float.Epsilon || _targetSkeletonDraw.TintColor != color)
             {
-                _targetSkeletonDraw.InitDraw(color, 0.005f);
+                _targetSkeletonDraw.InitDraw(color);
             }
 
             var scale = offset.lossyScale;
@@ -559,7 +559,7 @@ namespace Meta.XR.Movement.Retargeting
             _targetSkeletonDraw ??= new SkeletonDraw();
             if (_targetSkeletonDraw.LineThickness <= float.Epsilon || _targetSkeletonDraw.TintColor != color)
             {
-                _targetSkeletonDraw.InitDraw(color, 0.005f);
+                _targetSkeletonDraw.InitDraw(color);
             }
 
             _targetSkeletonDraw.Draw();

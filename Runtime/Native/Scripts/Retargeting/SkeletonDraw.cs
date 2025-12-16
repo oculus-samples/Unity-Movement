@@ -161,17 +161,11 @@ namespace Meta.XR.Movement.Retargeting
         [SerializeField]
         private GameObject[] _parentObjects;
 
-        private bool _isValid;
-        private Mesh _lineDrawMesh;
-        private Mesh _lastValidLineDrawMesh;
-        private Mesh _pivotDrawMesh;
-        private Material _drawMaterial;
-        private Material _lastValidDrawMaterial;
-        private RenderParams _renderParams;
+        /// <summary>
+        /// Array of custom bone colors per bone index.
+        /// </summary>
+        private Color?[] _boneColors;
 
-        // In case coloring is used for a bone, use a custom mesh for that.
-        private Mesh[] _customLineMesh;
-        private Mesh[] _customPivotMesh;
 #if UNITY_EDITOR
         private static int _skeletonDrawHash = "SkeletonDrawHandle".GetHashCode();
 #endif
@@ -184,106 +178,15 @@ namespace Meta.XR.Movement.Retargeting
         /// <returns>True if index should be visualized, false if not.</returns>
         public delegate bool AllowBoneVisualDelegate(int boneIndex);
 
-        ~SkeletonDraw()
-        {
-            if (!_isValid)
-            {
-                return;
-            }
-
-            // Remove any unmanaged objects owned and managed by this class.
-            CleanUpMesh(_lineDrawMesh);
-            CleanUpMesh(_pivotDrawMesh);
-            if (_customLineMesh != null)
-            {
-                foreach (var lineMesh in _customLineMesh)
-                {
-                    CleanUpMesh(lineMesh);
-                }
-            }
-
-            if (_customPivotMesh != null)
-            {
-                foreach (var pivotMesh in _customPivotMesh)
-                {
-                    CleanUpMesh(pivotMesh);
-                }
-            }
-
-            if (_drawMaterial != null)
-            {
-                if (Application.isPlaying)
-                {
-                    Object.Destroy(_drawMaterial);
-                }
-                else
-                {
-                    Object.DestroyImmediate(_drawMaterial);
-                }
-            }
-        }
-
-        private void CleanUpMesh(Mesh meshObject)
-        {
-            if (meshObject == null)
-            {
-                return;
-            }
-
-            if (Application.isPlaying)
-            {
-                Object.Destroy(meshObject);
-            }
-            else
-            {
-                Object.DestroyImmediate(meshObject);
-            }
-        }
-
         /// <summary>
         /// Main initializer for <see cref="SkeletonDraw"/>.
         /// </summary>
         /// <param name="color">The default color.</param>
         /// <param name="thickness">Thickness.</param>
-        public void InitDraw(Color color, float thickness)
+        public void InitDraw(Color color, float thickness = 0.04f)
         {
-            _isValid = true;
-            var tempLineObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            var tempPivotObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            var tempLineMesh = tempLineObject.GetComponent<MeshFilter>().sharedMesh;
-            var tempPivotMesh = tempPivotObject.GetComponent<MeshFilter>().sharedMesh;
-            var lineMesh = new Mesh
-            {
-                vertices = tempLineMesh.vertices,
-                triangles = tempLineMesh.triangles,
-                normals = tempLineMesh.normals,
-                uv = tempLineMesh.uv
-            };
-            var pivotMesh = new Mesh
-            {
-                vertices = tempPivotMesh.vertices,
-                triangles = tempPivotMesh.triangles,
-                normals = tempPivotMesh.normals,
-                uv = tempPivotMesh.uv
-            };
-
-            SetVertexColors(lineMesh, color);
-            SetVertexColors(pivotMesh, color);
-
-            if (Application.isPlaying)
-            {
-                Object.Destroy(tempLineObject);
-                Object.Destroy(tempPivotObject);
-            }
-            else
-            {
-                Object.DestroyImmediate(tempLineObject);
-                Object.DestroyImmediate(tempPivotObject);
-            }
-
-            InitMaterial(color, thickness);
-            CreateDrawLineMesh(lineMesh);
-            CreateDrawPivotMesh(pivotMesh);
+            TintColor = color;
+            LineThickness = thickness;
         }
 
         /// <summary>
@@ -293,58 +196,18 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="newColor">The new color.</param>
         public void SetBoneColor(int index, Color newColor)
         {
-            if (_customLineMesh.Length <= index)
+            if (_boneColors == null || _boneColors.Length <= index)
             {
-                Debug.LogError($"Can't set mesh color on skeletal index {index} because only " +
-                               $"(0-{_customLineMesh.Length - 1}) is valid.");
+                var oldLength = _boneColors?.Length ?? 0;
+                var newColors = new Color?[Mathf.Max(index + 1, oldLength * 2)];
+                if (_boneColors != null)
+                {
+                    Array.Copy(_boneColors, newColors, oldLength);
+                }
+                _boneColors = newColors;
             }
 
-            if (_customLineMesh[index] == null)
-            {
-                _customLineMesh[index] = Object.Instantiate(_lineDrawMesh);
-            }
-
-            SetVertexColors(_customLineMesh[index], newColor);
-            if (_customPivotMesh[index] == null)
-            {
-                _customPivotMesh[index] = Object.Instantiate(_pivotDrawMesh);
-            }
-
-            SetVertexColors(_customPivotMesh[index], newColor);
-        }
-
-        private void SetVertexColors(Mesh mesh, Color color)
-        {
-            var lineColors = new Color[mesh.vertexCount];
-            for (var i = 0; i < mesh.vertexCount; i++)
-            {
-                lineColors[i] = color;
-            }
-
-            mesh.colors = lineColors;
-        }
-
-        private void InitMaterial(Color color, float thickness)
-        {
-            TintColor = color;
-            LineThickness = thickness;
-
-            _drawMaterial = new Material(Resources.Load<Shader>("Runtime/SkeletonLines"));
-            _renderParams = new RenderParams(_drawMaterial);
-        }
-
-        private void CreateDrawLineMesh(Mesh mesh)
-        {
-            _lineDrawMesh = mesh;
-            _lineDrawMesh.RecalculateNormals();
-            _lineDrawMesh.RecalculateBounds();
-        }
-
-        private void CreateDrawPivotMesh(Mesh mesh)
-        {
-            _pivotDrawMesh = mesh;
-            _pivotDrawMesh.RecalculateNormals();
-            _pivotDrawMesh.RecalculateBounds();
+            _boneColors[index] = newColor;
         }
 
         /// <summary>
@@ -352,8 +215,7 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         public void Draw()
         {
-            if (_lineDrawMesh == null || _drawMaterial == null ||
-                _parentPositions == null || _childPositions == null ||
+            if (_parentPositions == null || _childPositions == null ||
                 _parentPositions.Length == 0 || _childPositions.Length == 0 ||
                 _parentPositions.Length != _childPositions.Length)
             {
@@ -369,8 +231,6 @@ namespace Meta.XR.Movement.Retargeting
             {
                 return;
             }
-            _drawMaterial.color = TintColor;
-            _drawMaterial.SetPass(0);
 
             for (var i = 0; i < _parentPositions.Length; i++)
             {
@@ -379,25 +239,18 @@ namespace Meta.XR.Movement.Retargeting
                     continue;
                 }
 
-                var lineMesh = _customLineMesh?.ElementAtOrDefault(i) ?? _lineDrawMesh;
-                var pivotMesh = _customPivotMesh?.ElementAtOrDefault(i) ?? _pivotDrawMesh;
+                var boneColor = _boneColors != null && i < _boneColors.Length && _boneColors[i].HasValue
+                    ? _boneColors[i].Value
+                    : TintColor;
 
-                if (lineMesh != null && pivotMesh != null)
+                var parentPos = _parentPositions[i];
+                var childPos = _childPositions[i];
+                var length = Vector3.Distance(parentPos, childPos);
+
+                if (length > 0f)
                 {
-                    var lineTransform =
-                        CalculateTransformMatrixBetweenPoints(_parentPositions[i], _childPositions[i]);
-                    var pivotTransform =
-                        Matrix4x4.TRS(_parentPositions[i], Quaternion.identity, Vector3.one * LineThickness * 1.5f);
-                    if (Application.isPlaying)
-                    {
-                        Graphics.RenderMesh(_renderParams, lineMesh, 0, lineTransform);
-                        Graphics.RenderMesh(_renderParams, pivotMesh, 0, pivotTransform);
-                    }
-                    else
-                    {
-                        Graphics.DrawMeshNow(lineMesh, lineTransform);
-                        Graphics.DrawMeshNow(pivotMesh, pivotTransform);
-                    }
+                    var rotation = Quaternion.FromToRotation(Vector3.forward, childPos - parentPos);
+                    MeshDraw.DrawBone(boneColor, parentPos, rotation, LineThickness, length);
                 }
 
                 if (_parentObjects != null && i < _parentObjects.Length)
@@ -434,18 +287,6 @@ namespace Meta.XR.Movement.Retargeting
             if (_runtimeIndexesToIgnore?.Length != jointCount)
             {
                 _runtimeIndexesToIgnore = new bool[jointCount];
-            }
-
-            if (_customLineMesh?.Length != jointCount)
-            {
-                _customLineMesh?.ToList().ForEach(CleanUpMesh);
-                _customLineMesh = new Mesh[jointCount];
-            }
-
-            if (_customPivotMesh?.Length != jointCount)
-            {
-                _customPivotMesh?.ToList().ForEach(CleanUpMesh);
-                _customPivotMesh = new Mesh[jointCount];
             }
 
             for (var i = 0; i < jointCount; i++)
@@ -502,18 +343,6 @@ namespace Meta.XR.Movement.Retargeting
                 _runtimeIndexesToIgnore = new bool[jointCount];
             }
 
-            if (_customLineMesh?.Length != jointCount)
-            {
-                _customLineMesh?.ToList().ForEach(CleanUpMesh);
-                _customLineMesh = new Mesh[jointCount];
-            }
-
-            if (_customPivotMesh?.Length != jointCount)
-            {
-                _customPivotMesh?.ToList().ForEach(CleanUpMesh);
-                _customPivotMesh = new Mesh[jointCount];
-            }
-
             if (_parentNames?.Length != jointCount)
             {
                 _parentNames = new string[jointCount];
@@ -544,7 +373,6 @@ namespace Meta.XR.Movement.Retargeting
                     }
                 }
 
-                // Skip drawing twist lines.
                 if (jointNames != null)
                 {
                     _childNames[i] = jointNames[i];
@@ -566,26 +394,6 @@ namespace Meta.XR.Movement.Retargeting
             }
         }
 
-        private Matrix4x4 CalculateTransformMatrixBetweenPoints(Vector3 start, Vector3 end)
-        {
-            Vector3 position = (start + end) / 2;
-
-            Vector3 direction = (end - start).normalized;
-            Quaternion rotation = Quaternion.FromToRotation(Vector3.up, direction);
-
-            float distance = Vector3.Distance(start, end);
-            Vector3 scale = new Vector3(LineThickness, distance / 2, LineThickness);
-
-            return Matrix4x4.TRS(position, rotation, scale);
-        }
-
-        private Bounds TransformBounds(Bounds bounds, Matrix4x4 matrix)
-        {
-            Vector3 center = matrix.MultiplyPoint3x4(bounds.center);
-            Vector3 extents = Vector3.Scale(bounds.extents, matrix.lossyScale);
-
-            return new Bounds(center, extents * 2.0f);
-        }
 
         private void HandleMouseClick(int index, GameObject parent, Vector3 parentPos, Vector3 childPos)
         {
@@ -690,21 +498,18 @@ namespace Meta.XR.Movement.Retargeting
                 if (GetInterpolatedJointPose(handle, TrackerJointType.CenterEye, ref centerEye,
                         renderTime))
                 {
-                    centerEye = SkeletonUtilities.FromOpenXRToUnitySpace(centerEye);
                     finalCenterEyePose = new Pose(centerEye.Position, centerEye.Orientation);
                 }
 
                 if (GetInterpolatedJointPose(handle, TrackerJointType.RightInput, ref rightInput,
                         renderTime))
                 {
-                    rightInput = SkeletonUtilities.FromOpenXRToUnitySpace(rightInput);
                     finalRightPose = new Pose(rightInput.Position, rightInput.Orientation);
                 }
 
                 if (GetInterpolatedJointPose(handle, TrackerJointType.LeftInput, ref leftInput,
                         renderTime))
                 {
-                    leftInput = SkeletonUtilities.FromOpenXRToUnitySpace(leftInput);
                     finalLeftPose = new Pose(leftInput.Position, leftInput.Orientation);
                 }
             }

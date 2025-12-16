@@ -89,19 +89,18 @@ namespace Meta.XR.Movement.Editor
         /// </summary>
         public void InitializeSkeletonDraws()
         {
-            var sourceColor = Color.white;
-            var targetColor = Color.green;
-            targetColor.a = 0.5f;
-
             for (var i = 0; i < _skeletonDraws.Length; i++)
             {
                 _skeletonDraws[i] = new SkeletonDraw();
             }
 
-            SourceSkeletonDrawTPose.InitDraw(sourceColor, 0.002f);
-            SourceSkeletonDrawPreviewPose.InitDraw(sourceColor, 0.002f);
-            TargetSkeletonDrawTPose.InitDraw(targetColor, 0.005f);
-            TargetSkeletonDrawPreviewPose.InitDraw(targetColor, 0.005f);
+            var sourceColor = Color.white;
+            var targetColor = Color.green;
+            targetColor.a = 0.5f;
+            SourceSkeletonDrawTPose.InitDraw(sourceColor, 0.02f);
+            SourceSkeletonDrawPreviewPose.InitDraw(sourceColor, 0.02f);
+            TargetSkeletonDrawTPose.InitDraw(targetColor);
+            TargetSkeletonDrawPreviewPose.InitDraw(targetColor);
         }
 
         /// <summary>

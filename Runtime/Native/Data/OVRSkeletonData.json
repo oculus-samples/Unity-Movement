@@ -2,6 +2,10 @@
     "name": "OVRSkeletonData",
     "config": {
         "version": 0.01,
+        "retargetingBehaviorFlags": {
+            "applyJointOrientationFixup": true,
+            "applyMSDKSourceHandBugFixup": true
+        },
         "coordinateSpace": {
             "up": {
                 "x": 0.0,

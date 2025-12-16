@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace Meta.XR.Movement.Networking.NGO
 {
+#if UNITY_NGO_MODULE_DEFINED
     /// <summary>
     /// Implementation of <see cref="INetworkCharacterBehaviour"/> using the Unity Netcode for
-    /// GameObjects networking framework.
-#if UNITY_NGO_MODULE_DEFINED
+    /// GameObjects networking framework. Uses NetworkCharacterDataStream for simplified data synchronization.
     /// </summary>
     public class NetworkCharacterBehaviourNGO : NetworkBehaviour, INetworkCharacterBehaviour
     {
@@ -73,6 +73,7 @@ namespace Meta.XR.Movement.Networking.NGO
         private NetworkVariable<int> _characterId;
         private NetworkVariable<float> _characterScale;
         private NetworkList<ulong> _clientIds;
+        private NetworkCharacterDataStreamNGO _characterDataStream;
 
         private ulong[] _localClientIds = Array.Empty<ulong>();
         private Transform _cameraRig;
@@ -80,16 +81,17 @@ namespace Meta.XR.Movement.Networking.NGO
 
         private void Awake()
         {
-            // Initialize network variables.
             _metaId = new NetworkVariable<ulong>();
             _characterId = new NetworkVariable<int>();
             _characterScale = new NetworkVariable<float>(0.0f,
                 NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
             _clientIds = new NetworkList<ulong>();
+            _characterDataStream = new NetworkCharacterDataStreamNGO(
+                NetworkVariableReadPermission.Everyone,
+                NetworkVariableWritePermission.Owner);
 
-            // Initialize local components.
             _characterHandler = GetComponent<INetworkCharacterHandler>();
-            _cameraRig = OVRManager.instance?.GetComponentInChildren<OVRCameraRig>().transform;
+            _cameraRig = OVRManager.instance?.GetComponentInChildren<OVRCameraRig>()?.transform;
         }
 
         private void FixedUpdate()
@@ -99,7 +101,6 @@ namespace Meta.XR.Movement.Networking.NGO
                 UpdateClientIds();
             }
 
-            // If this is our character.
             if (IsOwner)
             {
                 if (_characterHandler.Character != null)
@@ -107,7 +108,6 @@ namespace Meta.XR.Movement.Networking.NGO
                     _characterScale.Value = _characterHandler.Character.transform.localScale.x;
                 }
             }
-            // If this another player's character.
             else
             {
                 if (_characterHandler.Character != null)
@@ -129,8 +129,11 @@ namespace Meta.XR.Movement.Networking.NGO
         public override void OnDestroy()
         {
             base.OnDestroy();
-            _metaId.Dispose();
-            _characterId.Dispose();
+            _metaId?.Dispose();
+            _characterId?.Dispose();
+            _characterScale?.Dispose();
+            _clientIds?.Dispose();
+            _characterDataStream?.Dispose();
         }
 
         /// <inheritdoc />
@@ -138,6 +141,7 @@ namespace Meta.XR.Movement.Networking.NGO
         {
             _characterId.OnValueChanged += OnCharacterIdChanged;
             _clientIds.OnListChanged += OnClientIdsChanged;
+            _characterDataStream.OnDataChanged += OnCharacterDataChanged;
             OnCharacterIdChanged(0, _characterId.Value);
             base.OnNetworkSpawn();
         }
@@ -147,26 +151,21 @@ namespace Meta.XR.Movement.Networking.NGO
         {
             _characterId.OnValueChanged -= OnCharacterIdChanged;
             _clientIds.OnListChanged -= OnClientIdsChanged;
+            _characterDataStream.OnDataChanged -= OnCharacterDataChanged;
             base.OnNetworkDespawn();
         }
 
         /// <inheritdoc cref="INetworkCharacterBehaviour.ReceiveStreamData"/>
         public void ReceiveStreamData(ulong clientId, bool isReliable, NativeArray<byte> bytes)
         {
-            if (!IsSpawned)
+            if (!IsSpawned || !IsOwner)
             {
                 return;
             }
 
-            var target = RpcTarget.Single(clientId, RpcTargetUse.Temp);
-            if (isReliable)
-            {
-                ReceiveStreamDataRpc(bytes, target);
-            }
-            else
-            {
-                ReceiveStreamDataUnreliableRpc(bytes, target);
-            }
+            var arrayBytes = new byte[bytes.Length];
+            bytes.CopyTo(arrayBytes);
+            _characterDataStream.Value = arrayBytes;
         }
 
         /// <inheritdoc cref="INetworkCharacterBehaviour.ReceiveStreamAck"/>
@@ -196,6 +195,25 @@ namespace Meta.XR.Movement.Networking.NGO
             }
         }
 
+        private void OnCharacterDataChanged()
+        {
+            if (IsOwner || _characterHandler == null)
+            {
+                return;
+            }
+
+            var data = _characterDataStream.Value;
+            if (data == null || data.Length == 0)
+            {
+                return;
+            }
+
+            var nativeArray = new NativeArray<byte>(data.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            nativeArray.CopyFrom(data);
+            _characterHandler.ReceiveData(nativeArray);
+            nativeArray.Dispose();
+        }
+
         private void UpdateClientIds()
         {
             var numberOfClients = NetworkManager.ConnectedClients.Count;
@@ -211,37 +229,10 @@ namespace Meta.XR.Movement.Networking.NGO
             }
         }
 
-        [Rpc(SendTo.SpecifiedInParams, Delivery = RpcDelivery.Reliable)]
-        private void ReceiveStreamDataRpc(NativeArray<byte> bytes, RpcParams rpcParams)
-        {
-            if (_characterHandler == null)
-            {
-                return;
-            }
-
-            _characterHandler.ReceiveData(bytes);
-        }
-
-        [Rpc(SendTo.SpecifiedInParams, Delivery = RpcDelivery.Unreliable)]
-        private void ReceiveStreamDataUnreliableRpc(NativeArray<byte> bytes, RpcParams rpcParams)
-        {
-            if (_characterHandler == null)
-            {
-                return;
-            }
-
-            _characterHandler.ReceiveData(bytes);
-        }
-
         [Rpc(SendTo.Everyone, Delivery = RpcDelivery.Unreliable)]
         private void ReceiveStreamAckUnreliableRpc(ulong sender, int ack, RpcParams rpcParams = default)
         {
-            if (_characterHandler == null)
-            {
-                return;
-            }
-
-            _characterHandler.ReceiveAck(sender, ack);
+            _characterHandler?.ReceiveAck(sender, ack);
         }
     }
 #endif

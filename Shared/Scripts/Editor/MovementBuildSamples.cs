@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
 namespace Meta.XR.Movement.Editor
@@ -160,13 +161,13 @@ namespace Meta.XR.Movement.Editor
             QualitySettings.antiAliasing = 4;
 
             // Configure Android build settings
-            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
-            PlayerSettings.SetArchitecture(BuildTargetGroup.Android, 1); // ARM64
+            PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
+            PlayerSettings.SetArchitecture(NamedBuildTarget.Android, 1); // ARM64
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
             EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
 
             // Set application identifiers
-            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, $"{_bundlePrefix}{identifierSuffix}");
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, $"{_bundlePrefix}{identifierSuffix}");
             if (!string.IsNullOrEmpty(productName))
             {
                 PlayerSettings.productName = productName;

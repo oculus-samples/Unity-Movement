@@ -4,7 +4,8 @@
     "references": [
         "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
         "GUID:2665a8d13d1b3f18800f46e256720795",
-        "GUID:2a230cb87a1d3ba4a98bdc0ddae76e6c"
+        "GUID:2a230cb87a1d3ba4a98bdc0ddae76e6c",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -38,6 +39,11 @@
             "name": "com.meta.xr.sdk.core",
             "expression": "77.0.1",
             "define": "META_XR_CORE_V78_MIN"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "",
+            "define": "USE_UNITY_INPUT_SYSTEM"
         }
     ],
     "noEngineReferences": false

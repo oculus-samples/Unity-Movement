@@ -416,9 +416,31 @@ namespace Meta.XR.Movement.Editor
                     }
                     else
                     {
-                        Debug.LogWarning(
-                            $"Path '{assetNameOrPath}' is outside the Unity project and cannot be loaded directly.");
-                        // Fall through to name-based search
+                        // File is outside the Unity project - try to read directly from filesystem
+                        Debug.Log($"Reading custom source config from external path: {assetNameOrPath}");
+                        try
+                        {
+                            if (File.Exists(assetNameOrPath))
+                            {
+                                var jsonContent = File.ReadAllText(assetNameOrPath);
+                                var skeletonData = SkeletonData.CreateFromConfig(jsonContent, MSDKUtility.SkeletonType.SourceSkeleton);
+                                if (skeletonData != null)
+                                {
+                                    Debug.Log($"Successfully loaded custom source config from: {assetNameOrPath}");
+                                    return skeletonData;
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogError($"Custom source config file does not exist: {assetNameOrPath}");
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Debug.LogError($"Failed to read custom source config from '{assetNameOrPath}': {ex.Message}");
+                        }
+
+                        // Fall through to name-based search as final fallback
                         projectRelativePath = null;
                     }
                 }

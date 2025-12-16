@@ -19,6 +19,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
         private SerializedProperty _config;
         private SerializedProperty _jointPairs;
         private SerializedProperty _shapePoseData;
+        private SerializedProperty _maxFaceshapeValue;
 
         /// <summary>
         /// Grab serialized properties from the serialized object.
@@ -28,6 +29,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
             _config = serializedObject.FindProperty("_config");
             _jointPairs = serializedObject.FindProperty("_jointPairs");
             _shapePoseData = serializedObject.FindProperty("_shapePoseData");
+            _maxFaceshapeValue = serializedObject.FindProperty("_maxFaceshapeValue");
         }
 
         /// <inheritdoc />
@@ -97,6 +99,7 @@ namespace Meta.XR.Movement.Retargeting.Editor
 
             EditorGUILayout.PropertyField(_jointPairs);
             EditorGUILayout.PropertyField(_shapePoseData);
+            EditorGUILayout.PropertyField(_maxFaceshapeValue);
         }
 
         private void FindAndOpenConfigEditor(CharacterRetargeterConfig config)

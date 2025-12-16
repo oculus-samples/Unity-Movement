@@ -173,7 +173,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <summary>
         /// Gets the number of shapes in the configuration.
         /// </summary>
-        public int NumberOfShapes => _shapePoseData.Length;
+        public int NumberOfShapes => _shapePoseData != null ? _shapePoseData.Length : 0;
 
         /// <summary>
         /// Joints used for retargeted character.
@@ -208,8 +208,13 @@ namespace Meta.XR.Movement.Retargeting
         [SerializeField]
         protected ShapePoseData[] _shapePoseData;
 
-        protected TransformAccessArray _joints;
+        /// <summary>
+        /// Maximum faceshape value. Used for normalization.
+        /// </summary>
+        [SerializeField]
+        protected float _maxFaceshapeValue = 100.0f;
 
+        protected TransformAccessArray _joints;
 
         /// <summary>
         /// Initializes the TransformAccessArray with joint transforms when the component starts.
@@ -249,7 +254,7 @@ namespace Meta.XR.Movement.Retargeting
         /// Gets the current face pose.
         /// </summary>
         /// <returns>The current face pose.</returns>
-        public NativeArray<float> GetCurrentFacePose()
+        public NativeArray<float> GetCurrentFacePose(bool normalized = false)
         {
             // create flattened array to be used for data serialization.
             int numShapesTotal = NumberOfShapes;
@@ -260,10 +265,20 @@ namespace Meta.XR.Movement.Retargeting
             foreach (var shape in _shapePoseData)
             {
                 Assert.IsNotNull(shape.SkinnedMesh, "Skinned mesh null.");
-                faceShapePoses[shapePoseIndex++] = shape.SkinnedMesh.GetBlendShapeWeight(shape.ShapeIndex);
+                faceShapePoses[shapePoseIndex++] = normalized ?
+                    shape.SkinnedMesh.GetBlendShapeWeight(shape.ShapeIndex) / _maxFaceshapeValue :
+                    shape.SkinnedMesh.GetBlendShapeWeight(shape.ShapeIndex);
             }
 
             return faceShapePoses;
+        }
+
+        public void DeNormalizeFaceValues(ref NativeArray<float> facePose)
+        {
+            for (int i = 0; i < facePose.Length; i++)
+            {
+                facePose[i] *= _maxFaceshapeValue;
+            }
         }
 
         /// <summary>

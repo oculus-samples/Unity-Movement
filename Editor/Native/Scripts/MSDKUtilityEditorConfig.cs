@@ -428,11 +428,26 @@ namespace Meta.XR.Movement.Editor
             {
                 var shouldMapTwistJoints = twistJointOverride ?? (win.Overlay?.ShouldMapTwistJoints ?? true);
                 var childAlignedTwistBlocklist = win.Overlay?.ChildAlignedTwistBlockList;
+
+                // Convert childAlignedTwistBlocklist to AutoMappingJointData array
+                AutoMappingJointData[] additionalJointData = null;
+                if (childAlignedTwistBlocklist != null && childAlignedTwistBlocklist.Count > 0)
+                {
+                    additionalJointData = new AutoMappingJointData[childAlignedTwistBlocklist.Count];
+                    for (int i = 0; i < childAlignedTwistBlocklist.Count; i++)
+                    {
+                        int jointIndex = childAlignedTwistBlocklist[i];
+                        additionalJointData[i] = new AutoMappingJointData
+                        {
+                            JointName = initParams.TargetSkeleton.JointNames[jointIndex],
+                            Flags = AutoMappingJointFlags.ExcludeFromTwistMappings
+                        };
+                    }
+                }
+
                 GenerateMappings(newConfigHandle,
                     shouldMapTwistJoints ? AutoMappingFlags.EmptyFlag : AutoMappingFlags.SkipTwistJoints,
-                    childAlignedTwistBlocklist == null || childAlignedTwistBlocklist.Count == 0
-                        ? null
-                        : childAlignedTwistBlocklist.ToArray());
+                    additionalJointData);
             }
 
             config.ConfigHandle = newConfigHandle;
@@ -485,6 +500,9 @@ namespace Meta.XR.Movement.Editor
 
             // Initialize the single config with both source and target data
             config.Initialize(configJson, targetTPoseType);
+
+            // Update the source skeleton data's TPoseArray to point to the correct array based on the current step
+            UpdateSourceTPoseForStep(config, win.Step);
 
             // Store created handle.
             win.Config.AddHandle(config.ConfigHandle);
@@ -559,6 +577,29 @@ namespace Meta.XR.Movement.Editor
                 _ => SkeletonTPoseType.UnscaledTPose
             };
             LoadConfig(win, tPoseType, customConfig);
+        }
+
+        /// <summary>
+        /// Updates the source skeleton data's TPoseArray to point to the correct array based on the editor step.
+        /// This is an editor-only helper that keeps the step-dependent logic out of runtime code.
+        /// </summary>
+        /// <param name="config">The editor configuration.</param>
+        /// <param name="step">The current editor step.</param>
+        private static void UpdateSourceTPoseForStep(MSDKUtilityEditorConfig config, EditorStep step)
+        {
+            if (config?.SourceSkeletonData == null)
+            {
+                return;
+            }
+
+            var tPoseArray = step switch
+            {
+                EditorStep.MinTPose => config.SourceSkeletonData.MinTPoseArray,
+                EditorStep.MaxTPose => config.SourceSkeletonData.MaxTPoseArray,
+                _ => config.SourceSkeletonData.TPoseArray // Keep current for other steps
+            };
+
+            config.SourceSkeletonData.SetTPoseArray(tPoseArray);
         }
 
         /// <summary>

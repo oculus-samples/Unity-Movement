@@ -1,7 +1,7 @@
 {
   "name": "com.meta.xr.sdk.movement",
   "displayName": "Meta XR Movement SDK",
-  "version": "81.0.0",
+  "version": "83.0.0",
   "unity": "2022.3",
   "unityRelease": "15f1",
   "keywords": [
@@ -9,6 +9,7 @@
     "Oculus",
     "Movement",
     "Retargeting",
+    "AI",
     "SDK",
     "OVR",
     "Samples"

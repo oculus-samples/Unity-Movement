@@ -89,12 +89,12 @@ namespace Meta.XR.Movement.Networking
         // Dictionary to pair clients with last received ack.
         private readonly Dictionary<ulong, int> _clientsLastAck = new();
 
-        // Client data.
-        private NativeArray<byte>[] _streamedData;
+        // Client data - queue for streamed data (FIFO).
+        private Queue<NativeArray<byte>> _streamedData;
+
         private NativeArray<NativeTransform> _bodyPose;
         private NativeArray<float> _facePose;
         private bool _dataIsValid;
-        private int _currentStreamIndex;
 
         // Host data.
         private NativeArray<byte> _serializedData;
@@ -153,8 +153,6 @@ namespace Meta.XR.Movement.Networking
 
         #endregion
 
-        #region INetworkCharacterRetargeter
-
         /// <summary>
         /// Implementation of <see cref="INetworkCharacterHandler.Setup"/>. Instantiate the character
         /// optionally here, then assign the network config and start the native retargeter instance.
@@ -175,20 +173,49 @@ namespace Meta.XR.Movement.Networking
                 {
                     _networkCharacterRetargeter = _character.GetComponentInChildren<NetworkCharacterRetargeter>();
                 }
+
+                // Set ownership if not already set
+                if (_networkCharacterRetargeter.Owner == NetworkCharacterRetargeter.Ownership.None)
+                {
+                    if (_characterBehaviour.HasInputAuthority)
+                    {
+                        _networkCharacterRetargeter.Owner = NetworkCharacterRetargeter.Ownership.Host;
+                        gameObject.name = "LocalCharacter";
+                    }
+                    else
+                    {
+                        _networkCharacterRetargeter.Owner = NetworkCharacterRetargeter.Ownership.Client;
+                        gameObject.name = "RemoteCharacter";
+                    }
+                }
             }
+
+            // Validate ownership is set
+            if (_networkCharacterRetargeter.Owner == NetworkCharacterRetargeter.Ownership.None)
+            {
+                Debug.LogError("[NetworkCharacterHandler] Setup: Ownership is still None after initialization!");
+            }
+
+            // Initialize the retargeting system before we check the handle
+            // The retargeting handle must be created before we can use serialization/deserialization
+            EnsureRetargetingInitialized();
 
             // Setup the native data arrays for networking.
             _networkCharacterRetargeter.UpdateSerializationSettings();
+
+            var numJoints = _networkCharacterRetargeter.NumberOfJoints;
+            var numShapes = _networkCharacterRetargeter.NumberOfShapes;
+
             if (!_bodyPose.IsCreated)
             {
                 _bodyPose = new NativeArray<NativeTransform>(
-                    _networkCharacterRetargeter.NumberOfJoints, Persistent, UninitializedMemory);
+                    numJoints, Persistent, UninitializedMemory);
             }
 
             if (!_facePose.IsCreated)
             {
                 _facePose = new NativeArray<float>(
-                    _networkCharacterRetargeter.NumberOfShapes, Persistent, UninitializedMemory);
+                    numShapes, Persistent, UninitializedMemory);
             }
 
             enabled = true;
@@ -201,6 +228,16 @@ namespace Meta.XR.Movement.Networking
         /// <param name="networkTime">The current network time.</param>
         public void SendData(float networkTime)
         {
+            // Check if retargeting is ready to send data.
+            // We check IsValid and SkeletonRetargeter.AppliedPose directly because
+            // RetargeterValid includes AppliedPose which may not be set for networking scenarios.
+            if (!_networkCharacterRetargeter.IsValid ||
+                !_networkCharacterRetargeter.SkeletonRetargeter.IsInitialized ||
+                !_networkCharacterRetargeter.SkeletonRetargeter.AppliedPose)
+            {
+                return;
+            }
+
             var localClientId = _characterBehaviour.LocalClientId;
             foreach (var clientId in _characterBehaviour.ClientIds)
             {
@@ -208,16 +245,15 @@ namespace Meta.XR.Movement.Networking
                 {
                     continue;
                 }
-                // Don't serialize if retargeter doesn't have useful data.
-                if (!_networkCharacterRetargeter.RetargeterValid)
-                {
-                    continue;
-                }
 
                 var lastAck = _clientsLastAck.GetValueOrDefault(clientId, -1);
 
                 SerializeData(lastAck, networkTime);
-                _characterBehaviour.ReceiveStreamData(clientId, _shouldSyncData, _serializedData);
+
+                if (_serializedData.IsCreated && _serializedData.Length > 0)
+                {
+                    _characterBehaviour.ReceiveStreamData(clientId, false, _serializedData);
+                }
             }
 
             ResetSendTimers();
@@ -225,31 +261,23 @@ namespace Meta.XR.Movement.Networking
 
         /// <summary>
         /// Implementation of <see cref="INetworkCharacterHandler.ReceiveData"/>. Adds any received data
-        /// to the buffer of streamed data to be 1serialized and interpolated.
+        /// to the queue of streamed data to be deserialized and interpolated.
         /// </summary>
         /// <param name="data"></param>
         public void ReceiveData(NativeArray<byte> data)
         {
-            if (_networkCharacterRetargeter == null)
+            var maxBufferSize = _networkCharacterRetargeter.MaxBufferSize;
+            _streamedData ??= new Queue<NativeArray<byte>>(maxBufferSize);
+
+            while (_streamedData.Count >= maxBufferSize)
             {
-                return;
+                var discarded = _streamedData.Dequeue();
+                discarded.Dispose();
             }
 
-            _streamedData ??= new NativeArray<byte>[_networkCharacterRetargeter.MaxBufferSize];
-            if (_currentStreamIndex == _streamedData.Length)
-            {
-                _currentStreamIndex--;
-            }
-
-            if (_streamedData[_currentStreamIndex].IsCreated)
-            {
-                _streamedData[_currentStreamIndex].Dispose();
-            }
-
-            _streamedData[_currentStreamIndex] =
-                new NativeArray<byte>(data.Length, Persistent, UninitializedMemory);
-            data.CopyTo(_streamedData[_currentStreamIndex]);
-            _currentStreamIndex++;
+            var copy = new NativeArray<byte>(data.Length, Persistent, UninitializedMemory);
+            data.CopyTo(copy);
+            _streamedData.Enqueue(copy);
             _dataReadCount++;
 
             BytesReceived?.Invoke(data.Length);
@@ -282,8 +310,6 @@ namespace Meta.XR.Movement.Networking
             _clientsLastAck[id] = ack;
         }
 
-        #endregion
-
         /// <summary>
         /// Tries to deserialize received streamed data and apply the body pose to the character.
         /// </summary>
@@ -291,13 +317,24 @@ namespace Meta.XR.Movement.Networking
         /// <param name="renderTime">The current render time.</param>
         public void TryReceiveData(float networkTime, float renderTime)
         {
-            if (_currentStreamIndex > 0)
+            // Retargeting handle is required for deserialization and interpolation
+            if (_networkCharacterRetargeter.RetargetingHandle == INVALID_HANDLE)
+            {
+                return;
+            }
+
+            if (_streamedData is { Count: > 0 })
             {
                 DeserializeData();
-                _currentStreamIndex--;
             }
 
             if (!ApplyData)
+            {
+                return;
+            }
+
+            // Don't apply data until we have valid deserialized data
+            if (!_dataIsValid)
             {
                 return;
             }
@@ -333,13 +370,11 @@ namespace Meta.XR.Movement.Networking
         {
             if (_streamedData != null)
             {
-                foreach (var data in _streamedData)
+                while (_streamedData.Count > 0)
                 {
-                    if (data.IsCreated)
-                    {
-                        data.Dispose();
-                    }
+                    _streamedData.Dequeue().Dispose();
                 }
+                _streamedData = null;
             }
 
             if (_bodyPose.IsCreated)
@@ -392,17 +427,24 @@ namespace Meta.XR.Movement.Networking
 
         private void SerializeData(int lastAck, float networkTime)
         {
+            if (_networkCharacterRetargeter.RetargetingHandle == INVALID_HANDLE)
+            {
+                return;
+            }
+
             if (_shouldSyncData || !_networkCharacterRetargeter.UseDeltaCompression)
             {
                 lastAck = -1;
             }
+
             var bodyPose = _networkCharacterRetargeter.GetCurrentBodyPose(Retargeting.JointType.NoWorldSpace);
-            var facePose = _networkCharacterRetargeter.GetCurrentFacePose();
-            var bodyIndicesToSerialize =
-                lastAck == -1
-                    ? _networkCharacterRetargeter.BodyIndicesToSync
-                    : _networkCharacterRetargeter.BodyIndicesToSend;
+            var facePose = _networkCharacterRetargeter.GetCurrentFacePose(true);
+
+            var bodyIndicesToSerialize = lastAck == -1
+                ? _networkCharacterRetargeter.BodyIndicesToSync
+                : _networkCharacterRetargeter.BodyIndicesToSend;
             var faceIndicesToSerialize = _networkCharacterRetargeter.FaceIndicesToSync;
+
             _dataIsValid = SerializeSkeletonAndFace(
                 _networkCharacterRetargeter.RetargetingHandle,
                 networkTime,
@@ -412,26 +454,39 @@ namespace Meta.XR.Movement.Networking
                 bodyIndicesToSerialize,
                 faceIndicesToSerialize,
                 ref _serializedData);
-            bodyPose.Dispose();
+
+            if (bodyPose.IsCreated)
+            {
+                bodyPose.Dispose();
+            }
+
+            if (facePose.IsCreated)
+            {
+                facePose.Dispose();
+            }
         }
 
         private void DeserializeData()
         {
-            var data = _streamedData[0];
+            var data = _streamedData.Dequeue();
+
             if (!DeserializeSkeletonAndFace(
                     _networkCharacterRetargeter.RetargetingHandle,
                     data,
+                    SERIALIZATION_VERSION_CURRENT,
                     out var timestamp,
                     out var receivedCompressionType,
                     out var ack,
                     ref _bodyPose,
                     ref _facePose))
             {
-                Debug.LogError("Data received is invalid!");
                 _dataIsValid = false;
+                data.Dispose();
                 return;
             }
 
+            data.Dispose();
+            _networkCharacterRetargeter.DeNormalizeFaceValues(ref _facePose);
             _dataIsValid = true;
             SendAck(ack);
         }
@@ -467,11 +522,17 @@ namespace Meta.XR.Movement.Networking
                 return true;
             }
 
-            return GetInterpolatedFace(
-                _networkCharacterRetargeter.RetargetingHandle,
-                SkeletonType.TargetSkeleton,
-                ref _facePose,
-                renderTime);
+            if (GetInterpolatedFace(
+                    _networkCharacterRetargeter.RetargetingHandle,
+                    SkeletonType.TargetSkeleton,
+                    ref _facePose,
+                    renderTime))
+            {
+                _networkCharacterRetargeter.DeNormalizeFaceValues(ref _facePose);
+                return true;
+            }
+
+            return false;
         }
 
         private void ResetSendTimers()
@@ -484,6 +545,42 @@ namespace Meta.XR.Movement.Networking
             else if (_shouldSendData)
             {
                 _elapsedSendTime -= _networkCharacterRetargeter.IntervalToSendData;
+            }
+        }
+
+        /// <summary>
+        /// Ensures the retargeting system is initialized before we attempt to use it.
+        /// This must be called before any serialization/deserialization operations.
+        /// </summary>
+        private void EnsureRetargetingInitialized()
+        {
+            // If handle is already valid, nothing to do
+            if (_networkCharacterRetargeter.RetargetingHandle != INVALID_HANDLE)
+            {
+                return;
+            }
+
+            // Validate config is available
+            if (_networkCharacterRetargeter.ConfigAsset == null)
+            {
+                Debug.LogError("[NetworkCharacterHandler] EnsureRetargetingInitialized: ConfigAsset is null! Character retargeting will not work. Please assign a config TextAsset to the NetworkCharacterRetargeter component.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_networkCharacterRetargeter.Config))
+            {
+                Debug.LogError("[NetworkCharacterHandler] EnsureRetargetingInitialized: Config is empty! Character retargeting will not work.");
+                return;
+            }
+
+            // Manually call Setup if it hasn't been called yet
+            // This ensures the retargeting handle is created before we need it
+            _networkCharacterRetargeter.Setup(_networkCharacterRetargeter.Config);
+
+            // Verify initialization succeeded
+            if (_networkCharacterRetargeter.RetargetingHandle == INVALID_HANDLE)
+            {
+                Debug.LogError($"[NetworkCharacterHandler] EnsureRetargetingInitialized: Setup() was called but handle is still INVALID_HANDLE! This is a critical error.");
             }
         }
     }

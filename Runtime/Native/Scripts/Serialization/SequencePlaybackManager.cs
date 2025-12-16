@@ -62,6 +62,11 @@ namespace Meta.XR.Movement.Playback
         }
 
         /// <summary>
+        /// Returns data version of the opened recording file.
+        /// </summary>
+        public double DataVersion => _startHeader.DataVersion;
+
+        /// <summary>
         /// Delegate for processing a snapshot.
         /// </summary>
         /// <param name="snapshotBytes">Snapshot bytes to process.</param>
@@ -115,14 +120,11 @@ namespace Meta.XR.Movement.Playback
         /// <param name="playbackPath">Optional playback path.</param>
         public void OpenFileForPlayback(ulong handle, string playbackPath = null)
         {
-            double expectedDataVersion;
-            MSDKUtility.GetSerializationVersion(out expectedDataVersion);
             _playbackFile = PlaybackFunctions.OpenFileForPlayback(
                 ref _startHeader,
                 ref _endHeader,
                 ref _snapshotToByteoffsetAfterHeader,
-                expectedDataVersion,
-            playbackPath);
+                playbackPath);
             _snapshotIndex = 0;
             _numSnapshotBytesReadSoFar = 0;
             _playedFirstFrame = false;

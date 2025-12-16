@@ -20,9 +20,12 @@ namespace Meta.XR.Movement.Networking.Fusion
     public class NetworkCharacterSpawnerFusion : MonoBehaviour, INetworkCharacterSpawner
     {
         /// <summary>
-        /// A static array of character prefab references that should be the same across all users.
+        /// Static character prefab references shared across all users (thread-safe).
         /// </summary>
-        public static GameObject[] CharacterPrefabReferences => _characterPrefabReferences;
+        public static GameObject[] CharacterPrefabReferences
+        {
+            get { lock (_prefabLock) { return _characterPrefabReferences; } }
+        }
 
         /// <inheritdoc cref="INetworkCharacterSpawner.SelectedCharacterIndex"/>
         public int SelectedCharacterIndex
@@ -62,28 +65,43 @@ namespace Meta.XR.Movement.Networking.Fusion
         [SerializeField]
         private GameObject _networkedCharacterHandler;
 
-        private static GameObject[] _characterPrefabReferences { get; set; }
-
 #if META_PLATFORM_SDK_DEFINED
         private PlatformInfo? _platformInfo;
 #endif // META_PLATFORM_SDK_DEFINED
 
+        private static readonly object _prefabLock = new object();
+        private static GameObject[] _characterPrefabReferences;
         private NetworkRunner _networkRunner;
         private bool _sceneLoaded;
         private bool _entitlementCompleted;
 
         private void Awake()
         {
-            _characterPrefabReferences = _characterRetargeterPrefabs;
+            // Thread-safe initialization of static prefab references
+            // Only set if not already initialized or if we have more prefabs
+            lock (_prefabLock)
+            {
+                if (_characterPrefabReferences == null ||
+                    _characterPrefabReferences.Length < _characterRetargeterPrefabs.Length)
+                {
+                    _characterPrefabReferences = _characterRetargeterPrefabs;
+                }
+            }
 #if META_PLATFORM_SDK_DEFINED
             PlatformInit.GetEntitlementInformation(OnEntitlementFinished);
 #else
+            _entitlementCompleted = true;
+#endif // META_PLATFORM_SDK_DEFINED
+        }
+
+        private void Start()
+        {
+#if !META_PLATFORM_SDK_DEFINED
             if (_loadCharacterWhenConnected)
             {
-                _entitlementCompleted = true;
                 SpawnCharacter();
             }
-#endif // META_PLATFORM_SDK_DEFINED
+#endif // !META_PLATFORM_SDK_DEFINED
         }
 
         private void OnEnable()

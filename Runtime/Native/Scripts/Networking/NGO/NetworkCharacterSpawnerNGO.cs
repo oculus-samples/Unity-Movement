@@ -19,9 +19,12 @@ namespace Meta.XR.Movement.Networking.NGO
     public class NetworkCharacterSpawnerNGO : NetworkBehaviour, INetworkCharacterSpawner
     {
         /// <summary>
-        /// A static array of character prefab references that should be the same across all users.
+        /// Static character prefab references shared across all users (thread-safe).
         /// </summary>
-        public static GameObject[] CharacterPrefabReferences => _characterPrefabReferences;
+        public static GameObject[] CharacterPrefabReferences
+        {
+            get { lock (_prefabLock) { return _characterPrefabReferences; } }
+        }
 
         /// <inheritdoc cref="INetworkCharacterSpawner.SelectedCharacterIndex"/>
         public int SelectedCharacterIndex
@@ -61,7 +64,8 @@ namespace Meta.XR.Movement.Networking.NGO
         [SerializeField]
         private GameObject _networkedCharacterHandler;
 
-        private static GameObject[] _characterPrefabReferences { get; set; }
+        private static readonly object _prefabLock = new object();
+        private static GameObject[] _characterPrefabReferences;
         private Dictionary<ulong, GameObject> _idCharacterMapping { get; set; }
 
 #if META_PLATFORM_SDK_DEFINED
@@ -70,7 +74,16 @@ namespace Meta.XR.Movement.Networking.NGO
 
         private void Awake()
         {
-            _characterPrefabReferences = _characterRetargeterPrefabs;
+            // Thread-safe initialization of static prefab references
+            // Only set if not already initialized or if we have more prefabs
+            lock (_prefabLock)
+            {
+                if (_characterPrefabReferences == null ||
+                    _characterPrefabReferences.Length < _characterRetargeterPrefabs.Length)
+                {
+                    _characterPrefabReferences = _characterRetargeterPrefabs;
+                }
+            }
             _idCharacterMapping = new Dictionary<ulong, GameObject>();
 #if META_PLATFORM_SDK_DEFINED
             PlatformInit.GetEntitlementInformation(OnEntitlementFinished);
@@ -126,9 +139,9 @@ namespace Meta.XR.Movement.Networking.NGO
         private void SpawnCharacterServerRpc(ulong metaId, int characterId, RpcParams rpcParams = default)
         {
             var owningId = rpcParams.Receive.SenderClientId;
-            if (_idCharacterMapping.ContainsKey(owningId))
+            if (_idCharacterMapping.TryGetValue(owningId, out var existingCharacter))
             {
-                var mappedCharacter = _idCharacterMapping[owningId].GetComponent<NetworkObject>();
+                var mappedCharacter = existingCharacter.GetComponent<NetworkObject>();
                 mappedCharacter.Despawn();
                 _idCharacterMapping.Remove(owningId);
             }
@@ -140,7 +153,7 @@ namespace Meta.XR.Movement.Networking.NGO
             var behaviour = character.GetComponent<NetworkCharacterBehaviourNGO>();
             behaviour.MetaId = metaId;
             behaviour.CharacterId = characterId + 1;
-            _idCharacterMapping.Add(owningId, character);
+            _idCharacterMapping[owningId] = character;
         }
     }
 #else

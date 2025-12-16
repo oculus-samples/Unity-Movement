@@ -23,13 +23,13 @@ namespace Meta.XR.Movement.Networking.Block.Editor
                 return;
             }
 
-            InstallBuildingBlock("ICharacterRetargeter");
+            InstallBuildingBlock("CharacterRetargeter");
         }
 
         [MenuItem("GameObject/Movement SDK/Networking/Add Networked Character Retargeter")]
         private static void InstallNetworkedRetargetedCharacterBuildingBlock()
         {
-            InstallBuildingBlock("INetworkCharacterRetargeter");
+            InstallBuildingBlock("INetworkedCharacterRetargeter");
         }
 
         private static void InstallBuildingBlock(string buildingBlockAssetName)

@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -89,6 +90,8 @@ namespace Meta.XR.Movement.FaceTracking
         private List<Material> _recalculateMaterials = new List<Material>();
         private bool _runRecalculation;
 
+        private bool _initialized = false;
+
         /// <summary>
         /// Allows toggling this scripts functionality on or off.
         /// </summary>
@@ -131,15 +134,17 @@ namespace Meta.XR.Movement.FaceTracking
                 Assert.IsTrue(recalculateMaterialIndex < _instantiatedMaterials.Length);
                 _recalculateMaterials.Add(_instantiatedMaterials[recalculateMaterialIndex]);
             }
-
-            if (!_useUnityFunction)
-            {
-                RunRecalculation = true;
-            }
         }
 
-        private void Start()
+        private IEnumerator Start()
         {
+            // Initialization won't work if the scale of the meshes or its parent is zero.
+            // Just check the parent.
+            while (this.transform.localScale == Vector3.zero)
+            {
+                yield return null;
+            }
+
             _originalSharedMesh = _skinnedMeshRenderer.sharedMesh;
 
             if (!_useUnityFunction)
@@ -192,6 +197,10 @@ namespace Meta.XR.Movement.FaceTracking
                     out HashSet<int> subMeshVertexIndexSet,
                     out int vertexIdToTriangleMapCount);
 
+                // Wait another frame for the material to initialize before
+                // setting various buffers and enabling the recalc variant.
+                yield return null;
+
                 // subMeshVertexIdToNeighborList -> maps index to neighbor list.
                 // It might be possible that multiple verts exist in the same
                 // location, so multiple indices might share neighbors.
@@ -204,9 +213,11 @@ namespace Meta.XR.Movement.FaceTracking
                     _meshSnapshot,
                     _recalculateMaterials.ToArray(),
                     _subMesh);
+                RunRecalculation = true;
             }
 
             GeneratedDuplicateMesh?.Invoke();
+            _initialized = true;
         }
 
         private void LateUpdate()
@@ -223,6 +234,11 @@ namespace Meta.XR.Movement.FaceTracking
         /// </summary>
         public void ApplyNormalRecalculation()
         {
+            // Do not run if the initialization portion has not run.
+            if (!_initialized)
+            {
+                return;
+            }
             if (_useUnityFunction)
             {
                 _originalSharedMesh.RecalculateNormals();
