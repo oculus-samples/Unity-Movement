@@ -1,0 +1,236 @@
+{
+  "sitemap": {
+    "fileOptions": {
+      "api/*": {
+        "baseUrl": "https://oculus-samples.github.io/Unity-Movement/",
+        "changefreq": "daily"
+      }
+    },
+    "baseUrl": "https://oculus-samples.github.io/Unity-Movement/",
+    "changefreq": "weekly"
+  },
+  "homepages": [],
+  "source_base_path": "D:/a/Unity-Movement/Unity-Movement/.Documentation",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      },
+      "is_incremental": false
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Oculus.Movement.Utils.AddComponentsHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Oculus.Movement.Utils.AddComponentsHelper.html",
+          "hash": "ig2mPXiGdB5DRVN0cmSA8QG2tgmQQwStUOBe4om3OAM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Oculus.Movement.Utils.EnumNamedArrayAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Oculus.Movement.Utils.EnumNamedArrayAttribute.html",
+          "hash": "czL1mO/oSKASiG1655A0Tn9IHlR9Us3VVg9VhpCePn8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.html",
+          "hash": "6PV78Z81BIX3aWYN0ua1pUwTl2JFAM842u/sDP5B1oc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Oculus.Movement.Utils.InspectorGuiHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Oculus.Movement.Utils.InspectorGuiHelper.html",
+          "hash": "ZFEKyz94OJxEsh4QzY/bm0Z4Nct8ehMl0nOVvjqe5Jc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Oculus.Movement.Utils.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Oculus.Movement.Utils.html",
+          "hash": "F85Bn3ygB2it3zxm9WAkS9GLr5UCiTC/aGPGfpIww8E="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "XAGQr6pJO/VnJ/xTkp+7wGxWKKta/IVObn36ghPANKA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "favicon.ico",
+      "output": {
+        "resource": {
+          "relative_path": "favicon.ico"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "rqmrR90BHMEwPcj9UOhwBRuJBaSF++6ePilaNVEo/ME="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "logo.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/overview.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/overview.html",
+          "hash": "YG19JdQZ5RjfoGuBe3jfaPWLihHjR8Ka365BGIV5jNo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/samples.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/samples.html",
+          "hash": "yXl7HjXBLMkK/ArVORjR+ZMquP0yZRLVGljdIz6tj6E="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "manual/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "manual/toc.html",
+          "hash": "iKXO3YJ3IucLXVDTnwQ/LKBVqakhqWosChWVr1o13BY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "38rif9U4k2iik245GVVdyRsXki8ju6pllZhj5tzRZgE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot build incrementally because last build info is missing.",
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0,
+        "full_build_reason_code": "NoAvailableBuildCache"
+      },
+      "processors": {
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 3,
+          "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 12,
+          "skipped_file_count": 0
+        },
+        "ResourceDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: should not trace intermediate info.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

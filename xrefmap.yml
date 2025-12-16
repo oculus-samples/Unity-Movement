@@ -1,0 +1,164 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: Oculus.Movement.Utils
+  name: Oculus.Movement.Utils
+  href: api/Oculus.Movement.Utils.html
+  commentId: N:Oculus.Movement.Utils
+  fullName: Oculus.Movement.Utils
+  nameWithType: Oculus.Movement.Utils
+- uid: Oculus.Movement.Utils.AddComponentsHelper
+  name: AddComponentsHelper
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html
+  commentId: T:Oculus.Movement.Utils.AddComponentsHelper
+  fullName: Oculus.Movement.Utils.AddComponentsHelper
+  nameWithType: AddComponentsHelper
+- uid: Oculus.Movement.Utils.AddComponentsHelper._MOVEMENT_SAMPLES_MENU
+  name: _MOVEMENT_SAMPLES_MENU
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper__MOVEMENT_SAMPLES_MENU
+  commentId: F:Oculus.Movement.Utils.AddComponentsHelper._MOVEMENT_SAMPLES_MENU
+  fullName: Oculus.Movement.Utils.AddComponentsHelper._MOVEMENT_SAMPLES_MENU
+  nameWithType: AddComponentsHelper._MOVEMENT_SAMPLES_MENU
+- uid: Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent(GameObject,FaceRetargeterComponent,System.Boolean,RigType)
+  name: EnsureFaceDriverComponent(GameObject, FaceRetargeterComponent, Boolean, RigType)
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_EnsureFaceDriverComponent_GameObject_FaceRetargeterComponent_System_Boolean_RigType_
+  commentId: M:Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent(GameObject,FaceRetargeterComponent,System.Boolean,RigType)
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent(GameObject, FaceRetargeterComponent, System.Boolean, RigType)
+  nameWithType: AddComponentsHelper.EnsureFaceDriverComponent(GameObject, FaceRetargeterComponent, Boolean, RigType)
+- uid: Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent*
+  name: EnsureFaceDriverComponent
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_EnsureFaceDriverComponent_
+  commentId: Overload:Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.EnsureFaceDriverComponent
+  nameWithType: AddComponentsHelper.EnsureFaceDriverComponent
+- uid: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace(GameObject,System.Boolean,System.Boolean)
+  name: SetUpCharacterForA2EARKitFace(GameObject, Boolean, Boolean)
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EARKitFace_GameObject_System_Boolean_System_Boolean_
+  commentId: M:Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace(GameObject,System.Boolean,System.Boolean)
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace(GameObject, System.Boolean, System.Boolean)
+  nameWithType: AddComponentsHelper.SetUpCharacterForA2EARKitFace(GameObject, Boolean, Boolean)
+- uid: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace*
+  name: SetUpCharacterForA2EARKitFace
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EARKitFace_
+  commentId: Overload:Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EARKitFace
+  nameWithType: AddComponentsHelper.SetUpCharacterForA2EARKitFace
+- uid: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace(GameObject,System.Boolean,System.Boolean)
+  name: SetUpCharacterForA2EFace(GameObject, Boolean, Boolean)
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EFace_GameObject_System_Boolean_System_Boolean_
+  commentId: M:Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace(GameObject,System.Boolean,System.Boolean)
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace(GameObject, System.Boolean, System.Boolean)
+  nameWithType: AddComponentsHelper.SetUpCharacterForA2EFace(GameObject, Boolean, Boolean)
+- uid: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace*
+  name: SetUpCharacterForA2EFace
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_SetUpCharacterForA2EFace_
+  commentId: Overload:Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.SetUpCharacterForA2EFace
+  nameWithType: AddComponentsHelper.SetUpCharacterForA2EFace
+- uid: Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping(GameObject)
+  name: ValidateChildGameObjectsForFaceMapping(GameObject)
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_ValidateChildGameObjectsForFaceMapping_GameObject_
+  commentId: M:Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping(GameObject)
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping(GameObject)
+  nameWithType: AddComponentsHelper.ValidateChildGameObjectsForFaceMapping(GameObject)
+- uid: Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping*
+  name: ValidateChildGameObjectsForFaceMapping
+  href: api/Oculus.Movement.Utils.AddComponentsHelper.html#Oculus_Movement_Utils_AddComponentsHelper_ValidateChildGameObjectsForFaceMapping_
+  commentId: Overload:Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.AddComponentsHelper.ValidateChildGameObjectsForFaceMapping
+  nameWithType: AddComponentsHelper.ValidateChildGameObjectsForFaceMapping
+- uid: Oculus.Movement.Utils.EnumNamedArrayAttribute
+  name: EnumNamedArrayAttribute
+  href: api/Oculus.Movement.Utils.EnumNamedArrayAttribute.html
+  commentId: T:Oculus.Movement.Utils.EnumNamedArrayAttribute
+  fullName: Oculus.Movement.Utils.EnumNamedArrayAttribute
+  nameWithType: EnumNamedArrayAttribute
+- uid: Oculus.Movement.Utils.EnumNamedArrayAttribute.#ctor(System.Type)
+  name: EnumNamedArrayAttribute(Type)
+  href: api/Oculus.Movement.Utils.EnumNamedArrayAttribute.html#Oculus_Movement_Utils_EnumNamedArrayAttribute__ctor_System_Type_
+  commentId: M:Oculus.Movement.Utils.EnumNamedArrayAttribute.#ctor(System.Type)
+  fullName: Oculus.Movement.Utils.EnumNamedArrayAttribute.EnumNamedArrayAttribute(System.Type)
+  nameWithType: EnumNamedArrayAttribute.EnumNamedArrayAttribute(Type)
+- uid: Oculus.Movement.Utils.EnumNamedArrayAttribute.#ctor*
+  name: EnumNamedArrayAttribute
+  href: api/Oculus.Movement.Utils.EnumNamedArrayAttribute.html#Oculus_Movement_Utils_EnumNamedArrayAttribute__ctor_
+  commentId: Overload:Oculus.Movement.Utils.EnumNamedArrayAttribute.#ctor
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.EnumNamedArrayAttribute.EnumNamedArrayAttribute
+  nameWithType: EnumNamedArrayAttribute.EnumNamedArrayAttribute
+- uid: Oculus.Movement.Utils.EnumNamedArrayAttribute.GetNames
+  name: GetNames()
+  href: api/Oculus.Movement.Utils.EnumNamedArrayAttribute.html#Oculus_Movement_Utils_EnumNamedArrayAttribute_GetNames
+  commentId: M:Oculus.Movement.Utils.EnumNamedArrayAttribute.GetNames
+  fullName: Oculus.Movement.Utils.EnumNamedArrayAttribute.GetNames()
+  nameWithType: EnumNamedArrayAttribute.GetNames()
+- uid: Oculus.Movement.Utils.EnumNamedArrayAttribute.GetNames*
+  name: GetNames
+  href: api/Oculus.Movement.Utils.EnumNamedArrayAttribute.html#Oculus_Movement_Utils_EnumNamedArrayAttribute_GetNames_
+  commentId: Overload:Oculus.Movement.Utils.EnumNamedArrayAttribute.GetNames
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.EnumNamedArrayAttribute.GetNames
+  nameWithType: EnumNamedArrayAttribute.GetNames
+- uid: Oculus.Movement.Utils.EnumNamedArrayAttribute.TargetEnum
+  name: TargetEnum
+  href: api/Oculus.Movement.Utils.EnumNamedArrayAttribute.html#Oculus_Movement_Utils_EnumNamedArrayAttribute_TargetEnum
+  commentId: F:Oculus.Movement.Utils.EnumNamedArrayAttribute.TargetEnum
+  fullName: Oculus.Movement.Utils.EnumNamedArrayAttribute.TargetEnum
+  nameWithType: EnumNamedArrayAttribute.TargetEnum
+- uid: Oculus.Movement.Utils.InspectorGuiHelper
+  name: InspectorGuiHelper
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.html
+  commentId: T:Oculus.Movement.Utils.InspectorGuiHelper
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper
+  nameWithType: InspectorGuiHelper
+- uid: Oculus.Movement.Utils.InspectorGuiHelper.#ctor(System.Func{System.Boolean},System.Action,System.String,System.String,Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon)
+  name: InspectorGuiHelper(Func<Boolean>, Action, String, String, InspectorGuiHelper.OptionalIcon)
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.html#Oculus_Movement_Utils_InspectorGuiHelper__ctor_System_Func_System_Boolean__System_Action_System_String_System_String_Oculus_Movement_Utils_InspectorGuiHelper_OptionalIcon_
+  commentId: M:Oculus.Movement.Utils.InspectorGuiHelper.#ctor(System.Func{System.Boolean},System.Action,System.String,System.String,Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon)
+  name.vb: InspectorGuiHelper(Func(Of Boolean), Action, String, String, InspectorGuiHelper.OptionalIcon)
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper.InspectorGuiHelper(System.Func<System.Boolean>, System.Action, System.String, System.String, Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon)
+  fullName.vb: Oculus.Movement.Utils.InspectorGuiHelper.InspectorGuiHelper(System.Func(Of System.Boolean), System.Action, System.String, System.String, Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon)
+  nameWithType: InspectorGuiHelper.InspectorGuiHelper(Func<Boolean>, Action, String, String, InspectorGuiHelper.OptionalIcon)
+  nameWithType.vb: InspectorGuiHelper.InspectorGuiHelper(Func(Of Boolean), Action, String, String, InspectorGuiHelper.OptionalIcon)
+- uid: Oculus.Movement.Utils.InspectorGuiHelper.#ctor*
+  name: InspectorGuiHelper
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.html#Oculus_Movement_Utils_InspectorGuiHelper__ctor_
+  commentId: Overload:Oculus.Movement.Utils.InspectorGuiHelper.#ctor
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper.InspectorGuiHelper
+  nameWithType: InspectorGuiHelper.InspectorGuiHelper
+- uid: Oculus.Movement.Utils.InspectorGuiHelper.DrawInInspector
+  name: DrawInInspector()
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.html#Oculus_Movement_Utils_InspectorGuiHelper_DrawInInspector
+  commentId: M:Oculus.Movement.Utils.InspectorGuiHelper.DrawInInspector
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper.DrawInInspector()
+  nameWithType: InspectorGuiHelper.DrawInInspector()
+- uid: Oculus.Movement.Utils.InspectorGuiHelper.DrawInInspector*
+  name: DrawInInspector
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.html#Oculus_Movement_Utils_InspectorGuiHelper_DrawInInspector_
+  commentId: Overload:Oculus.Movement.Utils.InspectorGuiHelper.DrawInInspector
+  isSpec: "True"
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper.DrawInInspector
+  nameWithType: InspectorGuiHelper.DrawInInspector
+- uid: Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon
+  name: InspectorGuiHelper.OptionalIcon
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.html
+  commentId: T:Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon
+  nameWithType: InspectorGuiHelper.OptionalIcon
+- uid: Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.None
+  name: None
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.html#Oculus_Movement_Utils_InspectorGuiHelper_OptionalIcon_None
+  commentId: F:Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.None
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.None
+  nameWithType: InspectorGuiHelper.OptionalIcon.None
+- uid: Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.Warning
+  name: Warning
+  href: api/Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.html#Oculus_Movement_Utils_InspectorGuiHelper_OptionalIcon_Warning
+  commentId: F:Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.Warning
+  fullName: Oculus.Movement.Utils.InspectorGuiHelper.OptionalIcon.Warning
+  nameWithType: InspectorGuiHelper.OptionalIcon.Warning
