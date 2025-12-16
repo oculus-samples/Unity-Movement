@@ -194,6 +194,7 @@ namespace Meta.XR.Movement.Networking
         private GameObject[] _objectsToHideUntilValid;
 
         private bool _hasValidDebugPose = false;
+        private bool _hasLoggedOwnershipWarning = false;
 
         public override void Awake()
         {
@@ -204,14 +205,56 @@ namespace Meta.XR.Movement.Networking
         public override void Start()
         {
             base.Start();
+            InitializeIndicesToSendIfEmpty();
             UpdateSerializationSettings();
+        }
+
+        /// <summary>
+        /// Initialize body and face indices arrays if they are empty.
+        /// This ensures delta compression works correctly even if the arrays
+        /// were not configured in the Inspector.
+        /// </summary>
+        private void InitializeIndicesToSendIfEmpty()
+        {
+            var numJoints = NumberOfJoints;
+            var numShapes = NumberOfShapes;
+
+            InitializeIndexArrayIfEmpty(ref _bodyIndicesToSync, numJoints);
+            InitializeIndexArrayIfEmpty(ref _bodyIndicesToSend, numJoints);
+            InitializeIndexArrayIfEmpty(ref _faceIndicesToSend, numShapes);
+        }
+
+        private static void InitializeIndexArrayIfEmpty(ref int[] array, int size)
+        {
+            if ((array == null || array.Length == 0) && size > 0)
+            {
+                array = new int[size];
+                for (int i = 0; i < size; i++)
+                {
+                    array[i] = i;
+                }
+            }
         }
 
         public override void Update()
         {
             if (_ownership == Ownership.Host)
             {
+                if (RetargetingHandle == INVALID_HANDLE)
+                {
+                    if (!_hasLoggedOwnershipWarning)
+                    {
+                        Debug.LogError("[NetworkCharacterRetargeter] Update: RetargetingHandle is INVALID_HANDLE, waiting for initialization");
+                        _hasLoggedOwnershipWarning = true;
+                    }
+                    return;
+                }
                 base.Update();
+            }
+            else if (_ownership == Ownership.None && !_hasLoggedOwnershipWarning)
+            {
+                Debug.LogError("[NetworkCharacterRetargeter] Update: Ownership is None! Character will remain in T-Pose. Ensure Setup() is called before Update.");
+                _hasLoggedOwnershipWarning = true;
             }
         }
 
@@ -221,12 +264,9 @@ namespace Meta.XR.Movement.Networking
             {
                 base.LateUpdate();
             }
-            else if (_ownership == Ownership.Client)
+            else if (_ownership == Ownership.Client && _debugDrawTargetSkeleton && _hasValidDebugPose)
             {
-                if (_debugDrawTargetSkeleton && _hasValidDebugPose)
-                {
-                    _skeletonRetargeter.DrawDebugTargetPose(_debugDrawTransform, _debugDrawTargetSkeletonColor, true);
-                }
+                _skeletonRetargeter.DrawDebugTargetPose(_debugDrawTransform, _debugDrawTargetSkeletonColor, true);
             }
         }
 
@@ -256,7 +296,7 @@ namespace Meta.XR.Movement.Networking
         /// </summary>
         public void UpdateSerializationSettings()
         {
-            if (RetargetingHandle == 0)
+            if (RetargetingHandle == INVALID_HANDLE)
             {
                 return;
             }
@@ -267,7 +307,7 @@ namespace Meta.XR.Movement.Networking
                 settings.PositionThreshold = _positionThreshold;
                 settings.RotationAngleThresholdDegrees = _rotationAngleThreshold;
                 settings.ShapeThreshold = _shapeThreshold;
-                MSDKUtility.UpdateSerializationSettings(RetargetingHandle, settings);
+                MSDKUtility.SetSerializationSettings(RetargetingHandle, settings);
             }
         }
 
@@ -277,9 +317,17 @@ namespace Meta.XR.Movement.Networking
         /// <param name="isActive">True if the objects should be active.</param>
         public void ToggleObjects(bool isActive)
         {
+            if (_objectsToHideUntilValid == null)
+            {
+                return;
+            }
+
             foreach (var obj in _objectsToHideUntilValid)
             {
-                obj.SetActive(isActive);
+                if (obj != null)
+                {
+                    obj.SetActive(isActive);
+                }
             }
         }
     }

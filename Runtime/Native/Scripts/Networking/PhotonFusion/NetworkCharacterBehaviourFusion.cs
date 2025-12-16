@@ -4,7 +4,6 @@
 using Fusion;
 #endif
 using System;
-using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
@@ -13,7 +12,7 @@ namespace Meta.XR.Movement.Networking.Fusion
 #if FUSION2
     /// <summary>
     /// Implementation of <see cref="INetworkCharacterBehaviour"/> using the Photon Fusion 2
-    /// networking framework.
+    /// networking framework. Uses NetworkCharacterDataStreamFusion for simplified data synchronization.
     /// </summary>
     public class NetworkCharacterBehaviourFusion : NetworkBehaviour, INetworkCharacterBehaviour,
         IPlayerJoined, IPlayerLeft
@@ -64,6 +63,14 @@ namespace Meta.XR.Movement.Networking.Fusion
             set;
         }
 
+        [Networked]
+        private int CharacterDataStreamLength { get; set; }
+
+        [Networked]
+        [Capacity(_characterDataStreamMaxCapacity)]
+        [OnChangedRender(nameof(OnCharacterDataStreamChanged))]
+        private NetworkArray<byte> CharacterDataStream => default;
+
         /// <inheritdoc cref="_followCameraRig"/>
         public bool FollowCameraRig
         {
@@ -83,32 +90,28 @@ namespace Meta.XR.Movement.Networking.Fusion
         [SerializeField]
         private float _renderRateFactor = 250f;
 
-        private readonly List<ulong> _clientIdList = new();
+        private readonly System.Collections.Generic.List<ulong> _clientIdList = new();
+        private const int _characterDataStreamMaxCapacity = 1024;
         private const int _maxPlayers = 64;
-
         private ulong[] _clientIds = Array.Empty<ulong>();
         private Transform _cameraRig;
         private INetworkCharacterHandler _characterHandler;
+        private NetworkCharacterDataStreamFusion _characterDataStreamHelper;
 
         /// <inheritdoc cref="INetworkCharacterBehaviour.ReceiveStreamData"/>
         public void ReceiveStreamData(ulong clientId, bool isReliable, NativeArray<byte> bytes)
         {
-            var arrayBytes = new byte[bytes.Length];
-            bytes.CopyTo(arrayBytes);
-            var target = GetTargetPlayer(clientId);
-            if (target.IsNone)
+            if (!Object.HasStateAuthority)
             {
                 return;
             }
 
-            if (isReliable)
-            {
-                ReceiveStreamDataRpc(target, arrayBytes);
-            }
-            else
-            {
-                ReceiveStreamDataUnreliableRpc(target, arrayBytes);
-            }
+            var arrayBytes = new byte[bytes.Length];
+            bytes.CopyTo(arrayBytes);
+
+            int tempLength = CharacterDataStreamLength;
+            _characterDataStreamHelper.SetData(arrayBytes, CharacterDataStream, ref tempLength);
+            CharacterDataStreamLength = tempLength;
         }
 
         /// <inheritdoc cref="INetworkCharacterBehaviour.ReceiveStreamAck"/>
@@ -120,13 +123,19 @@ namespace Meta.XR.Movement.Networking.Fusion
         /// <inheritdoc />
         public override void Spawned()
         {
-            // Initialize local components.
             _characterHandler = GetComponent<INetworkCharacterHandler>();
-            _cameraRig = OVRManager.instance?.GetComponentInChildren<OVRCameraRig>().transform;
+            _cameraRig = OVRManager.instance?.GetComponentInChildren<OVRCameraRig>()?.transform;
+            _characterDataStreamHelper = new NetworkCharacterDataStreamFusion();
 
-            // Initialize network variables.
             OnCharacterIdChanged();
             UpdateClientIds();
+        }
+
+        /// <inheritdoc />
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            base.Despawned(runner, hasState);
+            _characterDataStreamHelper = null;
         }
 
         /// <summary>
@@ -160,10 +169,32 @@ namespace Meta.XR.Movement.Networking.Fusion
             _characterHandler.Setup();
         }
 
+        /// <summary>
+        /// Called when the character data stream changed.
+        /// </summary>
+        private void OnCharacterDataStreamChanged()
+        {
+            if (Object.HasStateAuthority || _characterHandler == null)
+            {
+                return;
+            }
+
+            var data = _characterDataStreamHelper.GetData(CharacterDataStream, CharacterDataStreamLength);
+            if (data == null || data.Length == 0)
+            {
+                return;
+            }
+
+            var nativeArray = new NativeArray<byte>(data.Length, Unity.Collections.Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            nativeArray.CopyFrom(data);
+            _characterHandler.ReceiveData(nativeArray);
+            nativeArray.Dispose();
+        }
+
         /// <inheritdoc />
         public override void FixedUpdateNetwork()
         {
-            if (HasInputAuthority)
+            if (HasInputAuthority && _characterHandler?.Character != null)
             {
                 CharacterScale = _characterHandler.Character.transform.localScale.x;
             }
@@ -178,7 +209,7 @@ namespace Meta.XR.Movement.Networking.Fusion
 
         private void FixedUpdate()
         {
-            if (!HasInputAuthority)
+            if (!HasInputAuthority && _characterHandler?.Character != null)
             {
                 _characterHandler.Character.transform.localScale = Vector3.one * CharacterScale;
             }
@@ -206,46 +237,10 @@ namespace Meta.XR.Movement.Networking.Fusion
             _clientIds = _clientIdList.ToArray();
         }
 
-        private PlayerRef GetTargetPlayer(ulong targetClientId)
-        {
-            if (Runner == null)
-            {
-                return PlayerRef.None;
-            }
-
-            foreach (var player in Runner.ActivePlayers)
-            {
-                if ((ulong)player.PlayerId == targetClientId)
-                {
-                    return player;
-                }
-            }
-
-            return PlayerRef.None;
-        }
-
-        [Rpc(RpcSources.InputAuthority, RpcTargets.Proxies, InvokeLocal = false, Channel = RpcChannel.Reliable)]
-        private void ReceiveStreamDataRpc([RpcTarget] PlayerRef player, byte[] bytes)
-        {
-            var arrayBytes = new NativeArray<byte>(bytes.Length, Unity.Collections.Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            arrayBytes.CopyFrom(bytes);
-            _characterHandler.ReceiveData(arrayBytes);
-        }
-
-        [Rpc(RpcSources.InputAuthority, RpcTargets.Proxies, InvokeLocal = false, Channel = RpcChannel.Unreliable)]
-        private void ReceiveStreamDataUnreliableRpc([RpcTarget] PlayerRef player, byte[] bytes)
-        {
-            var arrayBytes = new NativeArray<byte>(bytes.Length, Unity.Collections.Allocator.Temp,
-                NativeArrayOptions.UninitializedMemory);
-            arrayBytes.CopyFrom(bytes);
-            _characterHandler.ReceiveData(arrayBytes);
-        }
-
         [Rpc(RpcSources.All, RpcTargets.InputAuthority, InvokeLocal = false, Channel = RpcChannel.Unreliable)]
         private void ReceiveStreamAckUnreliableRpc(ulong id, int ack)
         {
-            _characterHandler.ReceiveAck(id, ack);
+            _characterHandler?.ReceiveAck(id, ack);
         }
     }
 #endif

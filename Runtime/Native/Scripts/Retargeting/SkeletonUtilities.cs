@@ -22,36 +22,6 @@ namespace Meta.XR.Movement.Retargeting
     public static class SkeletonUtilities
     {
         /// <summary>
-        /// Convert from OpenXR to Unity space.
-        /// </summary>
-        [BurstCompile]
-        public struct ConvertFromOpenXRToUnitySpace : IJob
-        {
-            /// <summary>
-            /// Transforms to modify
-            /// </summary>
-            public NativeArray<NativeTransform> Transforms;
-
-            /// <summary>
-            /// Execute the job.
-            /// </summary>
-            [BurstCompile]
-            public void Execute()
-            {
-                var numTransforms = Transforms.Length;
-                for (var i = 0; i < numTransforms; i++)
-                {
-                    var poseToModify = Transforms[i];
-                    var oldPosition = poseToModify.Position;
-                    var oldRotation = poseToModify.Orientation;
-                    poseToModify.Position = new Vector3() { x = oldPosition.x, y = oldPosition.y, z = -oldPosition.z };
-                    poseToModify.Orientation = new Quaternion() { x = -oldRotation.x, y = -oldRotation.y, z = oldRotation.z, w = oldRotation.w };
-                    Transforms[i] = poseToModify;
-                }
-            }
-        }
-
-        /// <summary>
         /// Updates an array of source poses from arrays of
         /// positions and rotations. An offset can be provided to
         /// transform the entire set of poses.
@@ -198,24 +168,6 @@ namespace Meta.XR.Movement.Retargeting
         private static OVRSkeleton.SkeletonPoseData _data;
         private static NativeArray<NativeTransform> _outputPoses;
         private static float _timestamp;
-
-        /// <summary>
-        /// Converts a pose from Unity space to OpenXR space.
-        /// </summary>
-        /// <param name="oldTransform">Old transform to convert.</param>
-        /// <returns>Converted transform in Unity space.</returns>
-        public static NativeTransform FromOpenXRToUnitySpace(NativeTransform oldTransform)
-        {
-            // These are from-flipped calculations going to Unity space.
-            var unitySpacePos =
-                new Vector3(oldTransform.Position.x, oldTransform.Position.y, -oldTransform.Position.z);
-            var unitySpaceQuat =
-                new Quaternion(-oldTransform.Orientation.x, -oldTransform.Orientation.y,
-                    oldTransform.Orientation.z, oldTransform.Orientation.w);
-            return new NativeTransform(
-                new Quaternion(unitySpaceQuat.x, unitySpaceQuat.y, unitySpaceQuat.z, unitySpaceQuat.w),
-                new Vector3(unitySpacePos.x, unitySpacePos.y, unitySpacePos.z));
-        }
 
         /// <summary>
         /// Computes world poses using SkeletonRetargeter for automatic parameter filling.
@@ -565,7 +517,7 @@ namespace Meta.XR.Movement.Retargeting
                     foundIndexWithLaterParent = true;
                     continue;
                 }
-                if (parentIndex < posesToModify.Length - 1)
+                if (parentIndex < posesToModify.Length)
                 {
                     var parentTransform = posesToModify[parentIndex];
                     var currentTransform = posesToModify[i];
@@ -598,7 +550,7 @@ namespace Meta.XR.Movement.Retargeting
                 {
                     continue;
                 }
-                if (parentIndex < posesToModify.Length - 1)
+                if (parentIndex < posesToModify.Length)
                 {
                     var parentTransform = posesToModify[parentIndex];
                     var currentTransform = posesToModify[i];
@@ -628,8 +580,8 @@ namespace Meta.XR.Movement.Retargeting
                     isLeftSide ? OVRPlugin.Hand.HandLeft : OVRPlugin.Hand.HandRight, ref handState))
             {
                 isHandTracked = true;
-                inputTrackingPosition = handState.PointerPose.Position.FromVector3f();
-                inputTrackingRotation = handState.PointerPose.Orientation.FromQuatf();
+                inputTrackingPosition = handState.PointerPose.Position.FromFlippedZVector3f();
+                inputTrackingRotation = handState.PointerPose.Orientation.FromFlippedZQuatf();
             }
             else
             {
@@ -642,8 +594,8 @@ namespace Meta.XR.Movement.Retargeting
                     OVRInput.GetLocalControllerRotation(isLeftSide
                         ? OVRInput.Controller.LTouch
                         : OVRInput.Controller.RTouch);
-                var toOpenXRPos = inputTrackingPosition.ToFlippedZVector3f();
-                var toOpenXRQuat = inputTrackingRotation.ToFlippedZQuatf();
+                var toOpenXRPos = inputTrackingPosition;
+                var toOpenXRQuat = inputTrackingRotation;
                 inputTrackingPosition = new Vector3(toOpenXRPos.x, toOpenXRPos.y, toOpenXRPos.z);
                 inputTrackingRotation = new Quaternion(toOpenXRQuat.x, toOpenXRQuat.y, toOpenXRQuat.z, toOpenXRQuat.w);
             }

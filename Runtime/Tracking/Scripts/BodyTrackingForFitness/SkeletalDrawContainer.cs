@@ -23,7 +23,7 @@ namespace Meta.XR.Movement.Fitness
         /// Controls skeletal thickness.
         /// </summary>
         [SerializeField]
-        protected float _thickness = 0.005f;
+        protected float _thickness = 0.05f;
 
         /// <summary>
         /// Transforms game object.

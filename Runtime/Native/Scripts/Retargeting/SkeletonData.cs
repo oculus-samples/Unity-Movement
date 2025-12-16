@@ -114,6 +114,98 @@ namespace Meta.XR.Movement.Retargeting
         };
 
         /// <summary>
+        /// Static array mapping from FullBodyTrackingBoneId to its parent bone ID.
+        /// Index is the bone ID, value is the parent bone ID.
+        /// Array size is End + 1 to include indices from Start (0) to End (84).
+        /// </summary>
+        public static readonly FullBodyTrackingBoneId[] ParentBoneId = {
+            FullBodyTrackingBoneId.Start, // Start/Root (index 0)
+            FullBodyTrackingBoneId.Root, // Hips
+            FullBodyTrackingBoneId.Hips, // SpineLower
+            FullBodyTrackingBoneId.SpineLower, // SpineMiddle
+            FullBodyTrackingBoneId.SpineMiddle, // SpineUpper
+            FullBodyTrackingBoneId.SpineUpper, // Chest
+            FullBodyTrackingBoneId.Chest, // Neck
+            FullBodyTrackingBoneId.Neck, // Head
+            FullBodyTrackingBoneId.Chest, // LeftShoulder
+            FullBodyTrackingBoneId.LeftShoulder, // LeftScapula
+            FullBodyTrackingBoneId.LeftScapula, // LeftArmUpper
+            FullBodyTrackingBoneId.LeftArmUpper, // LeftArmLower
+            FullBodyTrackingBoneId.LeftArmLower, // LeftHandWristTwist
+            FullBodyTrackingBoneId.Chest, // RightShoulder
+            FullBodyTrackingBoneId.RightShoulder, // RightScapula
+            FullBodyTrackingBoneId.RightScapula, // RightArmUpper
+            FullBodyTrackingBoneId.RightArmUpper, // RightArmLower
+            FullBodyTrackingBoneId.RightArmLower, // RightHandWristTwist
+            FullBodyTrackingBoneId.LeftHandWristTwist, // LeftHandPalm
+            FullBodyTrackingBoneId.LeftHandPalm, // LeftHandWrist
+            FullBodyTrackingBoneId.LeftHandWrist, // LeftHandThumbMetacarpal
+            FullBodyTrackingBoneId.LeftHandThumbMetacarpal, // LeftHandThumbProximal
+            FullBodyTrackingBoneId.LeftHandThumbProximal, // LeftHandThumbDistal
+            FullBodyTrackingBoneId.LeftHandThumbDistal, // LeftHandThumbTip
+            FullBodyTrackingBoneId.LeftHandWrist, // LeftHandIndexMetacarpal
+            FullBodyTrackingBoneId.LeftHandIndexMetacarpal, // LeftHandIndexProximal
+            FullBodyTrackingBoneId.LeftHandIndexProximal, // LeftHandIndexIntermediate
+            FullBodyTrackingBoneId.LeftHandIndexIntermediate, // LeftHandIndexDistal
+            FullBodyTrackingBoneId.LeftHandIndexDistal, // LeftHandIndexTip
+            FullBodyTrackingBoneId.LeftHandWrist, // LeftHandMiddleMetacarpal
+            FullBodyTrackingBoneId.LeftHandMiddleMetacarpal, // LeftHandMiddleProximal
+            FullBodyTrackingBoneId.LeftHandMiddleProximal, // LeftHandMiddleIntermediate
+            FullBodyTrackingBoneId.LeftHandMiddleIntermediate, // LeftHandMiddleDistal
+            FullBodyTrackingBoneId.LeftHandMiddleDistal, // LeftHandMiddleTip
+            FullBodyTrackingBoneId.LeftHandWrist, // LeftHandRingMetacarpal
+            FullBodyTrackingBoneId.LeftHandRingMetacarpal, // LeftHandRingProximal
+            FullBodyTrackingBoneId.LeftHandRingProximal, // LeftHandRingIntermediate
+            FullBodyTrackingBoneId.LeftHandRingIntermediate, // LeftHandRingDistal
+            FullBodyTrackingBoneId.LeftHandRingDistal, // LeftHandRingTip
+            FullBodyTrackingBoneId.LeftHandWrist, // LeftHandLittleMetacarpal
+            FullBodyTrackingBoneId.LeftHandLittleMetacarpal, // LeftHandLittleProximal
+            FullBodyTrackingBoneId.LeftHandLittleProximal, // LeftHandLittleIntermediate
+            FullBodyTrackingBoneId.LeftHandLittleIntermediate, // LeftHandLittleDistal
+            FullBodyTrackingBoneId.LeftHandLittleDistal, // LeftHandLittleTip
+            FullBodyTrackingBoneId.RightHandWristTwist, // RightHandPalm
+            FullBodyTrackingBoneId.RightHandPalm, // RightHandWrist
+            FullBodyTrackingBoneId.RightHandWrist, // RightHandThumbMetacarpal
+            FullBodyTrackingBoneId.RightHandThumbMetacarpal, // RightHandThumbProximal
+            FullBodyTrackingBoneId.RightHandThumbProximal, // RightHandThumbDistal
+            FullBodyTrackingBoneId.RightHandThumbDistal, // RightHandThumbTip
+            FullBodyTrackingBoneId.RightHandWrist, // RightHandIndexMetacarpal
+            FullBodyTrackingBoneId.RightHandIndexMetacarpal, // RightHandIndexProximal
+            FullBodyTrackingBoneId.RightHandIndexProximal, // RightHandIndexIntermediate
+            FullBodyTrackingBoneId.RightHandIndexIntermediate, // RightHandIndexDistal
+            FullBodyTrackingBoneId.RightHandIndexDistal, // RightHandIndexTip
+            FullBodyTrackingBoneId.RightHandWrist, // RightHandMiddleMetacarpal
+            FullBodyTrackingBoneId.RightHandMiddleMetacarpal, // RightHandMiddleProximal
+            FullBodyTrackingBoneId.RightHandMiddleProximal, // RightHandMiddleIntermediate
+            FullBodyTrackingBoneId.RightHandMiddleIntermediate, // RightHandMiddleDistal
+            FullBodyTrackingBoneId.RightHandMiddleDistal, // RightHandMiddleTip
+            FullBodyTrackingBoneId.RightHandWrist, // RightHandRingMetacarpal
+            FullBodyTrackingBoneId.RightHandRingMetacarpal, // RightHandRingProximal
+            FullBodyTrackingBoneId.RightHandRingProximal, // RightHandRingIntermediate
+            FullBodyTrackingBoneId.RightHandRingIntermediate, // RightHandRingDistal
+            FullBodyTrackingBoneId.RightHandRingDistal, // RightHandRingTip
+            FullBodyTrackingBoneId.RightHandWrist, // RightHandLittleMetacarpal
+            FullBodyTrackingBoneId.RightHandLittleMetacarpal, // RightHandLittleProximal
+            FullBodyTrackingBoneId.RightHandLittleProximal, // RightHandLittleIntermediate
+            FullBodyTrackingBoneId.RightHandLittleIntermediate, // RightHandLittleDistal
+            FullBodyTrackingBoneId.RightHandLittleDistal, // RightHandLittleTip
+            FullBodyTrackingBoneId.Hips, // LeftUpperLeg
+            FullBodyTrackingBoneId.LeftUpperLeg, // LeftLowerLeg
+            FullBodyTrackingBoneId.LeftLowerLeg, // LeftFootAnkleTwist
+            FullBodyTrackingBoneId.LeftFootAnkleTwist, // LeftFootAnkle
+            FullBodyTrackingBoneId.LeftFootAnkle, // LeftFootSubtalar
+            FullBodyTrackingBoneId.LeftFootSubtalar, // LeftFootTransverse
+            FullBodyTrackingBoneId.LeftFootTransverse, // LeftFootBall
+            FullBodyTrackingBoneId.Hips, // RightUpperLeg
+            FullBodyTrackingBoneId.RightUpperLeg, // RightLowerLeg
+            FullBodyTrackingBoneId.RightLowerLeg, // RightFootAnkleTwist
+            FullBodyTrackingBoneId.RightFootAnkleTwist, // RightFootAnkle
+            FullBodyTrackingBoneId.RightFootAnkle, // RightFootSubtalar
+            FullBodyTrackingBoneId.RightFootSubtalar, // RightFootTransverse
+            FullBodyTrackingBoneId.RightFootTransverse, // RightFootBall
+        };
+
+        /// <summary>
         /// Half body tracking bone id.
         /// </summary>
         public enum BodyTrackingBoneId
@@ -365,7 +457,16 @@ namespace Meta.XR.Movement.Retargeting
             GetParentJointNames(configHandle, skeletonType, out var parentJoints);
             GetKnownJointNames(configHandle, skeletonType, out var knownJoints);
             GetManifestationNames(configHandle, skeletonType, out var manifestationNames);
-            GetAutoMappingExcludedJoints(configHandle, skeletonType, out var autoMapExcludedJoints);
+            GetAutoMappingAdditionalJointData(configHandle, skeletonType, out var autoMappingJointData);
+
+            string[] autoMapExcludedJoints = new string[autoMappingJointData.Length];
+            for (var i = 0; i < autoMappingJointData.Length; i++)
+            {
+                if ((autoMappingJointData[i].Flags & AutoMappingJointFlags.Exclude) != 0)
+                {
+                    autoMapExcludedJoints[i] = autoMappingJointData[i].JointName;
+                }
+            }
 
             skeletonData._joints = joints;
             skeletonData._parentJoints = parentJoints;
@@ -502,34 +603,79 @@ namespace Meta.XR.Movement.Retargeting
             data._minTPoseArray = new NativeTransform[jointCount];
             data._maxTPoseArray = new NativeTransform[jointCount];
 
+            // Check if this is an OVRSkeleton by seeing if joints match FullBodyTrackingBoneId names
+            var isOVRSkeleton = IsOVRSkeleton(jointMapping);
+
             // First pass: assign indices to all joints
-            foreach (var jointPair in jointMapping)
+            if (isOVRSkeleton)
             {
-                jointToIndexMap[jointPair.Key] = index;
-                index++;
+                // For OVRSkeleton, order joints by FullBodyTrackingBoneId enum order
+                var orderedJoints = OrderJointsByFullBodyTrackingBoneId(jointMapping);
+                foreach (var joint in orderedJoints)
+                {
+                    jointToIndexMap[joint] = index;
+                    index++;
+                }
+            }
+            else
+            {
+                // For other skeletons, use transform hierarchy order
+                foreach (var jointPair in jointMapping)
+                {
+                    jointToIndexMap[jointPair.Key] = index;
+                    index++;
+                }
             }
 
             // Second pass: populate data arrays
             index = 0;
-            foreach (var jointPair in jointMapping)
+            if (isOVRSkeleton)
             {
-                var joint = jointPair.Key;
-                var parentJoint = jointPair.Value;
-
-                data._joints[index] = joint.name;
-                if (parentJoint == null)
+                // Use ordered joints for OVRSkeleton
+                var orderedJoints = OrderJointsByFullBodyTrackingBoneId(jointMapping);
+                foreach (var joint in orderedJoints)
                 {
-                    data._parentJoints[index] = string.Empty;
-                    data._parentIndices[index] = -1;
-                }
-                else
-                {
-                    data._parentJoints[index] = parentJoint.name;
-                    data._parentIndices[index] = jointToIndexMap.GetValueOrDefault(parentJoint, -1);
-                }
+                    var parentJoint = jointMapping[joint];
 
-                data._tPoseArray[index] = new Pose(joint.position * positionScale, joint.rotation);
-                index++;
+                    data._joints[index] = joint.name;
+                    if (parentJoint == null)
+                    {
+                        data._parentJoints[index] = string.Empty;
+                        data._parentIndices[index] = -1;
+                    }
+                    else
+                    {
+                        data._parentJoints[index] = parentJoint.name;
+                        data._parentIndices[index] = jointToIndexMap.GetValueOrDefault(parentJoint, -1);
+                    }
+
+                    data._tPoseArray[index] = new Pose(joint.position * positionScale, joint.rotation);
+                    index++;
+                }
+            }
+            else
+            {
+                // Use hierarchy order for other skeletons
+                foreach (var jointPair in jointMapping)
+                {
+                    var joint = jointPair.Key;
+                    var parentJoint = jointPair.Value;
+
+                    data._joints[index] = joint.name;
+                    if (parentJoint == null)
+                    {
+                        data._parentJoints[index] = string.Empty;
+                        data._parentIndices[index] = -1;
+                    }
+                    else
+                    {
+                        data._parentJoints[index] = parentJoint.name;
+                        data._parentIndices[index] = jointToIndexMap.GetValueOrDefault(parentJoint, -1);
+                    }
+
+                    data._tPoseArray[index] = new Pose(joint.position * positionScale, joint.rotation);
+                    index++;
+                }
             }
 
             // Set T-pose min/max to the same as T-pose (no joint limits from transform)
@@ -545,19 +691,130 @@ namespace Meta.XR.Movement.Retargeting
             return data;
         }
 
+        /// <summary>
+        /// Checks if the joint mapping represents an OVRSkeleton by verifying if joints match FullBodyTrackingBoneId names.
+        /// </summary>
+        /// <param name="jointMapping">The joint mapping to check.</param>
+        /// <returns>True if this is an OVRSkeleton, false otherwise.</returns>
+        private static bool IsOVRSkeleton(Dictionary<Transform, Transform> jointMapping)
+        {
+            // Get all FullBodyTrackingBoneId enum names
+            var ovrBoneNames = new HashSet<string>();
+            foreach (FullBodyTrackingBoneId boneId in Enum.GetValues(typeof(FullBodyTrackingBoneId)))
+            {
+                // Skip special markers
+                if (boneId == FullBodyTrackingBoneId.Start ||
+                    boneId == FullBodyTrackingBoneId.End ||
+                    boneId == FullBodyTrackingBoneId.NoOverride ||
+                    boneId == FullBodyTrackingBoneId.Remove)
+                {
+                    continue;
+                }
+                ovrBoneNames.Add(boneId.ToString());
+            }
+
+            // Check if at least 80% of the joints in the mapping match OVR bone names
+            var matchCount = 0;
+            foreach (var joint in jointMapping.Keys)
+            {
+                if (ovrBoneNames.Contains(joint.name))
+                {
+                    matchCount++;
+                }
+            }
+
+            // If at least 80% of joints match OVR bone names, consider it an OVRSkeleton
+            return matchCount >= jointMapping.Count * 0.8f;
+        }
+
+        /// <summary>
+        /// Orders joints by FullBodyTrackingBoneId enum order for OVRSkeleton.
+        /// </summary>
+        /// <param name="jointMapping">The joint mapping to order.</param>
+        /// <returns>List of transforms ordered by FullBodyTrackingBoneId.</returns>
+        private static List<Transform> OrderJointsByFullBodyTrackingBoneId(Dictionary<Transform, Transform> jointMapping)
+        {
+            // Create a mapping from bone name to transform
+            var nameToTransform = new Dictionary<string, Transform>();
+            foreach (var joint in jointMapping.Keys)
+            {
+                nameToTransform[joint.name] = joint;
+            }
+
+            var orderedJoints = new List<Transform>();
+
+            // Add Root first if it exists
+            if (nameToTransform.TryGetValue(FullBodyTrackingBoneId.Root.ToString(), out var rootTransform))
+            {
+                orderedJoints.Add(rootTransform);
+            }
+
+            // Iterate through FullBodyTrackingBoneId enum in order
+            foreach (FullBodyTrackingBoneId boneId in Enum.GetValues(typeof(FullBodyTrackingBoneId)))
+            {
+                // Skip special markers and Root (already added)
+                if (boneId == FullBodyTrackingBoneId.Start ||
+                    boneId == FullBodyTrackingBoneId.Root ||
+                    boneId == FullBodyTrackingBoneId.End ||
+                    boneId == FullBodyTrackingBoneId.NoOverride ||
+                    boneId == FullBodyTrackingBoneId.Remove)
+                {
+                    continue;
+                }
+
+                var boneName = boneId.ToString();
+                if (nameToTransform.TryGetValue(boneName, out var transform))
+                {
+                    orderedJoints.Add(transform);
+                }
+            }
+
+            // Add any remaining joints that didn't match OVR bone names (in case of custom bones)
+            foreach (var joint in jointMapping.Keys)
+            {
+                if (!orderedJoints.Contains(joint))
+                {
+                    orderedJoints.Add(joint);
+                }
+            }
+
+            return orderedJoints;
+        }
+
+        /// <summary>
+        /// Sets the array of joint names in the skeleton.
+        /// </summary>
+        /// <param name="joints">The joint names to set.</param>
         public void SetJoints(string[] joints)
         {
             _joints = joints;
         }
 
+        /// <summary>
+        /// Sets the array of parent joint names corresponding to each joint in the skeleton.
+        /// </summary>
+        /// <param name="parentJoints">The parent joint names to set.</param>
         public void SetParentJoints(string[] parentJoints)
         {
             _parentJoints = parentJoints;
         }
 
+        /// <summary>
+        /// Sets the array of known joint names that have been identified and mapped in the skeleton.
+        /// </summary>
+        /// <param name="knownJoints">The known joint names to set.</param>
         public void SetKnownJoints(string[] knownJoints)
         {
             _knownJoints = knownJoints;
+        }
+
+        /// <summary>
+        /// Sets the T-pose array. Used by editor to switch between min/max T-poses.
+        /// </summary>
+        /// <param name="tPoseArray">The T-pose array to set.</param>
+        public void SetTPoseArray(NativeTransform[] tPoseArray)
+        {
+            _tPoseArray = tPoseArray;
         }
 
         /// <summary>
@@ -603,7 +860,7 @@ namespace Meta.XR.Movement.Retargeting
                 MaxTPose = new NativeArray<NativeTransform>(MaxTPoseArray, Allocator.Temp),
                 // Optional data
                 OptionalKnownSourceJointNamesById = KnownJoints,
-                OptionalAutoMapExcludedJointNames = AutoMapExcludedJointNames,
+                OptionalAutoMapJointData = GenerateAutoMappingExcludedJointDataFromJointNameList(AutoMapExcludedJointNames),
                 OptionalManifestationNames = ManifestationNames,
                 OptionalManifestationJointCounts = ManifestationJointCounts,
                 OptionalManifestationJointNames = ManifestationJointNames,
@@ -613,6 +870,22 @@ namespace Meta.XR.Movement.Retargeting
 
             return initParams;
         }
+
+        public static AutoMappingJointData[] GenerateAutoMappingExcludedJointDataFromJointNameList(
+            IList<string> excludedJointNames)
+        {
+            AutoMappingJointData[] autoMapJointData = new AutoMappingJointData[excludedJointNames.Count];
+            for (var i = 0; i < excludedJointNames.Count; i++)
+            {
+                autoMapJointData[i] = new AutoMappingJointData
+                {
+                    JointName = excludedJointNames[i],
+                    Flags = AutoMappingJointFlags.Exclude
+                };
+            }
+            return autoMapJointData;
+        }
+
 
         /// <summary>
         /// Removes a joint from the skeleton data and updates parent references.
@@ -642,6 +915,11 @@ namespace Meta.XR.Movement.Retargeting
             }
         }
 
+        /// <summary>
+        /// Gets the FullBodyTrackingBoneId value for a given joint name.
+        /// </summary>
+        /// <param name="jointName">The name of the joint to look up.</param>
+        /// <returns>The integer value of the corresponding FullBodyTrackingBoneId, or -1 if not found.</returns>
         private static int GetBoneId(string jointName)
         {
             foreach (var boneId in Enum.GetValues(typeof(FullBodyTrackingBoneId)))

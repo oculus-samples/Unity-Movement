@@ -35,6 +35,10 @@ namespace Meta.XR.Movement.Networking.Editor
         // General information.
         private SerializedProperty _objectsToHideUntilValid;
 
+        // Debugging properties.
+        private SerializedProperty _debugDrawTargetSkeleton;
+        private SerializedProperty _debugDrawTargetSkeletonColor;
+
         /// <inheritdoc />
         public override void OnEnable()
         {
@@ -57,6 +61,9 @@ namespace Meta.XR.Movement.Networking.Editor
             _maxBufferSize = serializedObject.FindProperty("_maxBufferSize");
 
             _objectsToHideUntilValid = serializedObject.FindProperty("_objectsToHideUntilValid");
+
+            _debugDrawTargetSkeleton = serializedObject.FindProperty("_debugDrawTargetSkeleton");
+            _debugDrawTargetSkeletonColor = serializedObject.FindProperty("_debugDrawTargetSkeletonColor");
         }
 
         /// <inheritdoc />
@@ -74,6 +81,19 @@ namespace Meta.XR.Movement.Networking.Editor
             if (isHost)
             {
                 RenderRetargeting();
+            }
+
+            if (_ownership.intValue is (int)NetworkCharacterRetargeter.Ownership.Client)
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Debugging", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(_debugDrawTargetSkeleton);
+                if (_debugDrawTargetSkeleton.boolValue)
+                {
+                    EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(_debugDrawTargetSkeletonColor);
+                    EditorGUI.indentLevel--;
+                }
             }
 
             EditorGUILayout.Space();

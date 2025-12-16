@@ -1,3 +1,27 @@
+## [83.0.0]
+
+## What's New
+- **AI Motion Synthesizer:** Added AI Motion Synthesizer to the Movement SDK, which uses AI to generate natural, full-body character motion from sparse input signals. This feature supports joystick input with body tracking, synthesized standing poses that respect body tracking proportions for seated users, and smooth pose blending. Can be enabled on the MetaSourceDataProvider for any character using the retargeter with body tracking over PC Link and Quest devices.
+- **Networking Data Stream**: Added new networking data stream classes that replace RPC-based synchronization with a more efficient system supporting larger payloads. The MovementNetworking scene now includes a realistic character demonstrating face blendshape synchronization over the network.
+- **Mesh Draw Utility:** Added a new debugging utility for drawing meshes, primitive shapes, and skeletons at editor and runtime. Includes OVRSkeletonDraw support for visualizing the OVR skeleton from any code.
+- **ISDK Locomotion Sample Update:** Updated the ISDK Locomotion sample to use the latest ISDK sample scene from v83.
+- **Building Blocks Support:** Support v83 Meta XR Core SDK building blocks (CharacterRetargeter and NetworkCharacterRetargeter).
+
+## What's Fixed
+- Fixed networking character initialization order and delta compression setup.
+- Fixed crash when using the "Zero Root" retargeting behavior mode with native retargeting.
+- Fixed Hand Auto-Alignment not accounting for metacarpals, which can cause misaligned hands for some characters.
+- Fixed T-Pose fixup function to filter outliers.
+- Fixed CharacterRetargeter dispose handling for in-progress jobs.
+- Fixed RecalculateNormals initialization tracking for Unity 6.
+- Fixed face blendshape compression for networking.
+
+## Improvements
+- Refactored networking architecture to use NetworkVariables instead of RPCs, reducing bandwidth overhead and simplifying data synchronization flow.
+- Added Retargeting Behavior Flags for finer control, including options to use TPose for joint scaling.
+- Added support for saving and loading configs in different coordinate space types (RootSpace, Local, LocalScaled).
+- Improved skeleton visualization and debugging tools.
+
 ## [81.0.0]
 
 ## What's New

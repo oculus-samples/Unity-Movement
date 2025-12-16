@@ -58,8 +58,7 @@ namespace Meta.XR.Movement.Playback
             public void ParseHeadersAndOffsets(
                 ref StartHeader startHeader,
                 ref EndHeader endHeader,
-                ref int[] snapshotToByteOffsetAfterHeader,
-                double expectedDataVersion)
+                ref int[] snapshotToByteOffsetAfterHeader)
             {
                 byte[] startHeaderBytes = new byte[SERIALIZATION_START_HEADER_SIZE_BYTES];
                 byte[] endHeaderBytes = new byte[SERIALIZATION_END_HEADER_SIZE_BYTES];
@@ -68,11 +67,9 @@ namespace Meta.XR.Movement.Playback
                 {
                     throw new Exception("Could not deserialize start header from file!");
                 }
-                var expectedDataVersionString = expectedDataVersion.ToString(CultureInfo.InvariantCulture);
-                if (startHeader.DataVersion != expectedDataVersionString)
+                if (!GetIsSerializationVersionSupported(startHeader.DataVersion))
                 {
-                    throw new Exception($"Data version of file is {startHeader.DataVersion}, " +
-                        $"does not match reader's version of {expectedDataVersionString}.");
+                    throw new Exception($"Data version of file ({startHeader.DataVersion}) is not supported by this reader.");
                 }
 
                 // go through all snapshots and record byte offsets. This will allow scrubbing.
@@ -228,12 +225,11 @@ namespace Meta.XR.Movement.Playback
         /// <param name="startHeader">Start header to create.</param>
         /// <param name="endHeader">End header to create.</param>
         /// <param name="snapshotToByteOffsetAfterHeader">Snapshot to byte offset after start header.</param>
-        /// <param name="expectedDataVersion">Expected data version.</param>
         /// <param name="playbackPath">Optional path.</param>
         /// <returns></returns>
         public static ReaderFileStream OpenFileForPlayback(
             ref StartHeader startHeader, ref EndHeader endHeader,
-            ref int[] snapshotToByteOffsetAfterHeader, double expectedDataVersion,
+            ref int[] snapshotToByteOffsetAfterHeader,
             string playbackPath = null)
         {
             var playbackFile = playbackPath != null ? playbackPath : string.Empty;
@@ -258,8 +254,7 @@ namespace Meta.XR.Movement.Playback
                 readerFileStream.ParseHeadersAndOffsets(
                     ref startHeader,
                     ref endHeader,
-                    ref snapshotToByteOffsetAfterHeader,
-                    expectedDataVersion);
+                    ref snapshotToByteOffsetAfterHeader);
             }
             catch (Exception exception)
             {

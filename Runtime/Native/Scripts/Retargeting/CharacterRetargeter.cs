@@ -80,9 +80,14 @@ namespace Meta.XR.Movement.Retargeting
         }
 
         /// <summary>
+        /// Use this to wait for the convert pose job to complete.
+        /// </summary>
+        public JobHandle ConvertPoseJobHandle => _convertPoseJobHandle;
+
+        /// <summary>
         /// Set to true if the retargeter is valid or not.
         /// </summary>
-        public bool RetargeterValid => _isValid && _skeletonRetargeter.IsInitialized;
+        public bool RetargeterValid => _isValid && _skeletonRetargeter.IsInitialized && _skeletonRetargeter.AppliedPose;
 
         /// <summary>
         /// Whether to draw debug visualization for the source skeleton.
@@ -229,23 +234,35 @@ namespace Meta.XR.Movement.Retargeting
 
         /// <summary>
         /// Sets up the character retargeter with the specified configuration.
+        /// Can only be called once - subsequent calls are ignored.
         /// </summary>
-        /// <param name="config">The configuration string containing retargeting data.</param>
         public void Setup(string config)
         {
+            if (_skeletonRetargeter.IsInitialized)
+            {
+                return;
+            }
+
             _skeletonRetargeter.Dispose();
             _skeletonRetargeter.Setup(config);
             _skeletonRetargeter.HipsScale =
                 Vector3.Scale(_jointPairs[_skeletonRetargeter.HipsJointIndex].Joint.lossyScale,
                     transform.lossyScale.Reciprocal());
-            foreach (var sourceProcessorContainer in _sourceProcessorContainers)
+
+            if (_sourceProcessorContainers != null)
             {
-                sourceProcessorContainer?.GetCurrentProcessor()?.Initialize(this);
+                foreach (var sourceProcessorContainer in _sourceProcessorContainers)
+                {
+                    sourceProcessorContainer?.GetCurrentProcessor()?.Initialize(this);
+                }
             }
 
-            foreach (var targetProcessorContainer in _targetProcessorContainers)
+            if (_targetProcessorContainers != null)
             {
-                targetProcessorContainer?.GetCurrentProcessor()?.Initialize(this);
+                foreach (var targetProcessorContainer in _targetProcessorContainers)
+                {
+                    targetProcessorContainer?.GetCurrentProcessor()?.Initialize(this);
+                }
             }
 
             if (_skeletonRetargeter.ApplyRootScale)
@@ -259,8 +276,12 @@ namespace Meta.XR.Movement.Retargeting
         /// </summary>
         public void Dispose()
         {
+            if (!_convertPoseJobHandle.IsCompleted)
+            {
+                _convertPoseJobHandle.Complete();
+            }
+
             _skeletonRetargeter?.Dispose();
-            _skeletonRetargeter = null;
             if (_joints.isCreated)
             {
                 _joints.Dispose();
