@@ -13,7 +13,7 @@ using static Meta.XR.Movement.MSDKUtility;
 namespace Meta.XR.Movement.Retargeting
 {
     /// <summary>
-    /// Overrides joints with poses provided via ISDK.
+    /// Blends ISDK hand tracking into body joints while preserving body hand geometry.
     /// </summary>
     [System.Serializable]
     public class ISDKSkeletalProcessor : SourceProcessor
@@ -235,7 +235,7 @@ namespace Meta.XR.Movement.Retargeting
         protected bool _moveHandBackToOriginalPosition = false;
 
         /// <summary>
-        /// The maximum distance the wrist and fingers can be displaced by ISDK.
+        /// The maximum distance the wrist can be displaced by ISDK.
         /// </summary>
         [SerializeField]
         [Range(0.0f, 1.0f)]
@@ -301,24 +301,32 @@ namespace Meta.XR.Movement.Retargeting
             NativeArray<NativeTransform> trackerPoses)
         {
             if (Weight <= 0.0f || handInterface is not { IsTrackedDataValid: true } ||
-                trackerPoses.Length == 0)
+                jointPairs is not { Length: > 0 } || trackerPoses.Length == 0)
             {
                 return;
             }
 
-            var vectorToPreAdjustedWristPosition =
-                ComputeVectorToPreAdjustedWristPosition(
+            var maxWristDisplacement = _moveHandBackToOriginalPosition
+                ? 0.0f
+                : Mathf.Max(0.0f, _maxDisplacementDistance);
+            if (!TryComputeHandDisplacement(
                     handInterface,
                     jointPairs,
-                    trackerPoses);
-            var vectorToStartingHandPosition = _moveHandBackToOriginalPosition
-                ? vectorToPreAdjustedWristPosition
-                : Vector3.zero;
+                    trackerPoses,
+                    maxWristDisplacement,
+                    out var wristBodyJointId,
+                    out var isdkWristPose,
+                    out var handDisplacement))
+            {
+                return;
+            }
 
+            var weight = Mathf.Clamp01(Weight);
+            var weightedHandDisplacement = weight * handDisplacement;
             foreach (var pair in jointPairs)
             {
                 var joint = (int)pair.BodyJointID;
-                if (pair.HandJointID == HandJointId.Invalid || joint < 0)
+                if (joint < 0)
                 {
                     continue;
                 }
@@ -330,78 +338,98 @@ namespace Meta.XR.Movement.Retargeting
                 }
 
                 var bone = trackerPoses[joint];
-                handInterface.GetJointPose(pair.HandJointID, out Pose iSDKPose);
-#if ISDK_78_OR_NEWER || ISDK_OPENXR_HAND
-                if (OVRPlugin.HandSkeletonVersion == OVRHandSkeletonVersion.OpenXR)
+                // Move the complete body hand, including joints without an ISDK rotation mapping.
+                bone.Position += weightedHandDisplacement;
+                if (pair.HandJointID == HandJointId.Invalid)
                 {
-                    SkeletonUtilities.ConvertOpenXRHandToOvrHand(pair.BodyJointID, ref iSDKPose);
-                }
-#endif
-
-                var originalHandPos = bone.Position;
-                var originalHandRot = bone.Orientation;
-                var iSDKPosCameraRig =
-                    _cameraRig?.transform.InverseTransformPoint(iSDKPose.position) ?? iSDKPose.position;
-                var iSDKRotCameraRig = _cameraRig != null
-                    ? Quaternion.Inverse(_cameraRig.transform.rotation) * iSDKPose.rotation
-                    : iSDKPose.rotation;
-                if (_moveHandBackToOriginalPosition)
-                {
-                    var targetPosition = iSDKPosCameraRig + vectorToStartingHandPosition;
-                    bone.Position = Vector3.Lerp(originalHandPos, targetPosition, Weight);
-                    var slerpedRotation = Quaternion.Slerp(originalHandRot, iSDKRotCameraRig, Weight);
-                    bone.Orientation = slerpedRotation;
-                }
-                else
-                {
-                    var targetPosition = iSDKPosCameraRig;
-                    var restrictedPosition =
-                        Vector3.MoveTowards(originalHandPos, targetPosition, _maxDisplacementDistance);
-                    bone.Position = Vector3.Lerp(originalHandPos, restrictedPosition, Weight);
-                    // restrict rotation the same way we do position, based on how much position is restricted.
-                    var slerpValueBasedOnRestriction = (restrictedPosition - originalHandPos).magnitude /
-                                                       (targetPosition - originalHandPos).magnitude;
-                    var sourceRotation = bone.Orientation;
-                    var restrictedRotation = Quaternion.Slerp(
-                        sourceRotation,
-                        iSDKRotCameraRig,
-                        slerpValueBasedOnRestriction);
-
-                    var slerpedRotation = Quaternion.Slerp(sourceRotation, restrictedRotation, Weight);
-                    bone.Orientation = slerpedRotation;
+                    trackerPoses[joint] = bone;
+                    continue;
                 }
 
+                Pose iSDKPose;
+                if (pair.BodyJointID == wristBodyJointId)
+                {
+                    iSDKPose = isdkWristPose;
+                }
+                else if (!SkeletonUtilities.GetInteractionHandJointWorldPose(
+                             handInterface,
+                             pair.HandJointID,
+                             pair.BodyJointID,
+                             out iSDKPose))
+                {
+                    trackerPoses[joint] = bone;
+                    continue;
+                }
+
+                bone.Orientation = Quaternion.Slerp(bone.Orientation, iSDKPose.rotation, weight);
                 trackerPoses[joint] = bone;
             }
         }
 
         /// <summary>
-        /// Gets the vector from the adjusted wrist position to its original position.
-        /// Use this in case you want the finger to snap to the ISDK pose, but you don't
-        /// want the wrist to drift from its original position.
+        /// Computes one displacement for the complete body hand from the restricted ISDK wrist position.
         /// </summary>
         /// <param name="handInterface"><see cref="IHand"/> reference.</param>
         /// <param name="jointPairs">Hand-body joint pairs.</param>
         /// <param name="trackerPoses">Tracker poses.</param>
-        /// <returns>Vector from adjusted position back to the original</returns>
-        private Vector3 ComputeVectorToPreAdjustedWristPosition(
+        /// <param name="maxWristDisplacement">Maximum wrist displacement from the body pose.</param>
+        /// <param name="wristBodyJointId">The body wrist used as the displacement anchor.</param>
+        /// <param name="isdkWristPose">The converted ISDK wrist pose.</param>
+        /// <param name="displacement">Displacement applied to every body hand joint.</param>
+        /// <returns>True if both wrist positions are available.</returns>
+        private bool TryComputeHandDisplacement(
             IHand handInterface,
             HandBodyJointPair[] jointPairs,
-            NativeArray<NativeTransform> trackerPoses)
+            NativeArray<NativeTransform> trackerPoses,
+            float maxWristDisplacement,
+            out BodyJointId wristBodyJointId,
+            out Pose isdkWristPose,
+            out Vector3 displacement)
         {
-            var bodyHand = trackerPoses[(int)jointPairs[0].BodyJointID];
-            var startingHandPose = new Pose(bodyHand.Position, bodyHand.Orientation);
-            if (SkeletonUtilities.GetInteractionHandJointWorldPosition(
-                    handInterface,
-                    jointPairs[0].HandJointID,
-                    jointPairs[0].BodyJointID,
-                    _cameraRig,
-                    out var targetHandPos))
+            wristBodyJointId = BodyJointId.Invalid;
+            isdkWristPose = default;
+            displacement = Vector3.zero;
+            HandBodyJointPair wristPair = default;
+            var hasWristPair = false;
+            foreach (var pair in jointPairs)
             {
-                return startingHandPose.position - targetHandPos;
+                if (pair.HandJointID != HandJointId.Invalid &&
+                    pair.BodyJointID is BodyJointId.Body_LeftHandWrist or BodyJointId.Body_RightHandWrist)
+                {
+                    wristPair = pair;
+                    wristBodyJointId = pair.BodyJointID;
+                    hasWristPair = true;
+                    break;
+                }
             }
 
-            return Vector3.zero;
+            if (!hasWristPair)
+            {
+                return false;
+            }
+
+            var bodyJointIndex = (int)wristPair.BodyJointID;
+            if (bodyJointIndex < 0 || bodyJointIndex >= trackerPoses.Length)
+            {
+                return false;
+            }
+
+            var bodyWristPosition = trackerPoses[bodyJointIndex].Position;
+            if (SkeletonUtilities.GetInteractionHandJointWorldPose(
+                    handInterface,
+                    wristPair.HandJointID,
+                    wristPair.BodyJointID,
+                    out isdkWristPose))
+            {
+                var targetWristPosition = Vector3.MoveTowards(
+                    bodyWristPosition,
+                    isdkWristPose.position,
+                    maxWristDisplacement);
+                displacement = targetWristPosition - bodyWristPosition;
+                return true;
+            }
+
+            return false;
         }
 #endif
     }

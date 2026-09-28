@@ -1,3 +1,19 @@
+## [207.0.0]
+
+## What's New
+- **Gaze and pinch in samples**: All sample scenes now support eye gaze and pinch to interact with UI buttons, in addition to poke interaction.
+
+## What's Changed
+- Renamed the "Calibrate Height" button in the body tracking calibration menu to "Override Height to X.XXm" to clarify that it overrides the automatically estimated user height with a fixed value.
+- Regenerated the ARKit blendshape mapping example in the face tracking samples using the default retargeting setup.
+
+## What's Fixed
+- Fixed finger dislocation during retargeting. Hand joints are now rigid, so each child joint starts where its parent joint ends.
+- Fixed unstable hand scale during full retargeting with `UseTPoseForJointScale`. Hand and wrist scale now come from the target T-pose, and finger bone lengths match the target rig proportions, which removes thick or elongated fingers.
+- Fixed unstable head scale during full retargeting with `UseTPoseForJointScale` while preserving eye and facial joint transforms.
+- Fixed the reference T-pose set with `UpdateSourceReferenceTPose` being discarded on the next retargeting frame, which could cause overlapping or twisted fingers with upper body tracking.
+- Fixed Interaction SDK hand integration: `IHand` joint poses are now treated as world-space poses, body joints are preserved when hand data is unavailable, and wrist displacement limiting no longer distorts finger spacing.
+
 ## [205.0.0]
 
 ## What's Fixed

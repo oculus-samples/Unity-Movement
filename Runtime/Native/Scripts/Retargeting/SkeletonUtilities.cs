@@ -703,7 +703,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="hand">The IHand interface to get joint data from.</param>
         /// <param name="jointId">The hand joint ID to get the position for.</param>
         /// <param name="bodyJointId">The body joint ID corresponding to the hand joint ID.</param>
-        /// <param name="cameraRig">Optional camera rig for coordinate transformation.</param>
+        /// <param name="cameraRig">Retained for API compatibility; ISDK joint poses are already in world space.</param>
         /// <param name="worldPosition">Output world position of the joint.</param>
         /// <returns>True if the joint position was successfully retrieved, false otherwise.</returns>
         public static bool GetInteractionHandJointWorldPosition(
@@ -715,24 +715,46 @@ namespace Meta.XR.Movement.Retargeting
         {
             worldPosition = Vector3.zero;
 
-            if (hand is not { IsTrackedDataValid: true })
+            if (!GetInteractionHandJointWorldPose(hand, jointId, bodyJointId, out var worldPose))
             {
                 return false;
             }
 
-            // Get the joint pose from the hand
-            hand.GetJointPose(jointId, out var iSDKPose);
+            worldPosition = worldPose.position;
+            return true;
+        }
 
-#if ISDK_78_OR_NEWER || ISDK_OPENXR_HAND
-            // Apply OpenXR to OVR conversion if needed
+        /// <summary>
+        /// Gets a valid ISDK joint pose in world space and converts its orientation when required.
+        /// </summary>
+        /// <param name="hand">The hand supplying joint data.</param>
+        /// <param name="jointId">The ISDK hand joint.</param>
+        /// <param name="bodyJointId">The corresponding body joint.</param>
+        /// <param name="worldPose">The converted world-space pose.</param>
+        /// <returns>True when valid joint data is available.</returns>
+        internal static bool GetInteractionHandJointWorldPose(
+            IHand hand,
+            HandJointId jointId,
+            BodyJointId bodyJointId,
+            out Pose worldPose)
+        {
+            worldPose = default;
+
+            if (hand is not { IsTrackedDataValid: true } || !hand.GetJointPose(jointId, out worldPose))
+            {
+                return false;
+            }
+
+#if ISDK_OPENXR_HAND
+            // This define guarantees that ISDK supplies OpenXR-oriented poses.
+            ConvertOpenXRHandToOvrHand(bodyJointId, ref worldPose);
+#elif ISDK_78_OR_NEWER
             if (OVRPlugin.HandSkeletonVersion == OVRHandSkeletonVersion.OpenXR)
             {
-                ConvertOpenXRHandToOvrHand(bodyJointId, ref iSDKPose);
+                ConvertOpenXRHandToOvrHand(bodyJointId, ref worldPose);
             }
 #endif
 
-            // Transform the position using camera rig if available
-            worldPosition = cameraRig?.transform.InverseTransformPoint(iSDKPose.position) ?? iSDKPose.position;
             return true;
         }
 
@@ -743,21 +765,24 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="pose">The pose to convert (modified in place).</param>
         public static void ConvertOpenXRHandToOvrHand(BodyJointId bodyJointId, ref Pose pose)
         {
-            switch (bodyJointId)
+            Quaternion offset;
+            // Palm precedes wrist in BodyJointId; conversion covers palm, wrist, and every finger joint.
+            if (bodyJointId == BodyJointId.Body_LeftHandWrist ||
+                bodyJointId is >= BodyJointId.Body_LeftHandPalm and <= BodyJointId.Body_LeftHandLittleTip)
             {
-                case BodyJointId.Body_LeftHandWrist:
-                    pose.rotation *= _openXRLeftHandRotOffset;
-                    break;
-                case BodyJointId.Body_RightHandWrist:
-                    pose.rotation *= _openXRRightHandRotOffset;
-                    break;
-                case > BodyJointId.Body_LeftHandWrist and < BodyJointId.Body_LeftHandLittleTip:
-                    pose.rotation *= _openXRLeftHandRotOffset;
-                    break;
-                case > BodyJointId.Body_RightHandWrist and < BodyJointId.Body_RightHandLittleTip:
-                    pose.rotation *= _openXRRightHandRotOffset;
-                    break;
+                offset = _openXRLeftHandRotOffset;
             }
+            else if (bodyJointId == BodyJointId.Body_RightHandWrist ||
+                     bodyJointId is >= BodyJointId.Body_RightHandPalm and <= BodyJointId.Body_RightHandLittleTip)
+            {
+                offset = _openXRRightHandRotOffset;
+            }
+            else
+            {
+                return;
+            }
+
+            pose.rotation *= offset;
         }
 #endif
     }
