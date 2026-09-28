@@ -18,6 +18,9 @@ namespace Meta.XR.Movement.Samples
         [SerializeField]
         protected TMP_Text _worldText;
 
+        [SerializeField]
+        protected TMP_Text _buttonText;
+
         /// <summary>
         /// The height to set in meters.
         /// </summary>
@@ -35,7 +38,9 @@ namespace Meta.XR.Movement.Samples
         private void Awake()
         {
             Assert.IsNotNull(_worldText);
+            Assert.IsNotNull(_buttonText);
             Assert.IsTrue(_height > Mathf.Epsilon, "Height must be greater than 0 meters.");
+            _buttonText.text += $"\nto {_height:F2}m";
 
             if (_calibrateOnStartup)
             {
