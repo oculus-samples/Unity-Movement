@@ -263,7 +263,6 @@ namespace Meta.XR.Movement.Retargeting
         private NativeArray<NativeTransform> _targetReferencePose;
         private NativeArray<int> _targetFingerIndices;
         private NativeArray<byte> _mappedJointMask;
-        private JobHandle _applyPoseJobHandle;
 
         /// <summary>
         /// Destructor.
@@ -453,8 +452,7 @@ namespace Meta.XR.Movement.Retargeting
         /// <param name="joints">The joint access array to apply to.</param>
         public void ApplyPose(ref TransformAccessArray joints)
         {
-            // Create job to apply the pose.
-            var job = new SkeletonJobs.ApplyPoseJob
+            var applyPose = new SkeletonJobs.ApplyPoseJob
             {
                 BodyPose = RetargetedPoseLocal,
                 RotationOnlyIndices = _targetFingerIndices,
@@ -464,8 +462,10 @@ namespace Meta.XR.Movement.Retargeting
                 CurrentRotationIndex =
                     _retargetingBehavior == RetargetingBehavior.RotationsAndPositionsHandsRotationOnly ? 0 : -1
             };
-            _applyPoseJobHandle = job.Schedule(joints);
-            _applyPoseJobHandle.Complete();
+            for (var i = 0; i < joints.length; i++)
+            {
+                applyPose.Execute(i, joints[i]);
+            }
         }
 
         /// <summary>

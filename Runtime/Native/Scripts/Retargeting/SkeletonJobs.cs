@@ -63,33 +63,28 @@ namespace Meta.XR.Movement.Retargeting
         }
 
         /// <summary>
-        /// Job that applies a pose.
+        /// Applies a pose.
         /// </summary>
-        [BurstCompile]
-        public struct ApplyPoseJob : IJobParallelForTransform
+        public struct ApplyPoseJob
         {
             /// <summary>
             /// Body poses to read from.
             /// </summary>
-            [ReadOnly]
             public NativeArray<NativeTransform> BodyPose;
 
             /// <summary>
             /// Rotation only indices.
             /// </summary>
-            [ReadOnly]
             public NativeArray<int> RotationOnlyIndices;
 
             /// <summary>
             /// The root joint index.
             /// </summary>
-            [ReadOnly]
             public int RootJointIndex;
 
             /// <summary>
             /// The hips joint index.
             /// </summary>
-            [ReadOnly]
             public int HipsJointIndex;
 
             /// <summary>
@@ -97,17 +92,14 @@ namespace Meta.XR.Movement.Retargeting
             /// Unmapped joints (value 0) are skipped, leaving them free for other components.
             /// If empty, all joints are applied (backward compatible).
             /// </summary>
-            [ReadOnly]
             internal NativeArray<byte> MappedJointMask;
 
             /// <summary>
-            /// The current rotation index.
+            /// The current rotation index. Advanced as Execute walks the joints in ascending order.
             /// </summary>
             public int CurrentRotationIndex;
 
-            /// <inheritdoc cref="IJobParallelForTransform.Execute(int, TransformAccess)"/>
-            [BurstCompile]
-            public void Execute(int index, TransformAccess transform)
+            public void Execute(int index, Transform transform)
             {
                 if (MappedJointMask.IsCreated && MappedJointMask[index] == 0)
                 {
@@ -178,6 +170,11 @@ namespace Meta.XR.Movement.Retargeting
             [ReadOnly]
             public NativeArray<NativeTransform> LocalTPose;
 
+            [ReadOnly]
+            internal int LeftWristIndex;
+            [ReadOnly]
+            internal int RightWristIndex;
+
             /// <summary>
             /// Output array for the converted local space poses.
             /// </summary>
@@ -223,6 +220,44 @@ namespace Meta.XR.Movement.Retargeting
                         if (i != HipsJointIndex && parentIndex != RootJointIndex)
                         {
                             localPosition = Vector3.Scale(localPosition, inverseHipsScale);
+                        }
+
+                        if (LeftWristIndex >= 0 || RightWristIndex >= 0)
+                        {
+                            // Remove shear from the hand bones.
+                            // Positions and rotations are retargeted independently, so a joint's rotation and the placement of
+                            // its child need not agree. The resulting bone is no longer rigid: negligible on a femur, but very
+                            // visible on a 3cm finger bone, where it reads as the joint being rotated wrong while its child
+                            // sits in the right place. The bone length is left alone - that is what "source proportions" means -
+                            // and only the direction is snapped back to the rest pose.
+                            // Deliberately limited to the hands. Applying this up the arm would make forward-kinematic error
+                            // accumulate and the character's hand would stop landing on the tracked wrist position, which is
+                            // the whole reason positional retargeting exists.
+
+                            bool insideHand = false;
+                            // Bounded so a malformed hierarchy cannot spin forever inside a job.
+                            var ancestor = parentIndex;
+                            for (var step = 0; step < ParentIndices.Length && ancestor >= 0; step++)
+                            {
+                                if (ancestor == LeftWristIndex || ancestor == RightWristIndex)
+                                {
+                                    insideHand = true;
+                                    break;
+                                }
+
+                                ancestor = ParentIndices[ancestor];
+                            }
+
+                            // Applied last so the scaling above cannot shear the direction back.
+                            if (insideHand)
+                            {
+                                var restOffset = LocalTPose[i].Position;
+                                var restLengthSqr = restOffset.sqrMagnitude;
+                                if (restLengthSqr > 1e-12f)
+                                {
+                                    localPosition = restOffset * (localPosition.magnitude / Mathf.Sqrt(restLengthSqr));
+                                }
+                            }
                         }
 
                         pose.Position = localPosition;

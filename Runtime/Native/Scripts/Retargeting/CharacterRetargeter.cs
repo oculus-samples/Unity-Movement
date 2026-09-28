@@ -396,6 +396,8 @@ namespace Meta.XR.Movement.Retargeting
                 WorldPose = _skeletonRetargeter.RetargetedPose,
                 LocalPose = _skeletonRetargeter.RetargetedPoseLocal,
                 LocalTPose = _skeletonRetargeter.TargetReferencePoseLocal,
+                LeftWristIndex = GetJointIndexByKnownJointType(RetargetingHandle, SkeletonType.TargetSkeleton, KnownJointType.LeftWrist, out var leftWristIndex) ? leftWristIndex : INVALID_JOINT_INDEX,
+                RightWristIndex = GetJointIndexByKnownJointType(RetargetingHandle, SkeletonType.TargetSkeleton, KnownJointType.RightWrist, out var rightWristIndex) ? rightWristIndex : INVALID_JOINT_INDEX,
             };
             _convertPoseJobHandle = job.Schedule();
 
