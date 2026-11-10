@@ -21,9 +21,31 @@ namespace Meta.XR.Movement
         private static readonly string _hiddenMeshLayerName = "HiddenMesh";
 
         private const OVRProjectSetup.TaskGroup _group = OVRProjectSetup.TaskGroup.Features;
+        private static readonly string[] _affectedBiRPShaderNames =
+        {
+            "Movement/PBR (Metallic)",
+            "Movement/PBR (Specular)",
+            "Movement/Procedural Gradient Skybox",
+            "Movement/Transparent Color Textured",
+        };
+        private static readonly string[] _affectedBiRPPrefabGuids =
+        {
+            // Floor
+            "3f4ed02e98233244eb8b67eff35f6b77",
+            // BodyTrackingCalibrationMenu
+            "c723fc2e86185ec498c4ae6e14c45cd9",
+            // BodyTrackingFidelityMenu
+            "0737e3f63e17bac45b774695173860d1",
+            // BodyTrackingJointMenu
+            "1ae7b04c503f51c48ad2f60c89da8f0b",
+            // SceneSelectMenu
+            "d13bc4c12718d2a4f9222b0d93dd09f0",
+        };
 
         static MovementSDKProjectSetupTasks()
         {
+            RegisterBiRPShaderWarning();
+
             // Skin weights settings.
             OVRProjectSetup.AddTask(
                 level: OVRProjectSetup.TaskLevel.Recommended,
@@ -137,6 +159,21 @@ namespace Meta.XR.Movement
                 },
                 fixMessage: $"Set an unused layer to '{_hiddenMeshLayerName}'."
             );
+        }
+
+        private static void RegisterBiRPShaderWarning()
+        {
+            const string typeName = "Meta.XR.Editor.BiRPShaderWarning, Oculus.VR.Editor";
+            var warningType = System.Type.GetType(typeName);
+            var registerMethod = warningType?.GetMethod(
+                "Register",
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Static);
+
+            registerMethod?.Invoke(
+                null,
+                new object[] { _affectedBiRPShaderNames, _affectedBiRPPrefabGuids });
         }
 
         private static void SetLayerName(int layer, string name)

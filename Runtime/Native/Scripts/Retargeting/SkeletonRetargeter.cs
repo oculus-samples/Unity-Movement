@@ -262,7 +262,7 @@ namespace Meta.XR.Movement.Retargeting
         private ulong _nativeHandle = INVALID_HANDLE;
         private NativeArray<NativeTransform> _targetReferencePose;
         private NativeArray<int> _targetFingerIndices;
-        private NativeArray<byte> _mappedJointMask;
+        internal NativeArray<byte> _mappedJointMask;
 
         /// <summary>
         /// Destructor.

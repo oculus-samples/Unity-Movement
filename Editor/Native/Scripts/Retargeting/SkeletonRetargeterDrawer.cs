@@ -27,35 +27,18 @@ namespace Meta.XR.Movement.Retargeting
         private const int _hideLegScalePropertyIndex = 2;
         private const int _applyRootScalePropertyIndex = 3;
         private const int _applyHeadScalePropertyIndex = 4;
+        private const int _headScaleFactorPropertyIndex = 5;
+        private const int _scaleRangePropertyIndex = 6;
         private const int _readOnlyScalePropertyIndex = 7;
 
         /// <inheritdoc cref="PropertyDrawer.OnGUI"/>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
-            var applyRootScale =
-                property.FindPropertyRelative(_properties[_applyRootScalePropertyIndex].propertyName).boolValue;
-            var applyHeadScale =
-                property.FindPropertyRelative(_properties[_applyHeadScalePropertyIndex].propertyName).boolValue;
-            var hideLowerBody =
-                property.FindPropertyRelative(_properties[_hideLowerBodyPropertyIndex].propertyName).boolValue;
-
             int visiblePropertyCount = 0;
             for (var i = 0; i < _properties.Length; i++)
             {
-                // Skip scale-related properties if scale is not applied
-                if (i >= _applyRootScalePropertyIndex + 1 && !applyRootScale)
-                {
-                    continue;
-                }
-
-                if (i is >= _applyHeadScalePropertyIndex + 1 and <= _applyHeadScalePropertyIndex + 1 && !applyHeadScale)
-                {
-                    continue;
-                }
-
-                // Skip leg scale property if hide lower body is not enabled
-                if (i == _hideLegScalePropertyIndex && !hideLowerBody)
+                if (!IsVisible(i, property))
                 {
                     continue;
                 }
@@ -79,36 +62,31 @@ namespace Meta.XR.Movement.Retargeting
         /// <inheritdoc cref="PropertyDrawer.GetPropertyHeight(SerializedProperty, GUIContent)"/>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            var applyRootScale =
-                property.FindPropertyRelative(_properties[_applyRootScalePropertyIndex].propertyName).boolValue;
-            var applyHeadScale =
-                property.FindPropertyRelative(_properties[_applyHeadScalePropertyIndex].propertyName).boolValue;
-            var hideLowerBody =
-                property.FindPropertyRelative(_properties[_hideLowerBodyPropertyIndex].propertyName).boolValue;
-
-            // Calculate how many properties are hidden
-            int hiddenProperties = 0;
-
-            // Hide scale-related properties if scale is not applied
-            if (!applyRootScale)
+            var visibleProperties = 0;
+            for (var i = 0; i < _properties.Length; i++)
             {
-                hiddenProperties += 2; // _scaleRange, _currentScale
+                if (IsVisible(i, property))
+                {
+                    visibleProperties++;
+                }
             }
 
-            if (!applyRootScale || !applyHeadScale)
-            {
-                hiddenProperties += 1; // _headScaleFactor
-            }
-
-            // Hide leg scale property if hide lower body is not enabled
-            if (!hideLowerBody)
-            {
-                hiddenProperties += 1; // _hideLegScale
-            }
-
-            var visibleProperties = _properties.Length - hiddenProperties;
             return EditorGUIUtility.singleLineHeight * visibleProperties +
                    EditorGUIUtility.standardVerticalSpacing * (visibleProperties - 1);
+        }
+
+        // Head scale is computed from the head scale factor and the clamped current scale even when root scale is off.
+        private static bool IsVisible(int index, SerializedProperty property)
+        {
+            bool GetBool(int i) => property.FindPropertyRelative(_properties[i].propertyName).boolValue;
+            return index switch
+            {
+                _hideLegScalePropertyIndex => GetBool(_hideLowerBodyPropertyIndex),
+                _headScaleFactorPropertyIndex => GetBool(_applyHeadScalePropertyIndex),
+                _scaleRangePropertyIndex or _readOnlyScalePropertyIndex =>
+                    GetBool(_applyRootScalePropertyIndex) || GetBool(_applyHeadScalePropertyIndex),
+                _ => true,
+            };
         }
     }
 }

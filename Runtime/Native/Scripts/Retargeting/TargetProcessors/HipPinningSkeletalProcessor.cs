@@ -2,9 +2,7 @@
 
 using System;
 using Meta.XR.Movement.Retargeting.IK;
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
 
 namespace Meta.XR.Movement.Retargeting
@@ -87,28 +85,9 @@ namespace Meta.XR.Movement.Retargeting
                 }
 
                 LegBones[0].localRotation = TargetFoot.localRotation;
-                IKUtilities.SolveCCDIK(LegBones, TargetFoot.position, 0.01f, 5);
-            }
-        }
-
-        [BurstCompile]
-        private struct HipPinningJob : IJob
-        {
-            [ReadOnly]
-            public float Weight;
-
-            [ReadOnly]
-            public int HipsIndex;
-
-            public Vector3 TargetPosition;
-
-            public NativeArray<MSDKUtility.NativeTransform> TargetPose;
-
-            public void Execute()
-            {
-                var hips = TargetPose[HipsIndex];
-                hips.Position = Vector3.Lerp(hips.Position, TargetPosition, Weight);
-                TargetPose[HipsIndex] = hips;
+                // The solve warm-starts from last frame's leg pose and stops as soon as the foot is within
+                // tolerance, so the foot lands somewhere different inside that radius every frame. Keep it tight.
+                IKUtilities.SolveCCDIK(LegBones, TargetFoot.position, 0.001f, 10);
             }
         }
 
@@ -184,7 +163,7 @@ namespace Meta.XR.Movement.Retargeting
             var handle = retargeter.RetargetingHandle;
             MSDKUtility.GetJointIndexByKnownJointType(retargeter.RetargetingHandle,
                 MSDKUtility.SkeletonType.TargetSkeleton, MSDKUtility.KnownJointType.Root,
-                out var rootJointIndex);
+                out _rootJointIndex);
             MSDKUtility.GetJointIndexByKnownJointType(handle,
                 MSDKUtility.SkeletonType.TargetSkeleton, MSDKUtility.KnownJointType.Hips,
                 out _hipsJointIndex);
@@ -199,7 +178,7 @@ namespace Meta.XR.Movement.Retargeting
 
             _retargeter = retargeter;
             _initialHipRotation = tPose[_hipsJointIndex].Orientation;
-            _rootTransform = retargeter.JointPairs[rootJointIndex].Joint;
+            _rootTransform = retargeter.JointPairs[_rootJointIndex].Joint;
             _hipsTransform = retargeter.JointPairs[_hipsJointIndex].Joint;
             _leftData.Initialize(retargeter, localTPose);
             _rightData.Initialize(retargeter, localTPose);
@@ -229,62 +208,66 @@ namespace Meta.XR.Movement.Retargeting
                 return;
             }
 
-            // Hip pinning.
+            // The retargeter applies targetPose to the joint transforms only after the processors run, so they still
+            // hold last frame's pose. Sync them to this frame before anything below reads them.
+            ApplyPoseToTransform(targetPose, _rootJointIndex, _rootTransform);
+            ApplyPoseToTransform(targetPose, _hipsJointIndex, _hipsTransform);
+
             UpdateHipPinningObjectRotation(_initialHipRotation, _hipsTransform.rotation);
             var targetHipPinningPosition = _rootTransform.InverseTransformPoint(_targetHips.position);
 
-            // Check if we should trigger hip pinning events
+            // Fire the enter/exit events, and stop once the hips have left the hip pinning area.
             var currentHipPinningPosition = targetPose[_rootJointIndex].Position +
                                             targetPose[_rootJointIndex].Orientation *
                                             targetPose[_hipsJointIndex].Position;
-            switch (_previouslyActive)
+            if (!_previouslyActive)
             {
-                case true when Vector3.Distance(_initialHipPosition, currentHipPinningPosition) > _hipPinningThreshold:
-                    OnExitHipPinningArea.Invoke();
-                    return;
-                case false:
-                    _previouslyActive = true;
-                    _initialHipPosition = currentHipPinningPosition;
-                    OnEnterHipPinningArea.Invoke();
-                    break;
+                _previouslyActive = true;
+                _initialHipPosition = currentHipPinningPosition;
+                OnEnterHipPinningArea.Invoke();
+            }
+            else if (Vector3.Distance(_initialHipPosition, currentHipPinningPosition) > _hipPinningThreshold)
+            {
+                OnExitHipPinningArea.Invoke();
+                return;
             }
 
-            var job = new HipPinningJob
-            {
-                Weight = _weight,
-                HipsIndex = _hipsJointIndex,
-                TargetPosition = targetHipPinningPosition,
-                TargetPose = targetPose
-            };
-            job.Schedule().Complete();
+            // Pin the hips.
+            var hips = targetPose[_hipsJointIndex];
+            hips.Position = Vector3.Lerp(hips.Position, targetHipPinningPosition, _weight);
+            targetPose[_hipsJointIndex] = hips;
 
-            // Solve for legs.
-            _leftData.Solve();
-            _rightData.Solve();
-            for (var i = 0; i < _leftData.LegIndexes.Length; i++)
-            {
-                var index = _leftData.LegIndexes[i];
-                var joint = targetPose[index];
-                joint.Orientation = _leftData.LegBones[i].localRotation;
-                joint.Position = _leftData.LegBones[i].localPosition;
-                if (i == 0)
-                {
-                }
+            // The leg IK chains hang off the hips transform, so it must hold the pinned hips before solving.
+            ApplyPoseToTransform(targetPose, _hipsJointIndex, _hipsTransform);
 
-                targetPose[index] = joint;
+            SolveLeg(ref _leftData, targetPose);
+            SolveLeg(ref _rightData, targetPose);
+        }
+
+        private void ApplyPoseToTransform(NativeArray<MSDKUtility.NativeTransform> pose, int jointIndex,
+            Transform joint)
+        {
+            // Match the retargeter's ApplyPose, which leaves joints it does not drive untouched.
+            var mappedJointMask = _retargeter.SkeletonRetargeter._mappedJointMask;
+            if (mappedJointMask.IsCreated && mappedJointMask[jointIndex] == 0)
+            {
+                return;
             }
 
-            for (var i = 0; i < _rightData.LegIndexes.Length; i++)
-            {
-                var index = _rightData.LegIndexes[i];
-                var joint = targetPose[index];
-                joint.Orientation = _rightData.LegBones[i].localRotation;
-                joint.Position = _rightData.LegBones[i].localPosition;
-                if (i == 0)
-                {
-                }
+            var jointPose = pose[jointIndex];
+            joint.SetLocalPositionAndRotation(jointPose.Position, jointPose.Orientation);
+        }
 
-                targetPose[index] = joint;
+        private static void SolveLeg(ref HipPinningData leg, NativeArray<MSDKUtility.NativeTransform> pose)
+        {
+            leg.Solve();
+            for (var i = 0; i < leg.LegIndexes.Length; i++)
+            {
+                var index = leg.LegIndexes[i];
+                var joint = pose[index];
+                joint.Orientation = leg.LegBones[i].localRotation;
+                joint.Position = leg.LegBones[i].localPosition;
+                pose[index] = joint;
             }
         }
 

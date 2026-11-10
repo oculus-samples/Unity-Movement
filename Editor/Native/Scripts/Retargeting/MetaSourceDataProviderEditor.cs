@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
+using System.Collections.Generic;
+using Meta.XR.Movement.AI.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -100,10 +102,46 @@ namespace Meta.XR.Movement.Retargeting.Editor
                             EditorGUILayout.PropertyField(_aiMotionSynthesizerConfig, true);
                         }
                     }
+                    else
+                    {
+                        DrawClearDefaultAssets();
+                    }
                 }
             });
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawClearDefaultAssets()
+        {
+            var withDefaultAssets = new List<SerializedObject>();
+            foreach (var t in targets)
+            {
+                var so = new SerializedObject(t);
+                var config = so.FindProperty("_aiMotionSynthesizerConfig");
+                if (!so.FindProperty("_enableAIMotionSynthesizer").boolValue &&
+                    config != null && AIMotionSynthesizerConfigDrawer.HasDefaultAssets(config))
+                {
+                    withDefaultAssets.Add(so);
+                }
+            }
+
+            if (withDefaultAssets.Count == 0)
+            {
+                return;
+            }
+
+            EditorGUILayout.HelpBox(
+                "The default AI Motion Synthesizer assets, including the model, are still assigned and will be included in builds.",
+                MessageType.Warning);
+            if (GUILayout.Button("Clear Default AI Motion Synthesizer Assets"))
+            {
+                foreach (var so in withDefaultAssets)
+                {
+                    AIMotionSynthesizerConfigDrawer.ClearDefaultAssets(so.FindProperty("_aiMotionSynthesizerConfig"));
+                    so.ApplyModifiedProperties();
+                }
+            }
         }
 
         private void DrawSection(string title, Color color, System.Action content)

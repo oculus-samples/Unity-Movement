@@ -1,7 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-using System.Linq;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,7 +19,9 @@ namespace Meta.XR.Movement.Editor
 
         static ComponentScanner()
         {
-            EditorApplication.update += ScanForObjects;
+            EditorApplication.delayCall += ScanForObjects;
+            EditorSceneManager.sceneOpened += (scene, mode) => ScanForObjects();
+            EditorSceneManager.sceneSaved += scene => ScanForObjects();
         }
 
         /// <summary>
@@ -31,11 +33,11 @@ namespace Meta.XR.Movement.Editor
             {
                 TelemetryManager.SendFoundOVRBodyEvent();
             }
-            if (ShouldFireTelemetryForComponent<OVREyeGaze>(ref _foundOVRFace))
+            if (ShouldFireTelemetryForComponent<OVREyeGaze>(ref _foundOVREye))
             {
                 TelemetryManager.SendFoundOVREyeGazeEvent();
             }
-            if (ShouldFireTelemetryForComponent<OVRFaceExpressions>(ref _foundOVREye))
+            if (ShouldFireTelemetryForComponent<OVRFaceExpressions>(ref _foundOVRFace))
             {
                 TelemetryManager.SendFoundOVRFaceExpressionsEvent();
             }
@@ -47,17 +49,15 @@ namespace Meta.XR.Movement.Editor
             {
                 return false;
             }
-            // OVRProjectSetupUtils.FindComponentInScene seems inaccessible, so
-            // just use the same logic here.
-            var scene = SceneManager.GetActiveScene();
-            var rootGameObjects = scene.GetRootGameObjects();
-            var gameObjects = rootGameObjects.FirstOrDefault(go => go.GetComponentInChildren<T>())?.GetComponentInChildren<T>();
-            if (gameObjects == null)
+            foreach (var root in SceneManager.GetActiveScene().GetRootGameObjects())
             {
-                return false;
+                if (root.GetComponentInChildren<T>() != null)
+                {
+                    foundVariable = true;
+                    return true;
+                }
             }
-            foundVariable = true;
-            return true;
+            return false;
         }
     }
 }

@@ -224,16 +224,6 @@ namespace Meta.XR.Movement.Retargeting
 
                         if (LeftWristIndex >= 0 || RightWristIndex >= 0)
                         {
-                            // Remove shear from the hand bones.
-                            // Positions and rotations are retargeted independently, so a joint's rotation and the placement of
-                            // its child need not agree. The resulting bone is no longer rigid: negligible on a femur, but very
-                            // visible on a 3cm finger bone, where it reads as the joint being rotated wrong while its child
-                            // sits in the right place. The bone length is left alone - that is what "source proportions" means -
-                            // and only the direction is snapped back to the rest pose.
-                            // Deliberately limited to the hands. Applying this up the arm would make forward-kinematic error
-                            // accumulate and the character's hand would stop landing on the tracked wrist position, which is
-                            // the whole reason positional retargeting exists.
-
                             bool insideHand = false;
                             // Bounded so a malformed hierarchy cannot spin forever inside a job.
                             var ancestor = parentIndex;
@@ -248,14 +238,13 @@ namespace Meta.XR.Movement.Retargeting
                                 ancestor = ParentIndices[ancestor];
                             }
 
-                            // Applied last so the scaling above cannot shear the direction back.
+                            // Target rest offsets keep skinned hand hierarchies connected when source topology differs.
                             if (insideHand)
                             {
                                 var restOffset = LocalTPose[i].Position;
-                                var restLengthSqr = restOffset.sqrMagnitude;
-                                if (restLengthSqr > 1e-12f)
+                                if (restOffset.sqrMagnitude > 1e-12f)
                                 {
-                                    localPosition = restOffset * (localPosition.magnitude / Mathf.Sqrt(restLengthSqr));
+                                    localPosition = restOffset;
                                 }
                             }
                         }

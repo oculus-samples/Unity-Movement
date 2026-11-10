@@ -264,7 +264,8 @@ namespace Meta.XR.Movement.Retargeting.IK
             var effectorPosePosition =
                 GetBoneWorldPosition(_cachedCCdPosesLocal, rootPosition, rootRotation, effectorIndex);
             var iterations = 0;
-            while (sqrTolerance > tolerance && iterations < maxIterations)
+            var sqrMaxDistance = tolerance * tolerance;
+            while (sqrTolerance > sqrMaxDistance && iterations < maxIterations)
             {
                 for (int i = 1; i < _cachedCCdPosesLocal.Length; i++)
                 {
@@ -285,7 +286,7 @@ namespace Meta.XR.Movement.Retargeting.IK
                         GetBoneWorldPosition(_cachedCCdPosesLocal, rootPosition, rootRotation, effectorIndex);
                     // Check tolerance after each bone update
                     sqrTolerance = (effectorPosePosition - targetPosition).sqrMagnitude;
-                    if (sqrTolerance <= tolerance)
+                    if (sqrTolerance <= sqrMaxDistance)
                     {
                         ApplyPosesToTransforms(_cachedCCdPosesLocal, bones);
                         return true;

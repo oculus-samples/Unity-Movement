@@ -1,3 +1,28 @@
+## [209.0.0]
+
+## What's New
+- **Model scale warning in retargeting setup**: The retargeting setup now warns when a character is outside the 1.0–2.5 m height range and tells you which Scale Factor to set on its FBX. This also works for prefabs built from the FBX.
+- Added a **Clear Default AI Motion Synthesizer Assets** button to the `MetaSourceDataProvider` inspector that removes the default AI Motion Synthesizer asset references when AI Motion Synthesizer is disabled.
+
+## What's Changed
+- Re-running the retargeting setup now rebuilds the config from the current model while keeping known joints, auto-mapping exclusions, and removed joints. Setup is also much faster because only the saved config is imported instead of refreshing the whole project.
+- The `Character Retargeter` inspector no longer silently removes `OVRBody` components while drawing. It now shows a warning with a Fix button that replaces them with `MetaSourceDataProvider`, and the change can be undone.
+- Movement SDK shaders and prefabs affected by the Built-in Render Pipeline are now included in the project-wide BiRP warning.
+- The Advanced Samples description in Package Manager now notes that Body Tracking Samples must be imported too.
+- Improved Editor performance in large scenes: the Movement SDK no longer scans the active scene on every Editor update.
+
+## What's Fixed
+- Fixed skinned hand chains becoming disconnected during retargeting when the source and target thumb topologies differ.
+- Fixed retargeting config generation failing for rigs with Blender Rigify-style `.L`/`.R` joint names.
+- Fixed leg jitter in the Hip Pinning sample when a seated user leans forward and back.
+- Fixed `SkeletonData.RemoveJoint` re-parenting children to the wrong joint.
+- Fixed the ONNX Runtime AAR used by AI Motion Synthesizer being excluded from Android builds.
+- Fixed a `NullReferenceException` when clicking the toggle buttons of a `MovementDebugDrawSkeletonMenu` with no retargeters assigned.
+- Fixed **Apply Head Scale** being hidden in the `Character Retargeter` inspector when **Apply Root Scale** is off.
+- Fixed **Run Default Retargeting Setup** and **Add Character Retargeter** overwriting an existing asset named `<Model>-metadata.asset`.
+- Fixed **Meta → Samples → Build Movement SDK Samples** overwriting the project's Product Name and Android package name.
+- Fixed the scene select menu spawn position in the AI Motion Synthesizer and ISDK Locomotion sample scenes.
+
 ## [207.0.0]
 
 ## What's New

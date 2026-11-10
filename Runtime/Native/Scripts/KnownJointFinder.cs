@@ -1028,14 +1028,18 @@ namespace Meta.XR.Movement
             return (leftAnkle, rightAnkle);
         }
 
+        // The single-letter side marker must be a standalone token, otherwise "upper_arm.l" also matches "r_".
+        private static readonly Regex LeftSideToken = new Regex(@"(^|[^a-z0-9])l([^a-z0-9]|$)", RegexOptions.Compiled);
+        private static readonly Regex RightSideToken = new Regex(@"(^|[^a-z0-9])r([^a-z0-9]|$)", RegexOptions.Compiled);
+
         private static bool IsLeftSide(string name)
         {
-            return name.Contains("left") || name.Contains("l_") || name.Contains(".l") || name.Contains("_l");
+            return name.Contains("left") || LeftSideToken.IsMatch(name);
         }
 
         private static bool IsRightSide(string name)
         {
-            return name.Contains("right") || name.Contains("r_") || name.Contains(".r") || name.Contains("_r");
+            return name.Contains("right") || RightSideToken.IsMatch(name);
         }
 
         /// <summary>
