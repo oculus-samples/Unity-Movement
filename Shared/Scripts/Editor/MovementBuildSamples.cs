@@ -97,9 +97,19 @@ namespace Meta.XR.Movement.Editor
                 scenePaths.Insert(0, startingScene);
             }
 
-            SetAllSamplesSettings(includeBodySamples, includeFaceSamples, includeAdvancedSamples);
-            InitializeBuild("movementsamples", "Meta XR Movement SDK Samples");
-            Build("movement_samples.apk", scenePaths.ToArray());
+            var applicationIdentifier = PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android);
+            var productName = PlayerSettings.productName;
+            try
+            {
+                SetAllSamplesSettings(includeBodySamples, includeFaceSamples, includeAdvancedSamples);
+                InitializeBuild("movementsamples", "Meta XR Movement SDK Samples");
+                Build("movement_samples.apk", scenePaths.ToArray());
+            }
+            finally
+            {
+                PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, applicationIdentifier);
+                PlayerSettings.productName = productName;
+            }
         }
 
         /// <summary>

@@ -84,32 +84,75 @@ namespace Meta.XR.Movement.Retargeting.Editor
             EditorGUILayout.PropertyField(_sourceProcessorContainers);
             EditorGUILayout.PropertyField(_targetProcessorContainers);
 
-            // Enforce a skeleton data provider on the object.
-            var retargeter = target as CharacterRetargeter;
-            if (retargeter == null)
+            if (target is CharacterRetargeter retargeter)
+            {
+                RenderSourceDataProviderFix(retargeter);
+            }
+        }
+
+        private static void RenderSourceDataProviderFix(CharacterRetargeter retargeter)
+        {
+            var ovrBodies = retargeter.GetComponentsInChildren<OVRBody>();
+            if (ovrBodies is not { Length: > 0 })
             {
                 return;
             }
 
-            var dataProvider = retargeter.GetComponent<ISourceDataProvider>();
-            var ovrBodies = retargeter.GetComponentsInChildren<OVRBody>();
-            if (ovrBodies is { Length: > 0 })
+            var needsProvider = retargeter.GetComponent<ISourceDataProvider>() == null;
+            var hasPlainBody = false;
+            foreach (var ovrBody in ovrBodies)
             {
-                if (dataProvider == null)
+                if (ovrBody is not ISourceDataProvider)
                 {
-                    retargeter.gameObject.AddComponent<MetaSourceDataProvider>();
-                }
-                else
-                {
-                    foreach (var ovrBody in ovrBodies)
-                    {
-                        if (ovrBody is not ISourceDataProvider)
-                        {
-                            DestroyImmediate(ovrBody);
-                        }
-                    }
+                    hasPlainBody = true;
+                    break;
                 }
             }
+
+            if (!needsProvider && !hasPlainBody)
+            {
+                return;
+            }
+
+            EditorGUILayout.Space();
+            EditorGUILayout.HelpBox(
+                "Character Retargeter reads body tracking data from a Meta Source Data Provider. " +
+                "Plain OVR Body components on this character or its children conflict with it. " +
+                "Fix removes them and adds a Meta Source Data Provider if one is missing.",
+                MessageType.Warning);
+            if (GUILayout.Button("Fix"))
+            {
+                FixSourceDataProvider(retargeter, ovrBodies);
+            }
+        }
+
+        private static void FixSourceDataProvider(CharacterRetargeter retargeter, OVRBody[] ovrBodies)
+        {
+            Undo.IncrementCurrentGroup();
+            var undoGroup = Undo.GetCurrentGroup();
+
+            foreach (var ovrBody in ovrBodies)
+            {
+                if (ovrBody is ISourceDataProvider)
+                {
+                    continue;
+                }
+
+                Debug.LogWarning(
+                    $"Removed OVRBody from '{ovrBody.name}': CharacterRetargeter uses a " +
+                    $"{nameof(MetaSourceDataProvider)} as its body tracking source instead.",
+                    retargeter);
+                Undo.DestroyObjectImmediate(ovrBody);
+            }
+
+            // CharacterRetargeter only reads the provider from its own GameObject, so one on a child does not count.
+            if (retargeter.GetComponent<ISourceDataProvider>() == null)
+            {
+                Undo.AddComponent<MetaSourceDataProvider>(retargeter.gameObject);
+            }
+
+            Undo.SetCurrentGroupName("Replace OVRBody with Meta Source Data Provider");
+            Undo.CollapseUndoOperations(undoGroup);
         }
     }
 }

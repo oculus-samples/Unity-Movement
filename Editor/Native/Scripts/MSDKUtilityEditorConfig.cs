@@ -249,7 +249,8 @@ namespace Meta.XR.Movement.Editor
 
             File.WriteAllText(path, data);
             AssetDatabase.SaveAssetIfDirty(configJson);
-            AssetDatabase.Refresh();
+            // Import only the written file; a full Refresh scans the whole project on every save.
+            AssetDatabase.ImportAsset(path);
             EditorUtility.SetDirty(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
             AssetDatabase.SaveAssets();
             return true;

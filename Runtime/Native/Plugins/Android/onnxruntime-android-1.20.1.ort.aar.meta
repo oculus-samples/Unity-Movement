@@ -12,11 +12,11 @@ PluginImporter:
   validateReferences: 1
   platformData:
     Android:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: ARM64
     Any:
-      enabled: 0
+      enabled: 1
       settings:
         Exclude Android: 0
         Exclude Editor: 1

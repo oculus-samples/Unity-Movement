@@ -48,6 +48,11 @@ namespace Meta.XR.Movement.Samples
 
         public void ToggleSourceSkeletonDraw()
         {
+            if (_retargeters == null)
+            {
+                return;
+            }
+
             foreach (var retargeter in _retargeters)
             {
                 retargeter.DebugDrawSourceSkeleton = !retargeter.DebugDrawSourceSkeleton;
@@ -56,6 +61,11 @@ namespace Meta.XR.Movement.Samples
 
         public void ToggleTargetSkeletonDraw()
         {
+            if (_retargeters == null)
+            {
+                return;
+            }
+
             foreach (var retargeter in _retargeters)
             {
                 retargeter.DebugDrawTargetSkeleton = !retargeter.DebugDrawTargetSkeleton;
@@ -64,6 +74,11 @@ namespace Meta.XR.Movement.Samples
 
         public void ToggleSourceTPoseDraw()
         {
+            if (_retargeters == null)
+            {
+                return;
+            }
+
             foreach (var retargeter in _retargeters)
             {
                 retargeter.DebugDrawSourceTPose = !retargeter.DebugDrawSourceTPose;
@@ -72,6 +87,11 @@ namespace Meta.XR.Movement.Samples
 
         public void ToggleTargetTPoseDraw()
         {
+            if (_retargeters == null)
+            {
+                return;
+            }
+
             foreach (var retargeter in _retargeters)
             {
                 retargeter.DebugDrawTargetTPose = !retargeter.DebugDrawTargetTPose;
@@ -80,6 +100,11 @@ namespace Meta.XR.Movement.Samples
 
         public void ClearSkeletonDraw()
         {
+            if (_retargeters == null)
+            {
+                return;
+            }
+
             foreach (var retargeter in _retargeters)
             {
                 retargeter.DebugDrawSourceSkeleton = false;
