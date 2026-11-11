@@ -90,13 +90,14 @@ namespace Meta.XR.Movement.Editor
 
             if (metadataObj == null)
             {
-                metadataObj = MSDKUtilityEditorMetadata.FindMetadataAsset(target);
+                metadataObj = MSDKUtilityEditorMetadata.FindMetadataAsset(asset) ??
+                              MSDKUtilityEditorMetadata.FindMetadataAsset(target);
                 if (metadataObj == null)
                 {
                     metadataObj = ScriptableObject.CreateInstance<MSDKUtilityEditorMetadata>();
                     metadataObj.Model =
                         AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                    AssetDatabase.CreateAsset(metadataObj, metadataAssetPath);
+                    AssetDatabase.CreateAsset(metadataObj, AssetDatabase.GenerateUniqueAssetPath(metadataAssetPath));
                 }
             }
 
@@ -105,7 +106,7 @@ namespace Meta.XR.Movement.Editor
                 return metadataObj;
             }
 
-            var jsonPath = Path.ChangeExtension(metadataAssetPath.Replace("-metadata", string.Empty), ".json");
+            var jsonPath = assetPathSansExtension + ".json";
             metadataObj.ConfigJson = AssetDatabase.LoadAssetAtPath<TextAsset>(jsonPath);
             if (metadataObj.ConfigJson == null)
             {
@@ -413,7 +414,8 @@ namespace Meta.XR.Movement.Editor
         /// Headless equivalent of opening the Retargeting Configuration Editor and clicking
         /// Next-Next-Next-"Validate and save config"-Done with no manual edits. Produces the same
         /// two artifacts (config JSON + metadata ScriptableObject) without spawning any UI window
-        /// or preview stage.
+        /// or preview stage. An existing config is rebuilt from the current model in place, keeping its
+        /// known joints, auto-mapping exclusions and removed joints.
         /// </summary>
         /// <param name="asset">The FBX or prefab GameObject to configure.</param>
         /// <param name="customDataSourcePath">Optional custom source skeleton data name/path.</param>
@@ -457,27 +459,38 @@ namespace Meta.XR.Movement.Editor
                     sceneCharacter.transform.localScale = Vector3.one * importer.globalScale;
                     rootJoint.localScale = Vector3.one;
                 }
+                WarnIfUnexpectedHeight(asset, SkeletonData.CreateFromTransform(sceneCharacter.transform));
 
                 // 2. Find or create the metadata ScriptableObject (no JSON yet).
                 var metadata = FindOrCreateMetadataAsset(asset);
 
                 // 3. Build the initial JSON from the instantiated character (safe to read transforms;
                 // bypasses MSDKUtilityEditor.CreateRetargetingConfig which mutates the source asset).
-                if (metadata.ConfigJson == null)
+                // An existing config is rebuilt in place so it reflects the current model (e.g. after an
+                // import scale change); the replay below would otherwise keep its stored T-pose.
+                string jsonPath;
+                string previousConfigJson = null;
+                if (metadata.ConfigJson != null)
+                {
+                    jsonPath = AssetDatabase.GetAssetPath(metadata.ConfigJson);
+                    // Read from disk: the TextAsset is stale if the JSON was edited without a reimport.
+                    previousConfigJson = File.Exists(jsonPath) ? File.ReadAllText(jsonPath) : metadata.ConfigJson.text;
+                }
+                else
                 {
                     var assetPath = AssetDatabase.GetAssetPath(asset);
                     var assetPathExtension = Path.GetExtension(assetPath);
-                    var jsonPath = assetPath.Substring(0, assetPath.Length - assetPathExtension.Length) + ".json";
-                    BuildAndSaveInitialConfig(sceneCharacter, jsonPath, customDataSourcePath);
-                    metadata.ConfigJson = AssetDatabase.LoadAssetAtPath<TextAsset>(jsonPath);
-                    if (metadata.ConfigJson == null)
-                    {
-                        Debug.LogError($"RunDefaultRetargetingSetup: failed to create initial config at {jsonPath}.");
-                        return metadata;
-                    }
-                    EditorUtility.SetDirty(metadata);
-                    AssetDatabase.SaveAssets();
+                    jsonPath = assetPath.Substring(0, assetPath.Length - assetPathExtension.Length) + ".json";
                 }
+                BuildAndSaveInitialConfig(sceneCharacter, jsonPath, customDataSourcePath, previousConfigJson);
+                metadata.ConfigJson = AssetDatabase.LoadAssetAtPath<TextAsset>(jsonPath);
+                if (metadata.ConfigJson == null)
+                {
+                    Debug.LogError($"RunDefaultRetargetingSetup: failed to create initial config at {jsonPath}.");
+                    return metadata;
+                }
+                EditorUtility.SetDirty(metadata);
+                AssetDatabase.SaveAssets();
 
                 config.MetadataAssetPath = AssetDatabase.GetAssetPath(asset);
                 config.EditorMetadataObject = metadata;
@@ -599,7 +612,7 @@ namespace Meta.XR.Movement.Editor
 
             metadata = ScriptableObject.CreateInstance<MSDKUtilityEditorMetadata>();
             metadata.Model = asset;
-            AssetDatabase.CreateAsset(metadata, metadataAssetPath);
+            AssetDatabase.CreateAsset(metadata, AssetDatabase.GenerateUniqueAssetPath(metadataAssetPath));
             return metadata;
         }
 
@@ -607,13 +620,36 @@ namespace Meta.XR.Movement.Editor
         /// Builds the initial retargeting config JSON from the instantiated character in the preview
         /// scene and writes it to <paramref name="jsonPath"/>. Mirrors the data-only portion of
         /// <see cref="CreateRetargetingConfig()"/> but never touches the source asset.
+        /// When <paramref name="previousConfigJson"/> is provided, its target joint set, known joints and
+        /// (unless <paramref name="customDataSourceName"/> is set) source skeleton with auto-mapping
+        /// exclusions are carried over.
         /// </summary>
         private static void BuildAndSaveInitialConfig(GameObject sceneCharacter, string jsonPath,
-            string customDataSourceName)
+            string customDataSourceName, string previousConfigJson = null)
         {
+            SkeletonData previousSourceData = null;
+            SkeletonData previousTargetData = null;
+            if (previousConfigJson != null)
+            {
+                try
+                {
+                    previousSourceData =
+                        SkeletonData.CreateFromConfig(previousConfigJson, MSDKUtility.SkeletonType.SourceSkeleton);
+                    previousTargetData =
+                        SkeletonData.CreateFromConfig(previousConfigJson, MSDKUtility.SkeletonType.TargetSkeleton);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"BuildAndSaveInitialConfig: couldn't read the existing config at {jsonPath} " +
+                                     $"({ex.Message}), so it is rebuilt from scratch.");
+                    previousSourceData = null;
+                    previousTargetData = null;
+                }
+            }
+
             var sourceData = !string.IsNullOrEmpty(customDataSourceName)
                 ? FindSourceSkeletonData(customDataSourceName)
-                : FindSourceSkeletonData("OVRSkeletonData");
+                : previousSourceData ?? FindSourceSkeletonData("OVRSkeletonData");
             if (sourceData == null)
             {
                 Debug.LogError("BuildAndSaveInitialConfig: failed to load source skeleton data.");
@@ -621,6 +657,42 @@ namespace Meta.XR.Movement.Editor
             }
 
             var targetData = SkeletonData.CreateFromTransform(sceneCharacter.transform);
+            if (targetData == null)
+            {
+                Debug.LogError("BuildAndSaveInitialConfig: failed to build target skeleton data from the model.");
+                return;
+            }
+            if (previousTargetData != null)
+            {
+                if (previousTargetData.Joints.All(targetData.Joints.Contains))
+                {
+                    targetData.FilterJoints(previousTargetData.Joints);
+                }
+                else
+                {
+                    Debug.LogWarning("BuildAndSaveInitialConfig: the previous config has joints that aren't in the " +
+                                     "model (renamed?), so its removed joints aren't carried over.");
+                }
+
+                // Keep known joints picked in the previous config that still exist in the model, and drop
+                // auto-detected ones that were filtered out above.
+                var knownJoints = targetData.KnownJoints;
+                for (var i = 0; i < knownJoints.Length; i++)
+                {
+                    var previousKnownJoint = i < previousTargetData.KnownJoints.Length
+                        ? previousTargetData.KnownJoints[i]
+                        : null;
+                    if (!string.IsNullOrEmpty(previousKnownJoint) && targetData.Joints.Contains(previousKnownJoint))
+                    {
+                        knownJoints[i] = previousKnownJoint;
+                    }
+                    else if (!string.IsNullOrEmpty(knownJoints[i]) && !targetData.Joints.Contains(knownJoints[i]))
+                    {
+                        knownJoints[i] = string.Empty;
+                    }
+                }
+                targetData.SetKnownJoints(knownJoints);
+            }
             var skinnedMeshes = sceneCharacter.GetComponentsInChildren<SkinnedMeshRenderer>();
             var blendshapeNames = new HashSet<string>();
             foreach (var smr in skinnedMeshes)
@@ -640,7 +712,7 @@ namespace Meta.XR.Movement.Editor
 
             File.WriteAllText(jsonPath, configJsonString);
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            AssetDatabase.ImportAsset(jsonPath);
         }
 
         /// <summary>
@@ -805,6 +877,12 @@ namespace Meta.XR.Movement.Editor
 
             // Get or create target data
             var targetData = customTargetData ?? SkeletonData.CreateFromTransform(targetObject.transform);
+            if (customTargetData == null)
+            {
+                // Only warn when building from the model, not on every edit (e.g. joint removal) in the editor.
+                WarnIfUnexpectedHeight(
+                    PrefabUtility.GetCorrespondingObjectFromOriginalSource(targetObject) ?? targetObject, targetData);
+            }
 
             // Get blendshape data
             var skinnedMeshRenderers = GetValidSkinnedMeshRenderers(targetObject);
@@ -829,7 +907,7 @@ namespace Meta.XR.Movement.Editor
             // Write and create asset
             File.WriteAllText(finalConfigPath, configJsonString);
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            AssetDatabase.ImportAsset(finalConfigPath);
 
             var configAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(finalConfigPath);
             if (configAsset != null)
@@ -1256,6 +1334,60 @@ namespace Meta.XR.Movement.Editor
         {
             var newAlignmentStage = MSDKUtilityEditorStage.CreateInstanceOfStage(assetPath, customDataSourceName);
             StageUtility.GoToStage(newAlignmentStage, true);
+        }
+
+        /// <summary>
+        /// Logs the import Scale Factor to set if a character is authored far from human height. The runtime
+        /// clamps the root scale to <see cref="SkeletonRetargeter.ScaleRange"/> (default 0.8-1.2) while joint
+        /// positions are never clamped, so such a character's mesh skews when retargeted.
+        /// </summary>
+        private static void WarnIfUnexpectedHeight(GameObject asset, SkeletonData targetData)
+        {
+            const float referenceHeight = 1.7f;
+            const float minHeight = 1.0f;
+            const float maxHeight = 2.5f;
+            var tPose = targetData?.TPoseArray;
+            if (tPose == null || tPose.Length == 0)
+            {
+                return;
+            }
+
+            var height = tPose.Max(joint => joint.Position.y) - tPose.Min(joint => joint.Position.y);
+            if (height <= 0.0f || (height >= minHeight && height <= maxHeight))
+            {
+                return;
+            }
+
+            var assetPath = AssetDatabase.GetAssetPath(asset);
+            var assetName = string.IsNullOrEmpty(assetPath) ? asset.name : assetPath;
+            var importer = GetModelImporter(asset);
+            var fix = importer != null
+                ? $"Set the import Scale Factor of '{importer.assetPath}' from {importer.globalScale:G4} to " +
+                  $"{importer.globalScale * referenceHeight / height:G4} (keep Convert Units enabled)"
+                : $"Scale its source model by {referenceHeight / height:G4}";
+            Debug.LogError($"'{assetName}' is {height:F2} m tall in its T-pose (expected {minHeight:F1}-" +
+                             $"{maxHeight:F1} m), so its mesh will skew when retargeted. {fix}. Then run the " +
+                             "retargeting setup again.");
+        }
+
+        /// <summary>
+        /// Finds the model importer behind an FBX, or behind the model a prefab is built from.
+        /// </summary>
+        /// <param name="asset">The FBX or prefab asset.</param>
+        /// <returns>The model importer, or null if the asset isn't backed by a model file.</returns>
+        private static ModelImporter GetModelImporter(GameObject asset)
+        {
+            foreach (var transform in asset.GetComponentsInChildren<Transform>(true))
+            {
+                var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(transform.gameObject) ??
+                             transform.gameObject;
+                if (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) is ModelImporter importer)
+                {
+                    return importer;
+                }
+            }
+
+            return null;
         }
 
         private static SkinnedMeshRenderer[] GetValidSkinnedMeshRenderers(GameObject gameObject)

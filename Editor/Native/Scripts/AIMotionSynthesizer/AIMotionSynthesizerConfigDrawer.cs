@@ -144,6 +144,33 @@ namespace Meta.XR.Movement.AI.Editor
             }
         }
 
+        internal static bool HasDefaultAssets(SerializedProperty property)
+        {
+            foreach (var (prop, path) in DefaultAssets)
+            {
+                if (IsDefaultAsset(property.FindPropertyRelative(prop), path))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal static void ClearDefaultAssets(SerializedProperty property)
+        {
+            foreach (var (prop, path) in DefaultAssets)
+            {
+                var p = property.FindPropertyRelative(prop);
+                if (IsDefaultAsset(p, path))
+                {
+                    p.objectReferenceValue = null;
+                }
+            }
+        }
+
+        private static bool IsDefaultAsset(SerializedProperty p, string path) =>
+            p?.objectReferenceValue != null && AssetDatabase.GetAssetPath(p.objectReferenceValue) == BasePath + path;
+
         private void LoadAssets(SerializedProperty property)
         {
             bool changed = false;

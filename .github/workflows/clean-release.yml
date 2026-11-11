@@ -1,19 +1,43 @@
 name: Clean Release
 on:
   workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
-  build:
+  open-release-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-  call-merge:
-    uses: ./.github/workflows/merge.yml
-  call-cleanup:
-    needs: call-merge
-    uses: ./.github/workflows/cleanup.yml
-  call-release:
-    needs: call-cleanup
-    uses: ./.github/workflows/release.yml
-  call-documentation:
-    needs: call-release
-    uses: ./.github/workflows/documentation.yml
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set Git config
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "Github Actions"
+      - name: Merge dev into main
+        run: |
+          git pull
+          git merge --no-ff --allow-unrelated-histories -X theirs origin/dev -m "[Automated] Merged dev into main"
+      - name: Cleanup deleted files from dev in main
+        run: |
+          git merge --allow-unrelated-histories $(git commit-tree -p HEAD -m "[Automated] Cleanup" origin/dev^{tree})
+      - name: Rename Samples folder
+        run: |
+          git rm Samples.meta
+          git mv Samples Samples~
+          git commit --amend --no-edit --allow-empty
+      # release/** branches are excluded from the "Meta CLA Check" ruleset, so GITHUB_TOKEN can push there.
+      - name: Push release branch
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "BRANCH=release/v$VERSION" >> $GITHUB_ENV
+          git push --force origin HEAD:refs/heads/release/v$VERSION
+      - name: Open pull request into main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --base main --head "$BRANCH" --title "Release v$VERSION" \
+            --body "Merges \`dev\` into \`main\` for v$VERSION. Merging it publishes the GitHub release and documentation."

@@ -957,6 +957,7 @@ namespace Meta.XR.Movement.Retargeting
                 return;
             }
 
+            var removedJointParent = _parentJoints[indexToRemove];
             _joints = _joints.Where((_, index) => index != indexToRemove).ToArray();
             _parentJoints = _parentJoints.Where((_, index) => index != indexToRemove).ToArray();
             _tPoseArray = _tPoseArray.Where((_, index) => index != indexToRemove).ToArray();
@@ -968,7 +969,7 @@ namespace Meta.XR.Movement.Retargeting
             {
                 if (ParentJoints[i] == jointToRemove)
                 {
-                    _parentJoints[i] = ParentJoints[indexToRemove];
+                    _parentJoints[i] = removedJointParent;
                 }
             }
         }
