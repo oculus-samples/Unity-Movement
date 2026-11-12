@@ -38,7 +38,9 @@ jobs:
         run: |
           VERSION=${{ env.VERSION }}
           echo "Looking for changelog entries for version $VERSION"
-          CHANGELOG=$(awk -v ver="$VERSION" 'BEGIN {RS="## "; FS="\n"} $1 ~ ver {for (i=2; i<=NF; i++) print $i}' CHANGELOG.md)
+          # Print the lines under "## [$VERSION]" up to the next "## [" version header.
+          # Splitting records on "## " stopped at the first "## What's New" sub-heading and left the release body empty.
+          CHANGELOG=$(awk -v ver="## [$VERSION]" 'index($0, "## [") == 1 { p = (index($0, ver) == 1); next } p' CHANGELOG.md)
           if [ -z "$CHANGELOG" ]; then
             echo "No changelog entry found for version $VERSION"
           else
